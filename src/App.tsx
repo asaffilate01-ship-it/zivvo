@@ -13,6 +13,9 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import DealerPricing from "./pages/DealerPricing";
 import DealerDashboard from "./pages/DealerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import AgentDashboard from "./pages/AgentDashboard";
+import CreateListing from "./pages/CreateListing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +42,38 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <DealerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/listings/new"
+              element={
+                <ProtectedRoute>
+                  <CreateListing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sell"
+              element={
+                <ProtectedRoute>
+                  <CreateListing />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agent"
+              element={
+                <ProtectedRoute requiredRole="agent">
+                  <AgentDashboard />
                 </ProtectedRoute>
               }
             />
