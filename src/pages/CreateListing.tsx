@@ -234,49 +234,19 @@ const CreateListing = () => {
             <CardTitle className="text-base">Photos ({totalImages}/20)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-              {/* Existing images */}
-              {existingImages.map((src, i) => (
-                <div key={`existing-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
-                  <img src={src} alt="" className="h-full w-full object-cover" />
-                  <button
-                    onClick={() => removeExistingImage(i)}
-                    className="absolute right-1 top-1 rounded-full bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                  {i === 0 && (
-                    <span className="absolute bottom-1 left-1 rounded bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
-                      Cover
-                    </span>
-                  )}
-                </div>
-              ))}
-              {/* New image previews */}
-              {imagePreviews.map((src, i) => (
-                <div key={`new-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-primary/30">
-                  <img src={src} alt="" className="h-full w-full object-cover" />
-                  <button
-                    onClick={() => removeNewImage(i)}
-                    className="absolute right-1 top-1 rounded-full bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                  <span className="absolute bottom-1 left-1 rounded bg-success/90 px-1.5 py-0.5 text-[10px] font-medium text-success-foreground">
-                    New
-                  </span>
-                </div>
-              ))}
-              {totalImages < 20 && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-                >
-                  <ImagePlus className="h-6 w-6" />
-                  <span className="mt-1 text-xs">Add</span>
-                </button>
-              )}
-            </div>
+            <p className="mb-3 text-xs text-muted-foreground">Drag and drop to reorder. First image is the cover photo.</p>
+            <ImageReorder
+              existingImages={existingImages}
+              newPreviews={imagePreviews}
+              onReorderExisting={(imgs) => setExistingImages(imgs)}
+              onReorderNew={(indices) => {
+                setImages((prev) => indices.map((i) => prev[i]));
+                setImagePreviews((prev) => indices.map((i) => prev[i]));
+              }}
+              onRemoveExisting={removeExistingImage}
+              onRemoveNew={removeNewImage}
+              onAddClick={() => fileInputRef.current?.click()}
+            />
             <input
               ref={fileInputRef}
               type="file"

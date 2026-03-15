@@ -257,10 +257,10 @@ const DealerDashboard = () => {
           ))}
         </div>
 
-        {/* Charts */}
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <DashboardChart title="Views (Last 7 Days)" data={viewsChartData} type="area" color="hsl(210, 100%, 52%)" />
-          <DashboardChart title="Enquiries (Last 7 Days)" data={enquiriesChartData} type="bar" color="hsl(152, 60%, 42%)" />
+        {/* Analytics Section */}
+        <div className="mt-8">
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">Analytics & Insights</h2>
+          <SellerAnalytics />
         </div>
 
         {/* Recent Listings */}
