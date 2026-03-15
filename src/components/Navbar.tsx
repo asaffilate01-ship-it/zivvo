@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Car, User, Plus, Heart, LogOut, MessageSquare, Sun, Moon, Monitor } from "lucide-react";
+import { Menu, X, Car, User, Plus, Heart, LogOut, MessageSquare, Sun, Moon, Monitor, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -13,6 +14,34 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { theme, setTheme, resolved } = useTheme();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) { setUnreadCount(0); return; }
+
+    const fetchUnread = async () => {
+      const [messagesRes, enquiriesRes] = await Promise.all([
+        supabase.from("messages").select("id", { count: "exact", head: true }).eq("recipient_id", user.id).eq("read", false),
+        supabase.from("enquiries").select("id", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "unread"),
+      ]);
+      setUnreadCount((messagesRes.count || 0) + (enquiriesRes.count || 0));
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const InboxBadge = () => (
+    <div className="relative">
+      <MessageSquare className="h-5 w-5" />
+      {unreadCount > 0 && (
+        <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+          {unreadCount > 99 ? "99+" : unreadCount}
+        </span>
+      )}
+    </div>
+  );
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -70,7 +99,7 @@ const Navbar = () => {
           {user && (
             <Link to="/inbox">
               <Button variant="ghost" size="icon">
-                <MessageSquare className="h-5 w-5" />
+                <InboxBadge />
               </Button>
             </Link>
           )}
@@ -122,6 +151,13 @@ const Navbar = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          {user && (
+            <Link to="/inbox">
+              <Button variant="ghost" size="icon">
+                <InboxBadge />
+              </Button>
+            </Link>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -155,7 +191,9 @@ const Navbar = () => {
               </Link>
               {user && (
                 <Link to="/inbox" onClick={() => setMobileOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-start">Inbox</Button>
+                  <Button variant="ghost" className="w-full justify-start">
+                    Inbox {unreadCount > 0 && <Badge variant="destructive" className="ml-2 text-xs">{unreadCount}</Badge>}
+                  </Button>
                 </Link>
               )}
               <hr className="my-2 border-border" />

@@ -18,6 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
 const colors = ["Black", "White", "Silver", "Grey", "Blue", "Red", "Green", "Brown", "Beige", "Yellow", "Orange"];
+const doorOptions = ["2", "3", "4", "5"];
+const engineSizes = ["1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "5.0L+"];
 
 const Browse = () => {
   const [searchParams, setSearchParams] = useSearchParams();
