@@ -260,7 +260,10 @@ const CarDetail = () => {
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <Button variant="ghost" size="sm" className="flex-1" onClick={() => setLiked(!liked)}>
+                  <Button variant="ghost" size="sm" className="flex-1" onClick={() => {
+                    if (!user) { toast({ title: "Sign in to save cars" }); return; }
+                    toggle(car.id);
+                  }}>
                     <Heart className={`mr-1 h-4 w-4 ${liked ? "fill-accent text-accent" : ""}`} />
                     Save
                   </Button>
