@@ -7,6 +7,7 @@ import {
   ArrowLeft, Heart, Share2, Phone, Mail, MapPin, Calendar,
   Gauge, Fuel, Settings2, Shield, BadgeCheck, ExternalLink,
   ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck, Loader2,
+  MessageCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
