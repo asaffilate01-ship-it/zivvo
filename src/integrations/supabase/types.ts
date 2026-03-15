@@ -14,6 +14,259 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_commissions: {
+        Row: {
+          agent_id: string
+          amount: number | null
+          commission_rate: number | null
+          created_at: string
+          dealer_id: string
+          id: string
+          paid_at: string | null
+          period_end: string | null
+          period_start: string | null
+          status: string | null
+        }
+        Insert: {
+          agent_id: string
+          amount?: number | null
+          commission_rate?: number | null
+          created_at?: string
+          dealer_id: string
+          id?: string
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          status?: string | null
+        }
+        Update: {
+          agent_id?: string
+          amount?: number | null
+          commission_rate?: number | null
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_commissions_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      car_listings: {
+        Row: {
+          body_type: string | null
+          color: string | null
+          created_at: string
+          dealer_id: string | null
+          description: string | null
+          doors: number | null
+          engine_size: string | null
+          enquiries_count: number | null
+          features: string[] | null
+          finance_check_clear: boolean | null
+          fuel_type: string | null
+          id: string
+          images: string[] | null
+          is_featured: boolean | null
+          legal_check_clear: boolean | null
+          location: string | null
+          make: string
+          mileage: number | null
+          model: string
+          price: number
+          registration: string | null
+          seller_id: string
+          specs: Json | null
+          status: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          transmission: string | null
+          updated_at: string
+          verified: boolean | null
+          views_count: number | null
+          vin: string | null
+          year: number
+        }
+        Insert: {
+          body_type?: string | null
+          color?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          description?: string | null
+          doors?: number | null
+          engine_size?: string | null
+          enquiries_count?: number | null
+          features?: string[] | null
+          finance_check_clear?: boolean | null
+          fuel_type?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean | null
+          legal_check_clear?: boolean | null
+          location?: string | null
+          make: string
+          mileage?: number | null
+          model: string
+          price: number
+          registration?: string | null
+          seller_id: string
+          specs?: Json | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title: string
+          transmission?: string | null
+          updated_at?: string
+          verified?: boolean | null
+          views_count?: number | null
+          vin?: string | null
+          year: number
+        }
+        Update: {
+          body_type?: string | null
+          color?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          description?: string | null
+          doors?: number | null
+          engine_size?: string | null
+          enquiries_count?: number | null
+          features?: string[] | null
+          finance_check_clear?: boolean | null
+          fuel_type?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean | null
+          legal_check_clear?: boolean | null
+          location?: string | null
+          make?: string
+          mileage?: number | null
+          model?: string
+          price?: number
+          registration?: string | null
+          seller_id?: string
+          specs?: Json | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title?: string
+          transmission?: string | null
+          updated_at?: string
+          verified?: boolean | null
+          views_count?: number | null
+          vin?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_listings_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dealers: {
+        Row: {
+          address: string | null
+          approved_by: string | null
+          business_email: string | null
+          business_name: string
+          business_phone: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          kyc_approved_at: string | null
+          kyc_submitted_at: string | null
+          kyc_verified: boolean | null
+          landing_page_config: Json | null
+          logo_url: string | null
+          max_listings: number | null
+          onboarded_by_agent: string | null
+          postcode: string | null
+          slug: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          tier: Database["public"]["Enums"]["dealer_tier"] | null
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          approved_by?: string | null
+          business_email?: string | null
+          business_name: string
+          business_phone?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          kyc_approved_at?: string | null
+          kyc_submitted_at?: string | null
+          kyc_verified?: boolean | null
+          landing_page_config?: Json | null
+          logo_url?: string | null
+          max_listings?: number | null
+          onboarded_by_agent?: string | null
+          postcode?: string | null
+          slug?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          tier?: Database["public"]["Enums"]["dealer_tier"] | null
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          approved_by?: string | null
+          business_email?: string | null
+          business_name?: string
+          business_phone?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          kyc_approved_at?: string | null
+          kyc_submitted_at?: string | null
+          kyc_verified?: boolean | null
+          landing_page_config?: Json | null
+          logo_url?: string | null
+          max_listings?: number | null
+          onboarded_by_agent?: string | null
+          postcode?: string | null
+          slug?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          tier?: Database["public"]["Enums"]["dealer_tier"] | null
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -77,6 +330,14 @@ export type Database = {
     }
     Enums: {
       app_role: "buyer" | "seller" | "dealer" | "agent" | "admin"
+      dealer_tier: "starter" | "professional" | "enterprise"
+      listing_status: "draft" | "active" | "sold" | "expired" | "under_review"
+      subscription_status:
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "trialing"
+        | "incomplete"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -205,6 +466,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["buyer", "seller", "dealer", "agent", "admin"],
+      dealer_tier: ["starter", "professional", "enterprise"],
+      listing_status: ["draft", "active", "sold", "expired", "under_review"],
+      subscription_status: [
+        "active",
+        "past_due",
+        "canceled",
+        "trialing",
+        "incomplete",
+      ],
     },
   },
 } as const
