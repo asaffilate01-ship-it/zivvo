@@ -1,12 +1,15 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
+import { DetailSkeleton } from "@/components/LoadingSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Heart, Share2, Phone, Mail, MapPin, Calendar,
   Gauge, Fuel, Settings2, Shield, BadgeCheck, ExternalLink,
-  ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck, Loader2,
+  ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck,
   MessageCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -40,11 +43,8 @@ const CarDetail = () => {
 
       if (data) {
         setCar(data);
-        // Log view to listing_views table for analytics
         supabase.from("listing_views").insert({ listing_id: id, viewer_id: user?.id || null }).then();
-        // Also increment the aggregate counter
         supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
-        // fetch dealer info if applicable
         if (data.dealer_id) {
           const { data: d } = await supabase.from("dealers").select("business_name, slug, city, business_phone, business_email").eq("id", data.dealer_id).maybeSingle();
           if (d) setDealer(d);
@@ -59,9 +59,7 @@ const CarDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="flex items-center justify-center py-32">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <DetailSkeleton />
         <Footer />
       </div>
     );
@@ -70,14 +68,16 @@ const CarDetail = () => {
   if (!car) {
     return (
       <div className="min-h-screen bg-background">
+        <SEOHead title="Vehicle Not Found" description="This listing may have been removed or sold." />
         <Navbar />
-        <div className="container mx-auto flex flex-col items-center justify-center px-4 py-32 text-center">
-          <Car className="h-16 w-16 text-muted-foreground" />
-          <h1 className="mt-4 font-display text-2xl font-bold">Vehicle Not Found</h1>
-          <p className="mt-2 text-muted-foreground">This listing may have been removed or sold.</p>
-          <Link to="/browse">
-            <Button className="mt-6 gradient-primary border-0">Browse All Cars</Button>
-          </Link>
+        <div className="container mx-auto px-4 py-16">
+          <EmptyState
+            icon={Car}
+            title="Vehicle Not Found"
+            description="This listing may have been removed or sold."
+            actionLabel="Browse All Cars"
+            actionTo="/browse"
+          />
         </div>
         <Footer />
       </div>
@@ -89,18 +89,54 @@ const CarDetail = () => {
   const sellerName = dealer?.business_name || "Private Seller";
   const sellerLocation = car.location || dealer?.city || "";
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: car.title, text: `Check out this ${car.year} ${car.make} ${car.model}`, url });
+      } catch { /* user cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied to clipboard" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title={`${car.title} — $${Number(car.price).toLocaleString()}`}
+        description={`${car.year} ${car.make} ${car.model}. ${car.mileage ? car.mileage.toLocaleString() + " miles." : ""} ${car.fuel_type || ""} ${car.transmission || ""}. ${car.location || ""}`}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Car",
+          "name": car.title,
+          "manufacturer": car.make,
+          "model": car.model,
+          "modelDate": String(car.year),
+          "mileageFromOdometer": car.mileage ? { "@type": "QuantitativeValue", "value": car.mileage, "unitCode": "SMI" } : undefined,
+          "fuelType": car.fuel_type || undefined,
+          "vehicleTransmission": car.transmission || undefined,
+          "color": car.color || undefined,
+          "offers": {
+            "@type": "Offer",
+            "price": car.price,
+            "priceCurrency": "USD",
+            "availability": car.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
+          },
+          "image": images[0],
+        }}
+      />
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
-        <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <nav className="mb-4 flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
           <Link to="/" className="hover:text-primary">Home</Link>
           <span>/</span>
           <Link to="/browse" className="hover:text-primary">Browse</Link>
           <span>/</span>
-          <span className="text-foreground">{car.title}</span>
-        </div>
+          <span className="text-foreground line-clamp-1">{car.title}</span>
+        </nav>
 
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -110,7 +146,7 @@ const CarDetail = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 src={images[currentImage]}
-                alt={car.title}
+                alt={`${car.title} - Image ${currentImage + 1}`}
                 className="aspect-[16/10] w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent" />
@@ -123,6 +159,9 @@ const CarDetail = () => {
                   <Button variant="ghost" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={() => setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1))}>
                     <ChevronRight className="h-5 w-5" />
                   </Button>
+                  <div className="absolute bottom-3 right-3 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
+                    {currentImage + 1} / {images.length}
+                  </div>
                 </>
               )}
 
@@ -132,14 +171,15 @@ const CarDetail = () => {
               </div>
             </div>
 
-            <div className="mt-3 flex gap-2 overflow-x-auto">
+            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
               {images.map((img: string, i: number) => (
                 <button key={i} onClick={() => setCurrentImage(i)} className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${i === currentImage ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                  <img src={img} alt="" className="h-full w-full object-cover" />
+                  <img src={img} alt="" className="h-full w-full object-cover" loading="lazy" />
                 </button>
               ))}
             </div>
 
+            {/* Mobile title/price */}
             <div className="mt-6 lg:hidden">
               <h1 className="font-display text-2xl font-bold text-foreground">{car.title}</h1>
               <p className="mt-2 font-display text-3xl font-bold text-primary">${Number(car.price).toLocaleString()}</p>
@@ -270,9 +310,7 @@ const CarDetail = () => {
                       if (user.id === car.seller_id) { toast({ title: "This is your own listing" }); return; }
                       const ids = [user.id, car.seller_id].sort();
                       const convId = `${car.id}:${ids[0]}:${ids[1]}`;
-                      // Send initial message via inserting to messages, then redirect to inbox
                       navigate("/inbox");
-                      // Store conversation info in sessionStorage for the inbox to pick up
                       sessionStorage.setItem("openChat", JSON.stringify({
                         conversationId: convId,
                         recipientId: car.seller_id,
@@ -294,7 +332,7 @@ const CarDetail = () => {
                     <Heart className={`mr-1 h-4 w-4 ${liked ? "fill-accent text-accent" : ""}`} />
                     Save
                   </Button>
-                  <Button variant="ghost" size="sm" className="flex-1">
+                  <Button variant="ghost" size="sm" className="flex-1" onClick={handleShare}>
                     <Share2 className="mr-1 h-4 w-4" />
                     Share
                   </Button>

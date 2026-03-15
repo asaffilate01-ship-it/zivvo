@@ -3,9 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Browse from "./pages/Browse";
 import CarDetail from "./pages/CarDetail";
@@ -29,106 +31,110 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <SavedCarsProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/browse" element={<Browse />} />
-                <Route path="/car/:id" element={<CarDetail />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/dealers" element={<DealerPricing />} />
-                <Route path="/dealer/:slug" element={<DealerLanding />} />
-                <Route path="/saved" element={<SavedCars />} />
-                <Route
-                  path="/inbox"
-                  element={
-                    <ProtectedRoute>
-                      <Inbox />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <DealerDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/listings/new"
-                  element={
-                    <ProtectedRoute>
-                      <CreateListing />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/listings/edit"
-                  element={
-                    <ProtectedRoute>
-                      <CreateListing />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/sell"
-                  element={
-                    <ProtectedRoute>
-                      <CreateListing />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute requiredRole="admin">
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/agent"
-                  element={
-                    <ProtectedRoute requiredRole="agent">
-                      <AgentDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/agent/onboard"
-                  element={
-                    <ProtectedRoute requiredRole="agent">
-                      <AgentOnboard />
-                    </ProtectedRoute>
-                  }
-                />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </SavedCarsProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <ErrorBoundary>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AuthProvider>
+                <SavedCarsProvider>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/browse" element={<Browse />} />
+                    <Route path="/car/:id" element={<CarDetail />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/dealers" element={<DealerPricing />} />
+                    <Route path="/dealer/:slug" element={<DealerLanding />} />
+                    <Route path="/saved" element={<SavedCars />} />
+                    <Route
+                      path="/inbox"
+                      element={
+                        <ProtectedRoute>
+                          <Inbox />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/profile"
+                      element={
+                        <ProtectedRoute>
+                          <Profile />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <ProtectedRoute>
+                          <DealerDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/dashboard/listings/new"
+                      element={
+                        <ProtectedRoute>
+                          <CreateListing />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/dashboard/listings/edit"
+                      element={
+                        <ProtectedRoute>
+                          <CreateListing />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/sell"
+                      element={
+                        <ProtectedRoute>
+                          <CreateListing />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin"
+                      element={
+                        <ProtectedRoute requiredRole="admin">
+                          <AdminDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/agent"
+                      element={
+                        <ProtectedRoute requiredRole="agent">
+                          <AgentDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/agent/onboard"
+                      element={
+                        <ProtectedRoute requiredRole="agent">
+                          <AgentOnboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </SavedCarsProvider>
+              </AuthProvider>
+            </BrowserRouter>
+          </ErrorBoundary>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

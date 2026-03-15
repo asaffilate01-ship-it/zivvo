@@ -2,6 +2,8 @@ import Navbar from "@/components/Navbar";
 import HeroSearch from "@/components/HeroSearch";
 import CarCard from "@/components/CarCard";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
+import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -25,6 +27,7 @@ const Index = () => {
   const [featured, setFeatured] = useState<any[]>([]);
   const [latest, setLatest] = useState<any[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,14 +38,12 @@ const Index = () => {
       if (featuredRes.data) setFeatured(featuredRes.data);
       if (latestRes.data) setLatest(latestRes.data);
 
-      // Body type counts
       const { data: allActive } = await supabase.from("car_listings").select("body_type").eq("status", "active");
       if (allActive) {
         const counts: Record<string, number> = {};
         allActive.forEach((l: any) => {
           if (l.body_type) counts[l.body_type] = (counts[l.body_type] || 0) + 1;
         });
-        // Map fuel_type for Electric/Hybrid
         const { data: fuelData } = await supabase.from("car_listings").select("fuel_type").eq("status", "active");
         if (fuelData) {
           fuelData.forEach((l: any) => {
@@ -52,12 +53,26 @@ const Index = () => {
         }
         setCategoryCounts(counts);
       }
+      setLoading(false);
     };
     fetchData();
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="AutoVault — Buy & Sell Cars with Confidence"
+        description="Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing."
+        canonical="https://autovault.co"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "AutoVault",
+          "description": "Buy & sell cars with verified dealers and private sellers.",
+          "applicationCategory": "AutomotiveMarketplace",
+          "operatingSystem": "Web",
+        }}
+      />
       <Navbar />
       <HeroSearch />
 
@@ -106,11 +121,17 @@ const Index = () => {
           </Link>
         </div>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {featured.length > 0 ? featured.map((car, i) => (
-            <CarCard key={car.id} car={car} index={i} />
-          )) : (
-            <p className="col-span-full py-12 text-center text-muted-foreground">No featured vehicles yet. Check back soon!</p>
+        <div className="mt-8">
+          {loading ? (
+            <CarGridSkeleton count={4} />
+          ) : featured.length > 0 ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {featured.map((car, i) => (
+                <CarCard key={car.id} car={car} index={i} />
+              ))}
+            </div>
+          ) : (
+            <p className="py-12 text-center text-muted-foreground">No featured vehicles yet. Check back soon!</p>
           )}
         </div>
       </section>
@@ -153,11 +174,17 @@ const Index = () => {
           </Link>
         </div>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {latest.length > 0 ? latest.map((car, i) => (
-            <CarCard key={car.id} car={car} index={i} />
-          )) : (
-            <p className="col-span-full py-12 text-center text-muted-foreground">No listings yet. Be the first to post!</p>
+        <div className="mt-8">
+          {loading ? (
+            <CarGridSkeleton count={4} />
+          ) : latest.length > 0 ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {latest.map((car, i) => (
+                <CarCard key={car.id} car={car} index={i} />
+              ))}
+            </div>
+          ) : (
+            <p className="py-12 text-center text-muted-foreground">No listings yet. Be the first to post!</p>
           )}
         </div>
       </section>
