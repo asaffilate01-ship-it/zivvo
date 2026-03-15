@@ -84,7 +84,7 @@ const AdminDashboard = () => {
     fetchAll();
   };
 
-  const toggleListingStatus = async (listingId: string, newStatus: string) => {
+  const toggleListingStatus = async (listingId: string, newStatus: "active" | "draft" | "sold" | "expired" | "under_review") => {
     await supabase.from("car_listings").update({ status: newStatus }).eq("id", listingId);
     toast({ title: `Listing ${newStatus}` });
     fetchAll();
