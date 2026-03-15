@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Car, User, Plus, Heart, LogOut } from "lucide-react";
+import { Menu, X, Car, User, Plus, Heart, LogOut, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -31,9 +31,6 @@ const Navbar = () => {
           <Link to="/dealers">
             <Button variant="ghost" size="sm">For Dealers</Button>
           </Link>
-          <Link to="/finance-check">
-            <Button variant="ghost" size="sm">Finance Check</Button>
-          </Link>
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
@@ -42,12 +39,19 @@ const Navbar = () => {
               <Heart className="h-5 w-5" />
             </Button>
           </Link>
+          {user && (
+            <Link to="/inbox">
+              <Button variant="ghost" size="icon">
+                <MessageSquare className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
           {user ? (
             <>
-              <Link to="/dashboard">
+              <Link to="/profile">
                 <Button variant="outline" size="sm">
                   <User className="mr-1 h-4 w-4" />
-                  Dashboard
+                  Profile
                 </Button>
               </Link>
               <Button variant="ghost" size="sm" onClick={signOut}>
@@ -99,12 +103,20 @@ const Navbar = () => {
               <Link to="/dealers" onClick={() => setMobileOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">For Dealers</Button>
               </Link>
-              <Link to="/finance-check" onClick={() => setMobileOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start">Finance Check</Button>
+              <Link to="/saved" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">Saved Cars</Button>
               </Link>
+              {user && (
+                <Link to="/inbox" onClick={() => setMobileOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start">Inbox</Button>
+                </Link>
+              )}
               <hr className="my-2 border-border" />
               {user ? (
                 <>
+                  <Link to="/profile" onClick={() => setMobileOpen(false)}>
+                    <Button variant="outline" className="w-full">Profile</Button>
+                  </Link>
                   <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
                     <Button variant="outline" className="w-full">Dashboard</Button>
                   </Link>
