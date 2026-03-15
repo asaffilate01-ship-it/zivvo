@@ -116,7 +116,7 @@ const Browse = () => {
       setLoading(false);
     };
     fetchListings();
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, priceRange, yearRange, mileageMax, sortBy, page]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, page]);
 
   const clearFilters = () => {
     setKeyword("");
