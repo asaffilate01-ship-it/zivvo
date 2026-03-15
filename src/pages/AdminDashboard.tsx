@@ -37,6 +37,8 @@ const AdminDashboard = () => {
   const [allRoles, setAllRoles] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listingSearch, setListingSearch] = useState("");
+  const [listingStatusFilter, setListingStatusFilter] = useState("all");
+  const [userSearch, setUserSearch] = useState("");
   const [dateRange, setDateRange] = useState("month");
   const [loading, setLoading] = useState(true);
   const [selectedDealer, setSelectedDealer] = useState<any>(null);
@@ -139,10 +141,16 @@ const AdminDashboard = () => {
     d.business_email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredListings = listings.filter((l) =>
-    l.title?.toLowerCase().includes(listingSearch.toLowerCase()) ||
-    l.make?.toLowerCase().includes(listingSearch.toLowerCase()) ||
-    l.model?.toLowerCase().includes(listingSearch.toLowerCase())
+  const filteredListings = listings.filter((l) => {
+    const matchesSearch = l.title?.toLowerCase().includes(listingSearch.toLowerCase()) ||
+      l.make?.toLowerCase().includes(listingSearch.toLowerCase()) ||
+      l.model?.toLowerCase().includes(listingSearch.toLowerCase());
+    const matchesStatus = listingStatusFilter === "all" || l.status === listingStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredUsers = allProfiles.filter((p) =>
+    !userSearch || p.full_name?.toLowerCase().includes(userSearch.toLowerCase()) || p.phone?.includes(userSearch)
   );
 
   const revenueChartData = useMemo(() => {
@@ -367,12 +375,23 @@ const AdminDashboard = () => {
             <Card>
               <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="text-base">All Listings ({listings.length})</CardTitle>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <Select value={listingStatusFilter} onValueChange={setListingStatusFilter}>
+                    <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="under_review">Under Review</SelectItem>
+                      <SelectItem value="sold">Sold</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input placeholder="Search listings..." className="pl-9 w-56" value={listingSearch} onChange={(e) => setListingSearch(e.target.value)} />
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => exportCSV(listings, "listings")}><Download className="mr-1 h-4 w-4" /> CSV</Button>
+                  <Button variant="outline" size="sm" onClick={() => exportCSV(filteredListings, "listings")}><Download className="mr-1 h-4 w-4" /> CSV</Button>
                 </div>
               </CardHeader>
               <CardContent className="overflow-x-auto">
@@ -441,8 +460,12 @@ const AdminDashboard = () => {
           {/* Users Tab */}
           <TabsContent value="users" className="mt-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="text-base">All Users ({allProfiles.length})</CardTitle>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input placeholder="Search users..." className="pl-9 w-56" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
+                </div>
               </CardHeader>
               <CardContent className="overflow-x-auto">
                 <Table>
@@ -455,7 +478,7 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {allProfiles.map((p) => {
+                    {filteredUsers.map((p) => {
                       const roles = getUserRoles(p.user_id);
                       return (
                         <TableRow key={p.id}>

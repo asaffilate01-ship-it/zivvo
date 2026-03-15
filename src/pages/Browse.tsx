@@ -18,6 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
 const colors = ["Black", "White", "Silver", "Grey", "Blue", "Red", "Green", "Brown", "Beige", "Yellow", "Orange"];
+const doorOptions = ["2", "3", "4", "5"];
+const engineSizes = ["1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.5L", "3.0L", "3.5L", "4.0L", "5.0L+"];
 
 const Browse = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,6 +30,8 @@ const Browse = () => {
   const [selectedFuel, setSelectedFuel] = useState(searchParams.get("fuel") || "");
   const [selectedTransmission, setSelectedTransmission] = useState(searchParams.get("transmission") || "");
   const [selectedColor, setSelectedColor] = useState(searchParams.get("color") || "");
+  const [selectedDoors, setSelectedDoors] = useState(searchParams.get("doors") || "");
+  const [selectedEngine, setSelectedEngine] = useState(searchParams.get("engine") || "");
   const [priceRange, setPriceRange] = useState([
     parseInt(searchParams.get("priceMin") || "0"),
     parseInt(searchParams.get("priceMax") || "200000"),
@@ -55,6 +59,8 @@ const Browse = () => {
     if (selectedFuel) params.set("fuel", selectedFuel);
     if (selectedTransmission) params.set("transmission", selectedTransmission);
     if (selectedColor) params.set("color", selectedColor);
+    if (selectedDoors) params.set("doors", selectedDoors);
+    if (selectedEngine) params.set("engine", selectedEngine);
     if (priceRange[0] > 0) params.set("priceMin", String(priceRange[0]));
     if (priceRange[1] < 200000) params.set("priceMax", String(priceRange[1]));
     if (yearRange[0] > 2000) params.set("yearMin", String(yearRange[0]));
@@ -63,13 +69,13 @@ const Browse = () => {
     if (sortBy !== "newest") params.set("sort", sortBy);
     if (page > 0) params.set("page", String(page));
     setSearchParams(params, { replace: true });
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, priceRange, yearRange, mileageMax, sortBy, page, setSearchParams]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, page, setSearchParams]);
 
   useEffect(() => { updateURL(); }, [updateURL]);
 
   useEffect(() => {
     setPage(0);
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, priceRange, yearRange, mileageMax, sortBy]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -95,6 +101,8 @@ const Browse = () => {
       if (selectedFuel) query = query.eq("fuel_type", selectedFuel);
       if (selectedTransmission) query = query.eq("transmission", selectedTransmission);
       if (selectedColor) query = query.ilike("color", `%${selectedColor}%`);
+      if (selectedDoors) query = query.eq("doors", parseInt(selectedDoors));
+      if (selectedEngine) query = query.eq("engine_size", selectedEngine);
 
       const orderCol = sortBy === "price_asc" ? "price" : sortBy === "price_desc" ? "price" : sortBy === "mileage_asc" ? "mileage" : "created_at";
       const ascending = sortBy === "price_asc" || sortBy === "mileage_asc";
@@ -108,7 +116,7 @@ const Browse = () => {
       setLoading(false);
     };
     fetchListings();
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, priceRange, yearRange, mileageMax, sortBy, page]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, page]);
 
   const clearFilters = () => {
     setKeyword("");
@@ -117,6 +125,8 @@ const Browse = () => {
     setSelectedFuel("");
     setSelectedTransmission("");
     setSelectedColor("");
+    setSelectedDoors("");
+    setSelectedEngine("");
     setPriceRange([0, 200000]);
     setYearRange([2000, currentYear]);
     setMileageMax(200000);
@@ -128,6 +138,8 @@ const Browse = () => {
   if (selectedFuel) activeFiltersList.push({ label: selectedFuel, clear: () => setSelectedFuel("") });
   if (selectedTransmission) activeFiltersList.push({ label: selectedTransmission, clear: () => setSelectedTransmission("") });
   if (selectedColor) activeFiltersList.push({ label: selectedColor, clear: () => setSelectedColor("") });
+  if (selectedDoors) activeFiltersList.push({ label: `${selectedDoors} doors`, clear: () => setSelectedDoors("") });
+  if (selectedEngine) activeFiltersList.push({ label: selectedEngine, clear: () => setSelectedEngine("") });
   if (priceRange[0] > 0 || priceRange[1] < 200000) activeFiltersList.push({ label: `$${priceRange[0].toLocaleString()}-$${priceRange[1].toLocaleString()}`, clear: () => setPriceRange([0, 200000]) });
   if (yearRange[0] > 2000 || yearRange[1] < currentYear) activeFiltersList.push({ label: `${yearRange[0]}-${yearRange[1]}`, clear: () => setYearRange([2000, currentYear]) });
   if (mileageMax < 200000) activeFiltersList.push({ label: `≤${mileageMax.toLocaleString()} mi`, clear: () => setMileageMax(200000) });
@@ -269,6 +281,28 @@ const Browse = () => {
                   <SelectContent>
                     <SelectItem value="">Any Color</SelectItem>
                     {colors.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Doors</label>
+                <Select value={selectedDoors} onValueChange={setSelectedDoors}>
+                  <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Any</SelectItem>
+                    {doorOptions.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Engine Size</label>
+                <Select value={selectedEngine} onValueChange={setSelectedEngine}>
+                  <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Any</SelectItem>
+                    {engineSizes.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
