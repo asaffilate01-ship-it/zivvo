@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Car, User, Plus, Heart } from "lucide-react";
+import { Menu, X, Car, User, Plus, Heart, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -40,12 +42,27 @@ const Navbar = () => {
               <Heart className="h-5 w-5" />
             </Button>
           </Link>
-          <Link to="/login">
-            <Button variant="outline" size="sm">
-              <User className="mr-1 h-4 w-4" />
-              Sign In
-            </Button>
-          </Link>
+          {user ? (
+            <>
+              <Link to="/dashboard">
+                <Button variant="outline" size="sm">
+                  <User className="mr-1 h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Button variant="ghost" size="sm" onClick={signOut}>
+                <LogOut className="mr-1 h-4 w-4" />
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <Link to="/login">
+              <Button variant="outline" size="sm">
+                <User className="mr-1 h-4 w-4" />
+                Sign In
+              </Button>
+            </Link>
+          )}
           <Link to="/sell">
             <Button size="sm" className="gradient-primary border-0">
               <Plus className="mr-1 h-4 w-4" />
@@ -86,9 +103,20 @@ const Navbar = () => {
                 <Button variant="ghost" className="w-full justify-start">Finance Check</Button>
               </Link>
               <hr className="my-2 border-border" />
-              <Link to="/login" onClick={() => setMobileOpen(false)}>
-                <Button variant="outline" className="w-full">Sign In</Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                    <Button variant="outline" className="w-full">Dashboard</Button>
+                  </Link>
+                  <Button variant="ghost" className="w-full" onClick={() => { signOut(); setMobileOpen(false); }}>
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <Link to="/login" onClick={() => setMobileOpen(false)}>
+                  <Button variant="outline" className="w-full">Sign In</Button>
+                </Link>
+              )}
               <Link to="/sell" onClick={() => setMobileOpen(false)}>
                 <Button className="gradient-primary w-full border-0">Post Ad</Button>
               </Link>
