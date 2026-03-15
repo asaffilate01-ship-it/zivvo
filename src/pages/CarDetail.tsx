@@ -37,7 +37,9 @@ const CarDetail = () => {
 
       if (data) {
         setCar(data);
-        // increment views
+        // Log view to listing_views table for analytics
+        supabase.from("listing_views").insert({ listing_id: id, viewer_id: user?.id || null }).then();
+        // Also increment the aggregate counter
         supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
         // fetch dealer info if applicable
         if (data.dealer_id) {

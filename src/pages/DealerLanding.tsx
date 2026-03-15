@@ -9,11 +9,24 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, MapPin, Phone, Mail, Globe, Loader2, Car, BadgeCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
+interface LandingConfig {
+  hero_title?: string;
+  hero_subtitle?: string;
+  hero_image?: string;
+  accent_color?: string;
+  about_text?: string;
+  show_phone?: boolean;
+  show_email?: boolean;
+  show_address?: boolean;
+  cta_text?: string;
+}
+
 const DealerLanding = () => {
   const { slug } = useParams();
   const [dealer, setDealer] = useState<any>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [config, setConfig] = useState<LandingConfig>({});
 
   useEffect(() => {
     const fetch = async () => {
@@ -26,6 +39,7 @@ const DealerLanding = () => {
 
       if (d) {
         setDealer(d);
+        setConfig((d.landing_page_config as LandingConfig) || {});
         const { data: cars } = await supabase
           .from("car_listings")
           .select("*")
@@ -67,6 +81,11 @@ const DealerLanding = () => {
     );
   }
 
+  const heroImage = config.hero_image || "https://images.unsplash.com/photo-1567818735868-e71b99932e29?w=1920&q=80";
+  const showPhone = config.show_phone !== false;
+  const showEmail = config.show_email !== false;
+  const showAddress = config.show_address !== false;
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -74,7 +93,16 @@ const DealerLanding = () => {
       {/* Hero Banner */}
       <section className="relative overflow-hidden">
         <div className="gradient-dark absolute inset-0" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1567818735868-e71b99932e29?w=1920&q=80')] bg-cover bg-center opacity-15" />
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-15"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
+        {config.accent_color && (
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{ backgroundColor: config.accent_color }}
+          />
+        )}
         <div className="container relative mx-auto px-4 py-16 md:py-24">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl text-center">
             <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-background/10 backdrop-blur-sm">
@@ -85,9 +113,12 @@ const DealerLanding = () => {
               )}
             </div>
             <h1 className="font-display text-3xl font-bold text-primary-foreground md:text-5xl">
-              {dealer.business_name}
+              {config.hero_title || dealer.business_name}
             </h1>
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+            {config.hero_subtitle && (
+              <p className="mt-3 text-lg text-primary-foreground/70">{config.hero_subtitle}</p>
+            )}
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
               {dealer.kyc_verified && (
                 <Badge className="bg-success/20 text-success border-0">
                   <BadgeCheck className="mr-1 h-3 w-3" /> Verified Dealer
@@ -97,24 +128,32 @@ const DealerLanding = () => {
                 {dealer.tier?.charAt(0).toUpperCase() + dealer.tier?.slice(1)} Plan
               </Badge>
             </div>
-            {dealer.description && (
-              <p className="mt-4 text-primary-foreground/70">{dealer.description}</p>
+
+            {config.cta_text && (
+              <a href="#inventory">
+                <Button
+                  className="mt-6 border-0 text-primary-foreground"
+                  style={{ backgroundColor: config.accent_color || undefined }}
+                >
+                  {config.cta_text}
+                </Button>
+              </a>
             )}
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-primary-foreground/60">
-              {(dealer.city || dealer.address) && (
+              {showAddress && (dealer.city || dealer.address) && (
                 <span className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
                   {[dealer.address, dealer.city, dealer.postcode].filter(Boolean).join(", ")}
                 </span>
               )}
-              {dealer.business_phone && (
+              {showPhone && dealer.business_phone && (
                 <span className="flex items-center gap-1">
                   <Phone className="h-4 w-4" />
                   {dealer.business_phone}
                 </span>
               )}
-              {dealer.business_email && (
+              {showEmail && dealer.business_email && (
                 <span className="flex items-center gap-1">
                   <Mail className="h-4 w-4" />
                   {dealer.business_email}
@@ -131,8 +170,18 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* About Section */}
+      {config.about_text && (
+        <section className="border-b border-border">
+          <div className="container mx-auto max-w-3xl px-4 py-10 text-center">
+            <h2 className="font-display text-xl font-bold text-foreground">About Us</h2>
+            <p className="mt-3 leading-relaxed text-muted-foreground whitespace-pre-line">{config.about_text}</p>
+          </div>
+        </section>
+      )}
+
       {/* Inventory */}
-      <div className="container mx-auto px-4 py-10">
+      <div id="inventory" className="container mx-auto px-4 py-10">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-2xl font-bold text-foreground">
             Our Inventory
