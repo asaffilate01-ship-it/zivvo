@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ImagePlus, X, Upload, ArrowRight, Car } from "lucide-react";
+import { ImagePlus, X, ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -33,10 +29,14 @@ const CreateListing = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(!!editId);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -57,13 +57,54 @@ const CreateListing = () => {
     location: "",
   });
 
+  // Load existing listing for editing
+  useEffect(() => {
+    if (!editId || !user) return;
+    const loadListing = async () => {
+      const { data } = await supabase
+        .from("car_listings")
+        .select("*")
+        .eq("id", editId)
+        .eq("seller_id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        setForm({
+          title: data.title || "",
+          make: data.make || "",
+          model: data.model || "",
+          year: data.year,
+          price: String(data.price),
+          mileage: data.mileage ? String(data.mileage) : "",
+          fuel_type: data.fuel_type || "",
+          transmission: data.transmission || "",
+          body_type: data.body_type || "",
+          color: data.color || "",
+          doors: data.doors ? String(data.doors) : "4",
+          engine_size: data.engine_size || "",
+          registration: data.registration || "",
+          vin: data.vin || "",
+          description: data.description || "",
+          location: data.location || "",
+        });
+        setExistingImages(data.images || []);
+      } else {
+        toast({ title: "Listing not found", variant: "destructive" });
+        navigate("/dashboard");
+      }
+      setPageLoading(false);
+    };
+    loadListing();
+  }, [editId, user]);
+
   const updateField = (field: string, value: string | number) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (images.length + files.length > 20) {
+    const totalCount = existingImages.length + images.length + files.length;
+    if (totalCount > 20) {
       toast({ title: "Max 20 images", variant: "destructive" });
       return;
     }
@@ -75,9 +116,13 @@ const CreateListing = () => {
     });
   };
 
-  const removeImage = (index: number) => {
+  const removeNewImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (status: "draft" | "active") => {
@@ -90,7 +135,7 @@ const CreateListing = () => {
     setLoading(true);
 
     try {
-      // Upload images
+      // Upload new images
       const uploadedUrls: string[] = [];
       for (const file of images) {
         const ext = file.name.split(".").pop();
@@ -105,18 +150,10 @@ const CreateListing = () => {
         }
       }
 
-      // Check if user is a dealer
-      const { data: dealer } = await supabase
-        .from("dealers")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
+      const allImages = [...existingImages, ...uploadedUrls];
       const title = form.title || `${form.year} ${form.make} ${form.model}`;
 
-      const { error } = await supabase.from("car_listings").insert({
-        seller_id: user.id,
-        dealer_id: dealer?.id || null,
+      const listingData = {
         title,
         make: form.make,
         model: form.model,
@@ -133,49 +170,103 @@ const CreateListing = () => {
         vin: form.vin || null,
         description: form.description || null,
         location: form.location || null,
-        images: uploadedUrls,
+        images: allImages,
         status,
-      });
+      };
 
-      if (error) throw error;
+      if (editId) {
+        const { error } = await supabase.from("car_listings")
+          .update(listingData)
+          .eq("id", editId)
+          .eq("seller_id", user.id);
+        if (error) throw error;
+        toast({ title: "Listing updated!" });
+      } else {
+        // Check if user is a dealer
+        const { data: dealer } = await supabase
+          .from("dealers").select("id").eq("user_id", user.id).maybeSingle();
 
-      toast({ title: status === "draft" ? "Draft saved" : "Listing published!" });
+        const { error } = await supabase.from("car_listings").insert({
+          ...listingData,
+          seller_id: user.id,
+          dealer_id: dealer?.id || null,
+        });
+        if (error) throw error;
+        toast({ title: status === "draft" ? "Draft saved" : "Listing published!" });
+      }
+
       navigate("/dashboard");
     } catch (err: any) {
-      toast({ title: "Error creating listing", description: err.message, variant: "destructive" });
+      toast({ title: "Error saving listing", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
+
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
+
+  const totalImages = existingImages.length + images.length;
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto max-w-3xl px-4 py-8">
         <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-          Create Listing
+          {editId ? "Edit Listing" : "Create Listing"}
         </h1>
-        <p className="mt-1 text-muted-foreground">Add a new vehicle to the marketplace</p>
+        <p className="mt-1 text-muted-foreground">
+          {editId ? "Update your vehicle listing" : "Add a new vehicle to the marketplace"}
+        </p>
 
         {/* Images */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle className="text-base">Photos (up to 20)</CardTitle>
+            <CardTitle className="text-base">Photos ({totalImages}/20)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-              {imagePreviews.map((src, i) => (
-                <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+              {/* Existing images */}
+              {existingImages.map((src, i) => (
+                <div key={`existing-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
                   <img src={src} alt="" className="h-full w-full object-cover" />
                   <button
-                    onClick={() => removeImage(i)}
+                    onClick={() => removeExistingImage(i)}
                     className="absolute right-1 top-1 rounded-full bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
                   >
                     <X className="h-3 w-3" />
                   </button>
+                  {i === 0 && (
+                    <span className="absolute bottom-1 left-1 rounded bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
+                      Cover
+                    </span>
+                  )}
                 </div>
               ))}
-              {images.length < 20 && (
+              {/* New image previews */}
+              {imagePreviews.map((src, i) => (
+                <div key={`new-${i}`} className="group relative aspect-square overflow-hidden rounded-lg border border-primary/30">
+                  <img src={src} alt="" className="h-full w-full object-cover" />
+                  <button
+                    onClick={() => removeNewImage(i)}
+                    className="absolute right-1 top-1 rounded-full bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                  <span className="absolute bottom-1 left-1 rounded bg-success/90 px-1.5 py-0.5 text-[10px] font-medium text-success-foreground">
+                    New
+                  </span>
+                </div>
+              ))}
+              {totalImages < 20 && (
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
@@ -208,9 +299,7 @@ const CreateListing = () => {
                 <Select value={form.make} onValueChange={(v) => updateField("make", v)}>
                   <SelectTrigger><SelectValue placeholder="Select make" /></SelectTrigger>
                   <SelectContent>
-                    {makes.map((m) => (
-                      <SelectItem key={m} value={m}>{m}</SelectItem>
-                    ))}
+                    {makes.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -336,7 +425,7 @@ const CreateListing = () => {
             Save as Draft
           </Button>
           <Button className="gradient-primary flex-1 border-0" onClick={() => handleSubmit("active")} disabled={loading}>
-            {loading ? "Publishing..." : "Publish Listing"}
+            {loading ? "Saving..." : editId ? "Update Listing" : "Publish Listing"}
             <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
         </div>
