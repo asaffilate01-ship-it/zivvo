@@ -2,17 +2,31 @@ import { Link } from "react-router-dom";
 import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { CarListing } from "@/lib/mockData";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
 interface CarCardProps {
-  car: CarListing;
+  car: {
+    id: string;
+    title: string;
+    make: string;
+    model: string;
+    year: number;
+    price: number;
+    mileage?: number | null;
+    fuel_type?: string | null;
+    location?: string | null;
+    images?: string[] | null;
+    is_featured?: boolean | null;
+    verified?: boolean | null;
+    dealer_id?: string | null;
+  };
   index?: number;
 }
 
 const CarCard = ({ car, index = 0 }: CarCardProps) => {
   const [liked, setLiked] = useState(false);
+  const mainImage = car.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80";
 
   return (
     <motion.div
@@ -24,7 +38,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
         <div className="shadow-card overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:shadow-elevated hover:-translate-y-1">
           <div className="relative aspect-[16/10] overflow-hidden">
             <img
-              src={car.images[0]}
+              src={mainImage}
               alt={car.title}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
@@ -32,7 +46,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
 
             <div className="absolute left-3 top-3 flex gap-1.5">
-              {car.featured && (
+              {car.is_featured && (
                 <Badge className="gradient-primary border-0 text-xs font-semibold text-primary-foreground">
                   Featured
                 </Badge>
@@ -59,7 +73,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
 
             <div className="absolute bottom-3 left-3">
               <p className="font-display text-2xl font-bold text-primary-foreground">
-                ${car.price.toLocaleString()}
+                ${Number(car.price).toLocaleString()}
               </p>
             </div>
           </div>
@@ -74,23 +88,29 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
                 <Calendar className="h-3.5 w-3.5" />
                 {car.year}
               </span>
-              <span className="flex items-center gap-1">
-                <Gauge className="h-3.5 w-3.5" />
-                {car.mileage.toLocaleString()} mi
-              </span>
-              <span className="flex items-center gap-1">
-                <Fuel className="h-3.5 w-3.5" />
-                {car.fuelType}
-              </span>
+              {car.mileage != null && (
+                <span className="flex items-center gap-1">
+                  <Gauge className="h-3.5 w-3.5" />
+                  {car.mileage.toLocaleString()} mi
+                </span>
+              )}
+              {car.fuel_type && (
+                <span className="flex items-center gap-1">
+                  <Fuel className="h-3.5 w-3.5" />
+                  {car.fuel_type}
+                </span>
+              )}
             </div>
 
             <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
-              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5" />
-                {car.location}
-              </div>
-              <Badge variant={car.sellerType === "dealer" ? "default" : "outline"} className="text-xs">
-                {car.sellerType === "dealer" ? (
+              {car.location && (
+                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <MapPin className="h-3.5 w-3.5" />
+                  {car.location}
+                </div>
+              )}
+              <Badge variant={car.dealer_id ? "default" : "outline"} className="text-xs">
+                {car.dealer_id ? (
                   <><Shield className="mr-1 h-3 w-3" /> Dealer</>
                 ) : (
                   "Private"
