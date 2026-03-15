@@ -101,6 +101,8 @@ const Browse = () => {
       if (selectedFuel) query = query.eq("fuel_type", selectedFuel);
       if (selectedTransmission) query = query.eq("transmission", selectedTransmission);
       if (selectedColor) query = query.ilike("color", `%${selectedColor}%`);
+      if (selectedDoors) query = query.eq("doors", parseInt(selectedDoors));
+      if (selectedEngine) query = query.eq("engine_size", selectedEngine);
 
       const orderCol = sortBy === "price_asc" ? "price" : sortBy === "price_desc" ? "price" : sortBy === "mileage_asc" ? "mileage" : "created_at";
       const ascending = sortBy === "price_asc" || sortBy === "mileage_asc";
