@@ -30,6 +30,8 @@ const Browse = () => {
   const [selectedFuel, setSelectedFuel] = useState(searchParams.get("fuel") || "");
   const [selectedTransmission, setSelectedTransmission] = useState(searchParams.get("transmission") || "");
   const [selectedColor, setSelectedColor] = useState(searchParams.get("color") || "");
+  const [selectedDoors, setSelectedDoors] = useState(searchParams.get("doors") || "");
+  const [selectedEngine, setSelectedEngine] = useState(searchParams.get("engine") || "");
   const [priceRange, setPriceRange] = useState([
     parseInt(searchParams.get("priceMin") || "0"),
     parseInt(searchParams.get("priceMax") || "200000"),
