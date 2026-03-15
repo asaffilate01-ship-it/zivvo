@@ -59,6 +59,8 @@ const Browse = () => {
     if (selectedFuel) params.set("fuel", selectedFuel);
     if (selectedTransmission) params.set("transmission", selectedTransmission);
     if (selectedColor) params.set("color", selectedColor);
+    if (selectedDoors) params.set("doors", selectedDoors);
+    if (selectedEngine) params.set("engine", selectedEngine);
     if (priceRange[0] > 0) params.set("priceMin", String(priceRange[0]));
     if (priceRange[1] < 200000) params.set("priceMax", String(priceRange[1]));
     if (yearRange[0] > 2000) params.set("yearMin", String(yearRange[0]));
@@ -67,7 +69,7 @@ const Browse = () => {
     if (sortBy !== "newest") params.set("sort", sortBy);
     if (page > 0) params.set("page", String(page));
     setSearchParams(params, { replace: true });
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, priceRange, yearRange, mileageMax, sortBy, page, setSearchParams]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, page, setSearchParams]);
 
   useEffect(() => { updateURL(); }, [updateURL]);
 
