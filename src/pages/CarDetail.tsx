@@ -7,6 +7,7 @@ import {
   ArrowLeft, Heart, Share2, Phone, Mail, MapPin, Calendar,
   Gauge, Fuel, Settings2, Shield, BadgeCheck, ExternalLink,
   ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck, Loader2,
+  MessageCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -14,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
 
 const CarDetail = () => {
@@ -25,6 +27,7 @@ const CarDetail = () => {
   const { isSaved, toggle } = useSavedCars();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const liked = car ? isSaved(car.id) : false;
 
   useEffect(() => {
@@ -37,7 +40,9 @@ const CarDetail = () => {
 
       if (data) {
         setCar(data);
-        // increment views
+        // Log view to listing_views table for analytics
+        supabase.from("listing_views").insert({ listing_id: id, viewer_id: user?.id || null }).then();
+        // Also increment the aggregate counter
         supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
         // fetch dealer info if applicable
         if (data.dealer_id) {
@@ -257,6 +262,28 @@ const CarDetail = () => {
                     Show Phone Number
                   </Button>
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      if (!user) { toast({ title: "Sign in to message sellers" }); return; }
+                      if (user.id === car.seller_id) { toast({ title: "This is your own listing" }); return; }
+                      const ids = [user.id, car.seller_id].sort();
+                      const convId = `${car.id}:${ids[0]}:${ids[1]}`;
+                      // Send initial message via inserting to messages, then redirect to inbox
+                      navigate("/inbox");
+                      // Store conversation info in sessionStorage for the inbox to pick up
+                      sessionStorage.setItem("openChat", JSON.stringify({
+                        conversationId: convId,
+                        recipientId: car.seller_id,
+                        recipientName: sellerName,
+                        listingTitle: car.title,
+                      }));
+                    }}
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Message Seller
+                  </Button>
                 </div>
 
                 <div className="mt-4 flex gap-2">

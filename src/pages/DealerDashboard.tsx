@@ -13,6 +13,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DashboardChart from "@/components/DashboardChart";
+import DealerPageBuilder from "@/components/DealerPageBuilder";
+import SellerAnalytics from "@/components/SellerAnalytics";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -197,6 +199,12 @@ const DealerDashboard = () => {
               <CreditCard className="mr-1 h-4 w-4" />
               {portalLoading ? "Loading..." : "Manage Subscription"}
             </Button>
+            <DealerPageBuilder
+              dealerId={dealer.id}
+              currentConfig={(dealer as any).landing_page_config || {}}
+              businessName={dealer.business_name}
+              onSaved={() => {}}
+            />
             <Link to={`/dealer/${dealer.slug}`}><Button variant="outline" size="sm"><ExternalLink className="mr-1 h-4 w-4" /> Landing Page</Button></Link>
             <Link to="/dashboard/listings/new">
               <Button size="sm" className="gradient-primary border-0" disabled={summary.active >= dealer.max_listings && dealer.max_listings !== 9999}>
@@ -249,10 +257,10 @@ const DealerDashboard = () => {
           ))}
         </div>
 
-        {/* Charts */}
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <DashboardChart title="Views (Last 7 Days)" data={viewsChartData} type="area" color="hsl(210, 100%, 52%)" />
-          <DashboardChart title="Enquiries (Last 7 Days)" data={enquiriesChartData} type="bar" color="hsl(152, 60%, 42%)" />
+        {/* Analytics Section */}
+        <div className="mt-8">
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">Analytics & Insights</h2>
+          <SellerAnalytics />
         </div>
 
         {/* Recent Listings */}
