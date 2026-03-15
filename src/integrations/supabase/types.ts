@@ -267,6 +267,59 @@ export type Database = {
         }
         Relationships: []
       }
+      enquiries: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          message: string
+          replied_at: string | null
+          reply: string | null
+          seller_id: string
+          sender_email: string | null
+          sender_id: string
+          sender_name: string | null
+          sender_phone: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          message: string
+          replied_at?: string | null
+          reply?: string | null
+          seller_id: string
+          sender_email?: string | null
+          sender_id: string
+          sender_name?: string | null
+          sender_phone?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          message?: string
+          replied_at?: string | null
+          reply?: string | null
+          seller_id?: string
+          sender_email?: string | null
+          sender_id?: string
+          sender_name?: string | null
+          sender_phone?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -296,6 +349,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      saved_cars: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_cars_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
