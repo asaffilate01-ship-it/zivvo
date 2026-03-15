@@ -141,10 +141,16 @@ const AdminDashboard = () => {
     d.business_email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredListings = listings.filter((l) =>
-    l.title?.toLowerCase().includes(listingSearch.toLowerCase()) ||
-    l.make?.toLowerCase().includes(listingSearch.toLowerCase()) ||
-    l.model?.toLowerCase().includes(listingSearch.toLowerCase())
+  const filteredListings = listings.filter((l) => {
+    const matchesSearch = l.title?.toLowerCase().includes(listingSearch.toLowerCase()) ||
+      l.make?.toLowerCase().includes(listingSearch.toLowerCase()) ||
+      l.model?.toLowerCase().includes(listingSearch.toLowerCase());
+    const matchesStatus = listingStatusFilter === "all" || l.status === listingStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredUsers = allProfiles.filter((p) =>
+    !userSearch || p.full_name?.toLowerCase().includes(userSearch.toLowerCase()) || p.phone?.includes(userSearch)
   );
 
   const revenueChartData = useMemo(() => {
