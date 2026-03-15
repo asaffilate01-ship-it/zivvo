@@ -1,37 +1,59 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { mockListings } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft,
-  Heart,
-  Share2,
-  Phone,
-  Mail,
-  MapPin,
-  Calendar,
-  Gauge,
-  Fuel,
-  Settings2,
-  Shield,
-  BadgeCheck,
-  ExternalLink,
-  ChevronLeft,
-  ChevronRight,
-  AlertTriangle,
-  Car,
-  FileCheck,
+  ArrowLeft, Heart, Share2, Phone, Mail, MapPin, Calendar,
+  Gauge, Fuel, Settings2, Shield, BadgeCheck, ExternalLink,
+  ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck, Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
 const CarDetail = () => {
   const { id } = useParams();
-  const car = mockListings.find((c) => c.id === id);
+  const [car, setCar] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
   const [liked, setLiked] = useState(false);
+  const [dealer, setDealer] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchCar = async () => {
+      const { data } = await supabase
+        .from("car_listings")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (data) {
+        setCar(data);
+        // increment views
+        supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
+        // fetch dealer info if applicable
+        if (data.dealer_id) {
+          const { data: d } = await supabase.from("dealers").select("business_name, slug, city, business_phone, business_email").eq("id", data.dealer_id).maybeSingle();
+          if (d) setDealer(d);
+        }
+      }
+      setLoading(false);
+    };
+    fetchCar();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center py-32">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!car) {
     return (
@@ -49,6 +71,11 @@ const CarDetail = () => {
       </div>
     );
   }
+
+  const images = car.images?.length ? car.images : ["https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80"];
+  const specs = (car.specs as Record<string, any>) || {};
+  const sellerName = dealer?.business_name || "Private Seller";
+  const sellerLocation = car.location || dealer?.city || "";
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,54 +97,32 @@ const CarDetail = () => {
                 key={currentImage}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                src={car.images[currentImage]}
+                src={images[currentImage]}
                 alt={car.title}
                 className="aspect-[16/10] w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent" />
 
-              {car.images.length > 1 && (
+              {images.length > 1 && (
                 <>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm"
-                    onClick={() => setCurrentImage((p) => (p === 0 ? car.images.length - 1 : p - 1))}
-                  >
+                  <Button variant="ghost" size="icon" className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={() => setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1))}>
                     <ChevronLeft className="h-5 w-5" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm"
-                    onClick={() => setCurrentImage((p) => (p === car.images.length - 1 ? 0 : p + 1))}
-                  >
+                  <Button variant="ghost" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={() => setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1))}>
                     <ChevronRight className="h-5 w-5" />
                   </Button>
                 </>
               )}
 
               <div className="absolute left-3 top-3 flex gap-2">
-                {car.featured && (
-                  <Badge className="gradient-primary border-0 text-primary-foreground">Featured</Badge>
-                )}
-                {car.verified && (
-                  <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm">
-                    <BadgeCheck className="mr-1 h-3 w-3 text-success" /> Verified
-                  </Badge>
-                )}
+                {car.is_featured && <Badge className="gradient-primary border-0 text-primary-foreground">Featured</Badge>}
+                {car.verified && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" /> Verified</Badge>}
               </div>
             </div>
 
-            <div className="mt-3 flex gap-2">
-              {car.images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentImage(i)}
-                  className={`h-16 w-24 overflow-hidden rounded-lg border-2 transition-all ${
-                    i === currentImage ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"
-                  }`}
-                >
+            <div className="mt-3 flex gap-2 overflow-x-auto">
+              {images.map((img: string, i: number) => (
+                <button key={i} onClick={() => setCurrentImage(i)} className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${i === currentImage ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}>
                   <img src={img} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
@@ -125,17 +130,15 @@ const CarDetail = () => {
 
             <div className="mt-6 lg:hidden">
               <h1 className="font-display text-2xl font-bold text-foreground">{car.title}</h1>
-              <p className="mt-2 font-display text-3xl font-bold text-primary">
-                ${car.price.toLocaleString()}
-              </p>
+              <p className="mt-2 font-display text-3xl font-bold text-primary">${Number(car.price).toLocaleString()}</p>
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { icon: Calendar, label: "Year", value: car.year },
-                { icon: Gauge, label: "Mileage", value: `${car.mileage.toLocaleString()} mi` },
-                { icon: Fuel, label: "Fuel", value: car.fuelType },
-                { icon: Settings2, label: "Transmission", value: car.transmission },
+                { icon: Gauge, label: "Mileage", value: car.mileage ? `${car.mileage.toLocaleString()} mi` : "N/A" },
+                { icon: Fuel, label: "Fuel", value: car.fuel_type || "N/A" },
+                { icon: Settings2, label: "Transmission", value: car.transmission || "N/A" },
               ].map((spec) => (
                 <div key={spec.label} className="rounded-xl border border-border bg-card p-4">
                   <spec.icon className="h-5 w-5 text-primary" />
@@ -149,13 +152,14 @@ const CarDetail = () => {
               <h2 className="font-display text-xl font-bold text-foreground">Technical Specifications</h2>
               <div className="mt-4 grid grid-cols-2 gap-y-3 rounded-xl border border-border bg-card p-5 sm:grid-cols-3">
                 {[
-                  { label: "Engine", value: car.specs.engine },
-                  { label: "Power", value: car.specs.power },
-                  { label: "Drivetrain", value: car.specs.drivetrain },
-                  { label: "Body Type", value: car.bodyType },
-                  { label: "Doors", value: car.specs.doors },
-                  { label: "Seats", value: car.specs.seats },
-                  { label: "Color", value: car.color },
+                  { label: "Engine", value: car.engine_size || specs.engine || "N/A" },
+                  { label: "Power", value: specs.power || "N/A" },
+                  { label: "Drivetrain", value: specs.drivetrain || "N/A" },
+                  { label: "Body Type", value: car.body_type || "N/A" },
+                  { label: "Doors", value: car.doors || specs.doors || "N/A" },
+                  { label: "Color", value: car.color || "N/A" },
+                  { label: "VIN", value: car.vin || "N/A" },
+                  { label: "Registration", value: car.registration || "N/A" },
                 ].map((item) => (
                   <div key={item.label}>
                     <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -165,10 +169,23 @@ const CarDetail = () => {
               </div>
             </div>
 
-            <div className="mt-8">
-              <h2 className="font-display text-xl font-bold text-foreground">Description</h2>
-              <p className="mt-3 leading-relaxed text-muted-foreground">{car.description}</p>
-            </div>
+            {car.description && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground">Description</h2>
+                <p className="mt-3 leading-relaxed text-muted-foreground whitespace-pre-line">{car.description}</p>
+              </div>
+            )}
+
+            {car.features && car.features.length > 0 && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground">Features</h2>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {car.features.map((f: string) => (
+                    <Badge key={f} variant="secondary">{f}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Vehicle Checks</h2>
@@ -201,14 +218,10 @@ const CarDetail = () => {
             <div className="sticky top-20 space-y-4">
               <div className="hidden rounded-2xl border border-border bg-card p-6 shadow-card lg:block">
                 <h1 className="font-display text-xl font-bold text-card-foreground">{car.title}</h1>
-                <p className="mt-3 font-display text-3xl font-bold text-primary">
-                  ${car.price.toLocaleString()}
+                <p className="mt-3 font-display text-3xl font-bold text-primary">${Number(car.price).toLocaleString()}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Finance from ~${Math.round(Number(car.price) / 48).toLocaleString()}/mo
                 </p>
-                {car.financeAvailable && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Finance from ~${Math.round(car.price / 48).toLocaleString()}/mo
-                  </p>
-                )}
               </div>
 
               <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
@@ -217,17 +230,19 @@ const CarDetail = () => {
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="font-display font-semibold text-card-foreground">{car.sellerName}</p>
-                    <Badge variant={car.sellerType === "dealer" ? "default" : "outline"} className="text-xs">
-                      {car.sellerType === "dealer" ? "Verified Dealer" : "Private Seller"}
+                    <p className="font-display font-semibold text-card-foreground">{sellerName}</p>
+                    <Badge variant={car.dealer_id ? "default" : "outline"} className="text-xs">
+                      {car.dealer_id ? "Verified Dealer" : "Private Seller"}
                     </Badge>
                   </div>
                 </div>
 
-                <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {car.location}
-                </div>
+                {sellerLocation && (
+                  <div className="mt-3 flex items-center gap-1 text-sm text-muted-foreground">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {sellerLocation}
+                  </div>
+                )}
 
                 <div className="mt-5 space-y-2">
                   <Button className="w-full gradient-primary border-0">
@@ -251,6 +266,15 @@ const CarDetail = () => {
                   </Button>
                 </div>
               </div>
+
+              {dealer?.slug && (
+                <Link to={`/dealer/${dealer.slug}`}>
+                  <Button variant="outline" className="w-full">
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    View Dealer Showroom
+                  </Button>
+                </Link>
+              )}
 
               <div className="rounded-2xl border border-border bg-warning/5 p-5">
                 <h4 className="flex items-center gap-2 font-display font-semibold text-foreground">
