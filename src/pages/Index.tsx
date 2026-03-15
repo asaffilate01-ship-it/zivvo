@@ -1,12 +1,208 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Navbar from "@/components/Navbar";
+import HeroSearch from "@/components/HeroSearch";
+import CarCard from "@/components/CarCard";
+import Footer from "@/components/Footer";
+import { mockListings } from "@/lib/mockData";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Shield,
+  Search,
+  FileCheck,
+  Car,
+  Truck,
+  Zap,
+  Globe,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
+const categories = [
+  { icon: Car, label: "Sedan", count: "5,200" },
+  { icon: Truck, label: "SUV", count: "4,800" },
+  { icon: Car, label: "Coupe", count: "2,100" },
+  { icon: Zap, label: "Electric", count: "1,900" },
+  { icon: Car, label: "Estate", count: "1,400" },
+  { icon: Globe, label: "Hybrid", count: "2,300" },
+];
 
 const Index = () => {
+  const featured = mockListings.filter((c) => c.featured);
+  const latest = mockListings.slice(0, 8);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSearch />
+
+      {/* Categories */}
+      <section className="container mx-auto px-4 py-14">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+              Browse by Category
+            </h2>
+            <p className="mt-1 text-muted-foreground">Find exactly what you're looking for</p>
+          </div>
+          <Link to="/browse">
+            <Button variant="ghost" className="text-primary">
+              View All <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-8 grid grid-cols-3 gap-3 md:grid-cols-6 md:gap-4">
+          {categories.map((cat, i) => (
+            <motion.div
+              key={cat.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.05 }}
+              viewport={{ once: true }}
+            >
+              <Link
+                to={`/browse?body=${cat.label}`}
+                className="group flex flex-col items-center rounded-xl border border-border bg-card p-4 transition-all hover:border-primary hover:shadow-card md:p-6"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary/20">
+                  <cat.icon className="h-6 w-6 text-primary" />
+                </div>
+                <span className="mt-3 font-display text-sm font-semibold text-card-foreground">
+                  {cat.label}
+                </span>
+                <span className="text-xs text-muted-foreground">{cat.count} ads</span>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured Listings */}
+      <section className="container mx-auto px-4 py-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+                Featured Vehicles
+              </h2>
+              <Badge className="gradient-primary border-0 text-primary-foreground">Hot</Badge>
+            </div>
+            <p className="mt-1 text-muted-foreground">Hand-picked premium listings</p>
+          </div>
+          <Link to="/browse?featured=true">
+            <Button variant="ghost" className="text-primary">
+              See All <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {featured.map((car, i) => (
+            <CarCard key={car.id} car={car} index={i} />
+          ))}
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="border-y border-border bg-secondary/30 py-16">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+              Why Choose AutoVault?
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              We go the extra mile to ensure every transaction is safe and transparent
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                icon: Shield,
+                title: "Verified Listings",
+                desc: "Every dealer is vetted. Verified badges mean the vehicle has passed our checks for legality and outstanding finance.",
+              },
+              {
+                icon: Search,
+                title: "Finance & Legal Check",
+                desc: "Instantly check if a vehicle has outstanding finance, is reported stolen, or has been written off — before you buy.",
+              },
+              {
+                icon: FileCheck,
+                title: "Full History Reports",
+                desc: "Access complete MOT history, mileage verification, and previous owner details with a single click.",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="rounded-xl border border-border bg-card p-6 shadow-card"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                  <item.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="mt-4 font-display text-lg font-semibold text-card-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Latest Listings */}
+      <section className="container mx-auto px-4 py-14">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
+              Latest Listings
+            </h2>
+            <p className="mt-1 text-muted-foreground">Just posted by sellers near you</p>
+          </div>
+          <Link to="/browse">
+            <Button variant="ghost" className="text-primary">
+              View All <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {latest.map((car, i) => (
+            <CarCard key={car.id} car={car} index={i} />
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="gradient-dark py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="font-display text-2xl font-bold text-primary-foreground md:text-4xl">
+            Ready to Sell Your Car?
+          </h2>
+          <p className="mx-auto mt-3 max-w-lg text-primary-foreground/70">
+            Reach thousands of buyers instantly. Individual listings or dealer subscriptions available.
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link to="/sell">
+              <Button size="lg" className="gradient-primary border-0 px-8">
+                Post Your Ad — It's Free
+              </Button>
+            </Link>
+            <Link to="/dealers">
+              <Button size="lg" variant="outline" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">
+                Dealer Plans from $49/mo
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 };
