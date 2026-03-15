@@ -256,10 +256,7 @@ const CarDetail = () => {
                     <Phone className="mr-2 h-4 w-4" />
                     Show Phone Number
                   </Button>
-                  <Button variant="outline" className="w-full">
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Message
-                  </Button>
+                  <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
                 </div>
 
                 <div className="mt-4 flex gap-2">
