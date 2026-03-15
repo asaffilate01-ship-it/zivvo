@@ -3,7 +3,9 @@ import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck } from "lucide
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useSavedCars } from "@/contexts/SavedCarsContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface CarCardProps {
   car: {
@@ -25,8 +27,20 @@ interface CarCardProps {
 }
 
 const CarCard = ({ car, index = 0 }: CarCardProps) => {
-  const [liked, setLiked] = useState(false);
+  const { isSaved, toggle } = useSavedCars();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const liked = isSaved(car.id);
   const mainImage = car.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80";
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast({ title: "Sign in to save cars", description: "Create an account to save your favourite listings." });
+      return;
+    }
+    await toggle(car.id);
+  };
 
   return (
     <motion.div
@@ -63,10 +77,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
               variant="ghost"
               size="icon"
               className="absolute right-3 top-3 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background"
-              onClick={(e) => {
-                e.preventDefault();
-                setLiked(!liked);
-              }}
+              onClick={handleLike}
             >
               <Heart className={`h-4 w-4 ${liked ? "fill-accent text-accent" : "text-foreground"}`} />
             </Button>

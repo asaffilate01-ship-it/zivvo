@@ -11,14 +11,21 @@ import {
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useSavedCars } from "@/contexts/SavedCarsContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import EnquiryForm from "@/components/EnquiryForm";
 
 const CarDetail = () => {
   const { id } = useParams();
   const [car, setCar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
-  const [liked, setLiked] = useState(false);
   const [dealer, setDealer] = useState<any>(null);
+  const { isSaved, toggle } = useSavedCars();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const liked = car ? isSaved(car.id) : false;
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -249,14 +256,14 @@ const CarDetail = () => {
                     <Phone className="mr-2 h-4 w-4" />
                     Show Phone Number
                   </Button>
-                  <Button variant="outline" className="w-full">
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Message
-                  </Button>
+                  <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <Button variant="ghost" size="sm" className="flex-1" onClick={() => setLiked(!liked)}>
+                  <Button variant="ghost" size="sm" className="flex-1" onClick={() => {
+                    if (!user) { toast({ title: "Sign in to save cars" }); return; }
+                    toggle(car.id);
+                  }}>
                     <Heart className={`mr-1 h-4 w-4 ${liked ? "fill-accent text-accent" : ""}`} />
                     Save
                   </Button>
