@@ -116,12 +116,17 @@ const Profile = () => {
               <Card key={l.id}>
                 <CardContent className="flex items-center justify-between p-4">
                   <div>
-                    <p className="font-medium text-card-foreground">{l.title}</p>
+                    <Link to={`/car/${l.id}`} className="font-medium text-card-foreground hover:text-primary">{l.title}</Link>
                     <p className="text-sm text-muted-foreground">{l.make} {l.model} · {l.year}</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <Badge variant={l.status === "active" ? "default" : "secondary"}>{l.status}</Badge>
                     <span className="font-display font-semibold text-card-foreground">${Number(l.price).toLocaleString()}</span>
+                    <Link to={`/dashboard/listings/edit?edit=${l.id}`}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
