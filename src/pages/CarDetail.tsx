@@ -11,6 +11,10 @@ import {
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useSavedCars } from "@/contexts/SavedCarsContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import EnquiryForm from "@/components/EnquiryForm";
 
 const CarDetail = () => {
   const { id } = useParams();
