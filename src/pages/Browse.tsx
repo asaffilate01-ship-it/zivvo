@@ -2,13 +2,16 @@ import { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CarCard from "@/components/CarCard";
+import SEOHead from "@/components/SEOHead";
+import { CarGridSkeleton } from "@/components/LoadingSkeleton";
+import EmptyState from "@/components/EmptyState";
 import { makes, bodyTypes, fuelTypes, transmissions } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Search, SlidersHorizontal, Loader2, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,7 +22,6 @@ const colors = ["Black", "White", "Silver", "Grey", "Blue", "Red", "Green", "Bro
 const Browse = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Read initial values from URL
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
   const [selectedMake, setSelectedMake] = useState(searchParams.get("make") || "");
   const [selectedBody, setSelectedBody] = useState(searchParams.get("body") || "");
@@ -45,7 +47,6 @@ const Browse = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "0"));
 
-  // Sync filters to URL
   const updateURL = useCallback(() => {
     const params = new URLSearchParams();
     if (keyword) params.set("q", keyword);
@@ -135,6 +136,10 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Browse Cars for Sale"
+        description={`Browse ${totalCount > 0 ? totalCount.toLocaleString() : ""} verified vehicles. Filter by make, model, price, year, and more.`}
+      />
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
@@ -186,26 +191,30 @@ const Browse = () => {
         <div className="mt-6 grid gap-6 lg:grid-cols-4">
           {/* Filters Sidebar */}
           <div className={`lg:col-span-1 ${showFilters ? "block" : "hidden lg:block"}`}>
-            <div className="sticky top-20 space-y-5 rounded-xl border border-border bg-card p-5">
+            {/* Mobile overlay backdrop */}
+            {showFilters && (
+              <div className="fixed inset-0 z-40 bg-foreground/50 lg:hidden" onClick={() => setShowFilters(false)} />
+            )}
+            <div className={`${showFilters ? "fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl lg:static lg:max-h-none lg:rounded-none" : ""} sticky top-20 space-y-5 rounded-xl border border-border bg-card p-5`}>
               <div className="flex items-center justify-between">
                 <h3 className="font-display font-semibold text-card-foreground">Filters</h3>
-                {activeFiltersList.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">
-                    Clear all
+                <div className="flex items-center gap-2">
+                  {activeFiltersList.length > 0 && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">
+                      Clear all
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon" className="h-8 w-8 lg:hidden" onClick={() => setShowFilters(false)}>
+                    <X className="h-4 w-4" />
                   </Button>
-                )}
+                </div>
               </div>
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Search</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Keyword..."
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    className="pl-10"
-                  />
+                  <Input placeholder="Keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-10" />
                 </div>
               </div>
 
@@ -268,46 +277,25 @@ const Browse = () => {
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                   Price: ${priceRange[0].toLocaleString()} — ${priceRange[1].toLocaleString()}
                 </label>
-                <Slider
-                  min={0}
-                  max={200000}
-                  step={5000}
-                  value={priceRange}
-                  onValueChange={setPriceRange}
-                  className="mt-2"
-                />
+                <Slider min={0} max={200000} step={5000} value={priceRange} onValueChange={setPriceRange} className="mt-2" />
               </div>
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                   Year: {yearRange[0]} — {yearRange[1]}
                 </label>
-                <Slider
-                  min={2000}
-                  max={currentYear}
-                  step={1}
-                  value={yearRange}
-                  onValueChange={setYearRange}
-                  className="mt-2"
-                />
+                <Slider min={2000} max={currentYear} step={1} value={yearRange} onValueChange={setYearRange} className="mt-2" />
               </div>
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                   Max Mileage: {mileageMax >= 200000 ? "Any" : `${mileageMax.toLocaleString()} mi`}
                 </label>
-                <Slider
-                  min={0}
-                  max={200000}
-                  step={5000}
-                  value={[mileageMax]}
-                  onValueChange={(v) => setMileageMax(v[0])}
-                  className="mt-2"
-                />
+                <Slider min={0} max={200000} step={5000} value={[mileageMax]} onValueChange={(v) => setMileageMax(v[0])} className="mt-2" />
               </div>
 
-              {/* Mobile close button */}
-              <Button variant="outline" className="w-full lg:hidden" onClick={() => setShowFilters(false)}>
+              {/* Mobile apply button */}
+              <Button className="w-full gradient-primary border-0 lg:hidden" onClick={() => setShowFilters(false)}>
                 Show {totalCount} Results
               </Button>
             </div>
@@ -316,18 +304,15 @@ const Browse = () => {
           {/* Results */}
           <div className="lg:col-span-3">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
+              <CarGridSkeleton count={6} />
             ) : listings.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-card py-20 text-center">
-                <Search className="h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 font-display text-lg font-semibold text-foreground">No vehicles found</h3>
-                <p className="mt-1 text-muted-foreground">Try adjusting your filters</p>
-                <Button variant="outline" className="mt-4" onClick={clearFilters}>
-                  Clear Filters
-                </Button>
-              </div>
+              <EmptyState
+                icon={Search}
+                title="No vehicles found"
+                description="Try adjusting your filters or search criteria"
+                actionLabel="Clear Filters"
+                onAction={clearFilters}
+              />
             ) : (
               <>
                 <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -338,26 +323,14 @@ const Browse = () => {
 
                 {totalPages > 1 && (
                   <div className="mt-8 flex items-center justify-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page === 0}
-                      onClick={() => setPage((p) => p - 1)}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Previous
+                    <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+                      <ChevronLeft className="h-4 w-4" /> Previous
                     </Button>
                     <span className="text-sm text-muted-foreground">
                       Page {page + 1} of {totalPages}
                     </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={page >= totalPages - 1}
-                      onClick={() => setPage((p) => p + 1)}
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4" />
+                    <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
+                      Next <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
                 )}
