@@ -33,6 +33,26 @@ const Inbox = () => {
   const [activeChat, setActiveChat] = useState<Conversation | null>(null);
   const [tab, setTab] = useState("messages");
 
+  // Auto-open chat from sessionStorage (e.g. from CarDetail page)
+  useEffect(() => {
+    const stored = sessionStorage.getItem("openChat");
+    if (stored) {
+      sessionStorage.removeItem("openChat");
+      try {
+        const chatInfo = JSON.parse(stored);
+        setActiveChat({
+          conversationId: chatInfo.conversationId,
+          recipientId: chatInfo.recipientId,
+          recipientName: chatInfo.recipientName,
+          listingTitle: chatInfo.listingTitle,
+          lastMessage: "",
+          lastAt: "",
+          unreadCount: 0,
+        });
+      } catch {}
+    }
+  }, []);
+
   useEffect(() => {
     if (!user) return;
     const fetchAll = async () => {
