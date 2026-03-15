@@ -262,6 +262,28 @@ const CarDetail = () => {
                     Show Phone Number
                   </Button>
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      if (!user) { toast({ title: "Sign in to message sellers" }); return; }
+                      if (user.id === car.seller_id) { toast({ title: "This is your own listing" }); return; }
+                      const ids = [user.id, car.seller_id].sort();
+                      const convId = `${car.id}:${ids[0]}:${ids[1]}`;
+                      // Send initial message via inserting to messages, then redirect to inbox
+                      navigate("/inbox");
+                      // Store conversation info in sessionStorage for the inbox to pick up
+                      sessionStorage.setItem("openChat", JSON.stringify({
+                        conversationId: convId,
+                        recipientId: car.seller_id,
+                        recipientName: sellerName,
+                        listingTitle: car.title,
+                      }));
+                    }}
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Message Seller
+                  </Button>
                 </div>
 
                 <div className="mt-4 flex gap-2">
