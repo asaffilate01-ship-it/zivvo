@@ -27,6 +27,7 @@ const CarDetail = () => {
   const { isSaved, toggle } = useSavedCars();
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const liked = car ? isSaved(car.id) : false;
 
   useEffect(() => {
