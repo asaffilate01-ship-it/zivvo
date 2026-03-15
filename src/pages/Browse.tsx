@@ -286,6 +286,27 @@ const Browse = () => {
               </div>
 
               <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Doors</label>
+                <Select value={selectedDoors} onValueChange={setSelectedDoors}>
+                  <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Any</SelectItem>
+                    {doorOptions.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Engine Size</label>
+                <Select value={selectedEngine} onValueChange={setSelectedEngine}>
+                  <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Any</SelectItem>
+                    {engineSizes.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                   Price: ${priceRange[0].toLocaleString()} — ${priceRange[1].toLocaleString()}
                 </label>
