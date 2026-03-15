@@ -1,17 +1,22 @@
 import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Car, Plus, Eye, MessageSquare, TrendingUp, Package,
-  Settings, BarChart3, ExternalLink,
+  Settings, BarChart3, ExternalLink, CreditCard, Loader2, Edit, Trash2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import DashboardChart from "@/components/DashboardChart";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface DealerInfo {
   id: string;
@@ -33,14 +38,24 @@ interface ListingSummary {
 }
 
 const DealerDashboard = () => {
-  const { user } = useAuth();
+  const { user, subscription, refreshSubscription } = useAuth();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
   const [dealer, setDealer] = useState<DealerInfo | null>(null);
   const [summary, setSummary] = useState<ListingSummary>({
     total: 0, active: 0, draft: 0, sold: 0, totalViews: 0, totalEnquiries: 0,
   });
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  // Handle checkout success
+  useEffect(() => {
+    if (searchParams.get("checkout") === "success") {
+      toast({ title: "Subscription activated!", description: "Welcome to AutoVault Dealer!" });
+      refreshSubscription();
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user) return;
@@ -70,16 +85,56 @@ const DealerDashboard = () => {
     fetchData();
   }, [user]);
 
-  // Generate chart data from listings
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("customer-portal");
+      if (error) throw error;
+      if (data?.url) window.open(data.url, "_blank");
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const deleteListing = async (listingId: string) => {
+    const { error } = await supabase.from("car_listings").delete().eq("id", listingId);
+    if (error) {
+      toast({ title: "Error deleting listing", variant: "destructive" });
+    } else {
+      setListings((prev) => prev.filter((l) => l.id !== listingId));
+      toast({ title: "Listing deleted" });
+    }
+  };
+
+  const toggleStatus = async (listingId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "draft" : "active";
+    // Check listing limits
+    if (newStatus === "active" && dealer && summary.active >= dealer.max_listings) {
+      toast({ title: "Listing limit reached", description: "Upgrade your plan to add more active listings.", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("car_listings").update({ status: newStatus }).eq("id", listingId);
+    if (!error) {
+      setListings((prev) => prev.map((l) => l.id === listingId ? { ...l, status: newStatus } : l));
+      setSummary((prev) => ({
+        ...prev,
+        active: prev.active + (newStatus === "active" ? 1 : -1),
+        draft: prev.draft + (newStatus === "draft" ? 1 : -1),
+      }));
+      toast({ title: `Listing ${newStatus}` });
+    }
+  };
+
   const viewsChartData = useMemo(() => {
     const last7 = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
       return { label: d.toLocaleDateString("en-US", { weekday: "short" }), value: 0 };
     });
-    // Distribute views evenly for demo; in production would use daily analytics table
     const perDay = Math.round(summary.totalViews / 7);
-    return last7.map((d, i) => ({ ...d, value: perDay + Math.round(Math.random() * perDay * 0.4) }));
+    return last7.map((d) => ({ ...d, value: Math.max(0, perDay + Math.round(Math.random() * perDay * 0.4)) }));
   }, [summary.totalViews]);
 
   const enquiriesChartData = useMemo(() => {
@@ -101,7 +156,7 @@ const DealerDashboard = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -116,9 +171,12 @@ const DealerDashboard = () => {
           <p className="mt-2 text-muted-foreground">Subscribe to a dealer plan to access your dashboard.</p>
           <Link to="/dealers"><Button className="gradient-primary mt-6 border-0">View Dealer Plans</Button></Link>
         </div>
+        <Footer />
       </div>
     );
   }
+
+  const listingLimitPercent = dealer.max_listings === 9999 ? 0 : Math.round((summary.active / dealer.max_listings) * 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,37 +186,63 @@ const DealerDashboard = () => {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">{dealer.business_name}</h1>
-            <div className="mt-1 flex items-center gap-2">
+            <div className="mt-1 flex flex-wrap items-center gap-2">
               <Badge className={tierColors[dealer.tier] || ""}>{dealer.tier.charAt(0).toUpperCase() + dealer.tier.slice(1)}</Badge>
               <Badge variant={dealer.subscription_status === "active" ? "default" : "destructive"}>{dealer.subscription_status}</Badge>
               {dealer.kyc_verified && <Badge variant="outline" className="border-success text-success">KYC Verified</Badge>}
             </div>
           </div>
-          <div className="flex gap-2">
-            <Link to={`/dealer/${dealer.slug}`}><Button variant="outline" size="sm"><ExternalLink className="mr-1 h-4 w-4" /> View Landing Page</Button></Link>
-            <Link to="/dashboard/listings/new"><Button size="sm" className="gradient-primary border-0"><Plus className="mr-1 h-4 w-4" /> Add Listing</Button></Link>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={handleManageSubscription} disabled={portalLoading}>
+              <CreditCard className="mr-1 h-4 w-4" />
+              {portalLoading ? "Loading..." : "Manage Subscription"}
+            </Button>
+            <Link to={`/dealer/${dealer.slug}`}><Button variant="outline" size="sm"><ExternalLink className="mr-1 h-4 w-4" /> Landing Page</Button></Link>
+            <Link to="/dashboard/listings/new">
+              <Button size="sm" className="gradient-primary border-0" disabled={summary.active >= dealer.max_listings && dealer.max_listings !== 9999}>
+                <Plus className="mr-1 h-4 w-4" /> Add Listing
+              </Button>
+            </Link>
           </div>
         </div>
 
+        {/* Listing Limit Bar */}
+        {dealer.max_listings !== 9999 && (
+          <div className="mt-4 rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Active Listings</span>
+              <span className="font-medium text-card-foreground">{summary.active} / {dealer.max_listings}</span>
+            </div>
+            <div className="mt-2 h-2 rounded-full bg-muted">
+              <div
+                className={`h-full rounded-full transition-all ${listingLimitPercent >= 90 ? "bg-destructive" : listingLimitPercent >= 70 ? "bg-warning" : "bg-primary"}`}
+                style={{ width: `${Math.min(listingLimitPercent, 100)}%` }}
+              />
+            </div>
+            {listingLimitPercent >= 90 && (
+              <p className="mt-2 text-xs text-destructive">
+                You're near your listing limit. <Link to="/dealers" className="underline">Upgrade your plan</Link> for more.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Stats Grid */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Active Listings", value: summary.active, max: dealer.max_listings, icon: Car, color: "text-primary" },
+            { label: "Active Listings", value: summary.active, icon: Car, color: "text-primary" },
             { label: "Total Views", value: summary.totalViews, icon: Eye, color: "text-info" },
             { label: "Enquiries", value: summary.totalEnquiries, icon: MessageSquare, color: "text-success" },
             { label: "Sold", value: summary.sold, icon: TrendingUp, color: "text-warning" },
           ].map((stat) => (
             <Card key={stat.label}>
               <CardContent className="flex items-center gap-4 p-5">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-muted`}>
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted">
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <p className="font-display text-2xl font-bold text-card-foreground">
-                    {stat.value}
-                    {stat.max && <span className="text-sm font-normal text-muted-foreground">/{stat.max === 9999 ? "∞" : stat.max}</span>}
-                  </p>
+                  <p className="font-display text-2xl font-bold text-card-foreground">{stat.value}</p>
                 </div>
               </CardContent>
             </Card>
@@ -173,7 +257,10 @@ const DealerDashboard = () => {
 
         {/* Recent Listings */}
         <div className="mt-8">
-          <h2 className="font-display text-lg font-bold text-foreground">Recent Listings</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold text-foreground">Your Listings</h2>
+            <Link to="/inbox"><Button variant="ghost" size="sm">View Enquiries</Button></Link>
+          </div>
           {listings.length === 0 ? (
             <Card className="mt-4">
               <CardContent className="flex flex-col items-center justify-center py-12">
@@ -184,21 +271,45 @@ const DealerDashboard = () => {
             </Card>
           ) : (
             <div className="mt-4 space-y-3">
-              {listings.slice(0, 5).map((listing) => (
+              {listings.map((listing) => (
                 <Card key={listing.id}>
-                  <CardContent className="flex items-center justify-between p-4">
+                  <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
-                        <Car className="h-5 w-5 text-muted-foreground" />
-                      </div>
+                      {listing.images?.[0] ? (
+                        <img src={listing.images[0]} alt="" className="h-12 w-16 rounded-lg object-cover" />
+                      ) : (
+                        <div className="flex h-12 w-16 items-center justify-center rounded-lg bg-muted">
+                          <Car className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
                       <div>
-                        <p className="font-medium text-card-foreground">{listing.title}</p>
-                        <p className="text-sm text-muted-foreground">{listing.make} {listing.model} · {listing.year}</p>
+                        <Link to={`/car/${listing.id}`} className="font-medium text-card-foreground hover:text-primary">{listing.title}</Link>
+                        <p className="text-sm text-muted-foreground">{listing.views_count || 0} views · {listing.enquiries_count || 0} enquiries</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
                       <span className="font-display font-semibold text-card-foreground">${Number(listing.price).toLocaleString()}</span>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleStatus(listing.id, listing.status)}>
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete listing?</AlertDialogTitle>
+                            <AlertDialogDescription>This action cannot be undone. This will permanently delete "{listing.title}".</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteListing(listing.id)} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </CardContent>
                 </Card>
@@ -207,6 +318,7 @@ const DealerDashboard = () => {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
