@@ -68,6 +68,8 @@ const plans = [
   },
 ];
 
+import SEOHead from "@/components/SEOHead";
+
 const DealerPricing = () => {
   const { user, subscription, refreshSubscription } = useAuth();
   const navigate = useNavigate();
