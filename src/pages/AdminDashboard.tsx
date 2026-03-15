@@ -37,6 +37,8 @@ const AdminDashboard = () => {
   const [allRoles, setAllRoles] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listingSearch, setListingSearch] = useState("");
+  const [listingStatusFilter, setListingStatusFilter] = useState("all");
+  const [userSearch, setUserSearch] = useState("");
   const [dateRange, setDateRange] = useState("month");
   const [loading, setLoading] = useState(true);
   const [selectedDealer, setSelectedDealer] = useState<any>(null);
