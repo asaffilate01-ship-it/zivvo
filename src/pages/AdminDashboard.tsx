@@ -91,7 +91,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const toggleListingStatus = async (listingId: string, newStatus: string) => {
+  const toggleListingStatus = async (listingId: string, newStatus: "active" | "draft" | "sold" | "expired" | "under_review") => {
     const { error } = await supabase
       .from("car_listings")
       .update({ status: newStatus })
