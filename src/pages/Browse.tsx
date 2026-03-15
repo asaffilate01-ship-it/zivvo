@@ -75,7 +75,7 @@ const Browse = () => {
 
   useEffect(() => {
     setPage(0);
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, priceRange, yearRange, mileageMax, sortBy]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy]);
 
   useEffect(() => {
     const fetchListings = async () => {
