@@ -199,6 +199,12 @@ const DealerDashboard = () => {
               <CreditCard className="mr-1 h-4 w-4" />
               {portalLoading ? "Loading..." : "Manage Subscription"}
             </Button>
+            <DealerPageBuilder
+              dealerId={dealer.id}
+              currentConfig={(dealer as any).landing_page_config || {}}
+              businessName={dealer.business_name}
+              onSaved={() => {}}
+            />
             <Link to={`/dealer/${dealer.slug}`}><Button variant="outline" size="sm"><ExternalLink className="mr-1 h-4 w-4" /> Landing Page</Button></Link>
             <Link to="/dashboard/listings/new">
               <Button size="sm" className="gradient-primary border-0" disabled={summary.active >= dealer.max_listings && dealer.max_listings !== 9999}>
