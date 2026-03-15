@@ -22,6 +22,7 @@ import {
   ChevronRight,
   AlertTriangle,
   Car,
+  FileCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -54,7 +55,6 @@ const CarDetail = () => {
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
-        {/* Breadcrumb */}
         <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary">Home</Link>
           <span>/</span>
@@ -64,9 +64,7 @@ const CarDetail = () => {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left: Images + Details */}
           <div className="lg:col-span-2">
-            {/* Image Gallery */}
             <div className="relative overflow-hidden rounded-2xl">
               <motion.img
                 key={currentImage}
@@ -111,7 +109,6 @@ const CarDetail = () => {
               </div>
             </div>
 
-            {/* Thumbnails */}
             <div className="mt-3 flex gap-2">
               {car.images.map((img, i) => (
                 <button
@@ -126,7 +123,6 @@ const CarDetail = () => {
               ))}
             </div>
 
-            {/* Title & Price (mobile) */}
             <div className="mt-6 lg:hidden">
               <h1 className="font-display text-2xl font-bold text-foreground">{car.title}</h1>
               <p className="mt-2 font-display text-3xl font-bold text-primary">
@@ -134,7 +130,6 @@ const CarDetail = () => {
               </p>
             </div>
 
-            {/* Specs Grid */}
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { icon: Calendar, label: "Year", value: car.year },
@@ -150,7 +145,6 @@ const CarDetail = () => {
               ))}
             </div>
 
-            {/* Technical Specs */}
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Technical Specifications</h2>
               <div className="mt-4 grid grid-cols-2 gap-y-3 rounded-xl border border-border bg-card p-5 sm:grid-cols-3">
@@ -171,44 +165,40 @@ const CarDetail = () => {
               </div>
             </div>
 
-            {/* Description */}
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Description</h2>
               <p className="mt-3 leading-relaxed text-muted-foreground">{car.description}</p>
             </div>
 
-            {/* Checks */}
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Vehicle Checks</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <Button variant="outline" className="justify-start gap-2 border-success/30 bg-success/5 text-success hover:bg-success/10">
-                  <Shield className="h-4 w-4" />
-                  Check Finance Status
-                  <ExternalLink className="ml-auto h-3 w-3" />
+                <Button variant="outline" className="justify-start gap-2 border-success/30 bg-success/5 hover:bg-success/10">
+                  <Shield className="h-4 w-4 text-success" />
+                  <span className="text-success">Check Finance Status</span>
+                  <ExternalLink className="ml-auto h-3 w-3 text-success" />
                 </Button>
-                <Button variant="outline" className="justify-start gap-2 border-info/30 bg-info/5 text-info hover:bg-info/10">
-                  <FileCheck className="h-4 w-4" />
-                  Full History Report
-                  <ExternalLink className="ml-auto h-3 w-3" />
+                <Button variant="outline" className="justify-start gap-2 border-info/30 bg-info/5 hover:bg-info/10">
+                  <FileCheck className="h-4 w-4 text-info" />
+                  <span className="text-info">Full History Report</span>
+                  <ExternalLink className="ml-auto h-3 w-3 text-info" />
                 </Button>
-                <Button variant="outline" className="justify-start gap-2 border-warning/30 bg-warning/5 text-warning hover:bg-warning/10">
-                  <AlertTriangle className="h-4 w-4" />
-                  Stolen Vehicle Check
-                  <ExternalLink className="ml-auto h-3 w-3" />
+                <Button variant="outline" className="justify-start gap-2 border-warning/30 bg-warning/5 hover:bg-warning/10">
+                  <AlertTriangle className="h-4 w-4 text-warning" />
+                  <span className="text-warning">Stolen Vehicle Check</span>
+                  <ExternalLink className="ml-auto h-3 w-3 text-warning" />
                 </Button>
-                <Button variant="outline" className="justify-start gap-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10">
-                  <Car className="h-4 w-4" />
-                  MOT History
-                  <ExternalLink className="ml-auto h-3 w-3" />
+                <Button variant="outline" className="justify-start gap-2 border-primary/30 bg-primary/5 hover:bg-primary/10">
+                  <Car className="h-4 w-4 text-primary" />
+                  <span className="text-primary">MOT History</span>
+                  <ExternalLink className="ml-auto h-3 w-3 text-primary" />
                 </Button>
               </div>
             </div>
           </div>
 
-          {/* Right Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-20 space-y-4">
-              {/* Price Card (desktop) */}
               <div className="hidden rounded-2xl border border-border bg-card p-6 shadow-card lg:block">
                 <h1 className="font-display text-xl font-bold text-card-foreground">{car.title}</h1>
                 <p className="mt-3 font-display text-3xl font-bold text-primary">
@@ -216,12 +206,11 @@ const CarDetail = () => {
                 </p>
                 {car.financeAvailable && (
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Finance from ~${ Math.round(car.price / 48).toLocaleString()}/mo
+                    Finance from ~${Math.round(car.price / 48).toLocaleString()}/mo
                   </p>
                 )}
               </div>
 
-              {/* Seller Card */}
               <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -252,12 +241,7 @@ const CarDetail = () => {
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => setLiked(!liked)}
-                  >
+                  <Button variant="ghost" size="sm" className="flex-1" onClick={() => setLiked(!liked)}>
                     <Heart className={`mr-1 h-4 w-4 ${liked ? "fill-accent text-accent" : ""}`} />
                     Save
                   </Button>
@@ -268,7 +252,6 @@ const CarDetail = () => {
                 </div>
               </div>
 
-              {/* Safety Tips */}
               <div className="rounded-2xl border border-border bg-warning/5 p-5">
                 <h4 className="flex items-center gap-2 font-display font-semibold text-foreground">
                   <Shield className="h-4 w-4 text-warning" />
@@ -290,8 +273,5 @@ const CarDetail = () => {
     </div>
   );
 };
-
-// Need to import FileCheck for the button
-import { FileCheck } from "lucide-react";
 
 export default CarDetail;
