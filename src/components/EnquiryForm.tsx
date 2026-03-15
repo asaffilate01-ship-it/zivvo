@@ -36,7 +36,7 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
     if (!form.message.trim()) return;
 
     setLoading(true);
-    const { error } = await supabase.from("enquiries").insert({
+    const { data: enquiry, error } = await supabase.from("enquiries").insert({
       listing_id: listingId,
       seller_id: sellerId,
       sender_id: user.id,
@@ -44,17 +44,22 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
       sender_name: form.sender_name || null,
       sender_email: form.sender_email || null,
       sender_phone: form.sender_phone || null,
-    });
+    }).select("id").single();
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       setSent(true);
       // Increment enquiries count
-      supabase.rpc("has_role", { _user_id: user.id, _role: "buyer" as any }).then(); // no-op to keep import
       const { data: listing } = await supabase.from("car_listings").select("enquiries_count").eq("id", listingId).single();
       if (listing) {
         await supabase.from("car_listings").update({ enquiries_count: (listing.enquiries_count || 0) + 1 }).eq("id", listingId);
+      }
+      // Trigger notification (fire-and-forget)
+      if (enquiry?.id) {
+        supabase.functions.invoke("notify-enquiry", {
+          body: { enquiryId: enquiry.id },
+        }).catch(() => {}); // silent fail
       }
     }
     setLoading(false);
@@ -70,14 +75,14 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Send Enquiry</DialogTitle>
+          <DialogTitle className="font-display">Send Enquiry</DialogTitle>
           <p className="text-sm text-muted-foreground">About: {listingTitle}</p>
         </DialogHeader>
 
         {sent ? (
           <div className="flex flex-col items-center py-8 text-center">
             <CheckCircle className="h-12 w-12 text-success" />
-            <h3 className="mt-3 font-display text-lg font-semibold">Message Sent!</h3>
+            <h3 className="mt-3 font-display text-lg font-semibold text-foreground">Message Sent!</h3>
             <p className="mt-1 text-sm text-muted-foreground">The seller will be notified of your enquiry.</p>
             <Button className="mt-4" onClick={() => { setOpen(false); setSent(false); setForm({ message: "", sender_name: "", sender_email: "", sender_phone: "" }); }}>
               Close
@@ -86,21 +91,21 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium">Your Name</label>
+              <label className="mb-1 block text-sm font-medium text-foreground">Your Name</label>
               <Input value={form.sender_name} onChange={(e) => setForm((p) => ({ ...p, sender_name: e.target.value }))} placeholder="John Doe" />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium">Email</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Email</label>
                 <Input type="email" value={form.sender_email} onChange={(e) => setForm((p) => ({ ...p, sender_email: e.target.value }))} placeholder="john@example.com" />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium">Phone</label>
+                <label className="mb-1 block text-sm font-medium text-foreground">Phone</label>
                 <Input value={form.sender_phone} onChange={(e) => setForm((p) => ({ ...p, sender_phone: e.target.value }))} placeholder="+44 7123 456789" />
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">Message *</label>
+              <label className="mb-1 block text-sm font-medium text-foreground">Message *</label>
               <Textarea value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder="Hi, I'm interested in this vehicle..." rows={4} required />
             </div>
             <Button type="submit" className="gradient-primary w-full border-0" disabled={loading}>
