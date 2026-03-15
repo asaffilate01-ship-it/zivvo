@@ -23,15 +23,16 @@ const DashboardChart = ({ title, data, type = "area", color = "hsl(16, 90%, 54%)
         <ResponsiveContainer width="100%" height={height}>
           {type === "area" ? (
             <AreaChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 13%, 91%)" />
-              <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="hsl(220, 10%, 46%)" />
-              <YAxis tick={{ fontSize: 12 }} stroke="hsl(220, 10%, 46%)" />
+              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+              <XAxis dataKey="label" tick={{ fontSize: 12 }} className="fill-muted-foreground" stroke="currentColor" />
+              <YAxis tick={{ fontSize: 12 }} className="fill-muted-foreground" stroke="currentColor" />
               <Tooltip
                 contentStyle={{
-                  background: "hsl(0, 0%, 100%)",
-                  border: "1px solid hsl(220, 13%, 91%)",
+                  background: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
                   fontSize: 12,
+                  color: "hsl(var(--card-foreground))",
                 }}
               />
               <Area
@@ -45,15 +46,16 @@ const DashboardChart = ({ title, data, type = "area", color = "hsl(16, 90%, 54%)
             </AreaChart>
           ) : (
             <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 13%, 91%)" />
-              <XAxis dataKey="label" tick={{ fontSize: 12 }} stroke="hsl(220, 10%, 46%)" />
-              <YAxis tick={{ fontSize: 12 }} stroke="hsl(220, 10%, 46%)" />
+              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+              <XAxis dataKey="label" tick={{ fontSize: 12 }} className="fill-muted-foreground" stroke="currentColor" />
+              <YAxis tick={{ fontSize: 12 }} className="fill-muted-foreground" stroke="currentColor" />
               <Tooltip
                 contentStyle={{
-                  background: "hsl(0, 0%, 100%)",
-                  border: "1px solid hsl(220, 13%, 91%)",
+                  background: "hsl(var(--card))",
+                  border: "1px solid hsl(var(--border))",
                   borderRadius: "8px",
                   fontSize: 12,
+                  color: "hsl(var(--card-foreground))",
                 }}
               />
               <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} />
