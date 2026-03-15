@@ -21,8 +21,11 @@ const CarDetail = () => {
   const [car, setCar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
-  const [liked, setLiked] = useState(false);
   const [dealer, setDealer] = useState<any>(null);
+  const { isSaved, toggle } = useSavedCars();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const liked = car ? isSaved(car.id) : false;
 
   useEffect(() => {
     const fetchCar = async () => {
