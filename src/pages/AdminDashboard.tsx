@@ -460,8 +460,12 @@ const AdminDashboard = () => {
           {/* Users Tab */}
           <TabsContent value="users" className="mt-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="text-base">All Users ({allProfiles.length})</CardTitle>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input placeholder="Search users..." className="pl-9 w-56" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
+                </div>
               </CardHeader>
               <CardContent className="overflow-x-auto">
                 <Table>
@@ -474,7 +478,7 @@ const AdminDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {allProfiles.map((p) => {
+                    {filteredUsers.map((p) => {
                       const roles = getUserRoles(p.user_id);
                       return (
                         <TableRow key={p.id}>
