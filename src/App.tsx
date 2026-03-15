@@ -13,8 +13,10 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import DealerPricing from "./pages/DealerPricing";
 import DealerDashboard from "./pages/DealerDashboard";
+import DealerLanding from "./pages/DealerLanding";
 import AdminDashboard from "./pages/AdminDashboard";
 import AgentDashboard from "./pages/AgentDashboard";
+import AgentOnboard from "./pages/AgentOnboard";
 import CreateListing from "./pages/CreateListing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -37,6 +39,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dealers" element={<DealerPricing />} />
+            <Route path="/dealer/:slug" element={<DealerLanding />} />
             <Route
               path="/dashboard"
               element={
@@ -74,6 +77,14 @@ const App = () => (
               element={
                 <ProtectedRoute requiredRole="agent">
                   <AgentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agent/onboard"
+              element={
+                <ProtectedRoute requiredRole="agent">
+                  <AgentOnboard />
                 </ProtectedRoute>
               }
             />

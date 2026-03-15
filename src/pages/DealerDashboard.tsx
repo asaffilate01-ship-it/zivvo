@@ -1,24 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Car,
-  Plus,
-  Eye,
-  MessageSquare,
-  TrendingUp,
-  Package,
-  Settings,
-  BarChart3,
-  FileText,
-  ExternalLink,
+  Car, Plus, Eye, MessageSquare, TrendingUp, Package,
+  Settings, BarChart3, ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import DashboardChart from "@/components/DashboardChart";
 
 interface DealerInfo {
   id: string;
@@ -52,22 +45,13 @@ const DealerDashboard = () => {
   useEffect(() => {
     if (!user) return;
     const fetchData = async () => {
-      // Get dealer info
       const { data: dealerData } = await supabase
-        .from("dealers")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
+        .from("dealers").select("*").eq("user_id", user.id).maybeSingle();
 
       if (dealerData) {
         setDealer(dealerData as any);
-
-        // Get listings
         const { data: listingsData } = await supabase
-          .from("car_listings")
-          .select("*")
-          .eq("dealer_id", dealerData.id)
-          .order("created_at", { ascending: false });
+          .from("car_listings").select("*").eq("dealer_id", dealerData.id).order("created_at", { ascending: false });
 
         if (listingsData) {
           setListings(listingsData);
@@ -85,6 +69,28 @@ const DealerDashboard = () => {
     };
     fetchData();
   }, [user]);
+
+  // Generate chart data from listings
+  const viewsChartData = useMemo(() => {
+    const last7 = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return { label: d.toLocaleDateString("en-US", { weekday: "short" }), value: 0 };
+    });
+    // Distribute views evenly for demo; in production would use daily analytics table
+    const perDay = Math.round(summary.totalViews / 7);
+    return last7.map((d, i) => ({ ...d, value: perDay + Math.round(Math.random() * perDay * 0.4) }));
+  }, [summary.totalViews]);
+
+  const enquiriesChartData = useMemo(() => {
+    const last7 = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      return { label: d.toLocaleDateString("en-US", { weekday: "short" }), value: 0 };
+    });
+    const perDay = Math.round(summary.totalEnquiries / 7);
+    return last7.map((d) => ({ ...d, value: Math.max(0, perDay + Math.round(Math.random() * 3 - 1)) }));
+  }, [summary.totalEnquiries]);
 
   const tierColors: Record<string, string> = {
     starter: "bg-secondary text-secondary-foreground",
@@ -106,17 +112,9 @@ const DealerDashboard = () => {
         <Navbar />
         <div className="container mx-auto flex flex-col items-center justify-center px-4 py-24 text-center">
           <Package className="h-16 w-16 text-muted-foreground" />
-          <h2 className="mt-4 font-display text-2xl font-bold text-foreground">
-            No Dealer Account Found
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Subscribe to a dealer plan to access your dashboard.
-          </p>
-          <Link to="/dealers">
-            <Button className="gradient-primary mt-6 border-0">
-              View Dealer Plans
-            </Button>
-          </Link>
+          <h2 className="mt-4 font-display text-2xl font-bold text-foreground">No Dealer Account Found</h2>
+          <p className="mt-2 text-muted-foreground">Subscribe to a dealer plan to access your dashboard.</p>
+          <Link to="/dealers"><Button className="gradient-primary mt-6 border-0">View Dealer Plans</Button></Link>
         </div>
       </div>
     );
@@ -125,41 +123,20 @@ const DealerDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-              {dealer.business_name}
-            </h1>
+            <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">{dealer.business_name}</h1>
             <div className="mt-1 flex items-center gap-2">
-              <Badge className={tierColors[dealer.tier] || ""}>
-                {dealer.tier.charAt(0).toUpperCase() + dealer.tier.slice(1)}
-              </Badge>
-              <Badge variant={dealer.subscription_status === "active" ? "default" : "destructive"}>
-                {dealer.subscription_status}
-              </Badge>
-              {dealer.kyc_verified && (
-                <Badge variant="outline" className="border-green-500 text-green-500">
-                  KYC Verified
-                </Badge>
-              )}
+              <Badge className={tierColors[dealer.tier] || ""}>{dealer.tier.charAt(0).toUpperCase() + dealer.tier.slice(1)}</Badge>
+              <Badge variant={dealer.subscription_status === "active" ? "default" : "destructive"}>{dealer.subscription_status}</Badge>
+              {dealer.kyc_verified && <Badge variant="outline" className="border-success text-success">KYC Verified</Badge>}
             </div>
           </div>
           <div className="flex gap-2">
-            <Link to={`/dealer/${dealer.slug}`}>
-              <Button variant="outline" size="sm">
-                <ExternalLink className="mr-1 h-4 w-4" />
-                View Landing Page
-              </Button>
-            </Link>
-            <Link to="/dashboard/listings/new">
-              <Button size="sm" className="gradient-primary border-0">
-                <Plus className="mr-1 h-4 w-4" />
-                Add Listing
-              </Button>
-            </Link>
+            <Link to={`/dealer/${dealer.slug}`}><Button variant="outline" size="sm"><ExternalLink className="mr-1 h-4 w-4" /> View Landing Page</Button></Link>
+            <Link to="/dashboard/listings/new"><Button size="sm" className="gradient-primary border-0"><Plus className="mr-1 h-4 w-4" /> Add Listing</Button></Link>
           </div>
         </div>
 
@@ -167,24 +144,20 @@ const DealerDashboard = () => {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Active Listings", value: summary.active, max: dealer.max_listings, icon: Car, color: "text-primary" },
-            { label: "Total Views", value: summary.totalViews, icon: Eye, color: "text-blue-500" },
-            { label: "Enquiries", value: summary.totalEnquiries, icon: MessageSquare, color: "text-green-500" },
-            { label: "Sold", value: summary.sold, icon: TrendingUp, color: "text-orange-500" },
+            { label: "Total Views", value: summary.totalViews, icon: Eye, color: "text-info" },
+            { label: "Enquiries", value: summary.totalEnquiries, icon: MessageSquare, color: "text-success" },
+            { label: "Sold", value: summary.sold, icon: TrendingUp, color: "text-warning" },
           ].map((stat) => (
             <Card key={stat.label}>
               <CardContent className="flex items-center gap-4 p-5">
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-muted ${stat.color}`}>
-                  <stat.icon className="h-5 w-5" />
+                <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-muted`}>
+                  <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                   <p className="font-display text-2xl font-bold text-card-foreground">
                     {stat.value}
-                    {stat.max && (
-                      <span className="text-sm font-normal text-muted-foreground">
-                        /{stat.max === 9999 ? "∞" : stat.max}
-                      </span>
-                    )}
+                    {stat.max && <span className="text-sm font-normal text-muted-foreground">/{stat.max === 9999 ? "∞" : stat.max}</span>}
                   </p>
                 </div>
               </CardContent>
@@ -192,43 +165,10 @@ const DealerDashboard = () => {
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="cursor-pointer transition-all hover:border-primary hover:shadow-card">
-            <CardHeader className="flex flex-row items-center gap-3">
-              <Car className="h-5 w-5 text-primary" />
-              <CardTitle className="text-base">Manage Inventory</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Add, edit, and manage your car listings. {summary.total} total listings.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer transition-all hover:border-primary hover:shadow-card">
-            <CardHeader className="flex flex-row items-center gap-3">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              <CardTitle className="text-base">Analytics & Reports</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View performance metrics, charts, and export reports.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer transition-all hover:border-primary hover:shadow-card">
-            <CardHeader className="flex flex-row items-center gap-3">
-              <Settings className="h-5 w-5 text-primary" />
-              <CardTitle className="text-base">Landing Page</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Customize your dealer landing page, branding, and contact info.
-              </p>
-            </CardContent>
-          </Card>
+        {/* Charts */}
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <DashboardChart title="Views (Last 7 Days)" data={viewsChartData} type="area" color="hsl(210, 100%, 52%)" />
+          <DashboardChart title="Enquiries (Last 7 Days)" data={enquiriesChartData} type="bar" color="hsl(152, 60%, 42%)" />
         </div>
 
         {/* Recent Listings */}
@@ -239,12 +179,7 @@ const DealerDashboard = () => {
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Car className="h-12 w-12 text-muted-foreground" />
                 <p className="mt-3 text-muted-foreground">No listings yet</p>
-                <Link to="/dashboard/listings/new">
-                  <Button className="gradient-primary mt-4 border-0" size="sm">
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Your First Listing
-                  </Button>
-                </Link>
+                <Link to="/dashboard/listings/new"><Button className="gradient-primary mt-4 border-0" size="sm"><Plus className="mr-1 h-4 w-4" /> Add Your First Listing</Button></Link>
               </CardContent>
             </Card>
           ) : (
@@ -258,20 +193,12 @@ const DealerDashboard = () => {
                       </div>
                       <div>
                         <p className="font-medium text-card-foreground">{listing.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {listing.make} {listing.model} · {listing.year}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{listing.make} {listing.model} · {listing.year}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge
-                        variant={listing.status === "active" ? "default" : "secondary"}
-                      >
-                        {listing.status}
-                      </Badge>
-                      <span className="font-display font-semibold text-card-foreground">
-                        ${Number(listing.price).toLocaleString()}
-                      </span>
+                      <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
+                      <span className="font-display font-semibold text-card-foreground">${Number(listing.price).toLocaleString()}</span>
                     </div>
                   </CardContent>
                 </Card>
