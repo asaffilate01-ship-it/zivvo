@@ -143,7 +143,7 @@ const Browse = () => {
   if (selectedColor) activeFiltersList.push({ label: selectedColor, clear: () => setSelectedColor("") });
   if (selectedDoors) activeFiltersList.push({ label: `${selectedDoors} doors`, clear: () => setSelectedDoors("") });
   if (selectedEngine) activeFiltersList.push({ label: selectedEngine, clear: () => setSelectedEngine("") });
-  if (priceRange[0] > 0 || priceRange[1] < 200000) activeFiltersList.push({ label: `$${priceRange[0].toLocaleString()}-$${priceRange[1].toLocaleString()}`, clear: () => setPriceRange([0, 200000]) });
+  if (priceRange[0] > 0 || priceRange[1] < 200000) activeFiltersList.push({ label: `£${priceRange[0].toLocaleString()}-£${priceRange[1].toLocaleString()}`, clear: () => setPriceRange([0, 200000]) });
   if (yearRange[0] > 2000 || yearRange[1] < currentYear) activeFiltersList.push({ label: `${yearRange[0]}-${yearRange[1]}`, clear: () => setYearRange([2000, currentYear]) });
   if (mileageMax < 200000) activeFiltersList.push({ label: `≤${mileageMax.toLocaleString()} mi`, clear: () => setMileageMax(200000) });
 
