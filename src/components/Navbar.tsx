@@ -98,6 +98,7 @@ const Navbar = () => {
               <Heart className="h-5 w-5" />
             </Button>
           </Link>
+          {user && <NotificationBell />}
           {user && (
             <Link to="/inbox">
               <Button variant="ghost" size="icon">

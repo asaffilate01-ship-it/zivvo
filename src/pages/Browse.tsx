@@ -175,6 +175,14 @@ const Browse = () => {
                 <SelectItem value="mileage_asc">Mileage: Low-High</SelectItem>
               </SelectContent>
             </Select>
+            <SaveSearchDialog
+              filters={{
+                q: keyword, make: selectedMake, body: selectedBody, fuel: selectedFuel,
+                transmission: selectedTransmission, color: selectedColor, doors: selectedDoors,
+                engine: selectedEngine, priceMin: priceRange[0], priceMax: priceRange[1],
+                yearMin: yearRange[0], yearMax: yearRange[1], mileageMax,
+              }}
+            />
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}
