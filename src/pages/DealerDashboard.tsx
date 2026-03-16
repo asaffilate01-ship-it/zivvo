@@ -43,6 +43,7 @@ interface ListingSummary {
 
 const DealerDashboard = () => {
   const { user, subscription, refreshSubscription } = useAuth();
+  const { config } = useCountry();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [dealer, setDealer] = useState<DealerInfo | null>(null);

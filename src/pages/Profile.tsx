@@ -20,6 +20,7 @@ import {
 
 const Profile = () => {
   const { user, signOut } = useAuth();
+  const { config } = useCountry();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
