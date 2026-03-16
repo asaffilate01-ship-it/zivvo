@@ -358,8 +358,8 @@ const CreateListing = () => {
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Registration</Label>
-                <Input placeholder="e.g. AB12 CDE" value={form.registration} onChange={(e) => updateField("registration", e.target.value)} />
+                <Label>{config.terminology.registration}</Label>
+                <Input placeholder={country === "US" ? "e.g. ABC 1234" : country === "AE" ? "e.g. A 12345" : "e.g. AB12 CDE"} value={form.registration} onChange={(e) => updateField("registration", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label>VIN</Label>
