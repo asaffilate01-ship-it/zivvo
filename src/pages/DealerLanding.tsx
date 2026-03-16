@@ -30,12 +30,10 @@ const DealerLanding = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      // Query the safe dealer landing view (excludes Stripe IDs)
       const { data: d } = await supabase
-        .from("dealers")
-        .select("id, business_name, description, city, country, logo_url, website_url, slug, is_active, tier, business_phone, business_email, address, postcode, landing_page_config, kyc_verified")
+        .from("dealer_landing_public")
+        .select("*")
         .eq("slug", slug)
-        .eq("is_active", true)
         .maybeSingle();
 
       if (d) {
