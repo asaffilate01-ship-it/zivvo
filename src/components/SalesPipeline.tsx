@@ -275,67 +275,13 @@ const SalesPipeline = ({ mode, dealerId }: SalesPipelineProps) => {
           </div>
         </div>
 
-        {/* Kanban Board */}
         <TabsContent value="kanban" className="mt-4">
-          <div className="flex gap-3 overflow-x-auto pb-4">
-            {STAGES.filter(s => s.key !== "lost").map(stage => (
-              <div key={stage.key} className="min-w-[240px] flex-shrink-0">
-                <div className="mb-2 flex items-center justify-between rounded-lg bg-muted px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
-                    <span className="text-sm font-semibold text-card-foreground">{stage.label}</span>
-                  </div>
-                  <Badge variant="secondary" className="text-xs">{stageGroups[stage.key].length}</Badge>
-                </div>
-                <div className="space-y-2">
-                  <AnimatePresence>
-                    {stageGroups[stage.key].map(lead => (
-                      <motion.div
-                        key={lead.id}
-                        layout
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                      >
-                        <Card
-                          className="cursor-pointer transition-shadow hover:shadow-md"
-                          onClick={() => setSelectedLead(lead)}
-                        >
-                          <CardContent className="p-3">
-                            <p className="font-medium text-sm text-card-foreground">{lead.buyer_name || "Unknown"}</p>
-                            {lead.expected_value > 0 && (
-                              <p className="mt-1 text-xs font-semibold text-primary">${Number(lead.expected_value).toLocaleString()}</p>
-                            )}
-                            <div className="mt-2 flex items-center gap-2">
-                              {lead.buyer_email && <Mail className="h-3 w-3 text-muted-foreground" />}
-                              {lead.buyer_phone && <Phone className="h-3 w-3 text-muted-foreground" />}
-                              <span className="ml-auto text-[10px] text-muted-foreground">{lead.source}</span>
-                            </div>
-                            {/* Stage progression arrows */}
-                            {stage.key !== "sold" && (
-                              <div className="mt-2 flex gap-1">
-                                {STAGES.filter(s => s.key !== "lost" && STAGES.findIndex(x => x.key === s.key) > STAGES.findIndex(x => x.key === stage.key)).slice(0, 2).map(nextStage => (
-                                  <Button
-                                    key={nextStage.key}
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 px-2 text-[10px]"
-                                    onClick={(e) => { e.stopPropagation(); moveLead(lead.id, nextStage.key); }}
-                                  >
-                                    <ArrowRight className="mr-0.5 h-3 w-3" /> {nextStage.label}
-                                  </Button>
-                                ))}
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </div>
-            ))}
-          </div>
+          <KanbanBoard
+            stages={STAGES}
+            stageGroups={stageGroups}
+            onMoveLead={moveLead}
+            onSelectLead={setSelectedLead}
+          />
           {/* Lost leads summary */}
           {stageGroups.lost.length > 0 && (
             <Card className="mt-4 border-destructive/20">
