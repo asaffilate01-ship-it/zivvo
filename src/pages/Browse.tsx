@@ -196,6 +196,14 @@ const Browse = () => {
               >
                 <List className="h-3.5 w-3.5" />
               </Button>
+              <Button
+                variant={viewMode === "map" ? "default" : "ghost"}
+                size="icon"
+                className={`h-7 w-7 ${viewMode === "map" ? "gradient-primary border-0" : ""}`}
+                onClick={() => setViewMode("map")}
+              >
+                <MapPin className="h-3.5 w-3.5" />
+              </Button>
             </div>
 
             <Select value={sortBy} onValueChange={setSortBy}>
