@@ -277,26 +277,36 @@ const CarDetail = () => {
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Vehicle Checks</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <Button variant="outline" className="justify-start gap-2 border-success/30 bg-success/5 hover:bg-success/10">
+                <Button variant="outline" className="justify-start gap-2 border-success/30 bg-success/5 hover:bg-success/10" onClick={() => toast({ title: "Finance Check", description: "This feature connects to HPI/Experian. Coming soon as a premium check." })}>
                   <Shield className="h-4 w-4 text-success" />
                   <span className="text-success">Check Finance Status</span>
                   <ExternalLink className="ml-auto h-3 w-3 text-success" />
                 </Button>
-                <Button variant="outline" className="justify-start gap-2 border-info/30 bg-info/5 hover:bg-info/10">
+                <Button variant="outline" className="justify-start gap-2 border-info/30 bg-info/5 hover:bg-info/10" onClick={() => toast({ title: "History Report", description: "Full vehicle history report via HPI/Carfax. Coming soon." })}>
                   <FileCheck className="h-4 w-4 text-info" />
                   <span className="text-info">Full History Report</span>
                   <ExternalLink className="ml-auto h-3 w-3 text-info" />
                 </Button>
-                <Button variant="outline" className="justify-start gap-2 border-warning/30 bg-warning/5 hover:bg-warning/10">
+                <Button variant="outline" className="justify-start gap-2 border-warning/30 bg-warning/5 hover:bg-warning/10" onClick={() => toast({ title: "Stolen Check", description: "Connects to PNC/DVLA stolen vehicle database. Coming soon." })}>
                   <AlertTriangle className="h-4 w-4 text-warning" />
                   <span className="text-warning">Stolen Vehicle Check</span>
                   <ExternalLink className="ml-auto h-3 w-3 text-warning" />
                 </Button>
-                <Button variant="outline" className="justify-start gap-2 border-primary/30 bg-primary/5 hover:bg-primary/10">
-                  <Car className="h-4 w-4 text-primary" />
-                  <span className="text-primary">MOT History</span>
-                  <ExternalLink className="ml-auto h-3 w-3 text-primary" />
-                </Button>
+                {car.country === "GB" ? (
+                  <a href={car.registration ? `https://www.check-mot.service.gov.uk/?registration=${encodeURIComponent(car.registration)}` : "https://www.check-mot.service.gov.uk/"} target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" className="w-full justify-start gap-2 border-primary/30 bg-primary/5 hover:bg-primary/10">
+                      <Car className="h-4 w-4 text-primary" />
+                      <span className="text-primary">MOT History</span>
+                      <ExternalLink className="ml-auto h-3 w-3 text-primary" />
+                    </Button>
+                  </a>
+                ) : (
+                  <Button variant="outline" className="justify-start gap-2 border-primary/30 bg-primary/5 hover:bg-primary/10" onClick={() => toast({ title: "Vehicle History", description: "Government vehicle check is available for UK listings with registration numbers." })}>
+                    <Car className="h-4 w-4 text-primary" />
+                    <span className="text-primary">Vehicle History</span>
+                    <ExternalLink className="ml-auto h-3 w-3 text-primary" />
+                  </Button>
+                )}
               </div>
             </div>
           </div>
