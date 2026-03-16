@@ -97,15 +97,11 @@ const HeroSearch = () => {
                 <p className="mb-4 text-xs text-muted-foreground">Find exactly what you're looking for</p>
 
                 <div className="space-y-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      placeholder="Search make, model, or keyword..."
-                      value={keyword}
-                      onChange={(e) => setKeyword(e.target.value)}
-                      className="h-11 pl-10"
-                    />
-                  </div>
+                  <SearchAutocomplete
+                    value={keyword}
+                    onChange={setKeyword}
+                    placeholder="Search make, model, or keyword..."
+                  />
 
                   <div className="grid grid-cols-2 gap-3">
                     <Select value={make} onValueChange={setMake}>
