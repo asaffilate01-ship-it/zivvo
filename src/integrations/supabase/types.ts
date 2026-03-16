@@ -65,6 +65,7 @@ export type Database = {
         Row: {
           body_type: string | null
           color: string | null
+          country: string
           created_at: string
           dealer_id: string | null
           description: string | null
@@ -99,6 +100,7 @@ export type Database = {
         Insert: {
           body_type?: string | null
           color?: string | null
+          country?: string
           created_at?: string
           dealer_id?: string | null
           description?: string | null
@@ -133,6 +135,7 @@ export type Database = {
         Update: {
           body_type?: string | null
           color?: string | null
+          country?: string
           created_at?: string
           dealer_id?: string | null
           description?: string | null
