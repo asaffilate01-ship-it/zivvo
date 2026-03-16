@@ -54,7 +54,7 @@ const Browse = () => {
   const [mileageMax, setMileageMax] = useState(parseInt(searchParams.get("mileageMax") || "200000"));
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
 
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
