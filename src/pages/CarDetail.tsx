@@ -364,6 +364,15 @@ const CarDetail = () => {
                     <Share2 className="mr-1 h-4 w-4" />
                     Share
                   </Button>
+                  <Link to={`/compare?car=${car.id}`}>
+                    <Button variant="ghost" size="sm">
+                      <GitCompare className="mr-1 h-4 w-4" /> Compare
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="mt-3 flex justify-center">
+                  <ReportListingDialog listingId={car.id} />
                 </div>
               </div>
 
