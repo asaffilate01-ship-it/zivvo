@@ -1026,6 +1026,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_models_for_make: {
+        Args: { _country?: string; _make: string }
+        Returns: {
+          model: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

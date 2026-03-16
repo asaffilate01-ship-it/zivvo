@@ -43,6 +43,10 @@ const Browse = () => {
   const transmissions = config.transmissions;
   const cities = config.popularCities;
 
+  // Dynamic models from DB
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+
   // Core filters
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
   const [selectedMake, setSelectedMake] = useState(searchParams.get("make") || "");
@@ -79,6 +83,20 @@ const Browse = () => {
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "0"));
 
   // Collapsible sections
+  // Fetch models when make changes
+  useEffect(() => {
+    if (!selectedMake) {
+      setAvailableModels([]);
+      return;
+    }
+    setModelsLoading(true);
+    supabase.rpc("get_models_for_make", { _make: selectedMake, _country: country })
+      .then(({ data }) => {
+        setAvailableModels(data?.map((r: any) => r.model) || []);
+        setModelsLoading(false);
+      });
+  }, [selectedMake, country]);
+
   const [openSections, setOpenSections] = useState({
     vehicle: true,
     price: true,
@@ -193,10 +211,10 @@ const Browse = () => {
   const FilterSelect = ({ label, value, onChange, placeholder, options }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; options: string[] }) => (
     <div>
       <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{label}</label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value || undefined} onValueChange={(v) => onChange(v === "__clear__" ? "" : v)}>
         <SelectTrigger className="h-9 text-sm"><SelectValue placeholder={placeholder} /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="">{placeholder}</SelectItem>
+          <SelectItem value="__clear__">{placeholder}</SelectItem>
           {options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
         </SelectContent>
       </Select>
@@ -327,16 +345,26 @@ const Browse = () => {
               {/* Vehicle Section */}
               <FilterSection title="Vehicle" sectionKey="vehicle">
                 <FilterSelect label="Make" value={selectedMake} onChange={(v) => { setSelectedMake(v); setModel(""); }} placeholder="Any Make" options={makes} />
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Model</label>
-                  <Input
-                    placeholder={selectedMake ? `Search ${selectedMake} models...` : "Select a make first"}
+                {availableModels.length > 0 ? (
+                  <FilterSelect
+                    label="Model"
                     value={model}
-                    onChange={(e) => setModel(e.target.value)}
-                    className="h-9 text-sm"
-                    disabled={!selectedMake}
+                    onChange={setModel}
+                    placeholder={modelsLoading ? "Loading models..." : "Any Model"}
+                    options={availableModels}
                   />
-                </div>
+                ) : (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Model</label>
+                    <Input
+                      placeholder={selectedMake ? (modelsLoading ? "Loading..." : `Search ${selectedMake} models...`) : "Select a make first"}
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                      className="h-9 text-sm"
+                      disabled={!selectedMake}
+                    />
+                  </div>
+                )}
                 <FilterSelect label="Body Type" value={selectedBody} onChange={setSelectedBody} placeholder="Any Type" options={bodyTypes} />
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Year: {yearRange[0]} — {yearRange[1]}</label>
