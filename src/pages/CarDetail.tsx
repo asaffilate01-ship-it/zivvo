@@ -70,7 +70,7 @@ const CarDetail = () => {
         supabase.from("listing_views").insert({ listing_id: id, viewer_id: user?.id || null }).then();
         supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
         if (data.dealer_id) {
-          const { data: d } = await supabase.from("dealers").select("business_name, slug, city, business_phone, business_email").eq("id", data.dealer_id).maybeSingle();
+          const { data: d } = await supabase.from("dealers").select("business_name, slug, city, business_phone, business_email, kyc_verified").eq("id", data.dealer_id).maybeSingle();
           if (d) setDealer(d);
         }
         // Fetch similar cars (same make or body type, excluding current)
@@ -78,6 +78,7 @@ const CarDetail = () => {
           .from("car_listings")
           .select("*")
           .eq("status", "active")
+          .eq("country", data.country)
           .neq("id", id!)
           .or(`make.eq.${data.make},body_type.eq.${data.body_type}`)
           .order("created_at", { ascending: false })

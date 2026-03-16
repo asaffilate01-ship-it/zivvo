@@ -59,6 +59,13 @@ export type Database = {
             referencedRelation: "dealers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "agent_commissions_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       car_listings: {
@@ -173,6 +180,13 @@ export type Database = {
             columns: ["dealer_id"]
             isOneToOne: false
             referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "car_listings_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers_public"
             referencedColumns: ["id"]
           },
         ]
@@ -614,7 +628,63 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dealers_public: {
+        Row: {
+          business_name: string | null
+          city: string | null
+          country: string | null
+          description: string | null
+          id: string | null
+          is_active: boolean | null
+          logo_url: string | null
+          slug: string | null
+          tier: Database["public"]["Enums"]["dealer_tier"] | null
+          website_url: string | null
+        }
+        Insert: {
+          business_name?: string | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          slug?: string | null
+          tier?: Database["public"]["Enums"]["dealer_tier"] | null
+          website_url?: string | null
+        }
+        Update: {
+          business_name?: string | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          slug?: string | null
+          tier?: Database["public"]["Enums"]["dealer_tier"] | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      profiles_public: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

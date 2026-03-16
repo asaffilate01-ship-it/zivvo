@@ -4,11 +4,13 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { makes, bodyTypes } from "@/lib/mockData";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 import { motion } from "framer-motion";
 
 const HeroSearch = () => {
   const navigate = useNavigate();
+  const { config } = useCountry();
   const [keyword, setKeyword] = useState("");
   const [make, setMake] = useState("");
   const [bodyType, setBodyType] = useState("");
@@ -72,7 +74,7 @@ const HeroSearch = () => {
                     <SelectValue placeholder="Any Make" />
                   </SelectTrigger>
                   <SelectContent>
-                    {makes.map((m) => (
+                    {config.makes.map((m) => (
                       <SelectItem key={m} value={m}>{m}</SelectItem>
                     ))}
                   </SelectContent>
@@ -86,7 +88,7 @@ const HeroSearch = () => {
                     <SelectValue placeholder="Any Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {bodyTypes.map((b) => (
+                    {config.bodyTypes.map((b) => (
                       <SelectItem key={b} value={b}>{b}</SelectItem>
                     ))}
                   </SelectContent>
@@ -105,8 +107,13 @@ const HeroSearch = () => {
                 Advanced Filters
               </Button>
               <div className="hidden gap-2 md:flex">
-                {["Under £30k", "SUVs", "Electric", "Low Mileage"].map((tag) => (
-                  <Button key={tag} variant="outline" size="sm" className="rounded-full text-xs">
+                {[`Under ${formatPrice(30000, config)}`, "SUVs", "Electric", "Low Mileage"].map((tag) => (
+                  <Button key={tag} variant="outline" size="sm" className="rounded-full text-xs" onClick={() => {
+                    if (tag.startsWith("Under")) navigate(`/browse?priceMax=30000`);
+                    else if (tag === "SUVs") navigate("/browse?body=SUV");
+                    else if (tag === "Electric") navigate("/browse?fuel=Electric");
+                    else navigate("/browse?mileageMax=30000");
+                  }}>
                     {tag}
                   </Button>
                 ))}
