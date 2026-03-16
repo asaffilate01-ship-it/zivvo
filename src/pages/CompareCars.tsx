@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
@@ -14,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 const MAX_COMPARE = 3;
 
 const CompareCars = () => {
+  const { config } = useCountry();
   const [searchParams] = useSearchParams();
   const initialCar = searchParams.get("car");
   const [selectedIds, setSelectedIds] = useState<string[]>(initialCar ? [initialCar] : []);
@@ -66,9 +69,9 @@ const CompareCars = () => {
   };
 
   const specRows = [
-    { label: "Price", key: "price", fmt: (v: any) => v ? `£${Number(v).toLocaleString()}` : "N/A" },
+    { label: "Price", key: "price", fmt: (v: any) => v ? formatPrice(Number(v), config) : "N/A" },
     { label: "Year", key: "year", fmt: (v: any) => v || "N/A" },
-    { label: "Mileage", key: "mileage", fmt: (v: any) => v ? `${Number(v).toLocaleString()} mi` : "N/A" },
+    { label: config.terminology.mileage, key: "mileage", fmt: (v: any) => v ? formatDistance(Number(v), config) : "N/A" },
     { label: "Fuel Type", key: "fuel_type", fmt: (v: any) => v || "N/A" },
     { label: "Transmission", key: "transmission", fmt: (v: any) => v || "N/A" },
     { label: "Body Type", key: "body_type", fmt: (v: any) => v || "N/A" },
@@ -103,7 +106,7 @@ const CompareCars = () => {
               </div>
               <CardContent className="p-4">
                 <Link to={`/car/${car.id}`} className="font-display font-semibold text-card-foreground hover:text-primary line-clamp-1">{car.title}</Link>
-                <p className="mt-1 font-display text-lg font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
+                <p className="mt-1 font-display text-lg font-bold text-primary">{formatPrice(Number(car.price), config)}</p>
               </CardContent>
             </Card>
           ))}
@@ -124,7 +127,7 @@ const CompareCars = () => {
                           <img src={r.images?.[0] || "/placeholder.svg"} alt="" className="h-10 w-14 rounded object-cover" />
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-medium text-foreground">{r.title}</p>
-                            <p className="text-xs text-muted-foreground">£{Number(r.price).toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">{formatPrice(Number(r.price), config)}</p>
                           </div>
                         </button>
                       ))}

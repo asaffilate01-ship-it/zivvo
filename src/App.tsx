@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CountryProvider } from "@/contexts/CountryContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import CookieConsent from "@/components/CookieConsent";
+import BugReportButton from "@/components/BugReportButton";
 import Index from "./pages/Index";
 import Browse from "./pages/Browse";
 import CarDetail from "./pages/CarDetail";
@@ -35,6 +36,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CompareCars from "./pages/CompareCars";
 import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +69,7 @@ const App = () => (
                     <Route path="/help" element={<HelpCentre />} />
                     <Route path="/compare" element={<CompareCars />} />
                     <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:id" element={<BlogPost />} />
                     <Route
                       path="/inbox"
                       element={
@@ -143,6 +146,7 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <CookieConsent />
+                  <BugReportButton />
                 </SavedCarsProvider>
               </AuthProvider>
               </CountryProvider>
