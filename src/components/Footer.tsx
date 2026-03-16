@@ -24,17 +24,14 @@ const Footer = () => {
               links: [
                 { label: "Browse Cars", to: "/browse" },
                 { label: "Sell Your Car", to: "/sell" },
-                { label: "Finance Check", to: "/finance-check" },
-                { label: "Car Valuation", to: "/valuation" },
+                { label: "Saved Cars", to: "/saved" },
               ],
             },
             {
               title: "For Business",
               links: [
                 { label: "Dealer Plans", to: "/dealers" },
-                { label: "Agent Program", to: "/agents" },
-                { label: "Advertising", to: "/advertise" },
-                { label: "API Access", to: "/api" },
+                { label: "Agent Program", to: "/contact" },
               ],
             },
             {
