@@ -30,24 +30,17 @@ const BoostListingDialog = ({ listingId, listingTitle, isPromoted }: BoostListin
   const handleBoost = async (days: number, price: number) => {
     setLoading(days);
     try {
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
+      const { data, error } = await supabase.functions.invoke("boost-checkout", {
         body: {
-          mode: "payment",
-          line_items: [{
-            price_data: {
-              currency: config.currency.code.toLowerCase(),
-              product_data: { name: `Boost Listing: ${listingTitle} (${days} days)` },
-              unit_amount: Math.round(price * 100),
-            },
-            quantity: 1,
-          }],
-          metadata: { type: "boost", listing_id: listingId, days: String(days) },
-          success_url: `${window.location.origin}/dashboard?boost=success`,
-          cancel_url: `${window.location.origin}/dashboard`,
+          listingId,
+          listingTitle,
+          days,
+          amount: price,
+          currency: config.currency.code.toLowerCase(),
         },
       });
       if (error) throw error;
-      if (data?.url) window.location.href = data.url;
+      if (data?.url) window.open(data.url, "_blank");
     } catch {
       toast({ title: "Error", description: "Could not create checkout session. Try again.", variant: "destructive" });
     } finally {

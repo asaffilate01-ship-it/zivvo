@@ -167,6 +167,46 @@ serve(async (req) => {
         break;
       }
 
+      case "checkout.session.completed": {
+        const session2 = event.data.object as Stripe.Checkout.Session;
+        // Handle boost payments (one-time)
+        if (session2.metadata?.type === "boost" && session2.mode === "payment") {
+          const listingId = session2.metadata.listing_id;
+          const days = parseInt(session2.metadata.days || "7");
+          const promotedUntil = new Date();
+          promotedUntil.setDate(promotedUntil.getDate() + days);
+
+          const { error: boostErr } = await supabase
+            .from("car_listings")
+            .update({
+              is_promoted: true,
+              promoted_until: promotedUntil.toISOString(),
+            })
+            .eq("id", listingId);
+
+          if (boostErr) logStep("ERROR boosting listing", { error: boostErr.message });
+          else logStep("Listing boosted", { listingId, until: promotedUntil.toISOString() });
+
+          // Notify seller
+          if (session2.metadata.user_id) {
+            await supabase.from("notifications").insert({
+              user_id: session2.metadata.user_id,
+              type: "boost",
+              title: "Listing Boosted! 🚀",
+              message: `Your listing is now promoted for ${days} days.`,
+              link: `/car/${listingId}`,
+            });
+          }
+          break;
+        }
+
+        // Handle subscription checkout (existing logic already above)
+        // This case handles both - the subscription case is at the top
+        // If it reaches here without matching boost, it's a duplicate event for subscriptions
+        logStep("Checkout completed (non-boost, likely subscription handled above)");
+        break;
+      }
+
       default:
         logStep("Unhandled event type", { type: event.type });
     }
