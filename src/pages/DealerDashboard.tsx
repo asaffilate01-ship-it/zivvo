@@ -10,7 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Car, Plus, Eye, MessageSquare, TrendingUp, Package,
   Settings, BarChart3, ExternalLink, CreditCard, Loader2, Edit, Trash2, Rocket,
+  Download, CheckSquare, Square,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import BoostListingDialog from "@/components/BoostListingDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,6 +57,7 @@ const DealerDashboard = () => {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Handle checkout success
   useEffect(() => {
@@ -147,6 +150,46 @@ const DealerDashboard = () => {
       }));
       toast({ title: `Listing ${newStatus}` });
     }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === listings.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(listings.map(l => l.id)));
+  };
+
+  const bulkUpdateStatus = async (newStatus: string) => {
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from("car_listings").update({ status: newStatus } as any).in("id", ids);
+    if (!error) {
+      setListings(prev => prev.map(l => ids.includes(l.id) ? { ...l, status: newStatus } : l));
+      setSelectedIds(new Set());
+      toast({ title: `${ids.length} listings updated to ${newStatus}` });
+    } else {
+      toast({ title: "Bulk update failed", variant: "destructive" });
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = ["Title","Make","Model","Year","Price","Mileage","Status","Views","Enquiries","Created"];
+    const rows = listings.map(l => [
+      `"${(l.title||'').replace(/"/g,'""')}"`, l.make, l.model, l.year, l.price, l.mileage||"",
+      l.status, l.views_count||0, l.enquiries_count||0, new Date(l.created_at).toLocaleDateString(),
+    ]);
+    const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `listings-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "CSV exported" });
   };
 
   const viewsChartData = useMemo(() => {
@@ -293,8 +336,24 @@ const DealerDashboard = () => {
         <div className="mt-8">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-foreground">Your Listings</h2>
-            <Link to="/inbox"><Button variant="ghost" size="sm">View Enquiries</Button></Link>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={exportCSV} disabled={listings.length === 0}>
+                <Download className="mr-1 h-4 w-4" /> Export CSV
+              </Button>
+              <Link to="/inbox"><Button variant="ghost" size="sm">View Enquiries</Button></Link>
+            </div>
           </div>
+
+          {/* Bulk Action Bar */}
+          {selectedIds.size > 0 && (
+            <div className="mt-3 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+              <span className="text-sm font-medium text-foreground">{selectedIds.size} selected</span>
+              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("active")}>Set Active</Button>
+              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("draft")}>Set Draft</Button>
+              <Button size="sm" variant="outline" className="text-destructive" onClick={() => setSelectedIds(new Set())}>Clear</Button>
+            </div>
+          )}
+
           {listings.length === 0 ? (
             <Card className="mt-4">
               <CardContent className="flex flex-col items-center justify-center py-12">
@@ -305,10 +364,21 @@ const DealerDashboard = () => {
             </Card>
           ) : (
             <div className="mt-4 space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <Checkbox
+                  checked={selectedIds.size === listings.length && listings.length > 0}
+                  onCheckedChange={selectAll}
+                />
+                <span className="text-xs text-muted-foreground">Select all</span>
+              </div>
               {listings.map((listing) => (
-                <Card key={listing.id}>
+                <Card key={listing.id} className={selectedIds.has(listing.id) ? "border-primary/40" : ""}>
                   <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedIds.has(listing.id)}
+                        onCheckedChange={() => toggleSelect(listing.id)}
+                      />
                       {listing.images?.[0] ? (
                         <img src={listing.images[0]} alt="" className="h-12 w-16 rounded-lg object-cover" />
                       ) : (
