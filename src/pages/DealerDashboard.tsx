@@ -152,6 +152,46 @@ const DealerDashboard = () => {
     }
   };
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === listings.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(listings.map(l => l.id)));
+  };
+
+  const bulkUpdateStatus = async (newStatus: string) => {
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from("car_listings").update({ status: newStatus } as any).in("id", ids);
+    if (!error) {
+      setListings(prev => prev.map(l => ids.includes(l.id) ? { ...l, status: newStatus } : l));
+      setSelectedIds(new Set());
+      toast({ title: `${ids.length} listings updated to ${newStatus}` });
+    } else {
+      toast({ title: "Bulk update failed", variant: "destructive" });
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = ["Title","Make","Model","Year","Price","Mileage","Status","Views","Enquiries","Created"];
+    const rows = listings.map(l => [
+      `"${(l.title||'').replace(/"/g,'""')}"`, l.make, l.model, l.year, l.price, l.mileage||"",
+      l.status, l.views_count||0, l.enquiries_count||0, new Date(l.created_at).toLocaleDateString(),
+    ]);
+    const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `listings-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    URL.revokeObjectURL(url);
+    toast({ title: "CSV exported" });
+  };
+
   const viewsChartData = useMemo(() => {
     const last7 = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
