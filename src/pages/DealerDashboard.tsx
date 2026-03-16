@@ -10,7 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Car, Plus, Eye, MessageSquare, TrendingUp, Package,
   Settings, BarChart3, ExternalLink, CreditCard, Loader2, Edit, Trash2, Rocket,
+  Download, CheckSquare, Square,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import BoostListingDialog from "@/components/BoostListingDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
