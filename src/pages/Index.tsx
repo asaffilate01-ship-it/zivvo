@@ -3,6 +3,7 @@ import HeroSearch from "@/components/HeroSearch";
 import CarCard from "@/components/CarCard";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
