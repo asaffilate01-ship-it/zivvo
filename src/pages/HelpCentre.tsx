@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: "What are dealer subscription plans?",
-    a: "Dealers can choose from Starter ($49/mo, 15 listings), Professional ($99/mo, 50 listings), or Enterprise ($199/mo, unlimited listings). All plans include a customisable dealer landing page, analytics dashboard, and priority support.",
+    a: "Dealers can choose from Starter (£49/mo, 15 listings), Professional (£99/mo, 50 listings), or Enterprise (£199/mo, unlimited listings). All plans include a customisable dealer landing page, analytics dashboard, and priority support.",
   },
   {
     q: "How do I contact a seller?",

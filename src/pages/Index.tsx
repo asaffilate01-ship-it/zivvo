@@ -196,7 +196,7 @@ const Index = () => {
           <p className="mx-auto mt-3 max-w-lg text-primary-foreground/70">Reach thousands of buyers instantly. Individual listings or dealer subscriptions available.</p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link to="/sell"><Button size="lg" className="gradient-primary border-0 px-8">Post Your Ad — It's Free</Button></Link>
-            <Link to="/dealers"><Button size="lg" variant="outline" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">Dealer Plans from $49/mo</Button></Link>
+            <Link to="/dealers"><Button size="lg" variant="outline" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">Dealer Plans from £49/mo</Button></Link>
           </div>
         </div>
       </section>

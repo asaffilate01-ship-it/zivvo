@@ -22,6 +22,22 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
 
+const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
+  const [revealed, setRevealed] = useState(false);
+  if (!phone) return (
+    <Button className="w-full gradient-primary border-0" disabled>
+      <Phone className="mr-2 h-4 w-4" />
+      Phone Not Available
+    </Button>
+  );
+  return (
+    <Button className="w-full gradient-primary border-0" onClick={() => setRevealed(true)}>
+      <Phone className="mr-2 h-4 w-4" />
+      {revealed ? phone : "Show Phone Number"}
+    </Button>
+  );
+};
+
 const CarDetail = () => {
   const { id } = useParams();
   const [car, setCar] = useState<any>(null);
@@ -117,7 +133,7 @@ const CarDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${car.title} — $${Number(car.price).toLocaleString()}`}
+        title={`${car.title} — £${Number(car.price).toLocaleString()}`}
         description={`${car.year} ${car.make} ${car.model}. ${car.mileage ? car.mileage.toLocaleString() + " miles." : ""} ${car.fuel_type || ""} ${car.transmission || ""}. ${car.location || ""}`}
         type="product"
         jsonLd={{
@@ -134,7 +150,7 @@ const CarDetail = () => {
           "offers": {
             "@type": "Offer",
             "price": car.price,
-            "priceCurrency": "USD",
+            "priceCurrency": "GBP",
             "availability": car.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
           },
           "image": images[0],
@@ -195,7 +211,7 @@ const CarDetail = () => {
             {/* Mobile title/price */}
             <div className="mt-6 lg:hidden">
               <h1 className="font-display text-2xl font-bold text-foreground">{car.title}</h1>
-              <p className="mt-2 font-display text-3xl font-bold text-primary">${Number(car.price).toLocaleString()}</p>
+              <p className="mt-2 font-display text-3xl font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -283,9 +299,9 @@ const CarDetail = () => {
             <div className="sticky top-20 space-y-4">
               <div className="hidden rounded-2xl border border-border bg-card p-6 shadow-card lg:block">
                 <h1 className="font-display text-xl font-bold text-card-foreground">{car.title}</h1>
-                <p className="mt-3 font-display text-3xl font-bold text-primary">${Number(car.price).toLocaleString()}</p>
+                <p className="mt-3 font-display text-3xl font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Finance from ~${Math.round(Number(car.price) / 48).toLocaleString()}/mo
+                  Finance from ~£{Math.round(Number(car.price) / 48).toLocaleString()}/mo
                 </p>
               </div>
 
@@ -310,10 +326,7 @@ const CarDetail = () => {
                 )}
 
                 <div className="mt-5 space-y-2">
-                  <Button className="w-full gradient-primary border-0">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Show Phone Number
-                  </Button>
+                  <PhoneRevealButton phone={dealer?.business_phone} />
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
                   <Button
                     variant="outline"

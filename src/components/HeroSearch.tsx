@@ -105,7 +105,7 @@ const HeroSearch = () => {
                 Advanced Filters
               </Button>
               <div className="hidden gap-2 md:flex">
-                {["Under $30k", "SUVs", "Electric", "Low Mileage"].map((tag) => (
+                {["Under £30k", "SUVs", "Electric", "Low Mileage"].map((tag) => (
                   <Button key={tag} variant="outline" size="sm" className="rounded-full text-xs">
                     {tag}
                   </Button>

@@ -286,7 +286,7 @@ const CreateListing = () => {
                 <Input type="number" value={form.year} onChange={(e) => updateField("year", parseInt(e.target.value))} />
               </div>
               <div className="space-y-2">
-                <Label>Price ($) *</Label>
+                <Label>Price (£) *</Label>
                 <Input type="number" placeholder="25000" value={form.price} onChange={(e) => updateField("price", e.target.value)} />
               </div>
               <div className="space-y-2">
