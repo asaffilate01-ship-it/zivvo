@@ -33,6 +33,8 @@ const CarDetail = () => {
   const navigate = useNavigate();
   const liked = car ? isSaved(car.id) : false;
 
+  const [similarCars, setSimilarCars] = useState<any[]>([]);
+
   useEffect(() => {
     const fetchCar = async () => {
       const { data } = await supabase
@@ -49,6 +51,16 @@ const CarDetail = () => {
           const { data: d } = await supabase.from("dealers").select("business_name, slug, city, business_phone, business_email").eq("id", data.dealer_id).maybeSingle();
           if (d) setDealer(d);
         }
+        // Fetch similar cars (same make or body type, excluding current)
+        const { data: similar } = await supabase
+          .from("car_listings")
+          .select("*")
+          .eq("status", "active")
+          .neq("id", id!)
+          .or(`make.eq.${data.make},body_type.eq.${data.body_type}`)
+          .order("created_at", { ascending: false })
+          .limit(4);
+        if (similar) setSimilarCars(similar);
       }
       setLoading(false);
     };
