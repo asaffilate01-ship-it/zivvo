@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import DashboardChart from "@/components/DashboardChart";
 import DealerPageBuilder from "@/components/DealerPageBuilder";
 import SellerAnalytics from "@/components/SellerAnalytics";
+import SalesPipeline from "@/components/SalesPipeline";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -273,6 +274,12 @@ const DealerDashboard = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Sales Pipeline */}
+        <div className="mt-8">
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">Sales Pipeline</h2>
+          <SalesPipeline mode="dealer" dealerId={dealer.id} />
         </div>
 
         {/* Analytics Section */}

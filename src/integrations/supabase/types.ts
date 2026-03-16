@@ -644,6 +644,84 @@ export type Database = {
         }
         Relationships: []
       }
+      pipeline_leads: {
+        Row: {
+          actual_value: number | null
+          assigned_to: string | null
+          buyer_email: string | null
+          buyer_id: string | null
+          buyer_name: string | null
+          buyer_phone: string | null
+          closed_at: string | null
+          created_at: string
+          dealer_id: string | null
+          expected_value: number | null
+          id: string
+          listing_id: string | null
+          lost_reason: string | null
+          notes: string | null
+          seller_id: string
+          source: string | null
+          stage: Database["public"]["Enums"]["pipeline_stage"]
+          updated_at: string
+        }
+        Insert: {
+          actual_value?: number | null
+          assigned_to?: string | null
+          buyer_email?: string | null
+          buyer_id?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          closed_at?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          expected_value?: number | null
+          id?: string
+          listing_id?: string | null
+          lost_reason?: string | null
+          notes?: string | null
+          seller_id: string
+          source?: string | null
+          stage?: Database["public"]["Enums"]["pipeline_stage"]
+          updated_at?: string
+        }
+        Update: {
+          actual_value?: number | null
+          assigned_to?: string | null
+          buyer_email?: string | null
+          buyer_id?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          closed_at?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          expected_value?: number | null
+          id?: string
+          listing_id?: string | null
+          lost_reason?: string | null
+          notes?: string | null
+          seller_id?: string
+          source?: string | null
+          stage?: Database["public"]["Enums"]["pipeline_stage"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_leads_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pipeline_leads_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -824,6 +902,14 @@ export type Database = {
       app_role: "buyer" | "seller" | "dealer" | "agent" | "admin"
       dealer_tier: "starter" | "professional" | "enterprise"
       listing_status: "draft" | "active" | "sold" | "expired" | "under_review"
+      pipeline_stage:
+        | "lead"
+        | "enquiry"
+        | "viewing"
+        | "offer"
+        | "negotiation"
+        | "sold"
+        | "lost"
       subscription_status:
         | "active"
         | "past_due"
@@ -960,6 +1046,15 @@ export const Constants = {
       app_role: ["buyer", "seller", "dealer", "agent", "admin"],
       dealer_tier: ["starter", "professional", "enterprise"],
       listing_status: ["draft", "active", "sold", "expired", "under_review"],
+      pipeline_stage: [
+        "lead",
+        "enquiry",
+        "viewing",
+        "offer",
+        "negotiation",
+        "sold",
+        "lost",
+      ],
       subscription_status: [
         "active",
         "past_due",

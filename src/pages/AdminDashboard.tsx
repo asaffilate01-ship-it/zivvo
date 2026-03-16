@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import DashboardChart from "@/components/DashboardChart";
+import SalesPipeline from "@/components/SalesPipeline";
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -236,10 +237,11 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="dealers" className="mt-8">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="dealers">Dealers</TabsTrigger>
             <TabsTrigger value="kyc">KYC ({pendingKYC.length})</TabsTrigger>
             <TabsTrigger value="listings">Listings</TabsTrigger>
+            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="finance">Finance</TabsTrigger>
           </TabsList>
@@ -484,6 +486,11 @@ const AdminDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Pipeline Tab */}
+          <TabsContent value="pipeline" className="mt-4">
+            <SalesPipeline mode="admin" />
           </TabsContent>
 
           {/* Users Tab */}

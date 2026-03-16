@@ -28,6 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import SalesPipeline from "@/components/SalesPipeline";
 
 const AgentDashboard = () => {
   const { user } = useAuth();
@@ -125,9 +126,15 @@ const AgentDashboard = () => {
           ))}
         </div>
 
+        {/* Sales Pipeline Analytics */}
+        <div className="mt-8">
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">Dealer Sales Pipeline</h2>
+          <SalesPipeline mode="agent" />
+        </div>
+
         <Tabs defaultValue="pipeline" className="mt-8">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
+            <TabsTrigger value="pipeline">Onboarding</TabsTrigger>
             <TabsTrigger value="commissions">Commissions</TabsTrigger>
             <TabsTrigger value="payouts">Payouts</TabsTrigger>
           </TabsList>
