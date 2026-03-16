@@ -445,14 +445,53 @@ const CreateListing = () => {
           </CardContent>
         </Card>
 
-        {/* Description & Video */}
+        {/* Description & Media */}
         <Card className="mt-4">
           <CardHeader>
             <CardTitle className="text-base">Description & Media</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Description</Label>
+              <div className="flex items-center justify-between">
+                <Label>Description</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    if (!form.make || !form.model) {
+                      toast({ title: "Fill in make and model first", variant: "destructive" });
+                      return;
+                    }
+                    setAiLoading(true);
+                    try {
+                      const { data, error } = await supabase.functions.invoke("generate-description", {
+                        body: {
+                          make: form.make, model: form.model, year: form.year,
+                          mileage: form.mileage, fuel_type: form.fuel_type,
+                          transmission: form.transmission, body_type: form.body_type,
+                          color: form.color, engine_size: form.engine_size, price: form.price,
+                        },
+                      });
+                      if (error) throw error;
+                      if (data?.description) {
+                        updateField("description", data.description);
+                        toast({ title: "Description generated!" });
+                      } else if (data?.error) {
+                        toast({ title: "AI Error", description: data.error, variant: "destructive" });
+                      }
+                    } catch (err: any) {
+                      toast({ title: "Could not generate description", description: err.message, variant: "destructive" });
+                    } finally {
+                      setAiLoading(false);
+                    }
+                  }}
+                  disabled={aiLoading || !form.make || !form.model}
+                >
+                  {aiLoading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Sparkles className="mr-1 h-3 w-3" />}
+                  AI Write
+                </Button>
+              </div>
               <Textarea
                 rows={5}
                 placeholder="Describe your vehicle — condition, history, features, reason for selling..."
