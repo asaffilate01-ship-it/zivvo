@@ -171,6 +171,7 @@ const CreateListing = () => {
         location: form.location || null,
         images: allImages,
         status,
+        country,
       };
 
       if (editId) {

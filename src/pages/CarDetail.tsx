@@ -52,6 +52,7 @@ const CarDetail = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { config } = useCountry();
   const liked = car ? isSaved(car.id) : false;
 
   const [similarCars, setSimilarCars] = useState<any[]>([]);
