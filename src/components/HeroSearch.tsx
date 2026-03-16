@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 
 const HeroSearch = () => {
   const navigate = useNavigate();
+  const { config } = useCountry();
   const [keyword, setKeyword] = useState("");
   const [make, setMake] = useState("");
   const [bodyType, setBodyType] = useState("");
