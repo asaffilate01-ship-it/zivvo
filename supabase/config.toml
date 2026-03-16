@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.generate-description]
 verify_jwt = false
+
+[functions.boost-checkout]
+verify_jwt = false
