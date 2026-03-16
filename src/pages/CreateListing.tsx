@@ -60,6 +60,7 @@ const CreateListing = () => {
     vin: "",
     description: "",
     location: "",
+    video_url: "",
   });
 
   // Load existing listing for editing
