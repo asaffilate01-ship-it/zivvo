@@ -241,6 +241,7 @@ const CreateListing = () => {
         country,
         logbook_url: logbookUrl,
         hpi_check_data: hpiCheckData,
+        video_url: form.video_url || null,
       };
 
       if (editId) {
