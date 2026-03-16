@@ -92,6 +92,7 @@ const CreateListing = () => {
           vin: data.vin || "",
           description: data.description || "",
           location: data.location || "",
+          video_url: (data as any).video_url || "",
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
