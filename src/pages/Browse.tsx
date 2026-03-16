@@ -83,6 +83,20 @@ const Browse = () => {
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "0"));
 
   // Collapsible sections
+  // Fetch models when make changes
+  useEffect(() => {
+    if (!selectedMake) {
+      setAvailableModels([]);
+      return;
+    }
+    setModelsLoading(true);
+    supabase.rpc("get_models_for_make", { _make: selectedMake, _country: country })
+      .then(({ data }) => {
+        setAvailableModels(data?.map((r: any) => r.model) || []);
+        setModelsLoading(false);
+      });
+  }, [selectedMake, country]);
+
   const [openSections, setOpenSections] = useState({
     vehicle: true,
     price: true,
