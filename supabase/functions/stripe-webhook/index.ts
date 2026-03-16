@@ -46,12 +46,47 @@ serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.user_id;
+
+        if (!userId) {
+          logStep("ERROR: No user_id in session metadata");
+          break;
+        }
+
+        // Handle boost payments (one-time)
+        if (session.metadata?.type === "boost" && session.mode === "payment") {
+          const listingId = session.metadata.listing_id;
+          const days = parseInt(session.metadata.days || "7");
+          const promotedUntil = new Date();
+          promotedUntil.setDate(promotedUntil.getDate() + days);
+
+          const { error: boostErr } = await supabase
+            .from("car_listings")
+            .update({
+              is_promoted: true,
+              promoted_until: promotedUntil.toISOString(),
+            })
+            .eq("id", listingId);
+
+          if (boostErr) logStep("ERROR boosting listing", { error: boostErr.message });
+          else logStep("Listing boosted", { listingId, until: promotedUntil.toISOString() });
+
+          await supabase.from("notifications").insert({
+            user_id: userId,
+            type: "boost",
+            title: "Listing Boosted! 🚀",
+            message: `Your listing is now promoted for ${days} days.`,
+            link: `/car/${listingId}`,
+          });
+          break;
+        }
+
+        // Handle subscription checkout
         const businessName = session.metadata?.business_name || "My Dealership";
         const subscriptionId = session.subscription as string;
         const customerId = session.customer as string;
 
-        if (!userId) {
-          logStep("ERROR: No user_id in session metadata");
+        if (!subscriptionId) {
+          logStep("Non-subscription, non-boost checkout — skipping");
           break;
         }
 
@@ -62,7 +97,7 @@ serve(async (req) => {
         logStep("Processing checkout", { userId, tier: tierInfo.tier, priceId });
 
         const slug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-        
+
         const { data: existing } = await supabase
           .from("dealers")
           .select("id")
@@ -113,97 +148,6 @@ serve(async (req) => {
           }
         }
 
-        break;
-      }
-
-      case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const priceId = subscription.items.data[0]?.price.id;
-        const tierInfo = PRICE_TO_TIER[priceId] || { tier: "starter", maxListings: 15 };
-
-        const statusMap: Record<string, string> = {
-          active: "active",
-          past_due: "past_due",
-          canceled: "canceled",
-          trialing: "trialing",
-          incomplete: "incomplete",
-        };
-
-        const { error } = await supabase
-          .from("dealers")
-          .update({
-            subscription_status: statusMap[subscription.status] || "incomplete",
-            tier: tierInfo.tier,
-            max_listings: tierInfo.maxListings,
-          })
-          .eq("stripe_subscription_id", subscription.id);
-
-        if (error) logStep("ERROR updating subscription", { error: error.message });
-        else logStep("Subscription updated", { status: subscription.status, tier: tierInfo.tier });
-        break;
-      }
-
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const { error } = await supabase
-          .from("dealers")
-          .update({ subscription_status: "canceled", is_active: false })
-          .eq("stripe_subscription_id", subscription.id);
-
-        if (error) logStep("ERROR deleting subscription", { error: error.message });
-        else logStep("Subscription canceled");
-        break;
-      }
-
-      case "invoice.payment_failed": {
-        const invoice = event.data.object as Stripe.Invoice;
-        const customerId = invoice.customer as string;
-        logStep("Payment failed", { customerId, invoiceId: invoice.id });
-
-        await supabase
-          .from("dealers")
-          .update({ subscription_status: "past_due" })
-          .eq("stripe_customer_id", customerId);
-        break;
-      }
-
-      case "checkout.session.completed": {
-        const session2 = event.data.object as Stripe.Checkout.Session;
-        // Handle boost payments (one-time)
-        if (session2.metadata?.type === "boost" && session2.mode === "payment") {
-          const listingId = session2.metadata.listing_id;
-          const days = parseInt(session2.metadata.days || "7");
-          const promotedUntil = new Date();
-          promotedUntil.setDate(promotedUntil.getDate() + days);
-
-          const { error: boostErr } = await supabase
-            .from("car_listings")
-            .update({
-              is_promoted: true,
-              promoted_until: promotedUntil.toISOString(),
-            })
-            .eq("id", listingId);
-
-          if (boostErr) logStep("ERROR boosting listing", { error: boostErr.message });
-          else logStep("Listing boosted", { listingId, until: promotedUntil.toISOString() });
-
-          // Notify seller
-          if (session2.metadata.user_id) {
-            await supabase.from("notifications").insert({
-              user_id: session2.metadata.user_id,
-              type: "boost",
-              title: "Listing Boosted! 🚀",
-              message: `Your listing is now promoted for ${days} days.`,
-              link: `/car/${listingId}`,
-            });
-          }
-          break;
-        }
-
-        // Handle subscription checkout (existing logic already above)
-        // This case handles both - the subscription case is at the top
-        // If it reaches here without matching boost, it's a duplicate event for subscriptions
-        logStep("Checkout completed (non-boost, likely subscription handled above)");
         break;
       }
 
