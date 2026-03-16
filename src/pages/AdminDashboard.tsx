@@ -237,10 +237,11 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="dealers" className="mt-8">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="dealers">Dealers</TabsTrigger>
             <TabsTrigger value="kyc">KYC ({pendingKYC.length})</TabsTrigger>
             <TabsTrigger value="listings">Listings</TabsTrigger>
+            <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="finance">Finance</TabsTrigger>
           </TabsList>

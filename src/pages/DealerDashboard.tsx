@@ -276,6 +276,12 @@ const DealerDashboard = () => {
           ))}
         </div>
 
+        {/* Sales Pipeline */}
+        <div className="mt-8">
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">Sales Pipeline</h2>
+          <SalesPipeline mode="dealer" dealerId={dealer.id} />
+        </div>
+
         {/* Analytics Section */}
         <div className="mt-8">
           <h2 className="font-display text-lg font-bold text-foreground mb-4">Analytics & Insights</h2>
