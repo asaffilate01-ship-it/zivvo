@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import SaveSearchDialog from "@/components/SaveSearchDialog";
 
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
