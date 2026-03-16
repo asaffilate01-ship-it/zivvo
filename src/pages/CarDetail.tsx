@@ -7,16 +7,20 @@ import { DetailSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
 import ReportListingDialog from "@/components/ReportListingDialog";
 import SellerReviews from "@/components/SellerReviews";
+import PaymentCalculator from "@/components/PaymentCalculator";
+import MakeOfferDialog from "@/components/MakeOfferDialog";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Heart, Share2, Phone, Mail, MapPin, Calendar,
   Gauge, Fuel, Settings2, Shield, BadgeCheck, ExternalLink,
   ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck,
-  MessageCircle, GitCompare,
+  MessageCircle, GitCompare, Eye, Clock, Palette, DoorOpen,
+  Cog, Hash, Zap, CircleDot,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
@@ -48,12 +52,13 @@ const CarDetail = () => {
   const [car, setCar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState(0);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [dealer, setDealer] = useState<any>(null);
   const { isSaved, toggle } = useSavedCars();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { config } = useCountry();
+  const { config, country } = useCountry();
   const liked = car ? isSaved(car.id) : false;
 
   const [similarCars, setSimilarCars] = useState<any[]>([]);
@@ -74,7 +79,6 @@ const CarDetail = () => {
           const { data: d } = await supabase.from("dealer_landing_public").select("business_name, slug, city, kyc_verified").eq("id", data.dealer_id).maybeSingle();
           if (d) setDealer(d);
         }
-        // Fetch similar cars (same make or body type, excluding current)
         const { data: similar } = await supabase
           .from("car_listings")
           .select("*")
@@ -124,6 +128,7 @@ const CarDetail = () => {
   const specs = (car.specs as Record<string, any>) || {};
   const sellerName = dealer?.business_name || "Private Seller";
   const sellerLocation = car.location || dealer?.city || "";
+  const showWhatsApp = (country === "AE" || country === "PK");
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -136,6 +141,21 @@ const CarDetail = () => {
       toast({ title: "Link copied to clipboard" });
     }
   };
+
+  const allSpecs = [
+    { icon: Calendar, label: "Year", value: car.year },
+    { icon: Gauge, label: config.terminology.mileage, value: car.mileage ? formatDistance(car.mileage, config) : null },
+    { icon: Fuel, label: "Fuel Type", value: car.fuel_type },
+    { icon: Settings2, label: "Transmission", value: car.transmission },
+    { icon: Cog, label: "Engine", value: car.engine_size || specs.engine },
+    { icon: Zap, label: "Power", value: specs.power },
+    { icon: CircleDot, label: "Drivetrain", value: specs.drivetrain },
+    { icon: Car, label: "Body Type", value: car.body_type },
+    { icon: DoorOpen, label: "Doors", value: car.doors || specs.doors },
+    { icon: Palette, label: "Colour", value: car.color },
+    { icon: Hash, label: "VIN", value: car.vin },
+    { icon: FileCheck, label: config.terminology.registration, value: car.registration },
+  ].filter(s => s.value);
 
   return (
     <div className="min-h-screen bg-background">
@@ -166,6 +186,7 @@ const CarDetail = () => {
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
+        {/* Breadcrumbs */}
         <nav className="mb-4 flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
           <Link to="/" className="hover:text-primary">Home</Link>
           <span>/</span>
@@ -175,8 +196,10 @@ const CarDetail = () => {
         </nav>
 
         <div className="grid gap-8 lg:grid-cols-3">
+          {/* LEFT COLUMN */}
           <div className="lg:col-span-2">
-            <div className="relative overflow-hidden rounded-2xl">
+            {/* Image Gallery */}
+            <div className="relative overflow-hidden rounded-2xl cursor-pointer" onClick={() => setGalleryOpen(true)}>
               <motion.img
                 key={currentImage}
                 initial={{ opacity: 0 }}
@@ -189,14 +212,14 @@ const CarDetail = () => {
 
               {images.length > 1 && (
                 <>
-                  <Button variant="ghost" size="icon" className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={() => setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1))}>
+                  <Button variant="ghost" size="icon" className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1)); }}>
                     <ChevronLeft className="h-5 w-5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={() => setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1))}>
+                  <Button variant="ghost" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1)); }}>
                     <ChevronRight className="h-5 w-5" />
                   </Button>
                   <div className="absolute bottom-3 right-3 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
-                    {currentImage + 1} / {images.length}
+                    📷 {currentImage + 1} / {images.length}
                   </div>
                 </>
               )}
@@ -207,6 +230,7 @@ const CarDetail = () => {
               </div>
             </div>
 
+            {/* Thumbnails */}
             <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
               {images.map((img: string, i: number) => (
                 <button key={i} onClick={() => setCurrentImage(i)} className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${i === currentImage ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}>
@@ -219,78 +243,102 @@ const CarDetail = () => {
             <div className="mt-6 lg:hidden">
               <h1 className="font-display text-2xl font-bold text-foreground">{car.title}</h1>
               <p className="mt-2 font-display text-3xl font-bold text-primary">{formatPrice(Number(car.price), config)}</p>
+              <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
+                {car.views_count != null && (
+                  <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {car.views_count} views</span>
+                )}
+                <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> Listed {new Date(car.created_at).toLocaleDateString()}</span>
+              </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { icon: Calendar, label: "Year", value: car.year },
-                { icon: Gauge, label: "Mileage", value: car.mileage ? formatDistance(car.mileage, config) : "N/A" },
-                { icon: Fuel, label: "Fuel", value: car.fuel_type || "N/A" },
-                { icon: Settings2, label: "Transmission", value: car.transmission || "N/A" },
-              ].map((spec) => (
-                <div key={spec.label} className="rounded-xl border border-border bg-card p-4">
-                  <spec.icon className="h-5 w-5 text-primary" />
-                  <p className="mt-2 text-xs text-muted-foreground">{spec.label}</p>
-                  <p className="font-display font-semibold text-card-foreground">{spec.value}</p>
-                </div>
-              ))}
-            </div>
-
+            {/* Key Specs - Quick Glance */}
             <div className="mt-8">
-              <h2 className="font-display text-xl font-bold text-foreground">Technical Specifications</h2>
-              <div className="mt-4 grid grid-cols-2 gap-y-3 rounded-xl border border-border bg-card p-5 sm:grid-cols-3">
-                {[
-                  { label: "Engine", value: car.engine_size || specs.engine || "N/A" },
-                  { label: "Power", value: specs.power || "N/A" },
-                  { label: "Drivetrain", value: specs.drivetrain || "N/A" },
-                  { label: "Body Type", value: car.body_type || "N/A" },
-                  { label: "Doors", value: car.doors || specs.doors || "N/A" },
-                  { label: "Color", value: car.color || "N/A" },
-                  { label: "VIN", value: car.vin || "N/A" },
-                  { label: "Registration", value: car.registration || "N/A" },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className="font-medium text-card-foreground">{item.value}</p>
+              <h2 className="font-display text-xl font-bold text-foreground mb-4">Key Specifications</h2>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                {allSpecs.slice(0, 8).map((spec) => (
+                  <div key={spec.label} className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30">
+                    <spec.icon className="h-5 w-5 text-primary" />
+                    <p className="mt-2 text-xs text-muted-foreground">{spec.label}</p>
+                    <p className="font-display font-semibold text-card-foreground">{spec.value}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {car.description && (
+            {/* Full Technical Specifications */}
+            {allSpecs.length > 0 && (
               <div className="mt-8">
-                <h2 className="font-display text-xl font-bold text-foreground">Description</h2>
-                <p className="mt-3 leading-relaxed text-muted-foreground whitespace-pre-line">{car.description}</p>
-              </div>
-            )}
-
-            {car.features && car.features.length > 0 && (
-              <div className="mt-8">
-                <h2 className="font-display text-xl font-bold text-foreground">Features</h2>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {car.features.map((f: string) => (
-                    <Badge key={f} variant="secondary">{f}</Badge>
+                <h2 className="font-display text-xl font-bold text-foreground">All Specifications</h2>
+                <div className="mt-4 rounded-xl border border-border bg-card overflow-hidden">
+                  {allSpecs.map((spec, i) => (
+                    <div key={spec.label} className={`flex items-center justify-between px-5 py-3 ${i % 2 === 0 ? "bg-muted/30" : ""}`}>
+                      <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <spec.icon className="h-4 w-4" />
+                        {spec.label}
+                      </span>
+                      <span className="font-medium text-card-foreground text-sm">{spec.value}</span>
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* Description */}
+            {car.description && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground">Description</h2>
+                <div className="mt-3 rounded-xl border border-border bg-card p-5">
+                  <p className="leading-relaxed text-muted-foreground whitespace-pre-line">{car.description}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Features */}
+            {car.features && car.features.length > 0 && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground">Features & Equipment</h2>
+                <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {car.features.map((f: string) => (
+                    <div key={f} className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                      <BadgeCheck className="h-3.5 w-3.5 text-success shrink-0" />
+                      <span className="text-sm text-card-foreground">{f}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Vehicle Checks */}
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Vehicle Checks</h2>
               <VehicleChecks registration={car.registration} vin={car.vin} country={car.country} />
             </div>
+
+            {/* Finance Calculator - Mobile */}
+            <div className="mt-8 lg:hidden">
+              <PaymentCalculator price={Number(car.price)} />
+            </div>
           </div>
 
+          {/* RIGHT COLUMN — Sticky Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-20 space-y-4">
+              {/* Price Card */}
               <div className="hidden rounded-2xl border border-border bg-card p-6 shadow-card lg:block">
                 <h1 className="font-display text-xl font-bold text-card-foreground">{car.title}</h1>
                 <p className="mt-3 font-display text-3xl font-bold text-primary">{formatPrice(Number(car.price), config)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Finance from ~{formatPrice(Math.round(Number(car.price) / 48), config)}/mo
                 </p>
+                <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
+                  {car.views_count != null && (
+                    <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {car.views_count} views</span>
+                  )}
+                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {new Date(car.created_at).toLocaleDateString()}</span>
+                </div>
               </div>
 
+              {/* Seller Card */}
               <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -313,7 +361,9 @@ const CarDetail = () => {
 
                 <div className="mt-5 space-y-2">
                   <PhoneRevealButton phone={dealer?.business_phone} />
+                  {showWhatsApp && <WhatsAppButton phone={dealer?.business_phone} listingTitle={car.title} />}
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
+                  <MakeOfferDialog listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} askingPrice={Number(car.price)} />
                   <Button
                     variant="outline"
                     className="w-full"
@@ -360,6 +410,7 @@ const CarDetail = () => {
                 </div>
               </div>
 
+              {/* Dealer Showroom Link */}
               {dealer?.slug && (
                 <Link to={`/dealer/${dealer.slug}`}>
                   <Button variant="outline" className="w-full">
@@ -369,6 +420,12 @@ const CarDetail = () => {
                 </Link>
               )}
 
+              {/* Finance Calculator - Desktop */}
+              <div className="hidden lg:block">
+                <PaymentCalculator price={Number(car.price)} />
+              </div>
+
+              {/* Safety Tips */}
               <div className="rounded-2xl border border-border bg-warning/5 p-5">
                 <h4 className="flex items-center gap-2 font-display font-semibold text-foreground">
                   <Shield className="h-4 w-4 text-warning" />
@@ -402,6 +459,44 @@ const CarDetail = () => {
           </div>
         )}
       </div>
+
+      {/* Fullscreen Gallery Overlay */}
+      <AnimatePresence>
+        {galleryOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 backdrop-blur-sm"
+            onClick={() => setGalleryOpen(false)}
+          >
+            <Button variant="ghost" size="icon" className="absolute right-4 top-4 text-background hover:bg-background/20" onClick={() => setGalleryOpen(false)}>
+              ✕
+            </Button>
+            <img
+              src={images[currentImage]}
+              alt={car.title}
+              className="max-h-[90vh] max-w-[95vw] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+            {images.length > 1 && (
+              <>
+                <Button variant="ghost" size="icon" className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/20 text-background hover:bg-background/40" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1)); }}>
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button variant="ghost" size="icon" className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/20 text-background hover:bg-background/40" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1)); }}>
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  {images.map((_: string, i: number) => (
+                    <button key={i} onClick={(e) => { e.stopPropagation(); setCurrentImage(i); }} className={`h-2 w-2 rounded-full transition-all ${i === currentImage ? "bg-background w-6" : "bg-background/40"}`} />
+                  ))}
+                </div>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Footer />
     </div>
