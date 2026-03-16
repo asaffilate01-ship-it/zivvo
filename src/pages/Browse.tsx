@@ -112,7 +112,8 @@ const Browse = () => {
 
       const orderCol = sortBy === "price_asc" ? "price" : sortBy === "price_desc" ? "price" : sortBy === "mileage_asc" ? "mileage" : "created_at";
       const ascending = sortBy === "price_asc" || sortBy === "mileage_asc";
-      query = query.order(orderCol, { ascending }).range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      // Promoted listings always appear first
+      query = query.order("is_promoted", { ascending: false, nullsFirst: false }).order(orderCol, { ascending }).range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
       const { data, count, error } = await query;
       if (!error && data) { setListings(data); setTotalCount(count || 0); }
