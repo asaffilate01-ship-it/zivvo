@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 
 interface CarCardProps {
   car: {
@@ -30,6 +32,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
   const { isSaved, toggle } = useSavedCars();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { config } = useCountry();
   const liked = isSaved(car.id);
   const mainImage = car.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80";
 
@@ -84,7 +87,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
 
             <div className="absolute bottom-3 left-3">
               <p className="font-display text-2xl font-bold text-primary-foreground">
-                £{Number(car.price).toLocaleString()}
+                {formatPrice(Number(car.price), config)}
               </p>
             </div>
           </div>
@@ -102,7 +105,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
               {car.mileage != null && (
                 <span className="flex items-center gap-1">
                   <Gauge className="h-3.5 w-3.5" />
-                  {car.mileage.toLocaleString()} mi
+                  {formatDistance(car.mileage, config)}
                 </span>
               )}
               {car.fuel_type && (

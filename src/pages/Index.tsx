@@ -13,6 +13,8 @@ import {
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 
 const categories = [
   { icon: Car, label: "Sedan", count: "—" },
@@ -24,6 +26,7 @@ const categories = [
 ];
 
 const Index = () => {
+  const { country, config } = useCountry();
   const [featured, setFeatured] = useState<any[]>([]);
   const [latest, setLatest] = useState<any[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
@@ -31,32 +34,28 @@ const Index = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const [featuredRes, latestRes] = await Promise.all([
-        supabase.from("car_listings").select("*").eq("status", "active").eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
-        supabase.from("car_listings").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(8),
+        supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
+        supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).order("created_at", { ascending: false }).limit(8),
       ]);
       if (featuredRes.data) setFeatured(featuredRes.data);
       if (latestRes.data) setLatest(latestRes.data);
 
-      const { data: allActive } = await supabase.from("car_listings").select("body_type").eq("status", "active");
+      const { data: allActive } = await supabase.from("car_listings").select("body_type, fuel_type").eq("status", "active").eq("country", country);
       if (allActive) {
         const counts: Record<string, number> = {};
         allActive.forEach((l: any) => {
           if (l.body_type) counts[l.body_type] = (counts[l.body_type] || 0) + 1;
+          if (l.fuel_type === "Electric") counts["Electric"] = (counts["Electric"] || 0) + 1;
+          if (l.fuel_type === "Hybrid") counts["Hybrid"] = (counts["Hybrid"] || 0) + 1;
         });
-        const { data: fuelData } = await supabase.from("car_listings").select("fuel_type").eq("status", "active");
-        if (fuelData) {
-          fuelData.forEach((l: any) => {
-            if (l.fuel_type === "Electric") counts["Electric"] = (counts["Electric"] || 0) + 1;
-            if (l.fuel_type === "Hybrid") counts["Hybrid"] = (counts["Hybrid"] || 0) + 1;
-          });
-        }
         setCategoryCounts(counts);
       }
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [country]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -196,7 +195,7 @@ const Index = () => {
           <p className="mx-auto mt-3 max-w-lg text-primary-foreground/70">Reach thousands of buyers instantly. Individual listings or dealer subscriptions available.</p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link to="/sell"><Button size="lg" className="gradient-primary border-0 px-8">Post Your Ad — It's Free</Button></Link>
-            <Link to="/dealers"><Button size="lg" variant="outline" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">Dealer Plans from £49/mo</Button></Link>
+            <Link to="/dealers"><Button size="lg" variant="outline" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10">Dealer Plans from {formatPrice(config.dealerPlans[0].price, config)}/mo</Button></Link>
           </div>
         </div>
       </section>

@@ -11,73 +11,32 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 
-const plans = [
-  {
-    name: "Starter",
-    price: 49,
-    priceId: "price_1TBFMMFFogsDQVs4rwjRss69",
-    icon: Zap,
-    description: "Perfect for small dealerships getting started",
-    features: [
-      "Up to 15 active listings",
-      "Basic analytics dashboard",
-      "Marketplace presence",
-      "Email support",
-      "Standard listing placement",
-    ],
-    popular: false,
-  },
-  {
-    name: "Professional",
-    price: 99,
-    priceId: "price_1TBFMOFFogsDQVs4vv5Rx8lW",
-    icon: Star,
-    description: "For growing dealerships that need more",
-    features: [
-      "Up to 50 active listings",
-      "Full analytics & reports",
-      "Custom dealer landing page",
-      "Featured listing placements",
-      "Priority email & chat support",
-      "CSV/PDF export",
-      "Finance check integration",
-    ],
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: 199,
-    priceId: "price_1TBFMOFFogsDQVs4y0kujRs8",
-    icon: Crown,
-    description: "For large dealerships and dealer groups",
-    features: [
-      "Unlimited active listings",
-      "White-label landing page",
-      "API access & bulk import",
-      "Priority support + account manager",
-      "Advanced analytics & KPIs",
-      "Custom branding",
-      "Multi-location support",
-      "Dedicated onboarding",
-    ],
-    popular: false,
-  },
-];
+const planIcons = [Zap, Star, Crown];
 
 import SEOHead from "@/components/SEOHead";
 
 const DealerPricing = () => {
   const { user, subscription, refreshSubscription } = useAuth();
+  const { config } = useCountry();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
   const [showBusinessDialog, setShowBusinessDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState("");
   const [businessName, setBusinessName] = useState("");
+
+  const plans = config.dealerPlans.map((p, i) => ({
+    ...p,
+    icon: planIcons[i] || Zap,
+    popular: i === 1,
+    description: i === 0 ? "Perfect for small dealerships getting started" : i === 1 ? "For growing dealerships that need more" : "For large dealerships and dealer groups",
+  }));
 
   // Check if returning from checkout
   useEffect(() => {
@@ -140,7 +99,7 @@ const DealerPricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Dealer Plans & Pricing" description="Choose a dealer plan to scale your car dealership on AutoVault. Starting from £49/month with verified dealer badges and analytics." />
+      <SEOHead title="Dealer Plans & Pricing" description={`Choose a dealer plan to scale your car dealership on AutoVault. Starting from ${formatPrice(plans[0].price, config)}/month.`} />
       <Navbar />
 
       <section className="container mx-auto px-4 py-16">
@@ -201,7 +160,7 @@ const DealerPricing = () => {
                 <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
 
                 <div className="mt-5">
-                  <span className="font-display text-4xl font-bold text-card-foreground">£{plan.price}</span>
+                  <span className="font-display text-4xl font-bold text-card-foreground">{formatPrice(plan.price, config)}</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
 

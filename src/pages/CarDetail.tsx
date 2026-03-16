@@ -18,6 +18,8 @@ import {
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -50,6 +52,7 @@ const CarDetail = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { config } = useCountry();
   const liked = car ? isSaved(car.id) : false;
 
   const [similarCars, setSimilarCars] = useState<any[]>([]);
@@ -213,7 +216,7 @@ const CarDetail = () => {
             {/* Mobile title/price */}
             <div className="mt-6 lg:hidden">
               <h1 className="font-display text-2xl font-bold text-foreground">{car.title}</h1>
-              <p className="mt-2 font-display text-3xl font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
+              <p className="mt-2 font-display text-3xl font-bold text-primary">{formatPrice(Number(car.price), config)}</p>
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -301,9 +304,9 @@ const CarDetail = () => {
             <div className="sticky top-20 space-y-4">
               <div className="hidden rounded-2xl border border-border bg-card p-6 shadow-card lg:block">
                 <h1 className="font-display text-xl font-bold text-card-foreground">{car.title}</h1>
-                <p className="mt-3 font-display text-3xl font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
+                <p className="mt-3 font-display text-3xl font-bold text-primary">{formatPrice(Number(car.price), config)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Finance from ~£{Math.round(Number(car.price) / 48).toLocaleString()}/mo
+                  Finance from ~{formatPrice(Math.round(Number(car.price) / 48), config)}/mo
                 </p>
               </div>
 

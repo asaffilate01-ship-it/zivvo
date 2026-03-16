@@ -5,7 +5,6 @@ import CarCard from "@/components/CarCard";
 import SEOHead from "@/components/SEOHead";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
-import { makes, bodyTypes, fuelTypes, transmissions } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +14,8 @@ import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, GitCompare } f
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SaveSearchDialog from "@/components/SaveSearchDialog";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
@@ -24,7 +25,12 @@ const engineSizes = ["1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.
 
 const Browse = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { country, config } = useCountry();
 
+  const makes = config.makes;
+  const bodyTypes = config.bodyTypes;
+  const fuelTypes = config.fuelTypes;
+  const transmissions = config.transmissions;
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
   const [selectedMake, setSelectedMake] = useState(searchParams.get("make") || "");
   const [selectedBody, setSelectedBody] = useState(searchParams.get("body") || "");
@@ -76,7 +82,7 @@ const Browse = () => {
 
   useEffect(() => {
     setPage(0);
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, country]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -86,6 +92,7 @@ const Browse = () => {
         .from("car_listings")
         .select("*", { count: "exact" })
         .eq("status", "active")
+        .eq("country", country)
         .gte("price", priceRange[0])
         .lte("price", priceRange[1])
         .gte("year", yearRange[0])
@@ -119,7 +126,7 @@ const Browse = () => {
       setLoading(false);
     };
     fetchListings();
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, page]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, page, country]);
 
   const clearFilters = () => {
     setKeyword("");
