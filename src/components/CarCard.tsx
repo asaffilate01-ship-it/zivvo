@@ -117,6 +117,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             <img src={mainImage} alt={car.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
             <div className="absolute left-3 top-3 flex gap-1.5">
+              {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-xs font-semibold">🔥 Promoted</Badge>}
               {car.is_featured && <Badge className="gradient-primary border-0 text-xs font-semibold text-primary-foreground">Featured</Badge>}
               {car.verified && <Badge variant="secondary" className="bg-background/90 text-xs backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" />Verified</Badge>}
             </div>
