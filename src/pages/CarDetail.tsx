@@ -138,8 +138,8 @@ const CarDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${car.title} — £${Number(car.price).toLocaleString()}`}
-        description={`${car.year} ${car.make} ${car.model}. ${car.mileage ? car.mileage.toLocaleString() + " miles." : ""} ${car.fuel_type || ""} ${car.transmission || ""}. ${car.location || ""}`}
+        title={`${car.title} — ${formatPrice(Number(car.price), config)}`}
+        description={`${car.year} ${car.make} ${car.model}. ${car.mileage ? formatDistance(car.mileage, config) + "." : ""} ${car.fuel_type || ""} ${car.transmission || ""}. ${car.location || ""}`}
         type="product"
         jsonLd={{
           "@context": "https://schema.org",
@@ -148,14 +148,14 @@ const CarDetail = () => {
           "manufacturer": car.make,
           "model": car.model,
           "modelDate": String(car.year),
-          "mileageFromOdometer": car.mileage ? { "@type": "QuantitativeValue", "value": car.mileage, "unitCode": "SMI" } : undefined,
+          "mileageFromOdometer": car.mileage ? { "@type": "QuantitativeValue", "value": car.mileage, "unitCode": config.distanceUnit === "miles" ? "SMI" : "KMT" } : undefined,
           "fuelType": car.fuel_type || undefined,
           "vehicleTransmission": car.transmission || undefined,
           "color": car.color || undefined,
           "offers": {
             "@type": "Offer",
             "price": car.price,
-            "priceCurrency": "GBP",
+            "priceCurrency": config.currency.code,
             "availability": car.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
           },
           "image": images[0],
@@ -222,7 +222,7 @@ const CarDetail = () => {
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { icon: Calendar, label: "Year", value: car.year },
-                { icon: Gauge, label: "Mileage", value: car.mileage ? `${car.mileage.toLocaleString()} mi` : "N/A" },
+                { icon: Gauge, label: "Mileage", value: car.mileage ? formatDistance(car.mileage, config) : "N/A" },
                 { icon: Fuel, label: "Fuel", value: car.fuel_type || "N/A" },
                 { icon: Settings2, label: "Transmission", value: car.transmission || "N/A" },
               ].map((spec) => (

@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -41,6 +43,7 @@ interface ListingSummary {
 
 const DealerDashboard = () => {
   const { user, subscription, refreshSubscription } = useAuth();
+  const { config } = useCountry();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const [dealer, setDealer] = useState<DealerInfo | null>(null);
@@ -297,7 +300,7 @@ const DealerDashboard = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
-                      <span className="font-display font-semibold text-card-foreground">£{Number(listing.price).toLocaleString()}</span>
+                      <span className="font-display font-semibold text-card-foreground">{formatPrice(Number(listing.price), config)}</span>
                       <Link to={`/dashboard/listings/edit?edit=${listing.id}`}>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
                           <Edit className="h-4 w-4" />

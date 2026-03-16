@@ -150,9 +150,9 @@ const Browse = () => {
   if (selectedColor) activeFiltersList.push({ label: selectedColor, clear: () => setSelectedColor("") });
   if (selectedDoors) activeFiltersList.push({ label: `${selectedDoors} doors`, clear: () => setSelectedDoors("") });
   if (selectedEngine) activeFiltersList.push({ label: selectedEngine, clear: () => setSelectedEngine("") });
-  if (priceRange[0] > 0 || priceRange[1] < 200000) activeFiltersList.push({ label: `£${priceRange[0].toLocaleString()}-£${priceRange[1].toLocaleString()}`, clear: () => setPriceRange([0, 200000]) });
+  if (priceRange[0] > 0 || priceRange[1] < 200000) activeFiltersList.push({ label: `${formatPrice(priceRange[0], config)}-${formatPrice(priceRange[1], config)}`, clear: () => setPriceRange([0, 200000]) });
   if (yearRange[0] > 2000 || yearRange[1] < currentYear) activeFiltersList.push({ label: `${yearRange[0]}-${yearRange[1]}`, clear: () => setYearRange([2000, currentYear]) });
-  if (mileageMax < 200000) activeFiltersList.push({ label: `≤${mileageMax.toLocaleString()} mi`, clear: () => setMileageMax(200000) });
+  if (mileageMax < 200000) activeFiltersList.push({ label: `≤${formatDistance(mileageMax, config)}`, clear: () => setMileageMax(200000) });
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -332,7 +332,7 @@ const Browse = () => {
 
               <div>
               <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                  Price: £{priceRange[0].toLocaleString()} — £{priceRange[1].toLocaleString()}
+                  Price: {formatPrice(priceRange[0], config)} — {formatPrice(priceRange[1], config)}
                 </label>
                 <Slider min={0} max={200000} step={5000} value={priceRange} onValueChange={setPriceRange} className="mt-2" />
               </div>
@@ -346,7 +346,7 @@ const Browse = () => {
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                  Max Mileage: {mileageMax >= 200000 ? "Any" : `${mileageMax.toLocaleString()} mi`}
+                  Max Mileage: {mileageMax >= 200000 ? "Any" : formatDistance(mileageMax, config)}
                 </label>
                 <Slider min={0} max={200000} step={5000} value={[mileageMax]} onValueChange={(v) => setMileageMax(v[0])} className="mt-2" />
               </div>
