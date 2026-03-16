@@ -32,6 +32,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
   const { isSaved, toggle } = useSavedCars();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { config } = useCountry();
   const liked = isSaved(car.id);
   const mainImage = car.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80";
 
