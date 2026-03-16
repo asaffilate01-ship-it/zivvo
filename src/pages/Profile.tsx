@@ -6,18 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Settings, Car, Loader2, Save, Edit, Camera } from "lucide-react";
+import { User, Settings, Car, Loader2, Save, Edit, Camera, Download, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [profile, setProfile] = useState({ full_name: "", phone: "", avatar_url: "" });
   const [myListings, setMyListings] = useState<any[]>([]);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -83,6 +90,65 @@ const Profile = () => {
     setSaving(false);
   };
 
+  const handleExportData = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const [profileRes, listingsRes, enquiriesRes, savedRes, messagesRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("user_id", user.id),
+        supabase.from("car_listings").select("*").eq("seller_id", user.id),
+        supabase.from("enquiries").select("*").or(`sender_id.eq.${user.id},seller_id.eq.${user.id}`),
+        supabase.from("saved_cars").select("*").eq("user_id", user.id),
+        supabase.from("messages").select("*").or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`),
+      ]);
+
+      const exportData = {
+        exported_at: new Date().toISOString(),
+        email: user.email,
+        profile: profileRes.data,
+        listings: listingsRes.data,
+        enquiries: enquiriesRes.data,
+        saved_cars: savedRes.data,
+        messages: messagesRes.data,
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `autovault-data-export-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast({ title: "Data exported successfully" });
+    } catch {
+      toast({ title: "Export failed", variant: "destructive" });
+    }
+    setExporting(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setDeleting(true);
+    try {
+      // Delete user data in order
+      await supabase.from("saved_cars").delete().eq("user_id", user.id);
+      await supabase.from("saved_searches").delete().eq("user_id", user.id);
+      await supabase.from("notifications").delete().eq("user_id", user.id);
+      await supabase.from("messages").delete().or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
+      await supabase.from("enquiries").delete().eq("sender_id", user.id);
+      await supabase.from("car_listings").delete().eq("seller_id", user.id);
+      await supabase.from("user_roles").delete().eq("user_id", user.id);
+      await supabase.from("profiles").delete().eq("user_id", user.id);
+
+      await signOut();
+      toast({ title: "Account data deleted", description: "Your data has been removed. The auth account will be fully purged shortly." });
+      navigate("/");
+    } catch {
+      toast({ title: "Error deleting account", variant: "destructive" });
+    }
+    setDeleting(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -112,7 +178,6 @@ const Profile = () => {
                 <CardTitle className="flex items-center gap-2 text-base"><User className="h-4 w-4 text-primary" /> Personal Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Avatar Upload */}
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-border bg-muted">
@@ -200,10 +265,43 @@ const Profile = () => {
                   <p className="font-medium text-card-foreground">Account Created</p>
                   <p className="text-sm text-muted-foreground">{user?.created_at ? new Date(user.created_at).toLocaleDateString() : "N/A"}</p>
                 </div>
+
+                {/* GDPR Data Export */}
+                <div className="rounded-lg border border-border p-4">
+                  <p className="font-medium text-card-foreground">Export Your Data</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Download all your personal data as a JSON file (GDPR right of access).</p>
+                  <Button variant="outline" size="sm" className="mt-3" onClick={handleExportData} disabled={exporting}>
+                    {exporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+                    Export Data
+                  </Button>
+                </div>
+
+                {/* Account Deletion */}
                 <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
                   <p className="font-medium text-destructive">Danger Zone</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Account deletion is permanent and cannot be undone.</p>
-                  <Button variant="outline" size="sm" className="mt-3 border-destructive text-destructive">Request Account Deletion</Button>
+                  <p className="mt-1 text-sm text-muted-foreground">Account deletion is permanent and cannot be undone. All your listings, messages, and saved data will be removed.</p>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="mt-3 border-destructive text-destructive" disabled={deleting}>
+                        {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                        Delete Account
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete your account and all associated data including listings, messages, enquiries, and saved cars. This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Yes, delete my account
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </CardContent>
             </Card>

@@ -319,8 +319,8 @@ const Browse = () => {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                  Price: ${priceRange[0].toLocaleString()} — ${priceRange[1].toLocaleString()}
+              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                  Price: £{priceRange[0].toLocaleString()} — £{priceRange[1].toLocaleString()}
                 </label>
                 <Slider min={0} max={200000} step={5000} value={priceRange} onValueChange={setPriceRange} className="mt-2" />
               </div>
