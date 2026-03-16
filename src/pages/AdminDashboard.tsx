@@ -12,7 +12,7 @@ import {
 import {
   Users, Building2, Car, DollarSign, ShieldCheck, XCircle,
   CheckCircle, Search, TrendingUp, BarChart3, Download, Calendar,
-  Eye, Loader2, UserPlus, Ban, MoreHorizontal,
+  Eye, Loader2, UserPlus, Ban, MoreHorizontal, Flag, Mail, Bug,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -36,6 +36,9 @@ const AdminDashboard = () => {
   const [commissions, setCommissions] = useState<any[]>([]);
   const [allProfiles, setAllProfiles] = useState<any[]>([]);
   const [allRoles, setAllRoles] = useState<any[]>([]);
+  const [listingReports, setListingReports] = useState<any[]>([]);
+  const [contactMessages, setContactMessages] = useState<any[]>([]);
+  const [bugReports, setBugReports] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listingSearch, setListingSearch] = useState("");
   const [listingStatusFilter, setListingStatusFilter] = useState("all");
@@ -48,18 +51,24 @@ const AdminDashboard = () => {
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
-    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes] = await Promise.all([
+    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes] = await Promise.all([
       supabase.from("dealers").select("*").order("created_at", { ascending: false }),
       supabase.from("car_listings").select("*").order("created_at", { ascending: false }).limit(200),
       supabase.from("agent_commissions").select("*").order("created_at", { ascending: false }),
       supabase.from("profiles").select("*").order("created_at", { ascending: false }),
       supabase.from("user_roles").select("*"),
+      supabase.from("listing_reports").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("contact_messages").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("bug_reports").select("*").order("created_at", { ascending: false }).limit(100),
     ]);
     if (dealersRes.data) setDealers(dealersRes.data);
     if (listingsRes.data) setListings(listingsRes.data);
     if (commissionsRes.data) setCommissions(commissionsRes.data);
     if (profilesRes.data) setAllProfiles(profilesRes.data);
     if (rolesRes.data) setAllRoles(rolesRes.data);
+    if (reportsRes.data) setListingReports(reportsRes.data);
+    if (contactsRes.data) setContactMessages(contactsRes.data);
+    if (bugsRes.data) setBugReports(bugsRes.data);
     setLoading(false);
   };
 
@@ -120,6 +129,24 @@ const AdminDashboard = () => {
     fetchAll();
   };
 
+  const updateReportStatus = async (id: string, status: string) => {
+    await supabase.from("listing_reports").update({ status }).eq("id", id);
+    toast({ title: `Report ${status}` });
+    fetchAll();
+  };
+
+  const updateContactStatus = async (id: string, status: string) => {
+    await supabase.from("contact_messages").update({ status }).eq("id", id);
+    toast({ title: `Message ${status}` });
+    fetchAll();
+  };
+
+  const updateBugStatus = async (id: string, status: string) => {
+    await supabase.from("bug_reports").update({ status }).eq("id", id);
+    toast({ title: `Bug ${status}` });
+    fetchAll();
+  };
+
   const exportCSV = (data: any[], filename: string) => {
     if (!data.length) return;
     const headers = Object.keys(data[0]).join(",");
@@ -133,6 +160,7 @@ const AdminDashboard = () => {
 
   const pendingKYC = dealers.filter((d) => !d.kyc_verified && d.kyc_submitted_at);
   const activeListings = listings.filter((l) => l.status === "active");
+  const pendingReports = listingReports.filter((r) => r.status === "pending");
   const prices: Record<string, number> = { starter: 49, professional: 99, enterprise: 199 };
   const totalRevenue = dealers.filter((d) => d.subscription_status === "active").reduce((acc, d) => acc + (prices[d.tier] || 0), 0);
   const totalUsers = allProfiles.length;
@@ -211,7 +239,7 @@ const AdminDashboard = () => {
             { label: "Total Dealers", value: dealers.length, icon: Building2, color: "text-info" },
             { label: "Active Listings", value: activeListings.length, icon: Car, color: "text-success" },
             { label: "Monthly Revenue", value: `$${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
-            { label: "Pending KYC", value: pendingKYC.length, icon: ShieldCheck, color: "text-destructive" },
+            { label: "Pending Reports", value: pendingReports.length, icon: Flag, color: "text-destructive" },
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
               <Card>
@@ -237,12 +265,15 @@ const AdminDashboard = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="dealers" className="mt-8">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="flex w-full overflow-x-auto">
             <TabsTrigger value="dealers">Dealers</TabsTrigger>
             <TabsTrigger value="kyc">KYC ({pendingKYC.length})</TabsTrigger>
             <TabsTrigger value="listings">Listings</TabsTrigger>
+            <TabsTrigger value="reports">Reports ({pendingReports.length})</TabsTrigger>
             <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="contacts">Messages</TabsTrigger>
+            <TabsTrigger value="bugs">Bugs</TabsTrigger>
             <TabsTrigger value="finance">Finance</TabsTrigger>
           </TabsList>
 
@@ -488,6 +519,66 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* Reports Tab */}
+          <TabsContent value="reports" className="mt-4">
+            <Card>
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Flag className="h-4 w-4 text-destructive" /> Listing Reports ({listingReports.length})
+                </CardTitle>
+                <Button variant="outline" size="sm" onClick={() => exportCSV(listingReports, "listing-reports")}><Download className="mr-1 h-4 w-4" /> CSV</Button>
+              </CardHeader>
+              <CardContent>
+                {listingReports.length === 0 ? (
+                  <div className="flex flex-col items-center py-12">
+                    <Flag className="h-12 w-12 text-muted-foreground" />
+                    <p className="mt-3 text-muted-foreground">No listing reports</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Reason</TableHead>
+                        <TableHead>Details</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {listingReports.map((r) => (
+                        <TableRow key={r.id}>
+                          <TableCell className="font-medium text-card-foreground">{r.reason}</TableCell>
+                          <TableCell className="max-w-xs truncate text-muted-foreground">{r.details || "—"}</TableCell>
+                          <TableCell>
+                            <Badge variant={r.status === "pending" ? "destructive" : r.status === "resolved" ? "default" : "secondary"}>
+                              {r.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              {r.status === "pending" && (
+                                <>
+                                  <Button size="sm" variant="outline" onClick={() => updateReportStatus(r.id, "resolved")}>
+                                    <CheckCircle className="mr-1 h-3 w-3" /> Resolve
+                                  </Button>
+                                  <Button size="sm" variant="outline" className="text-destructive" onClick={() => updateReportStatus(r.id, "dismissed")}>
+                                    Dismiss
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Pipeline Tab */}
           <TabsContent value="pipeline" className="mt-4">
             <SalesPipeline mode="admin" />
@@ -551,6 +642,126 @@ const AdminDashboard = () => {
                 </Table>
                 {allProfiles.length === 0 && (
                   <p className="py-8 text-center text-muted-foreground">No users found</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Contact Messages Tab */}
+          <TabsContent value="contacts" className="mt-4">
+            <Card>
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Mail className="h-4 w-4 text-primary" /> Contact Messages ({contactMessages.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {contactMessages.length === 0 ? (
+                  <div className="flex flex-col items-center py-12">
+                    <Mail className="h-12 w-12 text-muted-foreground" />
+                    <p className="mt-3 text-muted-foreground">No contact messages</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>From</TableHead>
+                        <TableHead>Subject</TableHead>
+                        <TableHead>Message</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {contactMessages.map((m) => (
+                        <TableRow key={m.id}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium text-card-foreground">{m.name}</p>
+                              <p className="text-xs text-muted-foreground">{m.email}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium text-card-foreground">{m.subject}</TableCell>
+                          <TableCell className="max-w-xs truncate text-muted-foreground">{m.message}</TableCell>
+                          <TableCell>
+                            <Badge variant={m.status === "new" ? "destructive" : "default"}>{m.status}</Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{new Date(m.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            {m.status === "new" && (
+                              <Button size="sm" variant="outline" onClick={() => updateContactStatus(m.id, "read")}>
+                                Mark Read
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bug Reports Tab */}
+          <TabsContent value="bugs" className="mt-4">
+            <Card>
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Bug className="h-4 w-4 text-warning" /> Bug Reports ({bugReports.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {bugReports.length === 0 ? (
+                  <div className="flex flex-col items-center py-12">
+                    <Bug className="h-12 w-12 text-muted-foreground" />
+                    <p className="mt-3 text-muted-foreground">No bug reports</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Severity</TableHead>
+                        <TableHead>Page</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {bugReports.map((b) => (
+                        <TableRow key={b.id}>
+                          <TableCell className="max-w-xs truncate font-medium text-card-foreground">{b.description}</TableCell>
+                          <TableCell>
+                            <Badge variant={b.severity === "high" ? "destructive" : b.severity === "medium" ? "default" : "secondary"}>
+                              {b.severity}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="max-w-[120px] truncate text-muted-foreground">{b.page_url || "—"}</TableCell>
+                          <TableCell>
+                            <Badge variant={b.status === "open" ? "destructive" : b.status === "in_progress" ? "default" : "secondary"}>
+                              {b.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">{new Date(b.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => updateBugStatus(b.id, "in_progress")}>In Progress</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => updateBugStatus(b.id, "resolved")}>Resolved</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => updateBugStatus(b.id, "wont_fix")}>Won't Fix</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 )}
               </CardContent>
             </Card>
