@@ -148,7 +148,7 @@ const CarDetail = () => {
           "manufacturer": car.make,
           "model": car.model,
           "modelDate": String(car.year),
-          "mileageFromOdometer": car.mileage ? { "@type": "QuantitativeValue", "value": car.mileage, "unitCode": "SMI" } : undefined,
+          "mileageFromOdometer": car.mileage ? { "@type": "QuantitativeValue", "value": car.mileage, "unitCode": config.distanceUnit === "miles" ? "SMI" : "KMT" } : undefined,
           "fuelType": car.fuel_type || undefined,
           "vehicleTransmission": car.transmission || undefined,
           "color": car.color || undefined,
