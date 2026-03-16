@@ -26,6 +26,7 @@ const categories = [
 ];
 
 const Index = () => {
+  const { country, config } = useCountry();
   const [featured, setFeatured] = useState<any[]>([]);
   const [latest, setLatest] = useState<any[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
