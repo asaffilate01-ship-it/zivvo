@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { motion } from "framer-motion";
+import heroImage from "@/assets/hero-cars.jpg";
 
 const HeroSearch = () => {
   const navigate = useNavigate();
