@@ -13,6 +13,8 @@ import {
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 
 const categories = [
   { icon: Car, label: "Sedan", count: "—" },
