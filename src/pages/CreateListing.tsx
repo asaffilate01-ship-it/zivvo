@@ -60,6 +60,7 @@ const CreateListing = () => {
     vin: "",
     description: "",
     location: "",
+    video_url: "",
   });
 
   // Load existing listing for editing
@@ -91,6 +92,7 @@ const CreateListing = () => {
           vin: data.vin || "",
           description: data.description || "",
           location: data.location || "",
+          video_url: (data as any).video_url || "",
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
@@ -239,6 +241,7 @@ const CreateListing = () => {
         country,
         logbook_url: logbookUrl,
         hpi_check_data: hpiCheckData,
+        video_url: form.video_url || null,
       };
 
       if (editId) {
@@ -441,18 +444,30 @@ const CreateListing = () => {
           </CardContent>
         </Card>
 
-        {/* Description */}
+        {/* Description & Video */}
         <Card className="mt-4">
           <CardHeader>
-            <CardTitle className="text-base">Description</CardTitle>
+            <CardTitle className="text-base">Description & Media</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Textarea
-              rows={5}
-              placeholder="Describe your vehicle — condition, history, features, reason for selling..."
-              value={form.description}
-              onChange={(e) => updateField("description", e.target.value)}
-            />
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea
+                rows={5}
+                placeholder="Describe your vehicle — condition, history, features, reason for selling..."
+                value={form.description}
+                onChange={(e) => updateField("description", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Video URL (optional)</Label>
+              <Input
+                placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                value={form.video_url}
+                onChange={(e) => updateField("video_url", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Add a YouTube video walkthrough of your vehicle</p>
+            </div>
           </CardContent>
         </Card>
 

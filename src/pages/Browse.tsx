@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CarCard from "@/components/CarCard";
+import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import SEOHead from "@/components/SEOHead";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
@@ -10,12 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, GitCompare, LayoutGrid, List } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, GitCompare, LayoutGrid, List, MapPin } from "lucide-react";
+import { lazy, Suspense } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SaveSearchDialog from "@/components/SaveSearchDialog";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
+
+const BrowseMapView = lazy(() => import("@/components/BrowseMapView"));
 
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
@@ -50,7 +54,7 @@ const Browse = () => {
   const [mileageMax, setMileageMax] = useState(parseInt(searchParams.get("mileageMax") || "200000"));
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
 
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -111,7 +115,8 @@ const Browse = () => {
 
       const orderCol = sortBy === "price_asc" ? "price" : sortBy === "price_desc" ? "price" : sortBy === "mileage_asc" ? "mileage" : "created_at";
       const ascending = sortBy === "price_asc" || sortBy === "mileage_asc";
-      query = query.order(orderCol, { ascending }).range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      // Promoted listings always appear first
+      query = query.order("is_promoted", { ascending: false, nullsFirst: false }).order(orderCol, { ascending }).range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
       const { data, count, error } = await query;
       if (!error && data) { setListings(data); setTotalCount(count || 0); }
@@ -190,6 +195,14 @@ const Browse = () => {
                 onClick={() => setViewMode("list")}
               >
                 <List className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant={viewMode === "map" ? "default" : "ghost"}
+                size="icon"
+                className={`h-7 w-7 ${viewMode === "map" ? "gradient-primary border-0" : ""}`}
+                onClick={() => setViewMode("map")}
+              >
+                <MapPin className="h-3.5 w-3.5" />
               </Button>
             </div>
 
@@ -300,15 +313,24 @@ const Browse = () => {
               />
             ) : (
               <>
-                <div className={
-                  viewMode === "list"
-                    ? "flex flex-col gap-4"
-                    : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
-                }>
-                  {listings.map((car, i) => (
-                    <CarCard key={car.id} car={car} index={i} layout={viewMode} />
-                  ))}
-                </div>
+                {viewMode === "map" ? (
+                  <Suspense fallback={<div className="h-[500px] w-full animate-pulse rounded-xl bg-muted" />}>
+                    <BrowseMapView listings={listings} country={country} />
+                    <p className="mt-2 text-xs text-muted-foreground text-center">
+                      {listings.filter(l => l.location).length} of {listings.length} listings shown on map (based on location data)
+                    </p>
+                  </Suspense>
+                ) : (
+                  <div className={
+                    viewMode === "list"
+                      ? "flex flex-col gap-4"
+                      : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                  }>
+                    {listings.map((car, i) => (
+                      <CarCard key={car.id} car={car} index={i} layout={viewMode} />
+                    ))}
+                  </div>
+                )}
 
                 {totalPages > 1 && (
                   <div className="mt-8 flex items-center justify-center gap-2">
@@ -341,6 +363,9 @@ const Browse = () => {
           </div>
         </div>
       </div>
+
+      {/* Recently Viewed */}
+      <RecentlyViewedCarousel />
 
       <Footer />
     </div>

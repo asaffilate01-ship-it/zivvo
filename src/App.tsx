@@ -37,6 +37,7 @@ import CompareCars from "./pages/CompareCars";
 import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 import BlogPost from "./pages/BlogPost";
+import CarValuation from "./pages/CarValuation";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
                     <Route path="/compare" element={<CompareCars />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:id" element={<BlogPost />} />
+                    <Route path="/valuation" element={<CarValuation />} />
                     <Route
                       path="/inbox"
                       element={

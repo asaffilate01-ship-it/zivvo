@@ -30,6 +30,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
 import VehicleChecks from "@/components/VehicleChecks";
+import PriceHistoryChart from "@/components/PriceHistoryChart";
+import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
+import InspectionBadge from "@/components/InspectionBadge";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
   const [revealed, setRevealed] = useState(false);
@@ -60,8 +64,10 @@ const CarDetail = () => {
   const navigate = useNavigate();
   const { config, country } = useCountry();
   const liked = car ? isSaved(car.id) : false;
+  const { addViewed } = useRecentlyViewed();
 
   const [similarCars, setSimilarCars] = useState<any[]>([]);
+  const [inspectionReport, setInspectionReport] = useState<any>(null);
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -73,8 +79,21 @@ const CarDetail = () => {
 
       if (data) {
         setCar(data);
+        addViewed({
+          id: data.id,
+          title: data.title,
+          price: data.price,
+          image: data.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80",
+          make: data.make,
+          model: data.model,
+          year: data.year,
+        });
         supabase.from("listing_views").insert({ listing_id: id, viewer_id: user?.id || null }).then();
         supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
+        // Fetch inspection report
+        supabase.from("inspection_reports" as any).select("*").eq("listing_id", id).maybeSingle().then(({ data: ir }) => {
+          if (ir) setInspectionReport(ir);
+        });
         if (data.dealer_id) {
           const { data: d } = await supabase.from("dealer_landing_public").select("business_name, slug, city, kyc_verified").eq("id", data.dealer_id).maybeSingle();
           if (d) setDealer(d);
@@ -226,7 +245,9 @@ const CarDetail = () => {
 
               <div className="absolute left-3 top-3 flex gap-2">
                 {car.is_featured && <Badge className="gradient-primary border-0 text-primary-foreground">Featured</Badge>}
+                {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0">Promoted</Badge>}
                 {car.verified && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" /> Verified</Badge>}
+                {inspectionReport && <InspectionBadge score={inspectionReport.score} totalPoints={inspectionReport.total_points} />}
               </div>
             </div>
 
@@ -308,11 +329,61 @@ const CarDetail = () => {
               </div>
             )}
 
+            {/* Video */}
+            {(car as any).video_url && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground">Video</h2>
+                <div className="mt-3 aspect-video overflow-hidden rounded-xl border border-border">
+                  <iframe
+                    src={(car as any).video_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                    className="h-full w-full"
+                    allowFullScreen
+                    title="Vehicle Video"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Price History */}
+            <PriceHistoryChart listingId={car.id} currentPrice={Number(car.price)} />
+
             {/* Vehicle Checks */}
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Vehicle Checks</h2>
               <VehicleChecks registration={car.registration} vin={car.vin} country={car.country} />
             </div>
+
+            {/* Inspection Report */}
+            {inspectionReport && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+                  Inspection Report
+                  <InspectionBadge score={inspectionReport.score} totalPoints={inspectionReport.total_points} />
+                </h2>
+                <div className="mt-3 rounded-xl border border-border bg-card p-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Inspector: {inspectionReport.inspector_name || "Certified Inspector"}</p>
+                      <p className="text-sm text-muted-foreground">Date: {new Date(inspectionReport.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-display text-3xl font-bold text-primary">{Math.round((inspectionReport.score / inspectionReport.total_points) * 100)}%</p>
+                      <p className="text-xs text-muted-foreground">{inspectionReport.score}/{inspectionReport.total_points} pts</p>
+                    </div>
+                  </div>
+                  {inspectionReport.summary && (
+                    <p className="mt-3 text-sm text-muted-foreground">{inspectionReport.summary}</p>
+                  )}
+                  {inspectionReport.report_url && (
+                    <a href={inspectionReport.report_url} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="mt-3">
+                        <ExternalLink className="mr-1 h-3 w-3" /> View Full Report
+                      </Button>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Finance Calculator - Mobile */}
             <div className="mt-8 lg:hidden">
@@ -424,6 +495,9 @@ const CarDetail = () => {
               <div className="hidden lg:block">
                 <PaymentCalculator price={Number(car.price)} />
               </div>
+
+              {/* Finance & Insurance Quotes */}
+              <FinanceQuoteWidget carPrice={Number(car.price)} carTitle={car.title} listingId={car.id} />
 
               {/* Safety Tips */}
               <div className="rounded-2xl border border-border bg-warning/5 p-5">
