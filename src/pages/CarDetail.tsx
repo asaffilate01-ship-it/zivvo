@@ -30,6 +30,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
 import VehicleChecks from "@/components/VehicleChecks";
+import PriceHistoryChart from "@/components/PriceHistoryChart";
+import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
+import InspectionBadge from "@/components/InspectionBadge";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
   const [revealed, setRevealed] = useState(false);
