@@ -5,7 +5,6 @@ import CarCard from "@/components/CarCard";
 import SEOHead from "@/components/SEOHead";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
-import { makes, bodyTypes, fuelTypes, transmissions } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +14,8 @@ import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, GitCompare } f
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SaveSearchDialog from "@/components/SaveSearchDialog";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
