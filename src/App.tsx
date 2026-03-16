@@ -33,6 +33,7 @@ import Contact from "./pages/Contact";
 import HelpCentre from "./pages/HelpCentre";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CompareCars from "./pages/CompareCars";
+import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,7 @@ const App = () => (
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/help" element={<HelpCentre />} />
                     <Route path="/compare" element={<CompareCars />} />
+                    <Route path="/blog" element={<Blog />} />
                     <Route
                       path="/inbox"
                       element={

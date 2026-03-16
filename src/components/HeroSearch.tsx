@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { motion } from "framer-motion";
+import heroImage from "@/assets/hero-cars.jpg";
 
 const HeroSearch = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const HeroSearch = () => {
     <section className="relative overflow-hidden">
       {/* Background */}
       <div className="gradient-dark absolute inset-0" />
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&q=80')] bg-cover bg-center opacity-20" />
+      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${heroImage})` }} />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
 
       <div className="container relative mx-auto px-4 pb-20 pt-16 md:pb-28 md:pt-24">
