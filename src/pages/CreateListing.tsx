@@ -15,16 +15,7 @@ import ImageReorder from "@/components/ImageReorder";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-const makes = [
-  "Audi", "BMW", "Chevrolet", "Ford", "Honda", "Hyundai", "Jaguar",
-  "Kia", "Land Rover", "Lexus", "Mazda", "Mercedes-Benz", "Nissan",
-  "Porsche", "Range Rover", "Tesla", "Toyota", "Volkswagen", "Volvo",
-];
-
-const bodyTypes = ["Sedan", "SUV", "Coupe", "Hatchback", "Estate", "Convertible", "Van", "Pickup"];
-const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"];
-const transmissions = ["Automatic", "Manual"];
+import { useCountry } from "@/contexts/CountryContext";
 
 const CreateListing = () => {
   const { user } = useAuth();
