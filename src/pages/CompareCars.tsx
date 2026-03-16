@@ -14,7 +14,9 @@ import { supabase } from "@/integrations/supabase/client";
 const MAX_COMPARE = 3;
 
 const CompareCars = () => {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [searchParams] = useSearchParams();
+  const initialCar = searchParams.get("car");
+  const [selectedIds, setSelectedIds] = useState<string[]>(initialCar ? [initialCar] : []);
   const [cars, setCars] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
