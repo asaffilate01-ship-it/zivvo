@@ -345,16 +345,26 @@ const Browse = () => {
               {/* Vehicle Section */}
               <FilterSection title="Vehicle" sectionKey="vehicle">
                 <FilterSelect label="Make" value={selectedMake} onChange={(v) => { setSelectedMake(v); setModel(""); }} placeholder="Any Make" options={makes} />
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Model</label>
-                  <Input
-                    placeholder={selectedMake ? `Search ${selectedMake} models...` : "Select a make first"}
+                {availableModels.length > 0 ? (
+                  <FilterSelect
+                    label="Model"
                     value={model}
-                    onChange={(e) => setModel(e.target.value)}
-                    className="h-9 text-sm"
-                    disabled={!selectedMake}
+                    onChange={setModel}
+                    placeholder={modelsLoading ? "Loading models..." : "Any Model"}
+                    options={availableModels}
                   />
-                </div>
+                ) : (
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Model</label>
+                    <Input
+                      placeholder={selectedMake ? (modelsLoading ? "Loading..." : `Search ${selectedMake} models...`) : "Select a make first"}
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                      className="h-9 text-sm"
+                      disabled={!selectedMake}
+                    />
+                  </div>
+                )}
                 <FilterSelect label="Body Type" value={selectedBody} onChange={setSelectedBody} placeholder="Any Type" options={bodyTypes} />
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Year: {yearRange[0]} — {yearRange[1]}</label>
