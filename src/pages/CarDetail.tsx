@@ -78,6 +78,7 @@ const CarDetail = () => {
           .from("car_listings")
           .select("*")
           .eq("status", "active")
+          .eq("country", data.country)
           .neq("id", id!)
           .or(`make.eq.${data.make},body_type.eq.${data.body_type}`)
           .order("created_at", { ascending: false })

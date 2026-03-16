@@ -107,8 +107,13 @@ const HeroSearch = () => {
                 Advanced Filters
               </Button>
               <div className="hidden gap-2 md:flex">
-                {["Under £30k", "SUVs", "Electric", "Low Mileage"].map((tag) => (
-                  <Button key={tag} variant="outline" size="sm" className="rounded-full text-xs">
+                {[`Under ${formatPrice(30000, config)}`, "SUVs", "Electric", "Low Mileage"].map((tag) => (
+                  <Button key={tag} variant="outline" size="sm" className="rounded-full text-xs" onClick={() => {
+                    if (tag.startsWith("Under")) navigate(`/browse?priceMax=30000`);
+                    else if (tag === "SUVs") navigate("/browse?body=SUV");
+                    else if (tag === "Electric") navigate("/browse?fuel=Electric");
+                    else navigate("/browse?mileageMax=30000");
+                  }}>
                     {tag}
                   </Button>
                 ))}
