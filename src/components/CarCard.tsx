@@ -89,7 +89,6 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
               <p className="font-display text-2xl font-bold text-primary-foreground">
                 {formatPrice(Number(car.price), config)}
               </p>
-              </p>
             </div>
           </div>
 
