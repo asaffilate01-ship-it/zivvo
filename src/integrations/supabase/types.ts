@@ -644,10 +644,7 @@ export type Database = {
     Views: {
       dealer_landing_public: {
         Row: {
-          address: string | null
-          business_email: string | null
           business_name: string | null
-          business_phone: string | null
           city: string | null
           country: string | null
           description: string | null
@@ -656,16 +653,12 @@ export type Database = {
           kyc_verified: boolean | null
           landing_page_config: Json | null
           logo_url: string | null
-          postcode: string | null
           slug: string | null
           tier: Database["public"]["Enums"]["dealer_tier"] | null
           website_url: string | null
         }
         Insert: {
-          address?: string | null
-          business_email?: string | null
           business_name?: string | null
-          business_phone?: string | null
           city?: string | null
           country?: string | null
           description?: string | null
@@ -674,16 +667,12 @@ export type Database = {
           kyc_verified?: boolean | null
           landing_page_config?: Json | null
           logo_url?: string | null
-          postcode?: string | null
           slug?: string | null
           tier?: Database["public"]["Enums"]["dealer_tier"] | null
           website_url?: string | null
         }
         Update: {
-          address?: string | null
-          business_email?: string | null
           business_name?: string | null
-          business_phone?: string | null
           city?: string | null
           country?: string | null
           description?: string | null
@@ -692,7 +681,6 @@ export type Database = {
           kyc_verified?: boolean | null
           landing_page_config?: Json | null
           logo_url?: string | null
-          postcode?: string | null
           slug?: string | null
           tier?: Database["public"]["Enums"]["dealer_tier"] | null
           website_url?: string | null
