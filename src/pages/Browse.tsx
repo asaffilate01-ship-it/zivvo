@@ -164,6 +164,11 @@ const Browse = () => {
             <p className="text-muted-foreground">{totalCount} vehicles found</p>
           </div>
           <div className="flex items-center gap-2">
+            <Link to="/compare">
+              <Button variant="outline" size="sm">
+                <GitCompare className="mr-1 h-4 w-4" /> Compare
+              </Button>
+            </Link>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-40">
                 <SelectValue />
