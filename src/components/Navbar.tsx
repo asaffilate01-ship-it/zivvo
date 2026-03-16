@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Menu, X, Car, User, Plus, Heart, LogOut, MessageSquare, Sun, Moon, Monitor } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
+import CountrySwitcher from "@/components/CountrySwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
