@@ -134,7 +134,7 @@ const CarDetail = () => {
           "offers": {
             "@type": "Offer",
             "price": car.price,
-            "priceCurrency": "USD",
+            "priceCurrency": "GBP",
             "availability": car.status === "active" ? "https://schema.org/InStock" : "https://schema.org/SoldOut",
           },
           "image": images[0],
