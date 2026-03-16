@@ -146,6 +146,7 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <CookieConsent />
+                  <BugReportButton />
                 </SavedCarsProvider>
               </AuthProvider>
               </CountryProvider>
