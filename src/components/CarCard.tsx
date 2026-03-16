@@ -84,7 +84,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
 
             <div className="absolute bottom-3 left-3">
               <p className="font-display text-2xl font-bold text-primary-foreground">
-                ${Number(car.price).toLocaleString()}
+                £{Number(car.price).toLocaleString()}
               </p>
             </div>
           </div>

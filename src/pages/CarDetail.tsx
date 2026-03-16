@@ -310,10 +310,7 @@ const CarDetail = () => {
                 )}
 
                 <div className="mt-5 space-y-2">
-                  <Button className="w-full gradient-primary border-0">
-                    <Phone className="mr-2 h-4 w-4" />
-                    Show Phone Number
-                  </Button>
+                  <PhoneRevealButton phone={dealer?.business_phone} />
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
                   <Button
                     variant="outline"
