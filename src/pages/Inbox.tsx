@@ -381,6 +381,7 @@ const Inbox = () => {
           </TabsContent>
         </Tabs>
       </div>
+      <Footer />
     </div>
   );
 };
