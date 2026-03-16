@@ -19,6 +19,8 @@ import SaveSearchDialog from "@/components/SaveSearchDialog";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
 
+const BrowseMapView = lazy(() => import("@/components/BrowseMapView"));
+
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
 const colors = ["Black", "White", "Silver", "Grey", "Blue", "Red", "Green", "Brown", "Beige", "Yellow", "Orange"];
