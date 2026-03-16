@@ -13,33 +13,37 @@ import CookieConsent from "@/components/CookieConsent";
 import BugReportButton from "@/components/BugReportButton";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import OnboardingTour from "@/components/OnboardingTour";
-import Index from "./pages/Index";
-import Browse from "./pages/Browse";
-import CarDetail from "./pages/CarDetail";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import DealerPricing from "./pages/DealerPricing";
-import DealerDashboard from "./pages/DealerDashboard";
-import DealerLanding from "./pages/DealerLanding";
-import AdminDashboard from "./pages/AdminDashboard";
-import AgentDashboard from "./pages/AgentDashboard";
-import AgentOnboard from "./pages/AgentOnboard";
-import CreateListing from "./pages/CreateListing";
-import SavedCars from "./pages/SavedCars";
-import Inbox from "./pages/Inbox";
-import Profile from "./pages/Profile";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import Contact from "./pages/Contact";
-import HelpCentre from "./pages/HelpCentre";
+import PageSkeleton from "@/components/PageSkeleton";
+import { lazy, Suspense } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
-import CompareCars from "./pages/CompareCars";
-import Blog from "./pages/Blog";
-import NotFound from "./pages/NotFound";
-import BlogPost from "./pages/BlogPost";
-import CarValuation from "./pages/CarValuation";
+
+// Lazy-loaded routes
+const Index = lazy(() => import("./pages/Index"));
+const Browse = lazy(() => import("./pages/Browse"));
+const CarDetail = lazy(() => import("./pages/CarDetail"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const DealerPricing = lazy(() => import("./pages/DealerPricing"));
+const DealerDashboard = lazy(() => import("./pages/DealerDashboard"));
+const DealerLanding = lazy(() => import("./pages/DealerLanding"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
+const AgentOnboard = lazy(() => import("./pages/AgentOnboard"));
+const CreateListing = lazy(() => import("./pages/CreateListing"));
+const SavedCars = lazy(() => import("./pages/SavedCars"));
+const Inbox = lazy(() => import("./pages/Inbox"));
+const Profile = lazy(() => import("./pages/Profile"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const Contact = lazy(() => import("./pages/Contact"));
+const HelpCentre = lazy(() => import("./pages/HelpCentre"));
+const CompareCars = lazy(() => import("./pages/CompareCars"));
+const Blog = lazy(() => import("./pages/Blog"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const CarValuation = lazy(() => import("./pages/CarValuation"));
 
 const queryClient = new QueryClient();
 
@@ -55,100 +59,102 @@ const App = () => (
               <CountryProvider>
               <AuthProvider>
                 <SavedCarsProvider>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/browse" element={<Browse />} />
-                    <Route path="/car/:id" element={<CarDetail />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
-                    <Route path="/dealers" element={<DealerPricing />} />
-                    <Route path="/dealer/:slug" element={<DealerLanding />} />
-                    <Route path="/saved" element={<SavedCars />} />
-                    <Route path="/privacy" element={<PrivacyPolicy />} />
-                    <Route path="/terms" element={<TermsOfService />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/help" element={<HelpCentre />} />
-                    <Route path="/compare" element={<CompareCars />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/blog/:id" element={<BlogPost />} />
-                    <Route path="/valuation" element={<CarValuation />} />
-                    <Route
-                      path="/inbox"
-                      element={
-                        <ProtectedRoute>
-                          <Inbox />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/profile"
-                      element={
-                        <ProtectedRoute>
-                          <Profile />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <ProtectedRoute>
-                          <DealerDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/listings/new"
-                      element={
-                        <ProtectedRoute>
-                          <CreateListing />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/listings/edit"
-                      element={
-                        <ProtectedRoute>
-                          <CreateListing />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/sell"
-                      element={
-                        <ProtectedRoute>
-                          <CreateListing />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/admin"
-                      element={
-                        <ProtectedRoute requiredRole="admin">
-                          <AdminDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/agent"
-                      element={
-                        <ProtectedRoute requiredRole="agent">
-                          <AgentDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="/agent/onboard"
-                      element={
-                        <ProtectedRoute requiredRole="agent">
-                          <AgentOnboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                  <Suspense fallback={<PageSkeleton />}>
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/browse" element={<Browse />} />
+                      <Route path="/car/:id" element={<CarDetail />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/dealers" element={<DealerPricing />} />
+                      <Route path="/dealer/:slug" element={<DealerLanding />} />
+                      <Route path="/saved" element={<SavedCars />} />
+                      <Route path="/privacy" element={<PrivacyPolicy />} />
+                      <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/help" element={<HelpCentre />} />
+                      <Route path="/compare" element={<CompareCars />} />
+                      <Route path="/blog" element={<Blog />} />
+                      <Route path="/blog/:id" element={<BlogPost />} />
+                      <Route path="/valuation" element={<CarValuation />} />
+                      <Route
+                        path="/inbox"
+                        element={
+                          <ProtectedRoute>
+                            <Inbox />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/profile"
+                        element={
+                          <ProtectedRoute>
+                            <Profile />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <ProtectedRoute>
+                            <DealerDashboard />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard/listings/new"
+                        element={
+                          <ProtectedRoute>
+                            <CreateListing />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard/listings/edit"
+                        element={
+                          <ProtectedRoute>
+                            <CreateListing />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/sell"
+                        element={
+                          <ProtectedRoute>
+                            <CreateListing />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/admin"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <AdminDashboard />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/agent"
+                        element={
+                          <ProtectedRoute requiredRole="agent">
+                            <AgentDashboard />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/agent/onboard"
+                        element={
+                          <ProtectedRoute requiredRole="agent">
+                            <AgentOnboard />
+                          </ProtectedRoute>
+                        }
+                      />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
                   <CookieConsent />
                   <BugReportButton />
                   <PWAInstallPrompt />
