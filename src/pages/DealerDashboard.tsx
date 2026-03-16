@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Car, Plus, Eye, MessageSquare, TrendingUp, Package,
-  Settings, BarChart3, ExternalLink, CreditCard, Loader2, Edit, Trash2,
+  Settings, BarChart3, ExternalLink, CreditCard, Loader2, Edit, Trash2, Rocket,
 } from "lucide-react";
+import BoostListingDialog from "@/components/BoostListingDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -323,6 +324,9 @@ const DealerDashboard = () => {
                     <div className="flex items-center gap-2">
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
                       <span className="font-display font-semibold text-card-foreground">{formatPrice(Number(listing.price), config)}</span>
+                      {listing.status === "active" && (
+                        <BoostListingDialog listingId={listing.id} listingTitle={listing.title} isPromoted={listing.is_promoted} />
+                      )}
                       <Link to={`/dashboard/listings/edit?edit=${listing.id}`}>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
                           <Edit className="h-4 w-4" />

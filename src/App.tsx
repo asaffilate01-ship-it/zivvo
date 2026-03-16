@@ -11,6 +11,8 @@ import { CountryProvider } from "@/contexts/CountryContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import CookieConsent from "@/components/CookieConsent";
 import BugReportButton from "@/components/BugReportButton";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import OnboardingTour from "@/components/OnboardingTour";
 import Index from "./pages/Index";
 import Browse from "./pages/Browse";
 import CarDetail from "./pages/CarDetail";
@@ -149,6 +151,8 @@ const App = () => (
                   </Routes>
                   <CookieConsent />
                   <BugReportButton />
+                  <PWAInstallPrompt />
+                  <OnboardingTour />
                 </SavedCarsProvider>
               </AuthProvider>
               </CountryProvider>

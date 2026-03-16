@@ -34,6 +34,7 @@ import PriceHistoryChart from "@/components/PriceHistoryChart";
 import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
 import InspectionBadge from "@/components/InspectionBadge";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import ShareSheet from "@/components/ShareSheet";
 
 const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
   const [revealed, setRevealed] = useState(false);
@@ -465,10 +466,10 @@ const CarDetail = () => {
                     <Heart className={`mr-1 h-4 w-4 ${liked ? "fill-accent text-accent" : ""}`} />
                     Save
                   </Button>
-                  <Button variant="ghost" size="sm" className="flex-1" onClick={handleShare}>
-                    <Share2 className="mr-1 h-4 w-4" />
-                    Share
-                  </Button>
+                  <ShareSheet
+                    title={car.title}
+                    text={`Check out this ${car.year} ${car.make} ${car.model}`}
+                  />
                   <Link to={`/compare?car=${car.id}`}>
                     <Button variant="ghost" size="sm">
                       <GitCompare className="mr-1 h-4 w-4" /> Compare
