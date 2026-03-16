@@ -69,9 +69,9 @@ const CompareCars = () => {
   };
 
   const specRows = [
-    { label: "Price", key: "price", fmt: (v: any) => v ? `£${Number(v).toLocaleString()}` : "N/A" },
+    { label: "Price", key: "price", fmt: (v: any) => v ? formatPrice(Number(v), config) : "N/A" },
     { label: "Year", key: "year", fmt: (v: any) => v || "N/A" },
-    { label: "Mileage", key: "mileage", fmt: (v: any) => v ? `${Number(v).toLocaleString()} mi` : "N/A" },
+    { label: config.terminology.mileage, key: "mileage", fmt: (v: any) => v ? formatDistance(Number(v), config) : "N/A" },
     { label: "Fuel Type", key: "fuel_type", fmt: (v: any) => v || "N/A" },
     { label: "Transmission", key: "transmission", fmt: (v: any) => v || "N/A" },
     { label: "Body Type", key: "body_type", fmt: (v: any) => v || "N/A" },
