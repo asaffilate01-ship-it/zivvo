@@ -143,6 +143,7 @@ const App = () => (
                   <CookieConsent />
                 </SavedCarsProvider>
               </AuthProvider>
+              </CountryProvider>
             </BrowserRouter>
           </ErrorBoundary>
         </TooltipProvider>
