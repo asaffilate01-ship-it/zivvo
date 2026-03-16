@@ -71,6 +71,7 @@ const Navbar = () => {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
+          <CountrySwitcher />
           {/* Theme Toggle */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
