@@ -346,7 +346,7 @@ const Browse = () => {
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                  Max Mileage: {mileageMax >= 200000 ? "Any" : `${mileageMax.toLocaleString()} mi`}
+                  Max Mileage: {mileageMax >= 200000 ? "Any" : formatDistance(mileageMax, config)}
                 </label>
                 <Slider min={0} max={200000} step={5000} value={[mileageMax]} onValueChange={(v) => setMileageMax(v[0])} className="mt-2" />
               </div>

@@ -222,7 +222,7 @@ const CarDetail = () => {
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { icon: Calendar, label: "Year", value: car.year },
-                { icon: Gauge, label: "Mileage", value: car.mileage ? `${car.mileage.toLocaleString()} mi` : "N/A" },
+                { icon: Gauge, label: "Mileage", value: car.mileage ? formatDistance(car.mileage, config) : "N/A" },
                 { icon: Fuel, label: "Fuel", value: car.fuel_type || "N/A" },
                 { icon: Settings2, label: "Transmission", value: car.transmission || "N/A" },
               ].map((spec) => (
