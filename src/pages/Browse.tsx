@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import SaveSearchDialog from "@/components/SaveSearchDialog";
 
 const PAGE_SIZE = 12;
 const currentYear = new Date().getFullYear();
@@ -94,7 +95,9 @@ const Browse = () => {
         query = query.lte("mileage", mileageMax);
       }
       if (keyword) {
-        query = query.or(`title.ilike.%${keyword}%,make.ilike.%${keyword}%,model.ilike.%${keyword}%`);
+        // Use full-text search with tsquery for better relevance
+        const tsQuery = keyword.trim().split(/\s+/).join(" & ");
+        query = query.textSearch("search_vector", tsQuery, { config: "english" });
       }
       if (selectedMake) query = query.eq("make", selectedMake);
       if (selectedBody) query = query.eq("body_type", selectedBody);
@@ -172,6 +175,14 @@ const Browse = () => {
                 <SelectItem value="mileage_asc">Mileage: Low-High</SelectItem>
               </SelectContent>
             </Select>
+            <SaveSearchDialog
+              filters={{
+                q: keyword, make: selectedMake, body: selectedBody, fuel: selectedFuel,
+                transmission: selectedTransmission, color: selectedColor, doors: selectedDoors,
+                engine: selectedEngine, priceMin: priceRange[0], priceMax: priceRange[1],
+                yearMin: yearRange[0], yearMax: yearRange[1], mileageMax,
+              }}
+            />
             <Button
               variant="outline"
               onClick={() => setShowFilters(!showFilters)}

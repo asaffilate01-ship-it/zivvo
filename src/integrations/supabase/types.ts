@@ -84,6 +84,7 @@ export type Database = {
           model: string
           price: number
           registration: string | null
+          search_vector: unknown
           seller_id: string
           specs: Json | null
           status: Database["public"]["Enums"]["listing_status"] | null
@@ -117,6 +118,7 @@ export type Database = {
           model: string
           price: number
           registration?: string | null
+          search_vector?: unknown
           seller_id: string
           specs?: Json | null
           status?: Database["public"]["Enums"]["listing_status"] | null
@@ -150,6 +152,7 @@ export type Database = {
           model?: string
           price?: number
           registration?: string | null
+          search_vector?: unknown
           seller_id?: string
           specs?: Json | null
           status?: Database["public"]["Enums"]["listing_status"] | null
@@ -393,6 +396,39 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          link: string | null
+          message: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string | null
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link?: string | null
+          message?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -451,6 +487,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      saved_searches: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          name: string
+          notify: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name: string
+          notify?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name?: string
+          notify?: boolean
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

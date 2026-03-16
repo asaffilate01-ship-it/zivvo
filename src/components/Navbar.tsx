@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, X, Car, User, Plus, Heart, LogOut, MessageSquare, Sun, Moon, Monitor, Bell } from "lucide-react";
+import { Menu, X, Car, User, Plus, Heart, LogOut, MessageSquare, Sun, Moon, Monitor } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -97,6 +98,7 @@ const Navbar = () => {
               <Heart className="h-5 w-5" />
             </Button>
           </Link>
+          {user && <NotificationBell />}
           {user && (
             <Link to="/inbox">
               <Button variant="ghost" size="icon">
