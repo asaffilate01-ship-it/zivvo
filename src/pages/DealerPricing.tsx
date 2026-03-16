@@ -11,62 +11,13 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 
-const plans = [
-  {
-    name: "Starter",
-    price: 49,
-    priceId: "price_1TBFMMFFogsDQVs4rwjRss69",
-    icon: Zap,
-    description: "Perfect for small dealerships getting started",
-    features: [
-      "Up to 15 active listings",
-      "Basic analytics dashboard",
-      "Marketplace presence",
-      "Email support",
-      "Standard listing placement",
-    ],
-    popular: false,
-  },
-  {
-    name: "Professional",
-    price: 99,
-    priceId: "price_1TBFMOFFogsDQVs4vv5Rx8lW",
-    icon: Star,
-    description: "For growing dealerships that need more",
-    features: [
-      "Up to 50 active listings",
-      "Full analytics & reports",
-      "Custom dealer landing page",
-      "Featured listing placements",
-      "Priority email & chat support",
-      "CSV/PDF export",
-      "Finance check integration",
-    ],
-    popular: true,
-  },
-  {
-    name: "Enterprise",
-    price: 199,
-    priceId: "price_1TBFMOFFogsDQVs4y0kujRs8",
-    icon: Crown,
-    description: "For large dealerships and dealer groups",
-    features: [
-      "Unlimited active listings",
-      "White-label landing page",
-      "API access & bulk import",
-      "Priority support + account manager",
-      "Advanced analytics & KPIs",
-      "Custom branding",
-      "Multi-location support",
-      "Dedicated onboarding",
-    ],
-    popular: false,
-  },
-];
+const planIcons = [Zap, Star, Crown];
 
 import SEOHead from "@/components/SEOHead";
 
