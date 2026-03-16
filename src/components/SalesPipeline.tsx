@@ -23,6 +23,11 @@ import {
   Clock, CheckCircle, XCircle, Phone, Mail, GripVertical, Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  DndContext, closestCenter, DragOverlay, useSensor, useSensors, PointerSensor,
+  type DragStartEvent, type DragEndEvent, type DragOverEvent,
+} from "@dnd-kit/core";
+import { useDroppable, useDraggable } from "@dnd-kit/core";
 
 type PipelineStage = "lead" | "enquiry" | "viewing" | "offer" | "negotiation" | "sold" | "lost";
 
