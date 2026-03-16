@@ -42,6 +42,7 @@ const CreateListing = () => {
   const [existingLogbookUrl, setExistingLogbookUrl] = useState<string | null>(null);
   const [hpiCheckData, setHpiCheckData] = useState<any>(null);
   const [hpiLoading, setHpiLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
