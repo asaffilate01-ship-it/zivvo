@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
   ArrowRight, Shield, Search, FileCheck, Car, Truck, Zap, Globe, Star, Quote,
-  CheckCircle, Users, TrendingUp, Mail,
+  CheckCircle, Users, TrendingUp, Mail, Calculator,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
