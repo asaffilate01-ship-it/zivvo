@@ -79,8 +79,21 @@ const CarDetail = () => {
 
       if (data) {
         setCar(data);
+        addViewed({
+          id: data.id,
+          title: data.title,
+          price: data.price,
+          image: data.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80",
+          make: data.make,
+          model: data.model,
+          year: data.year,
+        });
         supabase.from("listing_views").insert({ listing_id: id, viewer_id: user?.id || null }).then();
         supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
+        // Fetch inspection report
+        supabase.from("inspection_reports" as any).select("*").eq("listing_id", id).maybeSingle().then(({ data: ir }) => {
+          if (ir) setInspectionReport(ir);
+        });
         if (data.dealer_id) {
           const { data: d } = await supabase.from("dealer_landing_public").select("business_name, slug, city, kyc_verified").eq("id", data.dealer_id).maybeSingle();
           if (d) setDealer(d);
