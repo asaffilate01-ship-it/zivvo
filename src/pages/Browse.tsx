@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, GitCompare } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, GitCompare, LayoutGrid, List } from "lucide-react";
 import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SaveSearchDialog from "@/components/SaveSearchDialog";
@@ -47,11 +47,10 @@ const Browse = () => {
     parseInt(searchParams.get("yearMin") || "2000"),
     parseInt(searchParams.get("yearMax") || String(currentYear)),
   ]);
-  const [mileageMax, setMileageMax] = useState(
-    parseInt(searchParams.get("mileageMax") || "200000")
-  );
+  const [mileageMax, setMileageMax] = useState(parseInt(searchParams.get("mileageMax") || "200000"));
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "newest");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +86,6 @@ const Browse = () => {
   useEffect(() => {
     const fetchListings = async () => {
       setLoading(true);
-
       let query = supabase
         .from("car_listings")
         .select("*", { count: "exact" })
@@ -98,11 +96,8 @@ const Browse = () => {
         .gte("year", yearRange[0])
         .lte("year", yearRange[1]);
 
-      if (mileageMax < 200000) {
-        query = query.lte("mileage", mileageMax);
-      }
+      if (mileageMax < 200000) query = query.lte("mileage", mileageMax);
       if (keyword) {
-        // Use full-text search with tsquery for better relevance
         const tsQuery = keyword.trim().split(/\s+/).join(" & ");
         query = query.textSearch("search_vector", tsQuery, { config: "english" });
       }
@@ -119,27 +114,16 @@ const Browse = () => {
       query = query.order(orderCol, { ascending }).range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
 
       const { data, count, error } = await query;
-      if (!error && data) {
-        setListings(data);
-        setTotalCount(count || 0);
-      }
+      if (!error && data) { setListings(data); setTotalCount(count || 0); }
       setLoading(false);
     };
     fetchListings();
   }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, page, country]);
 
   const clearFilters = () => {
-    setKeyword("");
-    setSelectedMake("");
-    setSelectedBody("");
-    setSelectedFuel("");
-    setSelectedTransmission("");
-    setSelectedColor("");
-    setSelectedDoors("");
-    setSelectedEngine("");
-    setPriceRange([0, 200000]);
-    setYearRange([2000, currentYear]);
-    setMileageMax(200000);
+    setKeyword(""); setSelectedMake(""); setSelectedBody(""); setSelectedFuel("");
+    setSelectedTransmission(""); setSelectedColor(""); setSelectedDoors(""); setSelectedEngine("");
+    setPriceRange([0, 200000]); setYearRange([2000, currentYear]); setMileageMax(200000);
   };
 
   const activeFiltersList: { label: string; clear: () => void }[] = [];
@@ -156,6 +140,19 @@ const Browse = () => {
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
+  const FilterSelect = ({ label, value, onChange, placeholder, options }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; options: string[] }) => (
+    <div>
+      <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{label}</label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="h-9 text-sm"><SelectValue placeholder={placeholder} /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">{placeholder}</SelectItem>
+          {options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
@@ -165,21 +162,39 @@ const Browse = () => {
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
+        {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Browse Cars</h1>
-            <p className="text-muted-foreground">{totalCount} vehicles found</p>
+            <p className="text-sm text-muted-foreground">{totalCount.toLocaleString()} vehicles found</p>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/compare">
-              <Button variant="outline" size="sm">
-                <GitCompare className="mr-1 h-4 w-4" /> Compare
-              </Button>
+              <Button variant="outline" size="sm"><GitCompare className="mr-1 h-4 w-4" /> Compare</Button>
             </Link>
+
+            {/* View toggle */}
+            <div className="hidden items-center rounded-lg border border-border bg-secondary p-0.5 sm:flex">
+              <Button
+                variant={viewMode === "grid" ? "default" : "ghost"}
+                size="icon"
+                className={`h-7 w-7 ${viewMode === "grid" ? "gradient-primary border-0" : ""}`}
+                onClick={() => setViewMode("grid")}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "ghost"}
+                size="icon"
+                className={`h-7 w-7 ${viewMode === "list" ? "gradient-primary border-0" : ""}`}
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="w-40 h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="newest">Newest First</SelectItem>
                 <SelectItem value="price_asc">Price: Low-High</SelectItem>
@@ -187,6 +202,7 @@ const Browse = () => {
                 <SelectItem value="mileage_asc">Mileage: Low-High</SelectItem>
               </SelectContent>
             </Select>
+
             <SaveSearchDialog
               filters={{
                 q: keyword, make: selectedMake, body: selectedBody, fuel: selectedFuel,
@@ -195,12 +211,9 @@ const Browse = () => {
                 yearMin: yearRange[0], yearMax: yearRange[1], mileageMax,
               }}
             />
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden"
-            >
-              <SlidersHorizontal className="mr-2 h-4 w-4" />
+
+            <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="lg:hidden">
+              <SlidersHorizontal className="mr-1 h-4 w-4" />
               Filters {activeFiltersList.length > 0 && `(${activeFiltersList.length})`}
             </Button>
           </div>
@@ -212,36 +225,23 @@ const Browse = () => {
             {activeFiltersList.map((f, i) => (
               <Badge key={i} variant="secondary" className="gap-1 pr-1">
                 {f.label}
-                <button onClick={f.clear} className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20">
-                  <X className="h-3 w-3" />
-                </button>
+                <button onClick={f.clear} className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"><X className="h-3 w-3" /></button>
               </Badge>
             ))}
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">
-              Clear all
-            </Button>
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">Clear all</Button>
           </div>
         )}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-4">
           {/* Filters Sidebar */}
           <div className={`lg:col-span-1 ${showFilters ? "block" : "hidden lg:block"}`}>
-            {/* Mobile overlay backdrop */}
-            {showFilters && (
-              <div className="fixed inset-0 z-40 bg-foreground/50 lg:hidden" onClick={() => setShowFilters(false)} />
-            )}
-            <div className={`${showFilters ? "fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl lg:static lg:max-h-none lg:rounded-none" : ""} sticky top-20 space-y-5 rounded-xl border border-border bg-card p-5`}>
+            {showFilters && <div className="fixed inset-0 z-40 bg-foreground/50 lg:hidden" onClick={() => setShowFilters(false)} />}
+            <div className={`${showFilters ? "fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl lg:static lg:max-h-none lg:rounded-none" : ""} sticky top-20 space-y-4 rounded-xl border border-border bg-card p-4`}>
               <div className="flex items-center justify-between">
-                <h3 className="font-display font-semibold text-card-foreground">Filters</h3>
+                <h3 className="font-display text-sm font-semibold text-card-foreground">Filters</h3>
                 <div className="flex items-center gap-2">
-                  {activeFiltersList.length > 0 && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">
-                      Clear all
-                    </Button>
-                  )}
-                  <Button variant="ghost" size="icon" className="h-8 w-8 lg:hidden" onClick={() => setShowFilters(false)}>
-                    <X className="h-4 w-4" />
-                  </Button>
+                  {activeFiltersList.length > 0 && <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">Clear all</Button>}
+                  <Button variant="ghost" size="icon" className="h-7 w-7 lg:hidden" onClick={() => setShowFilters(false)}><X className="h-4 w-4" /></Button>
                 </div>
               </div>
 
@@ -249,98 +249,27 @@ const Browse = () => {
                 <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Search</label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input placeholder="Keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="pl-10" />
+                  <Input placeholder="Keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="h-9 pl-10 text-sm" />
                 </div>
               </div>
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Make</label>
-                <Select value={selectedMake} onValueChange={setSelectedMake}>
-                  <SelectTrigger><SelectValue placeholder="Any Make" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any Make</SelectItem>
-                    {makes.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FilterSelect label="Make" value={selectedMake} onChange={setSelectedMake} placeholder="Any Make" options={makes} />
+              <FilterSelect label="Body Type" value={selectedBody} onChange={setSelectedBody} placeholder="Any Type" options={bodyTypes} />
+              <FilterSelect label="Fuel Type" value={selectedFuel} onChange={setSelectedFuel} placeholder="Any Fuel" options={fuelTypes} />
+              <FilterSelect label="Transmission" value={selectedTransmission} onChange={setSelectedTransmission} placeholder="Any" options={transmissions} />
+              <FilterSelect label="Color" value={selectedColor} onChange={setSelectedColor} placeholder="Any Color" options={colors} />
+              <FilterSelect label="Doors" value={selectedDoors} onChange={setSelectedDoors} placeholder="Any" options={doorOptions} />
+              <FilterSelect label="Engine Size" value={selectedEngine} onChange={setSelectedEngine} placeholder="Any" options={engineSizes} />
 
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Body Type</label>
-                <Select value={selectedBody} onValueChange={setSelectedBody}>
-                  <SelectTrigger><SelectValue placeholder="Any Type" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any Type</SelectItem>
-                    {bodyTypes.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Fuel Type</label>
-                <Select value={selectedFuel} onValueChange={setSelectedFuel}>
-                  <SelectTrigger><SelectValue placeholder="Any Fuel" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any Fuel</SelectItem>
-                    {fuelTypes.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Transmission</label>
-                <Select value={selectedTransmission} onValueChange={setSelectedTransmission}>
-                  <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any</SelectItem>
-                    {transmissions.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Color</label>
-                <Select value={selectedColor} onValueChange={setSelectedColor}>
-                  <SelectTrigger><SelectValue placeholder="Any Color" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any Color</SelectItem>
-                    {colors.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Doors</label>
-                <Select value={selectedDoors} onValueChange={setSelectedDoors}>
-                  <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any</SelectItem>
-                    {doorOptions.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Engine Size</label>
-                <Select value={selectedEngine} onValueChange={setSelectedEngine}>
-                  <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Any</SelectItem>
-                    {engineSizes.map((e) => <SelectItem key={e} value={e}>{e}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-              <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                   Price: {formatPrice(priceRange[0], config)} — {formatPrice(priceRange[1], config)}
                 </label>
                 <Slider min={0} max={200000} step={5000} value={priceRange} onValueChange={setPriceRange} className="mt-2" />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                  Year: {yearRange[0]} — {yearRange[1]}
-                </label>
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Year: {yearRange[0]} — {yearRange[1]}</label>
                 <Slider min={2000} max={currentYear} step={1} value={yearRange} onValueChange={setYearRange} className="mt-2" />
               </div>
 
@@ -351,7 +280,6 @@ const Browse = () => {
                 <Slider min={0} max={200000} step={5000} value={[mileageMax]} onValueChange={(v) => setMileageMax(v[0])} className="mt-2" />
               </div>
 
-              {/* Mobile apply button */}
               <Button className="w-full gradient-primary border-0 lg:hidden" onClick={() => setShowFilters(false)}>
                 Show {totalCount} Results
               </Button>
@@ -372,9 +300,13 @@ const Browse = () => {
               />
             ) : (
               <>
-                <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                <div className={
+                  viewMode === "list"
+                    ? "flex flex-col gap-4"
+                    : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                }>
                   {listings.map((car, i) => (
-                    <CarCard key={car.id} car={car} index={i} />
+                    <CarCard key={car.id} car={car} index={i} layout={viewMode} />
                   ))}
                 </div>
 
@@ -383,9 +315,22 @@ const Browse = () => {
                     <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
                       <ChevronLeft className="h-4 w-4" /> Previous
                     </Button>
-                    <span className="text-sm text-muted-foreground">
-                      Page {page + 1} of {totalPages}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                        const pageNum = totalPages <= 5 ? i : Math.max(0, Math.min(page - 2, totalPages - 5)) + i;
+                        return (
+                          <Button
+                            key={pageNum}
+                            variant={page === pageNum ? "default" : "outline"}
+                            size="sm"
+                            className={`h-8 w-8 p-0 ${page === pageNum ? "gradient-primary border-0" : ""}`}
+                            onClick={() => setPage(pageNum)}
+                          >
+                            {pageNum + 1}
+                          </Button>
+                        );
+                      })}
+                    </div>
                     <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
                       Next <ChevronRight className="h-4 w-4" />
                     </Button>
