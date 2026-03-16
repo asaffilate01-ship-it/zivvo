@@ -72,12 +72,20 @@ import SEOHead from "@/components/SEOHead";
 
 const DealerPricing = () => {
   const { user, subscription, refreshSubscription } = useAuth();
+  const { config } = useCountry();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
   const [showBusinessDialog, setShowBusinessDialog] = useState(false);
   const [selectedPriceId, setSelectedPriceId] = useState("");
   const [businessName, setBusinessName] = useState("");
+
+  const plans = config.dealerPlans.map((p, i) => ({
+    ...p,
+    icon: planIcons[i] || Zap,
+    popular: i === 1,
+    description: i === 0 ? "Perfect for small dealerships getting started" : i === 1 ? "For growing dealerships that need more" : "For large dealerships and dealer groups",
+  }));
 
   // Check if returning from checkout
   useEffect(() => {
