@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
 import Browse from "./pages/Browse";
 import CarDetail from "./pages/CarDetail";
@@ -25,6 +26,10 @@ import CreateListing from "./pages/CreateListing";
 import SavedCars from "./pages/SavedCars";
 import Inbox from "./pages/Inbox";
 import Profile from "./pages/Profile";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import Contact from "./pages/Contact";
+import HelpCentre from "./pages/HelpCentre";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +57,10 @@ const App = () => (
                     <Route path="/dealers" element={<DealerPricing />} />
                     <Route path="/dealer/:slug" element={<DealerLanding />} />
                     <Route path="/saved" element={<SavedCars />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route path="/terms" element={<TermsOfService />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/help" element={<HelpCentre />} />
                     <Route
                       path="/inbox"
                       element={
@@ -127,6 +136,7 @@ const App = () => (
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+                  <CookieConsent />
                 </SavedCarsProvider>
               </AuthProvider>
             </BrowserRouter>
