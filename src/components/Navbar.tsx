@@ -51,8 +51,8 @@ const Navbar = () => {
 
   const getDashboardLink = () => {
     if (hasRole("admin")) return "/admin";
-    if (hasRole("agent")) return "/agent-dashboard";
-    if (hasRole("dealer")) return "/dealer-dashboard";
+    if (hasRole("agent")) return "/agent";
+    if (hasRole("dealer")) return "/dashboard";
     return "/profile";
   };
 
@@ -174,7 +174,7 @@ const Navbar = () => {
                 )}
                 {hasRole("agent") && (
                   <DropdownMenuItem asChild>
-                    <Link to="/agent-dashboard" className="flex items-center gap-2">
+                    <Link to="/agent" className="flex items-center gap-2">
                       <Users className="h-4 w-4" /> Agent Panel
                     </Link>
                   </DropdownMenuItem>
