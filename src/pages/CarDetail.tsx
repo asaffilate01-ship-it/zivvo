@@ -34,6 +34,7 @@ import PriceHistoryChart from "@/components/PriceHistoryChart";
 import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
 import InspectionBadge from "@/components/InspectionBadge";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import ShareSheet from "@/components/ShareSheet";
 
 const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
   const [revealed, setRevealed] = useState(false);
