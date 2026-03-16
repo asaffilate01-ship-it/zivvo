@@ -336,8 +336,24 @@ const DealerDashboard = () => {
         <div className="mt-8">
           <div className="flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-foreground">Your Listings</h2>
-            <Link to="/inbox"><Button variant="ghost" size="sm">View Enquiries</Button></Link>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={exportCSV} disabled={listings.length === 0}>
+                <Download className="mr-1 h-4 w-4" /> Export CSV
+              </Button>
+              <Link to="/inbox"><Button variant="ghost" size="sm">View Enquiries</Button></Link>
+            </div>
           </div>
+
+          {/* Bulk Action Bar */}
+          {selectedIds.size > 0 && (
+            <div className="mt-3 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
+              <span className="text-sm font-medium text-foreground">{selectedIds.size} selected</span>
+              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("active")}>Set Active</Button>
+              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("draft")}>Set Draft</Button>
+              <Button size="sm" variant="outline" className="text-destructive" onClick={() => setSelectedIds(new Set())}>Clear</Button>
+            </div>
+          )}
+
           {listings.length === 0 ? (
             <Card className="mt-4">
               <CardContent className="flex flex-col items-center justify-center py-12">
@@ -348,10 +364,21 @@ const DealerDashboard = () => {
             </Card>
           ) : (
             <div className="mt-4 space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <Checkbox
+                  checked={selectedIds.size === listings.length && listings.length > 0}
+                  onCheckedChange={selectAll}
+                />
+                <span className="text-xs text-muted-foreground">Select all</span>
+              </div>
               {listings.map((listing) => (
-                <Card key={listing.id}>
+                <Card key={listing.id} className={selectedIds.has(listing.id) ? "border-primary/40" : ""}>
                   <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedIds.has(listing.id)}
+                        onCheckedChange={() => toggleSelect(listing.id)}
+                      />
                       {listing.images?.[0] ? (
                         <img src={listing.images[0]} alt="" className="h-12 w-16 rounded-lg object-cover" />
                       ) : (
