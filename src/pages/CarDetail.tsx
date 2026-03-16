@@ -5,13 +5,15 @@ import CarCard from "@/components/CarCard";
 import SEOHead from "@/components/SEOHead";
 import { DetailSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
+import ReportListingDialog from "@/components/ReportListingDialog";
+import SellerReviews from "@/components/SellerReviews";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Heart, Share2, Phone, Mail, MapPin, Calendar,
   Gauge, Fuel, Settings2, Shield, BadgeCheck, ExternalLink,
   ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck,
-  MessageCircle,
+  MessageCircle, GitCompare,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
