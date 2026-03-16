@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, X, GitCompare } from "lucide-react";
+import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import SaveSearchDialog from "@/components/SaveSearchDialog";
 
@@ -164,6 +164,11 @@ const Browse = () => {
             <p className="text-muted-foreground">{totalCount} vehicles found</p>
           </div>
           <div className="flex items-center gap-2">
+            <Link to="/compare">
+              <Button variant="outline" size="sm">
+                <GitCompare className="mr-1 h-4 w-4" /> Compare
+              </Button>
+            </Link>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-40">
                 <SelectValue />

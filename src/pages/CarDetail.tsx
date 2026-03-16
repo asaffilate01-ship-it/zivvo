@@ -5,13 +5,15 @@ import CarCard from "@/components/CarCard";
 import SEOHead from "@/components/SEOHead";
 import { DetailSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
+import ReportListingDialog from "@/components/ReportListingDialog";
+import SellerReviews from "@/components/SellerReviews";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Heart, Share2, Phone, Mail, MapPin, Calendar,
   Gauge, Fuel, Settings2, Shield, BadgeCheck, ExternalLink,
   ChevronLeft, ChevronRight, AlertTriangle, Car, FileCheck,
-  MessageCircle,
+  MessageCircle, GitCompare,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -362,6 +364,15 @@ const CarDetail = () => {
                     <Share2 className="mr-1 h-4 w-4" />
                     Share
                   </Button>
+                  <Link to={`/compare?car=${car.id}`}>
+                    <Button variant="ghost" size="sm">
+                      <GitCompare className="mr-1 h-4 w-4" /> Compare
+                    </Button>
+                  </Link>
+                </div>
+
+                <div className="mt-3 flex justify-center">
+                  <ReportListingDialog listingId={car.id} />
                 </div>
               </div>
 
@@ -388,6 +399,11 @@ const CarDetail = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Seller Reviews */}
+        <div className="mt-12">
+          <SellerReviews sellerId={car.seller_id} listingId={car.id} />
         </div>
 
         {/* Similar Cars */}
