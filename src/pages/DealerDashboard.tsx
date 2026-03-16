@@ -114,10 +114,25 @@ const DealerDashboard = () => {
   };
 
   const toggleStatus = async (listingId: string, currentStatus: string) => {
+    // Block toggling under_review or expired listings
+    if (currentStatus === "under_review") {
+      toast({ title: "Under Review", description: "This listing is pending admin approval and cannot be changed.", variant: "destructive" });
+      return;
+    }
+    if (currentStatus === "expired") {
+      toast({ title: "Listing Expired", description: "Re-submit this listing for review to reactivate it.", variant: "destructive" });
+      return;
+    }
     const newStatus = currentStatus === "active" ? "draft" : "active";
     // Check listing limits
     if (newStatus === "active" && dealer && summary.active >= dealer.max_listings) {
       toast({ title: "Listing limit reached", description: "Upgrade your plan to add more active listings.", variant: "destructive" });
+      return;
+    }
+    // When activating, check logbook exists
+    const listing = listings.find(l => l.id === listingId);
+    if (newStatus === "active" && listing && !listing.logbook_url) {
+      toast({ title: "Logbook Required", description: "Upload your V5C logbook before activating this listing.", variant: "destructive" });
       return;
     }
     const { error } = await supabase.from("car_listings").update({ status: newStatus }).eq("id", listingId);
