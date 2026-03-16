@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
