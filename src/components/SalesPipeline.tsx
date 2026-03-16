@@ -69,6 +69,114 @@ const STAGES: { key: PipelineStage; label: string; color: string }[] = [
 
 const FUNNEL_COLORS = ["#6366f1", "#3b82f6", "#8b5cf6", "#f59e0b", "#f97316", "#22c55e", "#ef4444"];
 
+// DnD Droppable Column
+const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={`space-y-2 min-h-[60px] rounded-lg p-1 transition-colors ${isOver ? "bg-primary/10" : ""}`}>
+      {children}
+    </div>
+  );
+};
+
+// DnD Draggable Lead Card
+const DraggableLeadCard = ({ lead, onClick }: { lead: PipelineLead; onClick: () => void }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: lead.id });
+  const style = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined;
+
+  return (
+    <div ref={setNodeRef} style={style} className={`${isDragging ? "opacity-50 z-50" : ""}`}>
+      <Card className="cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md" onClick={onClick}>
+        <CardContent className="p-3">
+          <div className="flex items-center gap-1">
+            <div {...listeners} {...attributes} className="cursor-grab touch-none">
+              <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+            </div>
+            <p className="font-medium text-sm text-card-foreground flex-1">{lead.buyer_name || "Unknown"}</p>
+          </div>
+          {lead.expected_value > 0 && (
+            <p className="mt-1 text-xs font-semibold text-primary">${Number(lead.expected_value).toLocaleString()}</p>
+          )}
+          <div className="mt-2 flex items-center gap-2">
+            {lead.buyer_email && <Mail className="h-3 w-3 text-muted-foreground" />}
+            {lead.buyer_phone && <Phone className="h-3 w-3 text-muted-foreground" />}
+            <span className="ml-auto text-[10px] text-muted-foreground">{lead.source}</span>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Kanban Board with DnD
+const KanbanBoard = ({
+  stages, stageGroups, onMoveLead, onSelectLead,
+}: {
+  stages: typeof STAGES;
+  stageGroups: Record<PipelineStage, PipelineLead[]>;
+  onMoveLead: (leadId: string, newStage: PipelineStage) => Promise<void>;
+  onSelectLead: (lead: PipelineLead) => void;
+}) => {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  const allLeads = useMemo(() => {
+    const map = new Map<string, PipelineLead>();
+    Object.values(stageGroups).forEach(arr => arr.forEach(l => map.set(l.id, l)));
+    return map;
+  }, [stageGroups]);
+
+  const handleDragStart = (event: DragStartEvent) => setActiveId(event.active.id as string);
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+    const leadId = active.id as string;
+    const targetStage = over.id as PipelineStage;
+    const lead = allLeads.get(leadId);
+    if (lead && lead.stage !== targetStage) {
+      onMoveLead(leadId, targetStage);
+    }
+  };
+
+  const activeLead = activeId ? allLeads.get(activeId) : null;
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="flex gap-3 overflow-x-auto pb-4">
+        {stages.filter(s => s.key !== "lost").map(stage => (
+          <div key={stage.key} className="min-w-[240px] flex-shrink-0">
+            <div className="mb-2 flex items-center justify-between rounded-lg bg-muted px-3 py-2">
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: stage.color }} />
+                <span className="text-sm font-semibold text-card-foreground">{stage.label}</span>
+              </div>
+              <Badge variant="secondary" className="text-xs">{stageGroups[stage.key].length}</Badge>
+            </div>
+            <DroppableColumn id={stage.key}>
+              {stageGroups[stage.key].map(lead => (
+                <DraggableLeadCard key={lead.id} lead={lead} onClick={() => onSelectLead(lead)} />
+              ))}
+            </DroppableColumn>
+          </div>
+        ))}
+      </div>
+      <DragOverlay>
+        {activeLead && (
+          <Card className="w-[230px] shadow-lg border-primary/30">
+            <CardContent className="p-3">
+              <p className="font-medium text-sm text-card-foreground">{activeLead.buyer_name || "Unknown"}</p>
+              {activeLead.expected_value > 0 && (
+                <p className="mt-1 text-xs font-semibold text-primary">${Number(activeLead.expected_value).toLocaleString()}</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+      </DragOverlay>
+    </DndContext>
+  );
+};
+
 const SalesPipeline = ({ mode, dealerId }: SalesPipelineProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
