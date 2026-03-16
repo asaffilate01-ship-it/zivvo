@@ -195,7 +195,7 @@ const CarDetail = () => {
             {/* Mobile title/price */}
             <div className="mt-6 lg:hidden">
               <h1 className="font-display text-2xl font-bold text-foreground">{car.title}</h1>
-              <p className="mt-2 font-display text-3xl font-bold text-primary">${Number(car.price).toLocaleString()}</p>
+              <p className="mt-2 font-display text-3xl font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
