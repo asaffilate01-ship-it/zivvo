@@ -56,6 +56,13 @@ export type Database = {
             foreignKeyName: "agent_commissions_dealer_id_fkey"
             columns: ["dealer_id"]
             isOneToOne: false
+            referencedRelation: "dealer_landing_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_commissions_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
             referencedRelation: "dealers"
             referencedColumns: ["id"]
           },
@@ -175,6 +182,13 @@ export type Database = {
           year?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "car_listings_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_landing_public"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "car_listings_dealer_id_fkey"
             columns: ["dealer_id"]
@@ -628,6 +642,63 @@ export type Database = {
       }
     }
     Views: {
+      dealer_landing_public: {
+        Row: {
+          address: string | null
+          business_email: string | null
+          business_name: string | null
+          business_phone: string | null
+          city: string | null
+          country: string | null
+          description: string | null
+          id: string | null
+          is_active: boolean | null
+          kyc_verified: boolean | null
+          landing_page_config: Json | null
+          logo_url: string | null
+          postcode: string | null
+          slug: string | null
+          tier: Database["public"]["Enums"]["dealer_tier"] | null
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_email?: string | null
+          business_name?: string | null
+          business_phone?: string | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          kyc_verified?: boolean | null
+          landing_page_config?: Json | null
+          logo_url?: string | null
+          postcode?: string | null
+          slug?: string | null
+          tier?: Database["public"]["Enums"]["dealer_tier"] | null
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_email?: string | null
+          business_name?: string | null
+          business_phone?: string | null
+          city?: string | null
+          country?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          kyc_verified?: boolean | null
+          landing_page_config?: Json | null
+          logo_url?: string | null
+          postcode?: string | null
+          slug?: string | null
+          tier?: Database["public"]["Enums"]["dealer_tier"] | null
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       dealers_public: {
         Row: {
           business_name: string | null
