@@ -23,6 +23,11 @@ const CreateListing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
+
+  const makes = config.makes;
+  const bodyTypes = config.bodyTypes;
+  const fuelTypes = config.fuelTypes;
+  const transmissions = config.transmissions;
   const editId = searchParams.get("edit");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
