@@ -106,7 +106,7 @@ const CarCard = ({ car, index = 0 }: CarCardProps) => {
               {car.mileage != null && (
                 <span className="flex items-center gap-1">
                   <Gauge className="h-3.5 w-3.5" />
-                  {car.mileage.toLocaleString()} mi
+                  {formatDistance(car.mileage, config)}
                 </span>
               )}
               {car.fuel_type && (
