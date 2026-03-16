@@ -28,6 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import SalesPipeline from "@/components/SalesPipeline";
 
 const AgentDashboard = () => {
   const { user } = useAuth();
