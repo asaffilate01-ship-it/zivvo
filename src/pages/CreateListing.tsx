@@ -132,10 +132,50 @@ const CreateListing = () => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleLogbookSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 10MB for logbook upload.", variant: "destructive" });
+      return;
+    }
+    setLogbookFile(file);
+  };
+
+  const runHpiCheck = async () => {
+    if (!form.registration && !form.vin) {
+      toast({ title: "Registration or VIN required", description: "Enter a registration number or VIN to run an HPI check.", variant: "destructive" });
+      return;
+    }
+    setHpiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("hpi-check", {
+        body: { registration: form.registration || undefined, vin: form.vin || undefined },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        setHpiCheckData(data.data);
+        toast({ title: "HPI Check Complete", description: data.data.stolen_reported ? "⚠️ Issues found — review results." : "✅ Vehicle passed all checks." });
+      } else {
+        toast({ title: "HPI Check Failed", description: data?.error || "Could not complete HPI check. You can still submit for review.", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "HPI Check Unavailable", description: "The HPI service is currently unavailable. You can still submit — admin will verify manually.", variant: "destructive" });
+    } finally {
+      setHpiLoading(false);
+    }
+  };
+
   const handleSubmit = async (status: "draft" | "active") => {
     if (!user) return;
     if (!form.make || !form.model || !form.price) {
       toast({ title: "Please fill required fields (make, model, price)", variant: "destructive" });
+      return;
+    }
+
+    // When publishing (not draft), require logbook
+    if (status === "active" && !logbookFile && !existingLogbookUrl) {
+      toast({ title: "Logbook Required", description: "Please upload a V5C logbook / ownership document before publishing.", variant: "destructive" });
       return;
     }
 
@@ -157,10 +197,27 @@ const CreateListing = () => {
         }
       }
 
+      // Upload logbook if new
+      let logbookUrl = existingLogbookUrl;
+      if (logbookFile) {
+        const ext = logbookFile.name.split(".").pop();
+        const logbookPath = `${user.id}/logbook-${Date.now()}.${ext}`;
+        const { error: logbookErr } = await supabase.storage
+          .from("listing-documents")
+          .upload(logbookPath, logbookFile);
+        if (!logbookErr) {
+          // For private bucket, store the path — admin will generate signed URL
+          logbookUrl = logbookPath;
+        }
+      }
+
       const allImages = [...existingImages, ...uploadedUrls];
       const title = form.title || `${form.year} ${form.make} ${form.model}`;
 
-      const listingData = {
+      // Force under_review when publishing (admin must approve with logbook + HPI)
+      const finalStatus = status === "active" ? "under_review" : status;
+
+      const listingData: Record<string, any> = {
         title,
         make: form.make,
         model: form.model,
@@ -178,8 +235,10 @@ const CreateListing = () => {
         description: form.description || null,
         location: form.location || null,
         images: allImages,
-        status,
+        status: finalStatus,
         country,
+        logbook_url: logbookUrl,
+        hpi_check_data: hpiCheckData,
       };
 
       if (editId) {
@@ -200,7 +259,7 @@ const CreateListing = () => {
           dealer_id: dealer?.id || null,
         });
         if (error) throw error;
-        toast({ title: status === "draft" ? "Draft saved" : "Listing published!" });
+        toast({ title: status === "draft" ? "Draft saved" : "Listing submitted for review!" });
       }
 
       navigate("/dashboard");
