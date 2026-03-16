@@ -95,7 +95,9 @@ const Browse = () => {
         query = query.lte("mileage", mileageMax);
       }
       if (keyword) {
-        query = query.or(`title.ilike.%${keyword}%,make.ilike.%${keyword}%,model.ilike.%${keyword}%`);
+        // Use full-text search with tsquery for better relevance
+        const tsQuery = keyword.trim().split(/\s+/).join(" & ");
+        query = query.textSearch("search_vector", tsQuery, { config: "english" });
       }
       if (selectedMake) query = query.eq("make", selectedMake);
       if (selectedBody) query = query.eq("body_type", selectedBody);
