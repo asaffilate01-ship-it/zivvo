@@ -74,7 +74,7 @@ const HeroSearch = () => {
                     <SelectValue placeholder="Any Make" />
                   </SelectTrigger>
                   <SelectContent>
-                    {makes.map((m) => (
+                    {config.makes.map((m) => (
                       <SelectItem key={m} value={m}>{m}</SelectItem>
                     ))}
                   </SelectContent>
@@ -88,7 +88,7 @@ const HeroSearch = () => {
                     <SelectValue placeholder="Any Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {bodyTypes.map((b) => (
+                    {config.bodyTypes.map((b) => (
                       <SelectItem key={b} value={b}>{b}</SelectItem>
                     ))}
                   </SelectContent>
