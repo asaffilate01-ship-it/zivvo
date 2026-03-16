@@ -211,13 +211,15 @@ const Browse = () => {
   const FilterSelect = ({ label, value, onChange, placeholder, options }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; options: string[] }) => (
     <div>
       <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{label}</label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value || undefined} onValueChange={(v) => onChange(v === "__clear__" ? "" : v)}>
         <SelectTrigger className="h-9 text-sm"><SelectValue placeholder={placeholder} /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="">{placeholder}</SelectItem>
+          <SelectItem value="__clear__">{placeholder}</SelectItem>
           {options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
         </SelectContent>
       </Select>
+    </div>
+  );
     </div>
   );
 
