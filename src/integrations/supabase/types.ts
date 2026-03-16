@@ -323,6 +323,44 @@ export type Database = {
           },
         ]
       }
+      listing_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          listing_id: string
+          reason: string
+          reporter_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          listing_id: string
+          reason: string
+          reporter_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          listing_id?: string
+          reason?: string
+          reporter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_views: {
         Row: {
           created_at: string
@@ -514,6 +552,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      seller_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          listing_id: string | null
+          rating: number
+          reviewer_id: string
+          seller_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          rating: number
+          reviewer_id: string
+          seller_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          rating?: number
+          reviewer_id?: string
+          seller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
