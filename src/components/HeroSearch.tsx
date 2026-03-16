@@ -4,7 +4,8 @@ import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { makes, bodyTypes } from "@/lib/mockData";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 import { motion } from "framer-motion";
 
 const HeroSearch = () => {
