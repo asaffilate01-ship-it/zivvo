@@ -178,7 +178,7 @@ const Profile = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={l.status === "active" ? "default" : "secondary"}>{l.status}</Badge>
-                    <span className="font-display font-semibold text-card-foreground">${Number(l.price).toLocaleString()}</span>
+                    <span className="font-display font-semibold text-card-foreground">£{Number(l.price).toLocaleString()}</span>
                     <Link to={`/dashboard/listings/edit?edit=${l.id}`}>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <Edit className="h-4 w-4" />

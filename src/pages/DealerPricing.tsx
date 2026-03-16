@@ -201,7 +201,7 @@ const DealerPricing = () => {
                 <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
 
                 <div className="mt-5">
-                  <span className="font-display text-4xl font-bold text-card-foreground">${plan.price}</span>
+                  <span className="font-display text-4xl font-bold text-card-foreground">£{plan.price}</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
 

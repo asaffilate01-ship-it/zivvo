@@ -22,6 +22,22 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
 
+const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
+  const [revealed, setRevealed] = useState(false);
+  if (!phone) return (
+    <Button className="w-full gradient-primary border-0" disabled>
+      <Phone className="mr-2 h-4 w-4" />
+      Phone Not Available
+    </Button>
+  );
+  return (
+    <Button className="w-full gradient-primary border-0" onClick={() => setRevealed(true)}>
+      <Phone className="mr-2 h-4 w-4" />
+      {revealed ? phone : "Show Phone Number"}
+    </Button>
+  );
+};
+
 const CarDetail = () => {
   const { id } = useParams();
   const [car, setCar] = useState<any>(null);
