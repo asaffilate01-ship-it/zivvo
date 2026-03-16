@@ -18,6 +18,8 @@ import {
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
