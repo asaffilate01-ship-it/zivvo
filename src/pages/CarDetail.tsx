@@ -117,7 +117,7 @@ const CarDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${car.title} — $${Number(car.price).toLocaleString()}`}
+        title={`${car.title} — £${Number(car.price).toLocaleString()}`}
         description={`${car.year} ${car.make} ${car.model}. ${car.mileage ? car.mileage.toLocaleString() + " miles." : ""} ${car.fuel_type || ""} ${car.transmission || ""}. ${car.location || ""}`}
         type="product"
         jsonLd={{
