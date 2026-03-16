@@ -25,7 +25,12 @@ const engineSizes = ["1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.
 
 const Browse = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { country, config } = useCountry();
 
+  const makes = config.makes;
+  const bodyTypes = config.bodyTypes;
+  const fuelTypes = config.fuelTypes;
+  const transmissions = config.transmissions;
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
   const [selectedMake, setSelectedMake] = useState(searchParams.get("make") || "");
   const [selectedBody, setSelectedBody] = useState(searchParams.get("body") || "");
