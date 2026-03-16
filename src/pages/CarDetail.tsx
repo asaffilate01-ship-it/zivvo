@@ -375,6 +375,18 @@ const CarDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Similar Cars */}
+        {similarCars.length > 0 && (
+          <div className="mt-12">
+            <h2 className="font-display text-2xl font-bold text-foreground">Similar Vehicles</h2>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {similarCars.map((c, i) => (
+                <CarCard key={c.id} car={c} index={i} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <Footer />
