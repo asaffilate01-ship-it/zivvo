@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { useSavedCars } from "@/contexts/SavedCarsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice, formatDistance } from "@/lib/countryConfig";
 
 interface CarCardProps {
   car: {
