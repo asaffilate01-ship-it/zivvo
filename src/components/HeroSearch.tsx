@@ -102,7 +102,7 @@ const HeroSearch = () => {
             </div>
 
             <div className="mt-3 flex items-center gap-4 border-t border-border pt-3">
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => navigate("/browse")}>
                 <SlidersHorizontal className="mr-1 h-4 w-4" />
                 Advanced Filters
               </Button>

@@ -368,7 +368,7 @@ const CreateListing = () => {
             </div>
             <div className="space-y-2">
               <Label>Location</Label>
-              <Input placeholder="e.g. London, UK" value={form.location} onChange={(e) => updateField("location", e.target.value)} />
+              <Input placeholder={config.popularCities[0] ? `e.g. ${config.popularCities[0]}` : "e.g. London"} value={form.location} onChange={(e) => updateField("location", e.target.value)} />
             </div>
           </CardContent>
         </Card>

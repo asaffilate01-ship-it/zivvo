@@ -195,6 +195,12 @@ const Navbar = () => {
               <Link to="/saved" onClick={() => setMobileOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">Saved Cars</Button>
               </Link>
+              <Link to="/help" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">Help Centre</Button>
+              </Link>
+              <Link to="/contact" onClick={() => setMobileOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">Contact Us</Button>
+              </Link>
               {user && (
                 <Link to="/inbox" onClick={() => setMobileOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start">
