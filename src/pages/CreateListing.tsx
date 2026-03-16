@@ -93,6 +93,8 @@ const CreateListing = () => {
           location: data.location || "",
         });
         setExistingImages(data.images || []);
+        setExistingLogbookUrl((data as any).logbook_url || null);
+        setHpiCheckData((data as any).hpi_check_data || null);
       } else {
         toast({ title: "Listing not found", variant: "destructive" });
         navigate("/dashboard");
