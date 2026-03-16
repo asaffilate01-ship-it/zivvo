@@ -220,8 +220,6 @@ const Browse = () => {
       </Select>
     </div>
   );
-    </div>
-  );
 
   const FilterSection = ({ title, sectionKey, children }: { title: string; sectionKey: keyof typeof openSections; children: React.ReactNode }) => (
     <Collapsible open={openSections[sectionKey]} onOpenChange={() => toggleSection(sectionKey)}>
