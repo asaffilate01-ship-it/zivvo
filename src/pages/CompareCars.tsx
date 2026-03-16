@@ -106,7 +106,7 @@ const CompareCars = () => {
               </div>
               <CardContent className="p-4">
                 <Link to={`/car/${car.id}`} className="font-display font-semibold text-card-foreground hover:text-primary line-clamp-1">{car.title}</Link>
-                <p className="mt-1 font-display text-lg font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
+                <p className="mt-1 font-display text-lg font-bold text-primary">{formatPrice(Number(car.price), config)}</p>
               </CardContent>
             </Card>
           ))}
