@@ -140,7 +140,7 @@ const DealerPricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Dealer Plans & Pricing" description="Choose a dealer plan to scale your car dealership on AutoVault. Starting from $49/month with verified dealer badges and analytics." />
+      <SEOHead title="Dealer Plans & Pricing" description="Choose a dealer plan to scale your car dealership on AutoVault. Starting from £49/month with verified dealer badges and analytics." />
       <Navbar />
 
       <section className="container mx-auto px-4 py-16">

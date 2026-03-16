@@ -419,7 +419,7 @@ const AdminDashboard = () => {
                             </div>
                           </div>
                         </TableCell>
-                        <TableCell>${Number(l.price).toLocaleString()}</TableCell>
+                        <TableCell>£{Number(l.price).toLocaleString()}</TableCell>
                         <TableCell><Badge variant={l.status === "active" ? "default" : l.status === "under_review" ? "destructive" : "secondary"}>{l.status}</Badge></TableCell>
                         <TableCell>{l.views_count || 0}</TableCell>
                         <TableCell>{l.enquiries_count || 0}</TableCell>
