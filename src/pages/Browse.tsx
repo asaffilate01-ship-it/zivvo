@@ -43,6 +43,10 @@ const Browse = () => {
   const transmissions = config.transmissions;
   const cities = config.popularCities;
 
+  // Dynamic models from DB
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+
   // Core filters
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
   const [selectedMake, setSelectedMake] = useState(searchParams.get("make") || "");
