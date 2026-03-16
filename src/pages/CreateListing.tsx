@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle } from "lucide-react";
 import ImageReorder from "@/components/ImageReorder";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,11 +30,18 @@ const CreateListing = () => {
   const transmissions = config.transmissions;
   const editId = searchParams.get("edit");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logbookInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(!!editId);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+
+  // KYC: Logbook & HPI
+  const [logbookFile, setLogbookFile] = useState<File | null>(null);
+  const [existingLogbookUrl, setExistingLogbookUrl] = useState<string | null>(null);
+  const [hpiCheckData, setHpiCheckData] = useState<any>(null);
+  const [hpiLoading, setHpiLoading] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
