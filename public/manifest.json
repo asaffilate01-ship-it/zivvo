@@ -1,0 +1,17 @@
+{
+  "name": "AutoVault — Buy & Sell Cars",
+  "short_name": "AutoVault",
+  "description": "Browse thousands of verified vehicles from trusted dealers and private sellers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#e8622c",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "categories": ["auto", "shopping"],
+  "screenshots": []
+}
