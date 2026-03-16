@@ -64,8 +64,10 @@ const CarDetail = () => {
   const navigate = useNavigate();
   const { config, country } = useCountry();
   const liked = car ? isSaved(car.id) : false;
+  const { addViewed } = useRecentlyViewed();
 
   const [similarCars, setSimilarCars] = useState<any[]>([]);
+  const [inspectionReport, setInspectionReport] = useState<any>(null);
 
   useEffect(() => {
     const fetchCar = async () => {
