@@ -51,8 +51,8 @@ const Navbar = () => {
 
   const getDashboardLink = () => {
     if (hasRole("admin")) return "/admin";
-    if (hasRole("agent")) return "/agent-dashboard";
-    if (hasRole("dealer")) return "/dealer-dashboard";
+    if (hasRole("agent")) return "/agent";
+    if (hasRole("dealer")) return "/dashboard";
     return "/profile";
   };
 
