@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CarCard from "@/components/CarCard";
 import SEOHead from "@/components/SEOHead";
 import { DetailSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
@@ -33,6 +34,8 @@ const CarDetail = () => {
   const navigate = useNavigate();
   const liked = car ? isSaved(car.id) : false;
 
+  const [similarCars, setSimilarCars] = useState<any[]>([]);
+
   useEffect(() => {
     const fetchCar = async () => {
       const { data } = await supabase
@@ -49,6 +52,16 @@ const CarDetail = () => {
           const { data: d } = await supabase.from("dealers").select("business_name, slug, city, business_phone, business_email").eq("id", data.dealer_id).maybeSingle();
           if (d) setDealer(d);
         }
+        // Fetch similar cars (same make or body type, excluding current)
+        const { data: similar } = await supabase
+          .from("car_listings")
+          .select("*")
+          .eq("status", "active")
+          .neq("id", id!)
+          .or(`make.eq.${data.make},body_type.eq.${data.body_type}`)
+          .order("created_at", { ascending: false })
+          .limit(4);
+        if (similar) setSimilarCars(similar);
       }
       setLoading(false);
     };
@@ -363,6 +376,18 @@ const CarDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Similar Cars */}
+        {similarCars.length > 0 && (
+          <div className="mt-12">
+            <h2 className="font-display text-2xl font-bold text-foreground">Similar Vehicles</h2>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {similarCars.map((c, i) => (
+                <CarCard key={c.id} car={c} index={i} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <Footer />
