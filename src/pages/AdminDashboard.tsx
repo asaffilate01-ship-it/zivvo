@@ -401,53 +401,82 @@ const AdminDashboard = () => {
                       <TableHead>Vehicle</TableHead>
                       <TableHead>Price</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Logbook</TableHead>
+                      <TableHead>HPI</TableHead>
                       <TableHead>Views</TableHead>
-                      <TableHead>Enquiries</TableHead>
                       <TableHead>Posted</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredListings.slice(0, 50).map((l) => (
-                      <TableRow key={l.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {l.images?.[0] && <img src={l.images[0]} alt="" className="h-8 w-12 rounded object-cover" />}
-                            <div>
-                              <p className="font-medium text-card-foreground">{l.year} {l.make} {l.model}</p>
-                              <p className="text-xs text-muted-foreground">{l.dealer_id ? "Dealer" : "Private"}</p>
+                    {filteredListings.slice(0, 50).map((l) => {
+                      const hasLogbook = !!(l as any).logbook_url;
+                      const hpiData = (l as any).hpi_check_data;
+                      const hasHpi = !!hpiData;
+                      const hpiClean = hasHpi && !hpiData?.stolen_reported && !hpiData?.finance_outstanding && !hpiData?.write_off;
+                      return (
+                        <TableRow key={l.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {l.images?.[0] && <img src={l.images[0]} alt="" className="h-8 w-12 rounded object-cover" />}
+                              <div>
+                                <p className="font-medium text-card-foreground">{l.year} {l.make} {l.model}</p>
+                                <p className="text-xs text-muted-foreground">{l.dealer_id ? "Dealer" : "Private"} · {l.registration || "No reg"}</p>
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>£{Number(l.price).toLocaleString()}</TableCell>
-                        <TableCell><Badge variant={l.status === "active" ? "default" : l.status === "under_review" ? "destructive" : "secondary"}>{l.status}</Badge></TableCell>
-                        <TableCell>{l.views_count || 0}</TableCell>
-                        <TableCell>{l.enquiries_count || 0}</TableCell>
-                        <TableCell className="text-muted-foreground">{new Date(l.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {l.status !== "active" && (
-                                <DropdownMenuItem onClick={() => toggleListingStatus(l.id, "active")}>
-                                  <CheckCircle className="mr-2 h-4 w-4" /> Approve
+                          </TableCell>
+                          <TableCell>£{Number(l.price).toLocaleString()}</TableCell>
+                          <TableCell><Badge variant={l.status === "active" ? "default" : l.status === "under_review" ? "destructive" : "secondary"}>{l.status}</Badge></TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={hasLogbook ? "border-success text-success" : "border-destructive text-destructive"}>
+                              {hasLogbook ? "✓" : "✗"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {hasHpi ? (
+                              <Badge variant="outline" className={hpiClean ? "border-success text-success" : "border-destructive text-destructive"}>
+                                {hpiClean ? "Clear" : "Issues"}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-muted-foreground text-muted-foreground">None</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>{l.views_count || 0}</TableCell>
+                          <TableCell className="text-muted-foreground">{new Date(l.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {l.status !== "active" && (
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      if (!hasLogbook) {
+                                        toast({ title: "Cannot approve", description: "Seller has not uploaded a logbook.", variant: "destructive" });
+                                        return;
+                                      }
+                                      toggleListingStatus(l.id, "active");
+                                    }}
+                                  >
+                                    <CheckCircle className="mr-2 h-4 w-4" /> Approve
+                                    {!hasLogbook && <span className="ml-1 text-xs text-destructive">(no logbook)</span>}
+                                  </DropdownMenuItem>
+                                )}
+                                {l.status === "active" && (
+                                  <DropdownMenuItem onClick={() => toggleListingStatus(l.id, "under_review")}>
+                                    <Ban className="mr-2 h-4 w-4" /> Suspend
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={() => deleteListing(l.id)} className="text-destructive">
+                                  <XCircle className="mr-2 h-4 w-4" /> Delete
                                 </DropdownMenuItem>
-                              )}
-                              {l.status === "active" && (
-                                <DropdownMenuItem onClick={() => toggleListingStatus(l.id, "under_review")}>
-                                  <Ban className="mr-2 h-4 w-4" /> Suspend
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem onClick={() => deleteListing(l.id)} className="text-destructive">
-                                <XCircle className="mr-2 h-4 w-4" /> Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
                 {filteredListings.length === 0 && (

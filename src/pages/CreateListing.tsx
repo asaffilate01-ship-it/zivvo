@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle } from "lucide-react";
 import ImageReorder from "@/components/ImageReorder";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,11 +30,18 @@ const CreateListing = () => {
   const transmissions = config.transmissions;
   const editId = searchParams.get("edit");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logbookInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(!!editId);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+
+  // KYC: Logbook & HPI
+  const [logbookFile, setLogbookFile] = useState<File | null>(null);
+  const [existingLogbookUrl, setExistingLogbookUrl] = useState<string | null>(null);
+  const [hpiCheckData, setHpiCheckData] = useState<any>(null);
+  const [hpiLoading, setHpiLoading] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -86,6 +93,8 @@ const CreateListing = () => {
           location: data.location || "",
         });
         setExistingImages(data.images || []);
+        setExistingLogbookUrl((data as any).logbook_url || null);
+        setHpiCheckData((data as any).hpi_check_data || null);
       } else {
         toast({ title: "Listing not found", variant: "destructive" });
         navigate("/dashboard");
@@ -123,10 +132,50 @@ const CreateListing = () => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleLogbookSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 10MB for logbook upload.", variant: "destructive" });
+      return;
+    }
+    setLogbookFile(file);
+  };
+
+  const runHpiCheck = async () => {
+    if (!form.registration && !form.vin) {
+      toast({ title: "Registration or VIN required", description: "Enter a registration number or VIN to run an HPI check.", variant: "destructive" });
+      return;
+    }
+    setHpiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("hpi-check", {
+        body: { registration: form.registration || undefined, vin: form.vin || undefined },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        setHpiCheckData(data.data);
+        toast({ title: "HPI Check Complete", description: data.data.stolen_reported ? "⚠️ Issues found — review results." : "✅ Vehicle passed all checks." });
+      } else {
+        toast({ title: "HPI Check Failed", description: data?.error || "Could not complete HPI check. You can still submit for review.", variant: "destructive" });
+      }
+    } catch (err: any) {
+      toast({ title: "HPI Check Unavailable", description: "The HPI service is currently unavailable. You can still submit — admin will verify manually.", variant: "destructive" });
+    } finally {
+      setHpiLoading(false);
+    }
+  };
+
   const handleSubmit = async (status: "draft" | "active") => {
     if (!user) return;
     if (!form.make || !form.model || !form.price) {
       toast({ title: "Please fill required fields (make, model, price)", variant: "destructive" });
+      return;
+    }
+
+    // When publishing (not draft), require logbook
+    if (status === "active" && !logbookFile && !existingLogbookUrl) {
+      toast({ title: "Logbook Required", description: "Please upload a V5C logbook / ownership document before publishing.", variant: "destructive" });
       return;
     }
 
@@ -148,10 +197,27 @@ const CreateListing = () => {
         }
       }
 
+      // Upload logbook if new
+      let logbookUrl = existingLogbookUrl;
+      if (logbookFile) {
+        const ext = logbookFile.name.split(".").pop();
+        const logbookPath = `${user.id}/logbook-${Date.now()}.${ext}`;
+        const { error: logbookErr } = await supabase.storage
+          .from("listing-documents")
+          .upload(logbookPath, logbookFile);
+        if (!logbookErr) {
+          // For private bucket, store the path — admin will generate signed URL
+          logbookUrl = logbookPath;
+        }
+      }
+
       const allImages = [...existingImages, ...uploadedUrls];
       const title = form.title || `${form.year} ${form.make} ${form.model}`;
 
-      const listingData = {
+      // Force under_review when publishing (admin must approve with logbook + HPI)
+      const finalStatus = status === "active" ? "under_review" : status;
+
+      const listingData: Record<string, any> = {
         title,
         make: form.make,
         model: form.model,
@@ -169,13 +235,15 @@ const CreateListing = () => {
         description: form.description || null,
         location: form.location || null,
         images: allImages,
-        status,
+        status: finalStatus,
         country,
+        logbook_url: logbookUrl,
+        hpi_check_data: hpiCheckData,
       };
 
       if (editId) {
         const { error } = await supabase.from("car_listings")
-          .update(listingData)
+          .update(listingData as any)
           .eq("id", editId)
           .eq("seller_id", user.id);
         if (error) throw error;
@@ -189,9 +257,9 @@ const CreateListing = () => {
           ...listingData,
           seller_id: user.id,
           dealer_id: dealer?.id || null,
-        });
+        } as any);
         if (error) throw error;
-        toast({ title: status === "draft" ? "Draft saved" : "Listing published!" });
+        toast({ title: status === "draft" ? "Draft saved" : "Listing submitted for review!" });
       }
 
       navigate("/dashboard");
@@ -388,13 +456,101 @@ const CreateListing = () => {
           </CardContent>
         </Card>
 
+        {/* KYC: Logbook & HPI Check */}
+        <Card className="mt-4 border-primary/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="h-4 w-4 text-primary" /> Verification Documents
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Logbook Upload */}
+            <div>
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <FileCheck className="h-4 w-4" /> V5C Log Book / Ownership Document *
+              </Label>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Upload your vehicle logbook (V5C) or ownership certificate. Required before your listing can go live.
+              </p>
+              <div className="mt-2 flex items-center gap-3">
+                {existingLogbookUrl ? (
+                  <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                    <CheckCircle className="h-4 w-4" /> Logbook uploaded
+                  </div>
+                ) : logbookFile ? (
+                  <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                    <CheckCircle className="h-4 w-4" /> {logbookFile.name}
+                  </div>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => logbookInputRef.current?.click()}
+                >
+                  <Upload className="mr-1 h-4 w-4" /> {existingLogbookUrl || logbookFile ? "Replace" : "Upload"}
+                </Button>
+                <input
+                  ref={logbookInputRef}
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.webp"
+                  className="hidden"
+                  onChange={handleLogbookSelect}
+                />
+              </div>
+            </div>
+
+            {/* HPI Check */}
+            <div>
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Shield className="h-4 w-4" /> HPI / Vehicle History Check
+              </Label>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Run an HPI check to verify the vehicle has no outstanding finance, theft records, or write-off history.
+              </p>
+              <div className="mt-2 flex items-center gap-3">
+                {hpiCheckData ? (
+                  <div className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${
+                    hpiCheckData.stolen_reported || hpiCheckData.finance_outstanding || hpiCheckData.write_off
+                      ? "border-destructive/40 bg-destructive/10 text-destructive"
+                      : "border-success/40 bg-success/10 text-success"
+                  }`}>
+                    {hpiCheckData.stolen_reported || hpiCheckData.finance_outstanding || hpiCheckData.write_off ? (
+                      <><AlertTriangle className="h-4 w-4" /> Issues found</>
+                    ) : (
+                      <><CheckCircle className="h-4 w-4" /> All clear</>
+                    )}
+                  </div>
+                ) : null}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={runHpiCheck}
+                  disabled={hpiLoading || (!form.registration && !form.vin)}
+                >
+                  {hpiLoading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Shield className="mr-1 h-4 w-4" />}
+                  {hpiCheckData ? "Re-run HPI Check" : "Run HPI Check"}
+                </Button>
+              </div>
+              {!form.registration && !form.vin && (
+                <p className="mt-1 text-xs text-muted-foreground">Enter a registration or VIN above to enable HPI check.</p>
+              )}
+            </div>
+
+            <div className="rounded-md border border-border bg-muted/50 p-3 text-xs text-muted-foreground">
+              <strong>Note:</strong> All listings are submitted for admin review. Your listing will go live once the logbook and vehicle history have been verified by our team.
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Actions */}
         <div className="mt-6 flex gap-3">
           <Button variant="outline" className="flex-1" onClick={() => handleSubmit("draft")} disabled={loading}>
             Save as Draft
           </Button>
           <Button className="gradient-primary flex-1 border-0" onClick={() => handleSubmit("active")} disabled={loading}>
-            {loading ? "Saving..." : editId ? "Update Listing" : "Publish Listing"}
+            {loading ? "Saving..." : editId ? "Update & Submit for Review" : "Submit for Review"}
             <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
         </div>

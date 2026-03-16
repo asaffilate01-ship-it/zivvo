@@ -75,11 +75,13 @@ export type Database = {
           features: string[] | null
           finance_check_clear: boolean | null
           fuel_type: string | null
+          hpi_check_data: Json | null
           id: string
           images: string[] | null
           is_featured: boolean | null
           legal_check_clear: boolean | null
           location: string | null
+          logbook_url: string | null
           make: string
           mileage: number | null
           model: string
@@ -110,11 +112,13 @@ export type Database = {
           features?: string[] | null
           finance_check_clear?: boolean | null
           fuel_type?: string | null
+          hpi_check_data?: Json | null
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
           legal_check_clear?: boolean | null
           location?: string | null
+          logbook_url?: string | null
           make: string
           mileage?: number | null
           model: string
@@ -145,11 +149,13 @@ export type Database = {
           features?: string[] | null
           finance_check_clear?: boolean | null
           fuel_type?: string | null
+          hpi_check_data?: Json | null
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
           legal_check_clear?: boolean | null
           location?: string | null
+          logbook_url?: string | null
           make?: string
           mileage?: number | null
           model?: string
