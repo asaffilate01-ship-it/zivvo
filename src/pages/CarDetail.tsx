@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import CarCard from "@/components/CarCard";
 import SEOHead from "@/components/SEOHead";
 import { DetailSkeleton } from "@/components/LoadingSkeleton";
 import EmptyState from "@/components/EmptyState";
