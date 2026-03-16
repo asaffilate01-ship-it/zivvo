@@ -22,12 +22,6 @@ const CreateListing = () => {
   const { country, config } = useCountry();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const makes = config.makes;
-  const bodyTypes = config.bodyTypes;
-  const fuelTypes = config.fuelTypes;
-  const transmissions = config.transmissions;
-  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit");
   const fileInputRef = useRef<HTMLInputElement>(null);
