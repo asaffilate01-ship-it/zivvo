@@ -260,6 +260,10 @@ const Profile = () => {
             ))}
           </TabsContent>
 
+          <TabsContent value="referrals" className="mt-4">
+            <ReferralPanel />
+          </TabsContent>
+
           <TabsContent value="settings" className="mt-4">
             <Card>
               <CardHeader>
