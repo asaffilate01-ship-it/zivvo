@@ -151,6 +151,8 @@ const App = () => (
                   </Routes>
                   <CookieConsent />
                   <BugReportButton />
+                  <PWAInstallPrompt />
+                  <OnboardingTour />
                 </SavedCarsProvider>
               </AuthProvider>
               </CountryProvider>

@@ -324,6 +324,9 @@ const DealerDashboard = () => {
                     <div className="flex items-center gap-2">
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
                       <span className="font-display font-semibold text-card-foreground">{formatPrice(Number(listing.price), config)}</span>
+                      {listing.status === "active" && (
+                        <BoostListingDialog listingId={listing.id} listingTitle={listing.title} isPromoted={listing.is_promoted} />
+                      )}
                       <Link to={`/dashboard/listings/edit?edit=${listing.id}`}>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
                           <Edit className="h-4 w-4" />
