@@ -174,7 +174,7 @@ const Navbar = () => {
                 )}
                 {hasRole("agent") && (
                   <DropdownMenuItem asChild>
-                    <Link to="/agent-dashboard" className="flex items-center gap-2">
+                    <Link to="/agent" className="flex items-center gap-2">
                       <Users className="h-4 w-4" /> Agent Panel
                     </Link>
                   </DropdownMenuItem>
