@@ -108,7 +108,9 @@ export type Database = {
           hpi_check_data: Json | null
           id: string
           images: string[] | null
+          inspection_score: number | null
           is_featured: boolean | null
+          is_promoted: boolean | null
           legal_check_clear: boolean | null
           location: string | null
           logbook_url: string | null
@@ -116,6 +118,7 @@ export type Database = {
           mileage: number | null
           model: string
           price: number
+          promoted_until: string | null
           registration: string | null
           search_vector: unknown
           seller_id: string
@@ -125,6 +128,7 @@ export type Database = {
           transmission: string | null
           updated_at: string
           verified: boolean | null
+          video_url: string | null
           views_count: number | null
           vin: string | null
           year: number
@@ -145,7 +149,9 @@ export type Database = {
           hpi_check_data?: Json | null
           id?: string
           images?: string[] | null
+          inspection_score?: number | null
           is_featured?: boolean | null
+          is_promoted?: boolean | null
           legal_check_clear?: boolean | null
           location?: string | null
           logbook_url?: string | null
@@ -153,6 +159,7 @@ export type Database = {
           mileage?: number | null
           model: string
           price: number
+          promoted_until?: string | null
           registration?: string | null
           search_vector?: unknown
           seller_id: string
@@ -162,6 +169,7 @@ export type Database = {
           transmission?: string | null
           updated_at?: string
           verified?: boolean | null
+          video_url?: string | null
           views_count?: number | null
           vin?: string | null
           year: number
@@ -182,7 +190,9 @@ export type Database = {
           hpi_check_data?: Json | null
           id?: string
           images?: string[] | null
+          inspection_score?: number | null
           is_featured?: boolean | null
+          is_promoted?: boolean | null
           legal_check_clear?: boolean | null
           location?: string | null
           logbook_url?: string | null
@@ -190,6 +200,7 @@ export type Database = {
           mileage?: number | null
           model?: string
           price?: number
+          promoted_until?: string | null
           registration?: string | null
           search_vector?: unknown
           seller_id?: string
@@ -199,6 +210,7 @@ export type Database = {
           transmission?: string | null
           updated_at?: string
           verified?: boolean | null
+          video_url?: string | null
           views_count?: number | null
           vin?: string | null
           year?: number
@@ -482,6 +494,47 @@ export type Database = {
           },
         ]
       }
+      inspection_reports: {
+        Row: {
+          created_at: string
+          id: string
+          inspector_name: string | null
+          listing_id: string
+          report_url: string | null
+          score: number
+          summary: string | null
+          total_points: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inspector_name?: string | null
+          listing_id: string
+          report_url?: string | null
+          score?: number
+          summary?: string | null
+          total_points?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inspector_name?: string | null
+          listing_id?: string
+          report_url?: string | null
+          score?: number
+          summary?: string | null
+          total_points?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_reports: {
         Row: {
           created_at: string
@@ -715,6 +768,38 @@ export type Database = {
           },
           {
             foreignKeyName: "pipeline_leads_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_history: {
+        Row: {
+          changed_at: string
+          id: string
+          listing_id: string
+          new_price: number
+          old_price: number
+        }
+        Insert: {
+          changed_at?: string
+          id?: string
+          listing_id: string
+          new_price: number
+          old_price: number
+        }
+        Update: {
+          changed_at?: string
+          id?: string
+          listing_id?: string
+          new_price?: number
+          old_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_history_listing_id_fkey"
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "car_listings"
