@@ -496,6 +496,9 @@ const CarDetail = () => {
                 <PaymentCalculator price={Number(car.price)} />
               </div>
 
+              {/* Finance & Insurance Quotes */}
+              <FinanceQuoteWidget carPrice={Number(car.price)} carTitle={car.title} listingId={car.id} />
+
               {/* Safety Tips */}
               <div className="rounded-2xl border border-border bg-warning/5 p-5">
                 <h4 className="flex items-center gap-2 font-display font-semibold text-foreground">
