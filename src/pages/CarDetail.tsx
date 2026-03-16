@@ -401,6 +401,11 @@ const CarDetail = () => {
           </div>
         </div>
 
+        {/* Seller Reviews */}
+        <div className="mt-12">
+          <SellerReviews sellerId={car.seller_id} listingId={car.id} />
+        </div>
+
         {/* Similar Cars */}
         {similarCars.length > 0 && (
           <div className="mt-12">
