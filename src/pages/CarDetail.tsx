@@ -245,7 +245,9 @@ const CarDetail = () => {
 
               <div className="absolute left-3 top-3 flex gap-2">
                 {car.is_featured && <Badge className="gradient-primary border-0 text-primary-foreground">Featured</Badge>}
+                {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0">Promoted</Badge>}
                 {car.verified && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" /> Verified</Badge>}
+                {inspectionReport && <InspectionBadge score={inspectionReport.score} totalPoints={inspectionReport.total_points} />}
               </div>
             </div>
 
