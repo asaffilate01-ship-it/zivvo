@@ -36,6 +36,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CompareCars from "./pages/CompareCars";
 import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
