@@ -34,32 +34,28 @@ const Index = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const [featuredRes, latestRes] = await Promise.all([
-        supabase.from("car_listings").select("*").eq("status", "active").eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
-        supabase.from("car_listings").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(8),
+        supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
+        supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).order("created_at", { ascending: false }).limit(8),
       ]);
       if (featuredRes.data) setFeatured(featuredRes.data);
       if (latestRes.data) setLatest(latestRes.data);
 
-      const { data: allActive } = await supabase.from("car_listings").select("body_type").eq("status", "active");
+      const { data: allActive } = await supabase.from("car_listings").select("body_type, fuel_type").eq("status", "active").eq("country", country);
       if (allActive) {
         const counts: Record<string, number> = {};
         allActive.forEach((l: any) => {
           if (l.body_type) counts[l.body_type] = (counts[l.body_type] || 0) + 1;
+          if (l.fuel_type === "Electric") counts["Electric"] = (counts["Electric"] || 0) + 1;
+          if (l.fuel_type === "Hybrid") counts["Hybrid"] = (counts["Hybrid"] || 0) + 1;
         });
-        const { data: fuelData } = await supabase.from("car_listings").select("fuel_type").eq("status", "active");
-        if (fuelData) {
-          fuelData.forEach((l: any) => {
-            if (l.fuel_type === "Electric") counts["Electric"] = (counts["Electric"] || 0) + 1;
-            if (l.fuel_type === "Hybrid") counts["Hybrid"] = (counts["Hybrid"] || 0) + 1;
-          });
-        }
         setCategoryCounts(counts);
       }
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [country]);
 
   return (
     <div className="min-h-screen bg-background">
