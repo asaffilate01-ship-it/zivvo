@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,132 +15,159 @@ const HeroSearch = () => {
   const [keyword, setKeyword] = useState("");
   const [make, setMake] = useState("");
   const [bodyType, setBodyType] = useState("");
+  const [priceRange, setPriceRange] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(`/browse?q=${keyword}&make=${make}&body=${bodyType}`);
+    const params = new URLSearchParams();
+    if (keyword) params.set("q", keyword);
+    if (make) params.set("make", make);
+    if (bodyType) params.set("body", bodyType);
+    if (priceRange) params.set("priceMax", priceRange);
+    navigate(`/browse?${params.toString()}`);
   };
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Background */}
-      <div className="gradient-dark absolute inset-0" />
-      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${heroImage})` }} />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
+    <section className="relative min-h-[600px] overflow-hidden md:min-h-[680px]">
+      {/* Layered background */}
+      <div className="absolute inset-0">
+        <img src={heroImage} alt="" className="h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 to-foreground/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+      </div>
 
-      <div className="container relative mx-auto px-4 pb-20 pt-16 md:pb-28 md:pt-24">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mx-auto max-w-3xl text-center"
-        >
-          <h1 className="font-display text-4xl font-bold leading-tight tracking-tight md:text-6xl">
-            <span className="text-primary-foreground">Find Your </span>
-            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Perfect Drive
-            </span>
-          </h1>
-          <p className="mt-4 text-lg text-primary-foreground/70 md:text-xl">
-            Browse thousands of verified vehicles from trusted dealers and private sellers
-          </p>
-        </motion.div>
+      {/* Floating accent shapes */}
+      <div className="absolute -right-20 top-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+      <div className="absolute -left-10 bottom-20 h-56 w-56 rounded-full bg-accent/10 blur-3xl" />
 
-        <motion.form
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          onSubmit={handleSearch}
-          className="mx-auto mt-10 max-w-4xl"
-        >
-          <div className="rounded-2xl border border-primary-foreground/10 bg-background/95 p-3 shadow-elevated backdrop-blur-xl md:p-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-end">
-              <div className="flex-1">
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Search</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Search make, model, or keyword..."
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    className="pl-10"
-                  />
+      <div className="container relative mx-auto px-4 pb-24 pt-20 md:pb-32 md:pt-28">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          {/* Left: Copy */}
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+          >
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              Live marketplace — updated in real-time
+            </div>
+
+            <h1 className="font-display text-4xl font-bold leading-[1.1] tracking-tight text-primary-foreground md:text-5xl lg:text-6xl">
+              Find Your
+              <br />
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                Perfect Drive
+              </span>
+            </h1>
+
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-primary-foreground/65 md:text-lg">
+              Browse thousands of verified vehicles from trusted dealers and private sellers across the {config.name}.
+            </p>
+
+            {/* Stats row */}
+            <div className="mt-8 flex gap-8">
+              {[
+                { value: "25K+", label: "Listings" },
+                { value: "3.2K+", label: "Dealers" },
+                { value: "98%", label: "Satisfaction" },
+              ].map((stat, i) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
+                >
+                  <p className="font-display text-2xl font-bold text-primary-foreground md:text-3xl">{stat.value}</p>
+                  <p className="text-xs text-primary-foreground/50">{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right: Search card */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            <form onSubmit={handleSearch}>
+              <div className="rounded-2xl border border-border/50 bg-card/95 p-5 shadow-elevated backdrop-blur-xl md:p-6">
+                <h2 className="font-display text-lg font-semibold text-card-foreground">Search Vehicles</h2>
+                <p className="mb-4 text-xs text-muted-foreground">Find exactly what you're looking for</p>
+
+                <div className="space-y-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder="Search make, model, or keyword..."
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      className="h-11 pl-10"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <Select value={make} onValueChange={setMake}>
+                      <SelectTrigger className="h-11"><SelectValue placeholder="Any Make" /></SelectTrigger>
+                      <SelectContent>
+                        {config.makes.map((m) => (
+                          <SelectItem key={m} value={m}>{m}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Select value={bodyType} onValueChange={setBodyType}>
+                      <SelectTrigger className="h-11"><SelectValue placeholder="Body Type" /></SelectTrigger>
+                      <SelectContent>
+                        {config.bodyTypes.map((b) => (
+                          <SelectItem key={b} value={b}>{b}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Select value={priceRange} onValueChange={setPriceRange}>
+                    <SelectTrigger className="h-11"><SelectValue placeholder="Max Price" /></SelectTrigger>
+                    <SelectContent>
+                      {[5000, 10000, 15000, 20000, 30000, 50000, 75000, 100000].map((p) => (
+                        <SelectItem key={p} value={String(p)}>Up to {formatPrice(p, config)}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Button type="submit" size="lg" className="gradient-primary h-12 w-full border-0 text-sm font-semibold">
+                    <Search className="mr-2 h-4 w-4" />
+                    Search Vehicles
+                  </Button>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
+                  <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => navigate("/browse")}>
+                    <SlidersHorizontal className="mr-1 h-3.5 w-3.5" />
+                    Advanced Filters
+                  </Button>
+                  <div className="hidden gap-1.5 md:flex">
+                    {["Electric", "SUVs", "Low Mileage"].map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        className="rounded-full border border-border bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                        onClick={() => {
+                          if (tag === "SUVs") navigate("/browse?body=SUV");
+                          else if (tag === "Electric") navigate("/browse?fuel=Electric");
+                          else navigate("/browse?mileageMax=30000");
+                        }}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-
-              <div className="w-full md:w-44">
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Make</label>
-                <Select value={make} onValueChange={setMake}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Any Make" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {config.makes.map((m) => (
-                      <SelectItem key={m} value={m}>{m}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="w-full md:w-44">
-                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Body Type</label>
-                <Select value={bodyType} onValueChange={setBodyType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Any Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {config.bodyTypes.map((b) => (
-                      <SelectItem key={b} value={b}>{b}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button type="submit" size="lg" className="gradient-primary border-0 px-8">
-                <Search className="mr-2 h-4 w-4" />
-                Search
-              </Button>
-            </div>
-
-            <div className="mt-3 flex items-center gap-4 border-t border-border pt-3">
-              <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => navigate("/browse")}>
-                <SlidersHorizontal className="mr-1 h-4 w-4" />
-                Advanced Filters
-              </Button>
-              <div className="hidden gap-2 md:flex">
-                {[`Under ${formatPrice(30000, config)}`, "SUVs", "Electric", "Low Mileage"].map((tag) => (
-                  <Button key={tag} variant="outline" size="sm" className="rounded-full text-xs" onClick={() => {
-                    if (tag.startsWith("Under")) navigate(`/browse?priceMax=30000`);
-                    else if (tag === "SUVs") navigate("/browse?body=SUV");
-                    else if (tag === "Electric") navigate("/browse?fuel=Electric");
-                    else navigate("/browse?mileageMax=30000");
-                  }}>
-                    {tag}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.form>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mx-auto mt-10 flex max-w-2xl justify-center gap-8 md:gap-16"
-        >
-          {[
-            { value: "25,000+", label: "Active Listings" },
-            { value: "3,200+", label: "Verified Dealers" },
-            { value: "98%", label: "Satisfaction Rate" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="font-display text-2xl font-bold text-primary-foreground md:text-3xl">{stat.value}</p>
-              <p className="mt-1 text-sm text-primary-foreground/60">{stat.label}</p>
-            </div>
-          ))}
-        </motion.div>
+            </form>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
