@@ -283,9 +283,9 @@ const CarDetail = () => {
             <div className="sticky top-20 space-y-4">
               <div className="hidden rounded-2xl border border-border bg-card p-6 shadow-card lg:block">
                 <h1 className="font-display text-xl font-bold text-card-foreground">{car.title}</h1>
-                <p className="mt-3 font-display text-3xl font-bold text-primary">${Number(car.price).toLocaleString()}</p>
+                <p className="mt-3 font-display text-3xl font-bold text-primary">£{Number(car.price).toLocaleString()}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Finance from ~${Math.round(Number(car.price) / 48).toLocaleString()}/mo
+                  Finance from ~£{Math.round(Number(car.price) / 48).toLocaleString()}/mo
                 </p>
               </div>
 
