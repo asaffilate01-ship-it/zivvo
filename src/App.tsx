@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SavedCarsProvider } from "@/contexts/SavedCarsContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { CountryProvider } from "@/contexts/CountryContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import CookieConsent from "@/components/CookieConsent";
 import Index from "./pages/Index";
