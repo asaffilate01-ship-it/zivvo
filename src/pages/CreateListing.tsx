@@ -243,7 +243,7 @@ const CreateListing = () => {
 
       if (editId) {
         const { error } = await supabase.from("car_listings")
-          .update(listingData)
+          .update(listingData as any)
           .eq("id", editId)
           .eq("seller_id", user.id);
         if (error) throw error;
@@ -257,7 +257,7 @@ const CreateListing = () => {
           ...listingData,
           seller_id: user.id,
           dealer_id: dealer?.id || null,
-        });
+        } as any);
         if (error) throw error;
         toast({ title: status === "draft" ? "Draft saved" : "Listing submitted for review!" });
       }
