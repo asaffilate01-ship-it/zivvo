@@ -82,7 +82,7 @@ const Browse = () => {
 
   useEffect(() => {
     setPage(0);
-  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy]);
+  }, [keyword, selectedMake, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, priceRange, yearRange, mileageMax, sortBy, country]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -92,6 +92,7 @@ const Browse = () => {
         .from("car_listings")
         .select("*", { count: "exact" })
         .eq("status", "active")
+        .eq("country", country)
         .gte("price", priceRange[0])
         .lte("price", priceRange[1])
         .gte("year", yearRange[0])
