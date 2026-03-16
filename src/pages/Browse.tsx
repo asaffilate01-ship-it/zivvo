@@ -313,15 +313,24 @@ const Browse = () => {
               />
             ) : (
               <>
-                <div className={
-                  viewMode === "list"
-                    ? "flex flex-col gap-4"
-                    : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
-                }>
-                  {listings.map((car, i) => (
-                    <CarCard key={car.id} car={car} index={i} layout={viewMode} />
-                  ))}
-                </div>
+                {viewMode === "map" ? (
+                  <Suspense fallback={<div className="h-[500px] w-full animate-pulse rounded-xl bg-muted" />}>
+                    <BrowseMapView listings={listings} country={country} />
+                    <p className="mt-2 text-xs text-muted-foreground text-center">
+                      {listings.filter(l => l.location).length} of {listings.length} listings shown on map (based on location data)
+                    </p>
+                  </Suspense>
+                ) : (
+                  <div className={
+                    viewMode === "list"
+                      ? "flex flex-col gap-4"
+                      : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                  }>
+                    {listings.map((car, i) => (
+                      <CarCard key={car.id} car={car} index={i} layout={viewMode} />
+                    ))}
+                  </div>
+                )}
 
                 {totalPages > 1 && (
                   <div className="mt-8 flex items-center justify-center gap-2">
