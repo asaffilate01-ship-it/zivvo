@@ -90,10 +90,10 @@ const Inbox = () => {
         const profileMap: Record<string, string> = {};
         if (userIds.size > 0) {
           const { data: profiles } = await supabase
-            .from("profiles")
+            .from("profiles_public")
             .select("user_id, full_name")
             .in("user_id", Array.from(userIds));
-          profiles?.forEach((p) => {
+          profiles?.forEach((p: any) => {
             profileMap[p.user_id] = p.full_name || "User";
           });
         }
