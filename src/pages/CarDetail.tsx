@@ -329,11 +329,61 @@ const CarDetail = () => {
               </div>
             )}
 
+            {/* Video */}
+            {(car as any).video_url && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground">Video</h2>
+                <div className="mt-3 aspect-video overflow-hidden rounded-xl border border-border">
+                  <iframe
+                    src={(car as any).video_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                    className="h-full w-full"
+                    allowFullScreen
+                    title="Vehicle Video"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Price History */}
+            <PriceHistoryChart listingId={car.id} currentPrice={Number(car.price)} />
+
             {/* Vehicle Checks */}
             <div className="mt-8">
               <h2 className="font-display text-xl font-bold text-foreground">Vehicle Checks</h2>
               <VehicleChecks registration={car.registration} vin={car.vin} country={car.country} />
             </div>
+
+            {/* Inspection Report */}
+            {inspectionReport && (
+              <div className="mt-8">
+                <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+                  Inspection Report
+                  <InspectionBadge score={inspectionReport.score} totalPoints={inspectionReport.total_points} />
+                </h2>
+                <div className="mt-3 rounded-xl border border-border bg-card p-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Inspector: {inspectionReport.inspector_name || "Certified Inspector"}</p>
+                      <p className="text-sm text-muted-foreground">Date: {new Date(inspectionReport.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-display text-3xl font-bold text-primary">{Math.round((inspectionReport.score / inspectionReport.total_points) * 100)}%</p>
+                      <p className="text-xs text-muted-foreground">{inspectionReport.score}/{inspectionReport.total_points} pts</p>
+                    </div>
+                  </div>
+                  {inspectionReport.summary && (
+                    <p className="mt-3 text-sm text-muted-foreground">{inspectionReport.summary}</p>
+                  )}
+                  {inspectionReport.report_url && (
+                    <a href={inspectionReport.report_url} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="mt-3">
+                        <ExternalLink className="mr-1 h-3 w-3" /> View Full Report
+                      </Button>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Finance Calculator - Mobile */}
             <div className="mt-8 lg:hidden">
