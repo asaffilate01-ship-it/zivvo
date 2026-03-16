@@ -46,6 +46,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <CountryProvider>
               <AuthProvider>
                 <SavedCarsProvider>
                   <Routes>
