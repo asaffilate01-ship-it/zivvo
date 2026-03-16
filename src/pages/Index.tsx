@@ -312,6 +312,27 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Recently Viewed */}
+      <RecentlyViewedCarousel />
+
+      {/* Car Valuation CTA */}
+      <section className="container mx-auto px-4 py-12">
+        <motion.div {...fadeUp}>
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 md:p-12 flex flex-col items-center text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+              <Calculator className="h-7 w-7 text-primary" />
+            </div>
+            <h2 className="mt-4 font-display text-2xl font-bold text-foreground md:text-3xl">What's My Car Worth?</h2>
+            <p className="mt-2 max-w-md text-muted-foreground">Get a free instant valuation in seconds. No sign-up required.</p>
+            <Link to="/valuation">
+              <Button className="gradient-primary mt-6 border-0 px-8" size="lg">
+                Get Free Valuation <ArrowRight className="ml-1 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Latest Listings */}
       <section className="border-t border-border bg-muted/30 py-16">
         <div className="container mx-auto px-4">

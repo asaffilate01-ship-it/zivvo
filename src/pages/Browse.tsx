@@ -344,6 +344,9 @@ const Browse = () => {
         </div>
       </div>
 
+      {/* Recently Viewed */}
+      <RecentlyViewedCarousel />
+
       <Footer />
     </div>
   );

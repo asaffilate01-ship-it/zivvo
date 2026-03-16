@@ -71,6 +71,7 @@ const App = () => (
                     <Route path="/compare" element={<CompareCars />} />
                     <Route path="/blog" element={<Blog />} />
                     <Route path="/blog/:id" element={<BlogPost />} />
+                    <Route path="/valuation" element={<CarValuation />} />
                     <Route
                       path="/inbox"
                       element={
