@@ -488,6 +488,11 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* Pipeline Tab */}
+          <TabsContent value="pipeline" className="mt-4">
+            <SalesPipeline mode="admin" />
+          </TabsContent>
+
           {/* Users Tab */}
           <TabsContent value="users" className="mt-4">
             <Card>
