@@ -31,6 +31,7 @@ import TermsOfService from "./pages/TermsOfService";
 import Contact from "./pages/Contact";
 import HelpCentre from "./pages/HelpCentre";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CompareCars from "./pages/CompareCars";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
