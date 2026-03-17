@@ -32,7 +32,7 @@ const HeroSearch = () => {
       {/* Layered background */}
       <div className="absolute inset-0">
         <img src={heroImage} alt="" className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 to-foreground/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/35" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
       </div>
 
