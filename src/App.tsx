@@ -61,6 +61,7 @@ const App = () => (
               <CountryProvider>
               <AuthProvider>
                 <SavedCarsProvider>
+                  <ScrollToTop />
                   <Suspense fallback={<PageSkeleton />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
