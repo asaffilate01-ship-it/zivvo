@@ -162,6 +162,7 @@ const App = () => (
                   <BugReportButton />
                   <PWAInstallPrompt />
                   <OnboardingTour />
+                  <BackToTopButton />
                 </SavedCarsProvider>
               </AuthProvider>
               </CountryProvider>
