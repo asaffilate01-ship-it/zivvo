@@ -492,6 +492,13 @@ export type Database = {
             referencedRelation: "car_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "enquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       inspection_reports: {
@@ -533,6 +540,13 @@ export type Database = {
             referencedRelation: "car_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "inspection_reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: true
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       listing_reports: {
@@ -571,6 +585,13 @@ export type Database = {
             referencedRelation: "car_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "listing_reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       listing_views: {
@@ -601,6 +622,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_views_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
             referencedColumns: ["id"]
           },
         ]
@@ -642,6 +670,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
             referencedColumns: ["id"]
           },
         ]
@@ -773,6 +808,13 @@ export type Database = {
             referencedRelation: "car_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pipeline_leads_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       price_history: {
@@ -803,6 +845,13 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "price_history_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
             referencedColumns: ["id"]
           },
         ]
@@ -936,6 +985,13 @@ export type Database = {
             referencedRelation: "car_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "saved_cars_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       saved_searches: {
@@ -1001,6 +1057,13 @@ export type Database = {
             referencedRelation: "car_listings"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "seller_reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -1023,7 +1086,131 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      car_listings_public: {
+        Row: {
+          body_type: string | null
+          color: string | null
+          country: string | null
+          created_at: string | null
+          dealer_id: string | null
+          description: string | null
+          doors: number | null
+          engine_size: string | null
+          enquiries_count: number | null
+          features: string[] | null
+          finance_check_clear: boolean | null
+          fuel_type: string | null
+          id: string | null
+          images: string[] | null
+          inspection_score: number | null
+          is_featured: boolean | null
+          is_promoted: boolean | null
+          legal_check_clear: boolean | null
+          location: string | null
+          make: string | null
+          mileage: number | null
+          model: string | null
+          price: number | null
+          promoted_until: string | null
+          registration: string | null
+          search_vector: unknown
+          seller_id: string | null
+          specs: Json | null
+          status: Database["public"]["Enums"]["listing_status"] | null
+          title: string | null
+          transmission: string | null
+          updated_at: string | null
+          verified: boolean | null
+          video_url: string | null
+          views_count: number | null
+          year: number | null
+        }
+        Insert: {
+          body_type?: string | null
+          color?: string | null
+          country?: string | null
+          created_at?: string | null
+          dealer_id?: string | null
+          description?: string | null
+          doors?: number | null
+          engine_size?: string | null
+          enquiries_count?: number | null
+          features?: string[] | null
+          finance_check_clear?: boolean | null
+          fuel_type?: string | null
+          id?: string | null
+          images?: string[] | null
+          inspection_score?: number | null
+          is_featured?: boolean | null
+          is_promoted?: boolean | null
+          legal_check_clear?: boolean | null
+          location?: string | null
+          make?: string | null
+          mileage?: number | null
+          model?: string | null
+          price?: number | null
+          promoted_until?: string | null
+          registration?: string | null
+          search_vector?: unknown
+          seller_id?: string | null
+          specs?: Json | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title?: string | null
+          transmission?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+          video_url?: string | null
+          views_count?: number | null
+          year?: number | null
+        }
+        Update: {
+          body_type?: string | null
+          color?: string | null
+          country?: string | null
+          created_at?: string | null
+          dealer_id?: string | null
+          description?: string | null
+          doors?: number | null
+          engine_size?: string | null
+          enquiries_count?: number | null
+          features?: string[] | null
+          finance_check_clear?: boolean | null
+          fuel_type?: string | null
+          id?: string | null
+          images?: string[] | null
+          inspection_score?: number | null
+          is_featured?: boolean | null
+          is_promoted?: boolean | null
+          legal_check_clear?: boolean | null
+          location?: string | null
+          make?: string | null
+          mileage?: number | null
+          model?: string | null
+          price?: number | null
+          promoted_until?: string | null
+          registration?: string | null
+          search_vector?: unknown
+          seller_id?: string | null
+          specs?: Json | null
+          status?: Database["public"]["Enums"]["listing_status"] | null
+          title?: string | null
+          transmission?: string | null
+          updated_at?: string | null
+          verified?: boolean | null
+          video_url?: string | null
+          views_count?: number | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_listings_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_models_for_make: {
