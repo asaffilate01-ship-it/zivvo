@@ -79,7 +79,7 @@ const Login = () => {
             <div className="gradient-primary mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
               <Car className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h1 className="mt-4 font-display text-3xl font-bold text-foreground">Welcome back</h1>
+            <div className="text-center">
             <p className="mt-2 text-muted-foreground">Sign in to your account</p>
           </div>
 
