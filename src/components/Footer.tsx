@@ -78,13 +78,17 @@ const Footer = () => {
             © {new Date().getFullYear()} AutoVault. All rights reserved.
           </p>
           <div className="flex gap-6">
-            {["Privacy", "Terms", "Cookies"].map((item) => (
+            {[
+              { label: "Privacy", to: "/privacy" },
+              { label: "Terms", to: "/terms" },
+              { label: "Cookies", to: "/privacy#cookies" },
+            ].map((item) => (
               <Link
-                key={item}
-                to={item === "Privacy" ? "/privacy" : item === "Terms" ? "/terms" : "/privacy"}
+                key={item.label}
+                to={item.to}
                 className="text-xs text-muted-foreground transition-colors hover:text-primary"
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </div>

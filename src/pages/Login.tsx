@@ -134,49 +134,51 @@ const Login = () => {
             </Link>
           </p>
 
-          {/* Dev Login Panel */}
-          <div className="border-t border-border pt-4">
-            <button
-              onClick={() => setShowDevPanel(!showDevPanel)}
-              className="flex w-full items-center justify-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <FlaskConical className="h-3.5 w-3.5" />
-              {showDevPanel ? "Hide" : "Show"} Dev Login Panel
-            </button>
+          {/* Dev Login Panel — only in development */}
+          {import.meta.env.DEV && (
+            <div className="border-t border-border pt-4">
+              <button
+                onClick={() => setShowDevPanel(!showDevPanel)}
+                className="flex w-full items-center justify-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <FlaskConical className="h-3.5 w-3.5" />
+                {showDevPanel ? "Hide" : "Show"} Dev Login Panel
+              </button>
 
-            {showDevPanel && (
-              <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/30 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium text-muted-foreground">Quick Login (Test Accounts)</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleSeed}
-                    disabled={seeding}
-                    className="h-7 text-xs"
-                  >
-                    {seeding ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
-                    {seeding ? "Seeding..." : "Seed Test Users"}
-                  </Button>
-                </div>
-                <div className="grid grid-cols-5 gap-2">
-                  {DEV_ACCOUNTS.map((acc) => (
-                    <button
-                      key={acc.email}
-                      onClick={() => handleDevLogin(acc.email, acc.password)}
-                      disabled={loading}
-                      className={`rounded-lg ${acc.color} px-2 py-2 text-center text-xs font-medium transition-all hover:scale-105 hover:shadow-md disabled:opacity-50`}
+              {showDevPanel && (
+                <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/30 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-muted-foreground">Quick Login (Test Accounts)</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSeed}
+                      disabled={seeding}
+                      className="h-7 text-xs"
                     >
-                      {acc.label}
-                    </button>
-                  ))}
+                      {seeding ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+                      {seeding ? "Seeding..." : "Seed Test Users"}
+                    </Button>
+                  </div>
+                  <div className="grid grid-cols-5 gap-2">
+                    {DEV_ACCOUNTS.map((acc) => (
+                      <button
+                        key={acc.email}
+                        onClick={() => handleDevLogin(acc.email, acc.password)}
+                        disabled={loading}
+                        className={`rounded-lg ${acc.color} px-2 py-2 text-center text-xs font-medium transition-all hover:scale-105 hover:shadow-md disabled:opacity-50`}
+                      >
+                        {acc.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground text-center">
+                    Password for all: <code className="bg-muted px-1 rounded">Test1234!</code>
+                  </p>
                 </div>
-                <p className="text-[10px] text-muted-foreground text-center">
-                  Password for all: <code className="bg-muted px-1 rounded">Test1234!</code>
-                </p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <Footer />
