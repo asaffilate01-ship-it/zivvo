@@ -14,6 +14,8 @@ import BugReportButton from "@/components/BugReportButton";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import OnboardingTour from "@/components/OnboardingTour";
 import PageSkeleton from "@/components/PageSkeleton";
+import ScrollToTop from "@/components/ScrollToTop";
+import BackToTopButton from "@/components/BackToTopButton";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 
