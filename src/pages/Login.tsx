@@ -74,8 +74,8 @@ const Login = () => {
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
       <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
+        <div className="w-full max-w-md">
+          <div className="rounded-2xl border border-border bg-card p-8 shadow-card space-y-8">
             <div className="gradient-primary mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
               <Car className="h-7 w-7 text-primary-foreground" />
             </div>
