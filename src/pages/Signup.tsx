@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Car, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Car, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -92,8 +92,9 @@ const Signup = () => {
               </div>
 
               <Button type="submit" className="gradient-primary w-full border-0" disabled={loading || !agreed}>
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loading ? "Creating account..." : "Create Account"}
-                <ArrowRight className="ml-1 h-4 w-4" />
+                {!loading && <ArrowRight className="ml-1 h-4 w-4" />}
               </Button>
             </form>
 
