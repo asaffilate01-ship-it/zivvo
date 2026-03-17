@@ -125,8 +125,13 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             <Button variant="ghost" size="icon" className="absolute right-3 top-3 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background" onClick={handleLike}>
               <Heart className={`h-4 w-4 ${liked ? "fill-accent text-accent" : "text-foreground"}`} />
             </Button>
-            <div className="absolute bottom-3 left-3">
+            <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
               <p className="font-display text-2xl font-bold text-primary-foreground">{formatPrice(Number(car.price), config)}</p>
+              {car.images && car.images.length > 1 && (
+                <span className="rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm">
+                  📷 {car.images.length}
+                </span>
+              )}
             </div>
           </div>
 

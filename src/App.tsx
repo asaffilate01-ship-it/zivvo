@@ -14,6 +14,8 @@ import BugReportButton from "@/components/BugReportButton";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import OnboardingTour from "@/components/OnboardingTour";
 import PageSkeleton from "@/components/PageSkeleton";
+import ScrollToTop from "@/components/ScrollToTop";
+import BackToTopButton from "@/components/BackToTopButton";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -59,6 +61,7 @@ const App = () => (
               <CountryProvider>
               <AuthProvider>
                 <SavedCarsProvider>
+                  <ScrollToTop />
                   <Suspense fallback={<PageSkeleton />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
@@ -159,6 +162,7 @@ const App = () => (
                   <BugReportButton />
                   <PWAInstallPrompt />
                   <OnboardingTour />
+                  <BackToTopButton />
                 </SavedCarsProvider>
               </AuthProvider>
               </CountryProvider>

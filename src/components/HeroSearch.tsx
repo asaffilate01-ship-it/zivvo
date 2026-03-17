@@ -143,7 +143,7 @@ const HeroSearch = () => {
                     <SlidersHorizontal className="mr-1 h-3.5 w-3.5" />
                     Advanced Filters
                   </Button>
-                  <div className="hidden gap-1.5 md:flex">
+                  <div className="flex flex-wrap gap-1.5">
                     {["Electric", "SUVs", "Low Mileage"].map((tag) => (
                       <button
                         key={tag}

@@ -203,6 +203,7 @@ const Navbar = () => {
         {/* Mobile right */}
         <div className="flex items-center gap-1 md:hidden">
           <CountrySwitcher />
+          {user && <NotificationBell />}
           {user && (
             <Link to="/inbox">
               <Button variant="ghost" size="icon" className="h-8 w-8">
