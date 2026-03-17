@@ -92,8 +92,9 @@ const Signup = () => {
               </div>
 
               <Button type="submit" className="gradient-primary w-full border-0" disabled={loading || !agreed}>
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loading ? "Creating account..." : "Create Account"}
-                <ArrowRight className="ml-1 h-4 w-4" />
+                {!loading && <ArrowRight className="ml-1 h-4 w-4" />}
               </Button>
             </form>
 
