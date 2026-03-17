@@ -270,6 +270,7 @@ const AgentDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+      <Footer />
     </div>
   );
 };
