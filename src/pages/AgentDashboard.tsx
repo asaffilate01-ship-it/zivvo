@@ -183,7 +183,7 @@ const AgentDashboard = () => {
                           </TableCell>
                           <TableCell>
                             {d.kyc_verified ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
+                              <CheckCircle className="h-4 w-4 text-success" />
                             ) : (
                               <Clock className="h-4 w-4 text-muted-foreground" />
                             )}
