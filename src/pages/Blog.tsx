@@ -99,6 +99,19 @@ const Blog = () => {
       <SEOHead
         title="AutoSouq Blog — Car Buying Tips, Reviews & Guides"
         description="Expert advice on buying, selling, and maintaining your car. Guides, reviews, and industry insights from the AutoSouq team."
+        keywords="car buying guide, used car tips, sell car fast, EV guide, car reviews, AutoSouq blog"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          "name": "AutoSouq Blog",
+          "description": "Expert advice on buying, selling, and maintaining your car.",
+          "url": "https://autosouq.app/blog",
+          "publisher": {
+            "@type": "Organization",
+            "name": "AutoSouq",
+            "logo": { "@type": "ImageObject", "url": "https://autosouq.app/icon-512.png" }
+          }
+        }}
       />
       <Navbar />
 
