@@ -671,6 +671,36 @@ const AuctionDetail = () => {
                 </CardContent>
               </Card>
 
+              {/* Post-Sale: Winner Payment Button */}
+              {(isSold || auction.status === "ended") && isWinner && escrow && escrow.status === "pending_deposit" && (
+                <Card className="border-amber-200 dark:border-amber-800">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-amber-600" /> Payment Required</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="text-sm space-y-1">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Total Due</span><span className="font-bold">{formatCurrency(Number(escrow.total_amount), country)}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Deposit Held</span><span>{deposit ? formatCurrency(Number(deposit.amount), country) : "—"}</span></div>
+                      <Separator />
+                      <div className="flex justify-between font-bold"><span>Remaining Balance</span><span className="text-primary">{formatCurrency(Number(escrow.total_amount) - (deposit ? Number(deposit.amount) : 0), country)}</span></div>
+                    </div>
+                    {(escrow as any).payment_deadline && (
+                      <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                        <Timer className="w-4 h-4 text-amber-600" />
+                        <div>
+                          <p className="text-xs font-medium text-amber-800 dark:text-amber-200">Payment Deadline</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">{new Date((escrow as any).payment_deadline).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    )}
+                    <Button className="w-full gap-2" onClick={() => payWinnerBalance.mutate()} disabled={payWinnerBalance.isPending}>
+                      {payWinnerBalance.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                      {payWinnerBalance.isPending ? "Processing..." : "Pay Remaining Balance"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Post-Sale: Contract section for winner/seller */}
               {(isSold || auction.status === "ended") && (isWinner || isSeller) && contract && (
                 <Card className="border-primary/30">
