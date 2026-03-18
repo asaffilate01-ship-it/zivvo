@@ -62,21 +62,34 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
+  const [platformStats, setPlatformStats] = useState({ users: 0, listings: 0, soldValue: 0, avgRating: 0 });
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [featuredRes, latestRes] = await Promise.all([
+      const [featuredRes, latestRes, profilesRes, allListingsRes, soldRes, reviewsRes] = await Promise.all([
         supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
         supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).order("created_at", { ascending: false }).limit(8),
+        supabase.from("profiles").select("user_id", { count: "exact", head: true }),
+        supabase.from("car_listings").select("body_type, fuel_type, status, price").eq("country", country),
+        supabase.from("car_listings").select("price").eq("status", "sold").eq("country", country),
+        supabase.from("seller_reviews").select("rating").limit(1000),
       ]);
       if (featuredRes.data) setFeatured(featuredRes.data);
       if (latestRes.data) setLatest(latestRes.data);
 
-      const { data: allActive } = await supabase.from("car_listings").select("body_type, fuel_type").eq("status", "active").eq("country", country);
-      if (allActive) {
+      // Real platform stats
+      const userCount = profilesRes.count || 0;
+      const activeListings = allListingsRes.data?.filter((l: any) => l.status === "active") || [];
+      const soldValue = soldRes.data?.reduce((a: number, l: any) => a + (l.price || 0), 0) || 0;
+      const avgRating = reviewsRes.data && reviewsRes.data.length > 0
+        ? Math.round(reviewsRes.data.reduce((a: number, r: any) => a + r.rating, 0) / reviewsRes.data.length * 10) / 10
+        : 0;
+      setPlatformStats({ users: userCount, listings: activeListings.length, soldValue, avgRating });
+
+      if (allListingsRes.data) {
         const counts: Record<string, number> = {};
-        allActive.forEach((l: any) => {
+        allListingsRes.data.filter((l: any) => l.status === "active").forEach((l: any) => {
           if (l.body_type) counts[l.body_type] = (counts[l.body_type] || 0) + 1;
           if (l.fuel_type === "Electric") counts["Electric"] = (counts["Electric"] || 0) + 1;
           if (l.fuel_type === "Hybrid") counts["Hybrid"] = (counts["Hybrid"] || 0) + 1;
@@ -234,10 +247,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {[
-              { icon: Users, value: "50,000+", label: "Active Users" },
-              { icon: Car, value: "25,000+", label: "Vehicles Listed" },
-              { icon: TrendingUp, value: "£2.3B+", label: "Total Value Sold" },
-              { icon: Star, value: "4.9/5", label: "Average Rating" },
+              { icon: Users, value: platformStats.users > 0 ? platformStats.users.toLocaleString() : "—", label: "Active Users" },
+              { icon: Car, value: platformStats.listings > 0 ? platformStats.listings.toLocaleString() : "—", label: "Vehicles Listed" },
+              { icon: TrendingUp, value: platformStats.soldValue > 0 ? formatPrice(platformStats.soldValue, config) : "—", label: "Total Value Sold" },
+              { icon: Star, value: platformStats.avgRating > 0 ? `${platformStats.avgRating}/5` : "—", label: "Average Rating" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
