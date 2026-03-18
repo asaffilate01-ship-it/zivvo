@@ -20,9 +20,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import SellerOffers from "@/components/SellerOffers";
 import {
   ArrowRightLeft, TrendingUp, Shield, Clock, CheckCircle2, XCircle,
-  DollarSign, Truck, FileText, Search, Plus, Eye, Building2,
+  DollarSign, Truck, FileText, Search, Plus, Eye, Building2, CreditCard,
+  Loader2 as Spinner, Banknote, Receipt,
 } from "lucide-react";
 
 const fmt = (amount: number, country: string) => {
