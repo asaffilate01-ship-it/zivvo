@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const cityCoords: Record<string, [number, number]> = {
   "London": [51.5074, -0.1278], "Manchester": [53.4808, -2.2426], "Birmingham": [52.4862, -1.8904],
@@ -33,22 +34,32 @@ const defaultCenter: Record<string, { lat: number; lng: number }> = {
   PK: { lat: 30.3, lng: 69.3 },
 };
 
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "";
-
 let googleMapsPromise: Promise<void> | null = null;
-const loadGoogleMaps = (): Promise<void> => {
-  if (googleMapsPromise) return googleMapsPromise;
-  if ((window as any).google?.maps) return Promise.resolve();
+let cachedApiKey: string | null = null;
 
-  googleMapsPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Failed to load Google Maps"));
-    document.head.appendChild(script);
-  });
+const fetchAndLoadGoogleMaps = async (): Promise<void> => {
+  if ((window as any).google?.maps) return;
+  if (googleMapsPromise) return googleMapsPromise;
+
+  googleMapsPromise = (async () => {
+    // Fetch the key from edge function
+    if (!cachedApiKey) {
+      const { data, error } = await supabase.functions.invoke("maps-key");
+      if (error || !data?.key) throw new Error("Could not fetch Maps API key");
+      cachedApiKey = data.key;
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${cachedApiKey}`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Failed to load Google Maps"));
+      document.head.appendChild(script);
+    });
+  })();
+
   return googleMapsPromise;
 };
 
@@ -69,11 +80,7 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
   const zoom = country === "US" ? 4 : country === "PK" ? 5 : 6;
 
   useEffect(() => {
-    if (!GOOGLE_MAPS_API_KEY) {
-      setMapError(true);
-      return;
-    }
-    loadGoogleMaps()
+    fetchAndLoadGoogleMaps()
       .then(() => setMapLoaded(true))
       .catch(() => setMapError(true));
   }, []);
@@ -96,7 +103,6 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
     const map = mapInstanceRef.current;
     if (!map || !mapLoaded || !g) return;
 
-    // Clear old markers
     markersRef.current.forEach((m: any) => m.setMap(null));
     markersRef.current = [];
 
@@ -109,11 +115,7 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
       const jitter = () => (Math.random() - 0.5) * 0.02;
       const position = { lat: coords[0] + jitter(), lng: coords[1] + jitter() };
 
-      const marker = new g.maps.Marker({
-        map,
-        position,
-        title: car.title,
-      });
+      const marker = new g.maps.Marker({ map, position, title: car.title });
 
       marker.addListener("click", () => {
         const imgHtml = car.images?.[0]
@@ -138,7 +140,7 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
   if (mapError) {
     return (
       <div className="flex h-[500px] w-full items-center justify-center rounded-xl border border-border bg-muted/30">
-        <p className="text-sm text-muted-foreground">Map unavailable. Please configure the Google Maps API key.</p>
+        <p className="text-sm text-muted-foreground">Map unavailable. Please check your Google Maps API key.</p>
       </div>
     );
   }
