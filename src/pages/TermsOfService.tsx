@@ -4,7 +4,7 @@ import SEOHead from "@/components/SEOHead";
 
 const TermsOfService = () => (
   <div className="min-h-screen bg-background">
-    <SEOHead title="Terms of Service — AutoVault" description="Read the terms and conditions for using AutoVault's vehicle marketplace." />
+    <SEOHead title="Terms of Service — AutoSouq" description="Read the terms and conditions for using AutoSouq's vehicle marketplace." />
     <Navbar />
     <div className="container mx-auto max-w-3xl px-4 py-12">
       <h1 className="font-display text-3xl font-bold text-foreground">Terms of Service</h1>
