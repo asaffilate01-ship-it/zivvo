@@ -72,7 +72,7 @@ serve(async (req) => {
           const totalAmount = hammerPrice + buyerPremium;
           const platformRevenue = buyerPremium + sellerFee;
 
-          // Create escrow record
+          // Create payment protection record
           await supabase.from("auction_escrow").insert({
             auction_id: auction.id,
             buyer_id: winningBid.bidder_id,
