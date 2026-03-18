@@ -136,7 +136,7 @@ const CreateAuction = () => {
                   <li>2. Our approved specialist inspects and rates your car (1-5)</li>
                   <li>3. HPI check & ownership verification completed</li>
                   <li>4. Auction goes live — verified buyers bid with pre-authorised funds</li>
-                  <li>5. Sale completed via escrow + e-signed contract</li>
+                  <li>5. Sale completed via Payment Protection + e-signed contract</li>
                 </ol>
                 <p className="mt-2 text-xs">Platform fee: <strong>1.5% seller fee</strong> on successful sale. Buyer pays 3% premium.</p>
               </div>

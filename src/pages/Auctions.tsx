@@ -97,7 +97,7 @@ const Auctions = () => {
                 {[
                   { icon: Shield, label: "HPI & Ownership Checked" },
                   { icon: Star, label: "1-5 Condition Rating" },
-                  { icon: CheckCircle2, label: "Escrow Protected" },
+                  { icon: CheckCircle2, label: "Payment Protected" },
                   { icon: Users, label: "Verified Buyers & Sellers" },
                 ].map(({ icon: Icon, label }) => (
                   <div key={label} className="flex items-center gap-2">

@@ -186,7 +186,7 @@ const AdminDashboard = () => {
     const update: any = { status };
     if (status === "released_to_seller") update.released_at = new Date().toISOString();
     await supabase.from("auction_escrow").update(update).eq("id", escrowId);
-    toast({ title: `Escrow ${status.replace(/_/g, " ")}` });
+    toast({ title: `Payment protection ${status.replace(/_/g, " ")}` });
     fetchAll();
   };
 
