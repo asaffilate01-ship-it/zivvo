@@ -58,7 +58,7 @@ const PopularCars = () => {
       <div className="min-h-screen bg-background">
         <SEOHead
           title="Popular Cars — Browse by Make"
-          description="Browse the most popular car makes on AutoVault. Find BMW, Mercedes, Audi, Tesla, and more."
+          description="Browse the most popular car makes on AutoSouq. Find BMW, Mercedes, Audi, Tesla, and more."
         />
         <Navbar />
         <div className="container mx-auto px-4 py-12">
