@@ -45,7 +45,7 @@ const Footer = () => {
               <div className="gradient-primary flex h-9 w-9 items-center justify-center rounded-xl">
                 <Car className="h-4.5 w-4.5 text-primary-foreground" />
               </div>
-              <span className="font-display text-xl font-bold text-foreground">AutoVault</span>
+              <span className="font-display text-xl font-bold text-foreground">AutoSouq</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               The trusted marketplace for buying and selling vehicles. Verified listings, transparent history, and secure transactions.
