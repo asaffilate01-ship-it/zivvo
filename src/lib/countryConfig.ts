@@ -78,8 +78,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 25, priceId: "price_us_individual", label: "per listing" },
     dealerPlans: [
       { name: "Starter", price: 59, priceId: "price_us_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard listing placement"] },
-      { name: "Professional", price: 129, priceId: "price_us_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured listing placements", "Priority support", "CARFAX integration"] },
-      { name: "Enterprise", price: 249, priceId: "price_us_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-location support"] },
+      { name: "Professional", price: 129, priceId: "price_us_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured listing placements", "Priority support", "CARFAX integration", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Enterprise", price: 249, priceId: "price_us_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-location support", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "License Plate", mileage: "Mileage", postcode: "ZIP Code", petrol: "Gasoline" },
   },
