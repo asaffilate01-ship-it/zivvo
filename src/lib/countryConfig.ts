@@ -38,7 +38,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
       "Nissan", "Peugeot", "Porsche", "Range Rover", "Renault", "Seat",
       "Skoda", "Tesla", "Toyota", "Vauxhall", "Volkswagen", "Volvo",
     ],
-    bodyTypes: ["Sedan", "SUV", "Coupe", "Hatchback", "Estate", "Convertible", "Van", "Pickup"],
+    bodyTypes: ["Saloon", "SUV", "Coupe", "Hatchback", "Estate", "Convertible", "Van", "Pickup"],
     fuelTypes: sharedFuelTypes,
     transmissions: sharedTransmissions,
     popularCities: ["London", "Birmingham", "Manchester", "Leeds", "Glasgow", "Liverpool", "Bristol", "Edinburgh", "Sheffield", "Cardiff"],
@@ -103,7 +103,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     code: "AE",
     name: "United Arab Emirates",
     flag: "🇦🇪",
-    currency: { symbol: "£", code: "GBP", locale: "en-GB" },
+    currency: { symbol: "AED ", code: "AED", locale: "en-AE" },
     distanceUnit: "km",
     driveSide: "right",
     makes: [
