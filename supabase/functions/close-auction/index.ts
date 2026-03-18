@@ -57,6 +57,18 @@ serve(async (req) => {
         },
       });
 
+      // Release deposits for non-winners via Stripe
+      const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+        apiVersion: "2025-08-27.basil",
+      });
+
+      // Get all authorized deposits for this auction
+      const { data: allDeposits } = await supabase
+        .from("auction_deposits")
+        .select("*")
+        .eq("auction_id", auction.id)
+        .eq("status", "authorized");
+
       if (newStatus === "sold" && auction.winning_bid_id) {
         // Get winning bid
         const { data: winningBid } = await supabase
@@ -66,13 +78,30 @@ serve(async (req) => {
           .single();
 
         if (winningBid) {
+          // Release deposits for non-winners
+          for (const dep of (allDeposits || [])) {
+            if (dep.user_id !== winningBid.bidder_id && dep.stripe_payment_intent_id) {
+              try {
+                await stripe.paymentIntents.cancel(dep.stripe_payment_intent_id);
+                await supabase.from("auction_deposits").update({
+                  status: "released",
+                  released_at: new Date().toISOString(),
+                }).eq("id", dep.id);
+                console.log(`✅ Released deposit ${dep.id} for non-winner ${dep.user_id}`);
+              } catch (e) {
+                console.log(`⚠️ Failed to release deposit ${dep.id}:`, e);
+              }
+            }
+          }
+
           const hammerPrice = winningBid.amount;
           const buyerPremium = hammerPrice * (auction.buyer_premium_pct / 100);
           const sellerFee = hammerPrice * (auction.seller_fee_pct / 100);
           const totalAmount = hammerPrice + buyerPremium;
           const platformRevenue = buyerPremium + sellerFee;
+          const paymentDeadline = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
 
-          // Create payment protection record
+          // Create payment protection record with 72-hour deadline
           await supabase.from("auction_escrow").insert({
             auction_id: auction.id,
             buyer_id: winningBid.bidder_id,
@@ -82,6 +111,7 @@ serve(async (req) => {
             seller_fee: sellerFee,
             platform_revenue: platformRevenue,
             status: "pending_deposit",
+            payment_deadline: paymentDeadline,
           });
 
           // Generate contract
