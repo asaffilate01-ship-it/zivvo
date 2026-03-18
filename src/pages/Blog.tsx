@@ -34,7 +34,7 @@ const blogPosts = [
   {
     id: "how-to-sell-car-fast",
     title: "How to Sell Your Car Fast: 10 Expert Tips",
-    excerpt: "From pricing strategy to photo tips, learn what makes listings sell faster. Data-backed advice from thousands of successful sales on AutoVault.",
+    excerpt: "From pricing strategy to photo tips, learn what makes listings sell faster. Data-backed advice from thousands of successful sales on AutoSouq.",
     category: "Selling Tips",
     image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&q=80",
     author: "AutoVault Team",
