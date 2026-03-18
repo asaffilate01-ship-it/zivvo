@@ -43,6 +43,8 @@ const CreateListing = () => {
   const [hpiCheckData, setHpiCheckData] = useState<any>(null);
   const [hpiLoading, setHpiLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     title: "",
@@ -214,6 +216,20 @@ const CreateListing = () => {
         }
       }
 
+      // Upload video file if provided
+      let videoUrl = form.video_url || null;
+      if (videoFile) {
+        const ext = videoFile.name.split(".").pop();
+        const videoPath = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: videoErr } = await supabase.storage
+          .from("car-videos")
+          .upload(videoPath, videoFile);
+        if (!videoErr) {
+          const { data: vUrlData } = supabase.storage.from("car-videos").getPublicUrl(videoPath);
+          videoUrl = vUrlData.publicUrl;
+        }
+      }
+
       const allImages = [...existingImages, ...uploadedUrls];
       const title = form.title || `${form.year} ${form.make} ${form.model}`;
 
@@ -242,7 +258,7 @@ const CreateListing = () => {
         country,
         logbook_url: logbookUrl,
         hpi_check_data: hpiCheckData,
-        video_url: form.video_url || null,
+        video_url: videoUrl,
       };
 
       if (editId) {
@@ -499,14 +515,45 @@ const CreateListing = () => {
                 onChange={(e) => updateField("description", e.target.value)}
               />
             </div>
-            <div className="space-y-2">
-              <Label>Video URL (optional)</Label>
-              <Input
-                placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
-                value={form.video_url}
-                onChange={(e) => updateField("video_url", e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">Add a YouTube video walkthrough of your vehicle</p>
+            <div className="space-y-3">
+              <Label>Video (optional)</Label>
+              <div className="space-y-2">
+                <Input
+                  placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                  value={form.video_url}
+                  onChange={(e) => updateField("video_url", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">Paste a YouTube URL, or upload a video file (max 100MB)</p>
+              </div>
+              <div className="flex items-center gap-3">
+                {videoFile && (
+                  <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                    <CheckCircle className="h-4 w-4" /> {videoFile.name}
+                    <button type="button" onClick={() => setVideoFile(null)} className="ml-1 text-muted-foreground hover:text-destructive">✕</button>
+                  </div>
+                )}
+                {!form.video_url && (
+                  <Button type="button" variant="outline" size="sm" onClick={() => videoInputRef.current?.click()}>
+                    <Upload className="mr-1 h-4 w-4" /> Upload Video
+                  </Button>
+                )}
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (file.size > 100 * 1024 * 1024) {
+                      toast({ title: "Video too large", description: "Max 100MB for video uploads.", variant: "destructive" });
+                      return;
+                    }
+                    setVideoFile(file);
+                    updateField("video_url", ""); // clear YouTube URL if uploading
+                  }}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
