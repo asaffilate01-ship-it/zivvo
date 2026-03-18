@@ -27,7 +27,7 @@ const blogPosts = [
     excerpt: "With EV infrastructure growing rapidly, we break down the real-world costs, range, and practicality of going electric versus hybrid.",
     category: "EV Guide",
     image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80",
-    author: "AutoVault Team",
+    author: "AutoSouq Team",
     date: "2026-03-05",
     readTime: "6 min read",
   },
