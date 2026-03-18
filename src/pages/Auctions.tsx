@@ -110,7 +110,7 @@ const Auctions = () => {
                 <Button asChild size="lg" className="gap-2">
                   <Link to="/auctions/apply"><Gavel className="w-4 h-4" /> Sell at Auction</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="gap-2 border-white/30 text-white hover:bg-white/10">
+                <Button asChild size="lg" variant="outline" className="gap-2 border-white/40 bg-white/10 text-white hover:bg-white/20 [&]:text-white">
                   <Link to="/auctions">Browse Auctions</Link>
                 </Button>
               </div>
