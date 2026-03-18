@@ -567,6 +567,173 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
+          {/* Auctions Tab */}
+          <TabsContent value="auctions" className="mt-4">
+            <div className="space-y-4">
+              {/* Pending Inspection Queue */}
+              {pendingAuctions.length > 0 && (
+                <Card className="border-amber-200 dark:border-amber-800">
+                  <CardHeader><CardTitle className="text-base flex items-center gap-2"><Clock className="h-4 w-4 text-amber-500" /> Pending Inspection ({pendingAuctions.length})</CardTitle></CardHeader>
+                  <CardContent className="space-y-3">
+                    {pendingAuctions.map((a: any) => {
+                      const l = a.car_listings;
+                      return (
+                        <div key={a.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border p-4">
+                          <div>
+                            <p className="font-medium text-card-foreground">{l?.year} {l?.make} {l?.model}</p>
+                            <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: £{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {[1,2,3,4,5].map(r => (
+                              <Button key={r} size="sm" variant="outline" onClick={() => approveAuction(a.id, r)} title={`Approve with ${r}/5 rating`}>
+                                ⭐{r}
+                              </Button>
+                            ))}
+                            <Button size="sm" variant="outline" className="text-destructive" onClick={() => rejectAuction(a.id)}>
+                              <XCircle className="mr-1 h-3 w-3" /> Reject
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* All Auctions */}
+              <Card>
+                <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <CardTitle className="text-base flex items-center gap-2"><Gavel className="h-4 w-4" /> All Auctions ({auctions.length})</CardTitle>
+                  <Select value={auctionStatusFilter} onValueChange={setAuctionStatusFilter}>
+                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="pending_inspection">Pending</SelectItem>
+                      <SelectItem value="live">Live</SelectItem>
+                      <SelectItem value="sold">Sold</SelectItem>
+                      <SelectItem value="ended">Ended</SelectItem>
+                      <SelectItem value="reserve_not_met">Reserve Not Met</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Vehicle</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Rating</TableHead>
+                        <TableHead>Current Bid</TableHead>
+                        <TableHead>Bids</TableHead>
+                        <TableHead>Ends</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAuctions.slice(0, 50).map((a: any) => {
+                        const l = a.car_listings;
+                        return (
+                          <TableRow key={a.id}>
+                            <TableCell>
+                              <p className="font-medium text-card-foreground">{l?.year} {l?.make} {l?.model}</p>
+                              <p className="text-xs text-muted-foreground">{a.format} · {l?.registration || "N/A"}</p>
+                            </TableCell>
+                            <TableCell><Badge variant={a.status === "live" ? "default" : a.status === "sold" ? "secondary" : "outline"}>{a.status}</Badge></TableCell>
+                            <TableCell>{a.inspection_rating ? `${a.inspection_rating}/5` : "—"}</TableCell>
+                            <TableCell>£{Number(a.current_bid || a.starting_price).toLocaleString()}</TableCell>
+                            <TableCell>{a.bid_count || 0}</TableCell>
+                            <TableCell className="text-xs text-muted-foreground">{a.ends_at ? new Date(a.ends_at).toLocaleDateString() : "—"}</TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => setSelectedAuction(a)}><Eye className="mr-2 h-4 w-4" /> Details</DropdownMenuItem>
+                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => approveAuction(a.id, 3)}><CheckCircle className="mr-2 h-4 w-4" /> Quick Approve (3/5)</DropdownMenuItem>}
+                                  {a.status !== "cancelled" && <DropdownMenuItem onClick={() => rejectAuction(a.id)} className="text-destructive"><XCircle className="mr-2 h-4 w-4" /> Cancel</DropdownMenuItem>}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Escrow Management */}
+              <Card>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Escrow Management ({auctionEscrows.length})</CardTitle></CardHeader>
+                <CardContent className="overflow-x-auto">
+                  {auctionEscrows.length === 0 ? (
+                    <p className="py-8 text-center text-muted-foreground">No escrow records yet</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Auction</TableHead>
+                          <TableHead>Total</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>V5C</TableHead>
+                          <TableHead>Keys</TableHead>
+                          <TableHead>Contract</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {auctionEscrows.map((e: any) => (
+                          <TableRow key={e.id}>
+                            <TableCell className="text-xs">{e.auction_id.slice(0, 8)}...</TableCell>
+                            <TableCell>£{Number(e.total_amount).toLocaleString()}</TableCell>
+                            <TableCell><Badge variant="outline" className="capitalize">{(e.status as string).replace(/_/g, " ")}</Badge></TableCell>
+                            <TableCell>{e.v5c_received ? "✅" : "⏳"}</TableCell>
+                            <TableCell>{e.keys_handed_over ? "✅" : "⏳"}</TableCell>
+                            <TableCell>{e.contract_signed ? "✅" : "⏳"}</TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {e.v5c_received && e.keys_handed_over && e.contract_signed && e.status !== "released_to_seller" && (
+                                    <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "released_to_seller")}><CheckCircle className="mr-2 h-4 w-4" /> Release to Seller</DropdownMenuItem>
+                                  )}
+                                  {e.status !== "refunded" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "refunded")} className="text-destructive">Refund Buyer</DropdownMenuItem>}
+                                  {e.status !== "disputed" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "disputed")}>Mark Disputed</DropdownMenuItem>}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Audit Log */}
+              <Card>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4" /> Auction Audit Log (last 200)</CardTitle></CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-72">
+                    <div className="space-y-1">
+                      {auctionAuditLog.map((log: any) => (
+                        <div key={log.id} className="flex items-center justify-between py-1.5 px-2 rounded text-xs hover:bg-muted/50">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-[9px] py-0">{log.action}</Badge>
+                            <span className="text-muted-foreground">{log.actor_role || "system"}</span>
+                          </div>
+                          <span className="text-muted-foreground">{new Date(log.created_at).toLocaleString()}</span>
+                        </div>
+                      ))}
+                      {auctionAuditLog.length === 0 && <p className="text-center text-muted-foreground py-4">No audit entries</p>}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Reports Tab */}
           <TabsContent value="reports" className="mt-4">
             <Card>
