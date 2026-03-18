@@ -57,7 +57,7 @@ const TermsOfService = () => (
             <li>Posting false, fraudulent, or misleading listings.</li>
             <li>Harassing, threatening, or abusing other users.</li>
             <li>Attempting to circumvent security measures or access other users' accounts.</li>
-            <li>Using AutoVault for any illegal purpose.</li>
+            <li>Using AutoSouq for any illegal purpose.</li>
             <li>Scraping or automated data collection without permission.</li>
           </ul>
         </section>
