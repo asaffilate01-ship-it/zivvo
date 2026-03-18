@@ -21,7 +21,7 @@ const TermsOfService = () => (
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>You must provide accurate information when creating an account.</li>
             <li>You are responsible for maintaining the security of your account credentials.</li>
-            <li>You must be at least 18 years old to use AutoVault.</li>
+            <li>You must be at least 18 years old to use AutoSouq.</li>
             <li>One person may not maintain multiple accounts.</li>
           </ul>
         </section>
