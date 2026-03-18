@@ -31,7 +31,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
-    localStorage.setItem("autovault-theme", t);
+    localStorage.setItem("autosouq-theme", t);
   };
 
   useEffect(() => {
