@@ -316,6 +316,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="dealers">Dealers</TabsTrigger>
             <TabsTrigger value="kyc">KYC ({pendingKYC.length})</TabsTrigger>
             <TabsTrigger value="listings">Listings</TabsTrigger>
+            <TabsTrigger value="auctions" className="gap-1"><Gavel className="h-3 w-3" /> Auctions ({pendingAuctions.length})</TabsTrigger>
             <TabsTrigger value="reports">Reports ({pendingReports.length})</TabsTrigger>
             <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
