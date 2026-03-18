@@ -407,8 +407,9 @@ const CarDetail = () => {
             )}
 
             {/* Finance Calculator - Mobile */}
-            <div className="mt-8 lg:hidden">
+            <div className="mt-8 space-y-4 lg:hidden">
               <PaymentCalculator price={Number(car.price)} />
+              <PartExchangeWidget targetPrice={Number(car.price)} />
             </div>
           </div>
 
