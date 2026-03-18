@@ -15,6 +15,7 @@ import { Gavel, Shield, Clock, Search, Star, TrendingUp, Users, CheckCircle2, Ti
 import { motion } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
+import LiveEventBanner from "@/components/LiveEventBanner";
 
 const fmtCurrency = (amount: number, country: string) => {
   const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
