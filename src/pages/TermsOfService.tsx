@@ -64,7 +64,7 @@ const TermsOfService = () => (
 
         <section>
           <h2 className="font-display text-lg font-semibold text-foreground">7. Limitation of Liability</h2>
-          <p className="mt-2">AutoVault is provided "as is" without warranties of any kind. We are not liable for any damages arising from your use of the platform, including but not limited to losses from vehicle transactions.</p>
+          <p className="mt-2">AutoSouq is provided "as is" without warranties of any kind. We are not liable for any damages arising from your use of the platform, including but not limited to losses from vehicle transactions.</p>
         </section>
 
         <section>
