@@ -1,5 +1,5 @@
+/// <reference types="google.maps" />
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { Loader2 } from "lucide-react";
@@ -33,22 +33,14 @@ const defaultCenter: Record<string, { lat: number; lng: number }> = {
   PK: { lat: 30.3, lng: 69.3 },
 };
 
-declare global {
-  interface Window {
-    google?: typeof google;
-  }
-}
-
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "";
 
-// Load the Google Maps script once
 let googleMapsPromise: Promise<void> | null = null;
 const loadGoogleMaps = (): Promise<void> => {
   if (googleMapsPromise) return googleMapsPromise;
-  if (window.google?.maps) return Promise.resolve();
+  if ((window as any).google?.maps) return Promise.resolve();
 
   googleMapsPromise = new Promise((resolve, reject) => {
-    // Try loading from edge function to keep key server-side
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`;
     script.async = true;
@@ -68,15 +60,14 @@ interface BrowseMapViewProps {
 const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
   const { config } = useCountry();
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState(false);
 
   const center = defaultCenter[country] || { lat: 51.5, lng: -0.1 };
   const zoom = country === "US" ? 4 : country === "PK" ? 5 : 6;
 
-  // Load Google Maps
   useEffect(() => {
     if (!GOOGLE_MAPS_API_KEY) {
       setMapError(true);
@@ -87,13 +78,12 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
       .catch(() => setMapError(true));
   }, []);
 
-  // Initialize map
   useEffect(() => {
     if (!mapLoaded || !mapRef.current || mapInstanceRef.current) return;
-    mapInstanceRef.current = new google.maps.Map(mapRef.current, {
+    const g = (window as any).google;
+    mapInstanceRef.current = new g.maps.Map(mapRef.current, {
       center,
       zoom,
-      mapId: "browse-map",
       disableDefaultUI: false,
       zoomControl: true,
       mapTypeControl: false,
@@ -101,16 +91,16 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
     });
   }, [mapLoaded]);
 
-  // Update markers
   useEffect(() => {
+    const g = (window as any).google;
     const map = mapInstanceRef.current;
-    if (!map || !mapLoaded) return;
+    if (!map || !mapLoaded || !g) return;
 
     // Clear old markers
-    markersRef.current.forEach((m) => (m.map = null));
+    markersRef.current.forEach((m: any) => m.setMap(null));
     markersRef.current = [];
 
-    const infoWindow = new google.maps.InfoWindow();
+    const infoWindow = new g.maps.InfoWindow();
 
     listings.forEach((car) => {
       const coords = getCoords(car.location || "");
@@ -119,7 +109,7 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
       const jitter = () => (Math.random() - 0.5) * 0.02;
       const position = { lat: coords[0] + jitter(), lng: coords[1] + jitter() };
 
-      const marker = new google.maps.marker.AdvancedMarkerElement({
+      const marker = new g.maps.Marker({
         map,
         position,
         title: car.title,
@@ -148,7 +138,7 @@ const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
   if (mapError) {
     return (
       <div className="flex h-[500px] w-full items-center justify-center rounded-xl border border-border bg-muted/30">
-        <p className="text-sm text-muted-foreground">Map unavailable. Please check your Google Maps API key configuration.</p>
+        <p className="text-sm text-muted-foreground">Map unavailable. Please configure the Google Maps API key.</p>
       </div>
     );
   }
