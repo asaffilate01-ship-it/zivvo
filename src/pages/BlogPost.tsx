@@ -64,7 +64,7 @@ const blogPosts: Record<string, {
     content: [
       "Every year, thousands of cars are sold with outstanding finance — meaning the buyer could lose the car and their money. A finance check is one of the most important steps you can take.",
       "## What Is Outstanding Finance?\n\nWhen a car is bought on finance (HP, PCP, or personal loan secured against the vehicle), the finance company retains legal ownership until the debt is fully paid. If you buy a car with outstanding finance, the finance company can legally repossess it.",
-      "## How to Check\n\nAutoVault's integrated HPI check includes a comprehensive finance check. Simply enter the registration number and we'll search against all major UK finance databases.",
+      "## How to Check\n\nAutoSouq's integrated HPI check includes a comprehensive finance check. Simply enter the registration number and we'll search against all major UK finance databases.",
       "## What If Finance Is Found?\n\nDon't panic — but don't proceed with the purchase either. The seller needs to settle the outstanding amount before the sale can go through legitimately.",
     ],
   },
