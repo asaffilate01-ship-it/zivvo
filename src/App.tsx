@@ -46,6 +46,9 @@ const Blog = lazy(() => import("./pages/Blog"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const CarValuation = lazy(() => import("./pages/CarValuation"));
+const SellMyCar = lazy(() => import("./pages/SellMyCar"));
+const CarReviews = lazy(() => import("./pages/CarReviews"));
+const PopularCars = lazy(() => import("./pages/PopularCars"));
 
 const queryClient = new QueryClient();
 
@@ -82,6 +85,10 @@ const App = () => (
                       <Route path="/blog" element={<Blog />} />
                       <Route path="/blog/:id" element={<BlogPost />} />
                       <Route path="/valuation" element={<CarValuation />} />
+                      <Route path="/sell-my-car" element={<SellMyCar />} />
+                      <Route path="/reviews" element={<CarReviews />} />
+                      <Route path="/cars" element={<PopularCars />} />
+                      <Route path="/cars/:make" element={<PopularCars />} />
                       <Route
                         path="/inbox"
                         element={

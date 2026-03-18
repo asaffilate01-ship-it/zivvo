@@ -4,6 +4,11 @@ import CarCard from "@/components/CarCard";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
+import BrowseByBodyType from "@/components/BrowseByBodyType";
+import BudgetPresets from "@/components/BudgetPresets";
+import RecentlySoldFeed from "@/components/RecentlySoldFeed";
+import TrustReviewWidget from "@/components/TrustReviewWidget";
+import EVSection from "@/components/EVSection";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -113,43 +118,11 @@ const Index = () => {
       <Navbar />
       <HeroSearch />
 
-      {/* Categories */}
-      <section className="container mx-auto px-4 py-16">
-        <motion.div {...fadeUp} className="flex items-end justify-between">
-          <div>
-            <Badge variant="outline" className="mb-3 text-xs">Categories</Badge>
-            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">Browse by Type</h2>
-          </div>
-          <Link to="/browse">
-            <Button variant="ghost" size="sm" className="text-primary">
-              View All <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </Link>
-        </motion.div>
+      {/* Browse by Body Type */}
+      <BrowseByBodyType counts={categoryCounts} />
 
-        <div className="mt-8 grid grid-cols-3 gap-3 md:grid-cols-6 md:gap-4">
-          {categories.map((cat, i) => (
-            <motion.div
-              key={cat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.05 }}
-              viewport={{ once: true }}
-            >
-              <Link
-                to={cat.label === "Electric" || cat.label === "Hybrid" ? `/browse?fuel=${cat.label}` : `/browse?body=${cat.label}`}
-                className="group flex flex-col items-center rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/50 hover:shadow-card md:p-6"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/8 transition-colors group-hover:bg-primary/15">
-                  <cat.icon className="h-6 w-6 text-primary" />
-                </div>
-                <span className="mt-3 font-display text-sm font-semibold text-card-foreground">{cat.label}</span>
-                <span className="text-xs text-muted-foreground">{categoryCounts[cat.label] || 0} ads</span>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      {/* Budget Presets */}
+      <BudgetPresets />
 
       {/* Featured */}
       <section className="border-y border-border bg-muted/30 py-16">
@@ -243,6 +216,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Trust Review Widget */}
+      <TrustReviewWidget />
+
       {/* Social Proof Strip */}
       <section className="border-y border-border bg-muted/30 py-10">
         <div className="container mx-auto px-4">
@@ -314,6 +290,12 @@ const Index = () => {
 
       {/* Recently Viewed */}
       <RecentlyViewedCarousel />
+
+      {/* Recently Sold Feed */}
+      <RecentlySoldFeed />
+
+      {/* EV Section */}
+      <EVSection />
 
       {/* Car Valuation CTA */}
       <section className="container mx-auto px-4 py-12">
