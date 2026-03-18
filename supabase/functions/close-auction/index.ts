@@ -187,15 +187,32 @@ serve(async (req) => {
         }
       }
 
-      // Notify watchers if reserve not met
-      if (newStatus === "reserve_not_met") {
-        await supabase.from("notifications").insert({
-          user_id: auction.seller_id,
-          type: "auction",
-          title: "Reserve price not met",
-          message: `Your auction for ${(auction.car_listings as any)?.title} ended but the reserve was not met. Highest bid: ${auction.current_bid}`,
-          link: `/auction/${auction.id}`,
-        });
+      // Release ALL deposits for non-sold auctions (reserve not met, ended without bids)
+      if (newStatus === "reserve_not_met" || newStatus === "ended") {
+        for (const dep of (allDeposits || [])) {
+          if (dep.stripe_payment_intent_id) {
+            try {
+              await stripe.paymentIntents.cancel(dep.stripe_payment_intent_id);
+              await supabase.from("auction_deposits").update({
+                status: "released",
+                released_at: new Date().toISOString(),
+              }).eq("id", dep.id);
+              console.log(`✅ Released deposit ${dep.id} (auction ${newStatus})`);
+            } catch (e) {
+              console.log(`⚠️ Failed to release deposit ${dep.id}:`, e);
+            }
+          }
+        }
+
+        if (newStatus === "reserve_not_met") {
+          await supabase.from("notifications").insert({
+            user_id: auction.seller_id,
+            type: "auction",
+            title: "Reserve price not met",
+            message: `Your auction for ${(auction.car_listings as any)?.title} ended but the reserve was not met. Highest bid: ${auction.current_bid}`,
+            link: `/auction/${auction.id}`,
+          });
+        }
       }
 
       closedCount++;
