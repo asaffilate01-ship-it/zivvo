@@ -166,7 +166,7 @@ const SellMyCar = () => {
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> The Easy Way</span>
             </h1>
             <p className="mt-2 text-muted-foreground">
-              List your car for just {formatPrice(config.individualPlan.price, config)} — live for {config.individualPlan.durationDays / 30} months. Reach thousands of verified buyers.
+              List your car for just {formatPrice(config.individualPlan.price, config)}. Stays live until sold. If vehicle details change, it's treated as a new listing.
             </p>
 
             <div className="mt-6 flex justify-center gap-8 text-xs text-muted-foreground">

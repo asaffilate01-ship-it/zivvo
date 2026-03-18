@@ -126,7 +126,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     fuelTypes: ["Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"],
     transmissions: ["Automatic", "Manual"],
     popularCities: ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Ras Al Khaimah", "Fujairah", "Umm Al Quwain", "Al Ain"],
-    individualPlan: { price: 75, priceId: "price_ae_individual", durationDays: 90, label: "3-month listing" },
+    individualPlan: { price: 75, priceId: "price_ae_individual", label: "per listing" },
     dealerPlans: [
       { name: "Starter", price: 199, priceId: "price_ae_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
       { name: "Professional", price: 399, priceId: "price_ae_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Vehicle history integration"] },
