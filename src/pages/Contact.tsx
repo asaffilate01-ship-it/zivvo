@@ -36,7 +36,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Contact Us — AutoVault" description="Get in touch with the AutoVault team. We're here to help with any questions about buying, selling, or dealer subscriptions." />
+      <SEOHead title="Contact Us — AutoSouq" description="Get in touch with the AutoSouq team. We're here to help with any questions about buying, selling, or dealer subscriptions." />
       <Navbar />
       <div className="container mx-auto max-w-5xl px-4 py-12">
         <div className="text-center">
