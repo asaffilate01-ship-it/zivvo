@@ -44,13 +44,18 @@ const AdminDashboard = () => {
   const [listingReports, setListingReports] = useState<any[]>([]);
   const [contactMessages, setContactMessages] = useState<any[]>([]);
   const [bugReports, setBugReports] = useState<any[]>([]);
+  const [auctions, setAuctions] = useState<any[]>([]);
+  const [auctionEscrows, setAuctionEscrows] = useState<any[]>([]);
+  const [auctionAuditLog, setAuctionAuditLog] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listingSearch, setListingSearch] = useState("");
   const [listingStatusFilter, setListingStatusFilter] = useState("all");
   const [userSearch, setUserSearch] = useState("");
+  const [auctionStatusFilter, setAuctionStatusFilter] = useState("all");
   const [dateRange, setDateRange] = useState("month");
   const [loading, setLoading] = useState(true);
   const [selectedDealer, setSelectedDealer] = useState<any>(null);
+  const [selectedAuction, setSelectedAuction] = useState<any>(null);
   const [roleDialog, setRoleDialog] = useState<{ userId: string; currentRoles: string[] } | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
