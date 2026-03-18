@@ -221,8 +221,9 @@ const TradeStock = () => {
       <Navbar />
       <main className="min-h-screen bg-background">
         {/* Hero */}
-        <section className="gradient-dark text-white py-16 md:py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.15),transparent_60%)]" />
+        <section className="text-white py-16 md:py-20 relative overflow-hidden">
+          <img src={heroTradeStock} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
           <div className="container mx-auto px-4 relative z-10">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
