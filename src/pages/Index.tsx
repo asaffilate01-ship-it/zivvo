@@ -30,14 +30,15 @@ import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
 import trustImage from "@/assets/trust-verify.jpg";
 
-const categories = [
-  { icon: Car, label: "Sedan", count: "—" },
-  { icon: Truck, label: "SUV", count: "—" },
-  { icon: Car, label: "Coupe", count: "—" },
-  { icon: Zap, label: "Electric", count: "—" },
-  { icon: Car, label: "Estate", count: "—" },
-  { icon: Globe, label: "Hybrid", count: "—" },
-];
+const getCategories = (bodyTypes: string[]) => {
+  const iconMap: Record<string, any> = { SUV: Truck, Electric: Zap, Hybrid: Globe };
+  const types = bodyTypes.slice(0, 4);
+  return [
+    ...types.map((t) => ({ icon: iconMap[t] || Car, label: t, count: "—" })),
+    { icon: Zap, label: "Electric", count: "—" },
+    { icon: Globe, label: "Hybrid", count: "—" },
+  ];
+};
 
 const testimonials = [
   { name: "Sarah K.", location: "London", rating: 5, text: "Sold my BMW in 3 days. The verified badge made buyers trust my listing instantly." },
