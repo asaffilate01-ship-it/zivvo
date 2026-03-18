@@ -397,8 +397,9 @@ const DealerDashboard = () => {
                         <Link to={`/car/${listing.id}`} className="font-medium text-card-foreground hover:text-primary">{listing.title}</Link>
                         <p className="text-sm text-muted-foreground">{listing.views_count || 0} views · {listing.enquiries_count || 0} enquiries</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
+                      {listing.status === "active" && dealer && (
+                        <ListingSyndicationStatus listingId={listing.id} dealerId={dealer.id} />
+                      )}
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
                       <span className="font-display font-semibold text-card-foreground">{formatPrice(Number(listing.price), config)}</span>
                       {listing.status === "active" && (
