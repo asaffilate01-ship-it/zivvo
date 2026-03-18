@@ -143,7 +143,7 @@ const Browse = () => {
     const fetchListings = async () => {
       setLoading(true);
       let query = supabase
-        .from("car_listings")
+        .from("car_listings_public")
         .select("*", { count: "exact" })
         .eq("status", "active")
         .eq("country", country)
