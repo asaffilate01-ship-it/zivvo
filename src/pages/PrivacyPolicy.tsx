@@ -76,7 +76,7 @@ const PrivacyPolicy = () => (
             <li><strong>Object</strong> to processing based on legitimate interest.</li>
             <li><strong>Withdraw consent</strong> at any time.</li>
           </ul>
-          <p className="mt-2">To exercise any of these rights, use the settings in your Profile page or contact us at privacy@autovault.co.</p>
+          <p className="mt-2">To exercise any of these rights, use the settings in your Profile page or contact us at privacy@autosouq.app.</p>
         </section>
 
         <section>
