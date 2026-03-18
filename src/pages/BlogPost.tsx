@@ -31,7 +31,7 @@ const blogPosts: Record<string, {
     excerpt: "We break down the real-world costs, range, and practicality.",
     category: "EV Guide",
     image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80",
-    author: "AutoVault Team", date: "2026-03-05", readTime: "6 min read",
+    author: "AutoSouq Team", date: "2026-03-05", readTime: "6 min read",
     content: [
       "The electric vehicle landscape has transformed dramatically. With charging infrastructure now covering most major routes and battery costs falling year on year, the question is no longer 'if' but 'when' to go electric.",
       "## Full Electric (BEV)\n\nPure electric vehicles offer the lowest running costs, zero tailpipe emissions, and an increasingly impressive range. Most modern EVs now offer 250-400 miles per charge, making range anxiety largely a thing of the past.",
