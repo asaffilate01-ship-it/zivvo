@@ -171,6 +171,48 @@ serve(async (req) => {
       console.log(`✅ Auction ${auction.id} closed → ${newStatus}`);
     }
 
+    // Also notify watchers/bidders of auctions ending within 1 hour
+    const oneHourFromNow = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    const { data: endingSoon } = await supabase
+      .from("auctions")
+      .select("id, ends_at, car_listings!inner(title, make, model, year)")
+      .eq("status", "live")
+      .lte("ends_at", oneHourFromNow)
+      .gt("ends_at", new Date().toISOString());
+
+    for (const soon of endingSoon || []) {
+      // Check if we already notified (avoid duplicate notifications by checking recent ones)
+      const listing = soon.car_listings as any;
+      const { data: existing } = await supabase
+        .from("notifications")
+        .select("id")
+        .eq("type", "auction")
+        .ilike("title", "%ending soon%")
+        .eq("link", `/auction/${soon.id}`)
+        .gte("created_at", new Date(Date.now() - 3600000).toISOString())
+        .limit(1);
+
+      if (existing && existing.length > 0) continue;
+
+      // Notify watchers
+      const { data: watchers } = await supabase
+        .from("auction_watchers")
+        .select("user_id")
+        .eq("auction_id", soon.id);
+
+      if (watchers?.length) {
+        await supabase.from("notifications").insert(
+          watchers.map((w) => ({
+            user_id: w.user_id,
+            type: "auction",
+            title: "Auction ending soon! ⏰",
+            message: `${listing?.year} ${listing?.make} ${listing?.model} ends in less than 1 hour.`,
+            link: `/auction/${soon.id}`,
+          }))
+        );
+      }
+    }
+
     return new Response(JSON.stringify({ success: true, closed: closedCount }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
