@@ -335,12 +335,31 @@ const CarDetail = () => {
               <div className="mt-8">
                 <h2 className="font-display text-xl font-bold text-foreground">Video</h2>
                 <div className="mt-3 aspect-video overflow-hidden rounded-xl border border-border">
-                  <iframe
-                    src={(car as any).video_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
-                    className="h-full w-full"
-                    allowFullScreen
-                    title="Vehicle Video"
-                  />
+                  {(() => {
+                    const rawUrl: string = (car as any).video_url;
+                    // Check if it's a YouTube URL
+                    const ytMatch = rawUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+                    if (ytMatch) {
+                      return (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+                          className="h-full w-full"
+                          allowFullScreen
+                          title="Vehicle Video"
+                          sandbox="allow-scripts allow-same-origin allow-presentation"
+                        />
+                      );
+                    }
+                    // Direct video file (from storage)
+                    return (
+                      <video
+                        src={rawUrl}
+                        controls
+                        className="h-full w-full object-contain bg-black"
+                        preload="metadata"
+                      />
+                    );
+                  })()}
                 </div>
               </div>
             )}
