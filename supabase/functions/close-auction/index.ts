@@ -1,11 +1,49 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+// Use fetch-based Stripe API calls to avoid Deno.core.runMicrotasks crash
+async function cancelPaymentIntent(paymentIntentId: string, stripeKey: string): Promise<boolean> {
+  try {
+    const res = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/cancel`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${stripeKey}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    return res.ok;
+  } catch (e) {
+    console.log(`⚠️ Stripe cancel failed for ${paymentIntentId}:`, e);
+    return false;
+  }
+}
+
+async function releaseDeposits(
+  supabase: ReturnType<typeof createClient>,
+  deposits: any[],
+  stripeKey: string,
+  excludeUserId?: string
+) {
+  for (const dep of deposits) {
+    if (excludeUserId && dep.user_id === excludeUserId) continue;
+    if (!dep.stripe_payment_intent_id) continue;
+    const ok = await cancelPaymentIntent(dep.stripe_payment_intent_id, stripeKey);
+    if (ok) {
+      await supabase.from("auction_deposits").update({
+        status: "released",
+        released_at: new Date().toISOString(),
+      }).eq("id", dep.id);
+      console.log(`✅ Released deposit ${dep.id}`);
+    } else {
+      console.log(`⚠️ Failed to release deposit ${dep.id}`);
+    }
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -17,6 +55,8 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     { auth: { persistSession: false } }
   );
+
+  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
 
   try {
     // Find auctions that have ended
@@ -38,7 +78,6 @@ serve(async (req) => {
     for (const auction of endedAuctions) {
       const reserveMet = !auction.reserve_price || (auction.current_bid >= auction.reserve_price);
       const hasBids = auction.bid_count > 0;
-
       const newStatus = hasBids && reserveMet ? "sold" : hasBids ? "reserve_not_met" : "ended";
 
       // Update auction status
@@ -58,11 +97,6 @@ serve(async (req) => {
         },
       });
 
-      // Release deposits for non-winners via Stripe
-      const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-        apiVersion: "2023-10-16",
-      });
-
       // Get all authorized deposits for this auction
       const { data: allDeposits } = await supabase
         .from("auction_deposits")
@@ -71,7 +105,6 @@ serve(async (req) => {
         .eq("status", "authorized");
 
       if (newStatus === "sold" && auction.winning_bid_id) {
-        // Get winning bid
         const { data: winningBid } = await supabase
           .from("auction_bids")
           .select("*")
@@ -80,20 +113,7 @@ serve(async (req) => {
 
         if (winningBid) {
           // Release deposits for non-winners
-          for (const dep of (allDeposits || [])) {
-            if (dep.user_id !== winningBid.bidder_id && dep.stripe_payment_intent_id) {
-              try {
-                await stripe.paymentIntents.cancel(dep.stripe_payment_intent_id);
-                await supabase.from("auction_deposits").update({
-                  status: "released",
-                  released_at: new Date().toISOString(),
-                }).eq("id", dep.id);
-                console.log(`✅ Released deposit ${dep.id} for non-winner ${dep.user_id}`);
-              } catch (e) {
-                console.log(`⚠️ Failed to release deposit ${dep.id}:`, e);
-              }
-            }
-          }
+          await releaseDeposits(supabase, allDeposits || [], stripeKey, winningBid.bidder_id);
 
           const hammerPrice = winningBid.amount;
           const buyerPremium = hammerPrice * (auction.buyer_premium_pct / 100);
@@ -102,7 +122,6 @@ serve(async (req) => {
           const platformRevenue = buyerPremium + sellerFee;
           const paymentDeadline = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
 
-          // Create payment protection record with 72-hour deadline
           await supabase.from("auction_escrow").insert({
             auction_id: auction.id,
             buyer_id: winningBid.bidder_id,
@@ -135,12 +154,12 @@ serve(async (req) => {
             <hr style="margin:12px 0;"/>
             <h3 style="font-weight:bold;">Terms & Conditions</h3>
             <ol style="padding-left:20px;font-size:13px;">
-              <li>The Seller agrees to transfer the vehicle to the Buyer upon receipt of full payment and completion of all handover requirements.</li>
+              <li>The Seller agrees to transfer the vehicle to the Buyer upon receipt of full payment.</li>
               <li>The Buyer agrees to pay the Total Due within 72 hours of auction close.</li>
               <li>Funds are held under Payment Protection and released to the Seller only upon: (a) V5C/logbook transfer, (b) key handover, and (c) mutual contract signing.</li>
-              <li>The vehicle is sold as described in the inspection and condition report. The platform makes no additional warranty unless explicitly stated.</li>
+              <li>The vehicle is sold as described in the inspection and condition report.</li>
               <li>Delivery via logistics partners is at additional cost to the Buyer if arranged.</li>
-              <li>This agreement is legally binding upon digital signature by both parties. IP addresses and timestamps are recorded for audit purposes.</li>
+              <li>This agreement is legally binding upon digital signature by both parties.</li>
               <li>Any disputes shall be resolved through the platform's dispute resolution process.</li>
             </ol>
           `;
@@ -171,7 +190,6 @@ serve(async (req) => {
             },
           ]);
 
-          // Audit
           await supabase.from("auction_audit_log").insert({
             auction_id: auction.id,
             actor_role: "system",
@@ -187,22 +205,9 @@ serve(async (req) => {
         }
       }
 
-      // Release ALL deposits for non-sold auctions (reserve not met, ended without bids)
+      // Release ALL deposits for non-sold auctions
       if (newStatus === "reserve_not_met" || newStatus === "ended") {
-        for (const dep of (allDeposits || [])) {
-          if (dep.stripe_payment_intent_id) {
-            try {
-              await stripe.paymentIntents.cancel(dep.stripe_payment_intent_id);
-              await supabase.from("auction_deposits").update({
-                status: "released",
-                released_at: new Date().toISOString(),
-              }).eq("id", dep.id);
-              console.log(`✅ Released deposit ${dep.id} (auction ${newStatus})`);
-            } catch (e) {
-              console.log(`⚠️ Failed to release deposit ${dep.id}:`, e);
-            }
-          }
-        }
+        await releaseDeposits(supabase, allDeposits || [], stripeKey);
 
         if (newStatus === "reserve_not_met") {
           await supabase.from("notifications").insert({
@@ -219,7 +224,7 @@ serve(async (req) => {
       console.log(`✅ Auction ${auction.id} closed → ${newStatus}`);
     }
 
-    // Also notify watchers/bidders of auctions ending within 1 hour
+    // Notify watchers of auctions ending within 1 hour
     const oneHourFromNow = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     const { data: endingSoon } = await supabase
       .from("auctions")
@@ -229,7 +234,6 @@ serve(async (req) => {
       .gt("ends_at", new Date().toISOString());
 
     for (const soon of endingSoon || []) {
-      // Check if we already notified (avoid duplicate notifications by checking recent ones)
       const listing = soon.car_listings as any;
       const { data: existing } = await supabase
         .from("notifications")
@@ -242,7 +246,6 @@ serve(async (req) => {
 
       if (existing && existing.length > 0) continue;
 
-      // Notify watchers
       const { data: watchers } = await supabase
         .from("auction_watchers")
         .select("user_id")
