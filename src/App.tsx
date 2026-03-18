@@ -104,6 +104,14 @@ const App = () => (
                         }
                       />
                       <Route
+                        path="/trade-stock"
+                        element={
+                          <ProtectedRoute>
+                            <TradeStock />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
                         path="/inbox"
                         element={
                           <ProtectedRoute>
