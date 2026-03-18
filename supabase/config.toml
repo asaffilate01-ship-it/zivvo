@@ -50,3 +50,30 @@ verify_jwt = false
 
 [functions.maps-key]
 verify_jwt = false
+
+[functions.sitemap]
+verify_jwt = false
+
+[functions.ai-chat]
+verify_jwt = false
+
+[functions.price-check]
+verify_jwt = false
+
+[functions.dvla-lookup]
+verify_jwt = false
+
+[functions.mot-history]
+verify_jwt = false
+
+[functions.hpi-check]
+verify_jwt = false
+
+[functions.nhtsa-vin-decode]
+verify_jwt = false
+
+[functions.dev-seed]
+verify_jwt = false
+
+[functions.notify-price-drop]
+verify_jwt = false
