@@ -43,8 +43,8 @@ const getCategories = (bodyTypes: string[]) => {
 const testimonials = [
   { name: "Sarah K.", location: "London", rating: 5, text: "Sold my BMW in 3 days. The verified badge made buyers trust my listing instantly." },
   { name: "James T.", location: "Manchester", rating: 5, text: "The finance check feature saved me from buying a car with outstanding debt." },
-  { name: "Aisha M.", location: "Dubai", rating: 5, text: "As a dealer, AutoVault brings us qualified leads every day." },
-  { name: "David R.", location: "New York", rating: 5, text: "Found my dream Porsche through AutoVault. Transparent and verified." },
+  { name: "Aisha M.", location: "Dubai", rating: 5, text: "As a dealer, AutoSouq brings us qualified leads every day." },
+  { name: "David R.", location: "New York", rating: 5, text: "Found my dream Porsche through AutoSouq. Transparent and verified." },
 ];
 
 const fadeUp = {
