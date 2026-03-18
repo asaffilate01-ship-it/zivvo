@@ -69,7 +69,7 @@ const TermsOfService = () => (
 
         <section>
           <h2 className="font-display text-lg font-semibold text-foreground">8. Changes to Terms</h2>
-          <p className="mt-2">We may update these terms from time to time. Continued use of AutoVault after changes constitutes acceptance of the new terms.</p>
+          <p className="mt-2">We may update these terms from time to time. Continued use of AutoSouq after changes constitutes acceptance of the new terms.</p>
         </section>
 
         <section>
