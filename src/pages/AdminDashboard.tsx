@@ -13,7 +13,7 @@ import {
   Users, Building2, Car, DollarSign, ShieldCheck, XCircle,
   CheckCircle, Search, TrendingUp, BarChart3, Download, Calendar,
   Eye, Loader2, UserPlus, Ban, MoreHorizontal, Flag, Mail, Bug,
-  Gavel, Shield, FileText, Package, Clock,
+  Gavel, Shield, FileText, Package, Clock, ClipboardCheck,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import DashboardChart from "@/components/DashboardChart";
 import SalesPipeline from "@/components/SalesPipeline";
+import AdminInspectionPanel from "@/components/AdminInspectionPanel";
 
 
 
