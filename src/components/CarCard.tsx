@@ -28,6 +28,7 @@ interface CarCardProps {
     verified?: boolean | null;
     dealer_id?: string | null;
     video_url?: string | null;
+    market_average?: number | null;
   };
   index?: number;
   layout?: "grid" | "list";
