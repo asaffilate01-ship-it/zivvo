@@ -27,7 +27,7 @@ const cityCoords: Record<string, [number, number]> = {
 };
 
 const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-  const R = 3959; // Earth radius in miles
+  const R = 3959;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = Math.sin(dLat / 2) ** 2 +
@@ -52,6 +52,18 @@ const radiusOptions = [
   { value: "national", label: "Nationwide" },
 ];
 
+const reverseGeocodeGoogle = async (lat: number, lng: number): Promise<string> => {
+  try {
+    const { data, error } = await supabase.functions.invoke("reverse-geocode", {
+      body: { lat, lng },
+    });
+    if (error) throw error;
+    return data?.city || "your area";
+  } catch {
+    return "your area";
+  }
+};
+
 const CarsNearYou = () => {
   const { country, config } = useCountry();
   const [cars, setCars] = useState<any[]>([]);
@@ -73,25 +85,11 @@ const CarsNearYou = () => {
         const { latitude, longitude } = position.coords;
         setUserCoords([latitude, longitude]);
         setGeoStatus("granted");
-
-        // Reverse geocode to get city name
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&zoom=10`,
-            { headers: { "Accept-Language": "en" } }
-          );
-          if (res.ok) {
-            const data = await res.json();
-            const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || "your area";
-            setLocationName(city);
-          }
-        } catch {
-          setLocationName("your area");
-        }
+        const city = await reverseGeocodeGoogle(latitude, longitude);
+        setLocationName(city);
       },
       () => {
         setGeoStatus("denied");
-        // Fallback to country-based defaults
         const fallbackCities: Record<string, string> = {
           GB: "London", US: "New York", PK: "Lahore", AE: "Dubai",
         };
@@ -129,7 +127,7 @@ const CarsNearYou = () => {
     } else {
       const maxDist = parseInt(radius);
       const distUnit = config.distanceUnit;
-      const multiplier = distUnit === "km" ? 1.60934 : 1; // convert radius to miles for calculation
+      const multiplier = distUnit === "km" ? 1.60934 : 1;
 
       const withDistance = data
         .map((car) => {
@@ -159,16 +157,8 @@ const CarsNearYou = () => {
       async (position) => {
         setUserCoords([position.coords.latitude, position.coords.longitude]);
         setGeoStatus("granted");
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json&zoom=10`,
-            { headers: { "Accept-Language": "en" } }
-          );
-          if (res.ok) {
-            const data = await res.json();
-            setLocationName(data.address?.city || data.address?.town || "your area");
-          }
-        } catch { /* ignore */ }
+        const city = await reverseGeocodeGoogle(position.coords.latitude, position.coords.longitude);
+        setLocationName(city);
       },
       () => setGeoStatus("denied"),
       { enableHighAccuracy: true, timeout: 10000 }
@@ -201,7 +191,6 @@ const CarsNearYou = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Radius selector */}
             <Select value={radius} onValueChange={setRadius}>
               <SelectTrigger className="h-9 w-[140px] text-sm">
                 <SelectValue placeholder="Distance" />

@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.send-notification-email]
 verify_jwt = false
+
+[functions.reverse-geocode]
+verify_jwt = false
