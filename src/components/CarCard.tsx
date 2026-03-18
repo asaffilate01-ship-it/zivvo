@@ -128,11 +128,18 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             </Button>
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
               <p className="font-display text-2xl font-bold text-primary-foreground">{formatPrice(Number(car.price), config)}</p>
-              {car.images && car.images.length > 1 && (
-                <span className="rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm">
-                  📷 {car.images.length}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5">
+                {(car as any).video_url && (
+                  <span className="flex items-center gap-0.5 rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm">
+                    <Video className="h-3 w-3" /> Video
+                  </span>
+                )}
+                {car.images && car.images.length > 1 && (
+                  <span className="rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm">
+                    📷 {car.images.length}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

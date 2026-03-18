@@ -563,6 +563,13 @@ const CarDetail = () => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 backdrop-blur-sm"
             onClick={() => setGalleryOpen(false)}
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setGalleryOpen(false);
+              if (e.key === "ArrowLeft") setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1));
+              if (e.key === "ArrowRight") setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1));
+            }}
+            ref={(el) => el?.focus()}
           >
             <Button variant="ghost" size="icon" className="absolute right-4 top-4 text-background hover:bg-background/20" onClick={() => setGalleryOpen(false)}>
               ✕
