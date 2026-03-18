@@ -61,6 +61,392 @@ export type Database = {
           },
         ]
       }
+      auction_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_role: string | null
+          auction_id: string | null
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_role?: string | null
+          auction_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_role?: string | null
+          auction_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_audit_log_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auction_bids: {
+        Row: {
+          amount: number
+          auction_id: string
+          bidder_id: string
+          created_at: string
+          deposit_verified: boolean | null
+          finance_preapproved: boolean | null
+          id: string
+          ip_address: string | null
+          is_auto_bid: boolean | null
+          is_winning: boolean | null
+          max_auto_bid: number | null
+        }
+        Insert: {
+          amount: number
+          auction_id: string
+          bidder_id: string
+          created_at?: string
+          deposit_verified?: boolean | null
+          finance_preapproved?: boolean | null
+          id?: string
+          ip_address?: string | null
+          is_auto_bid?: boolean | null
+          is_winning?: boolean | null
+          max_auto_bid?: number | null
+        }
+        Update: {
+          amount?: number
+          auction_id?: string
+          bidder_id?: string
+          created_at?: string
+          deposit_verified?: boolean | null
+          finance_preapproved?: boolean | null
+          id?: string
+          ip_address?: string | null
+          is_auto_bid?: boolean | null
+          is_winning?: boolean | null
+          max_auto_bid?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_bids_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auction_contracts: {
+        Row: {
+          auction_id: string
+          buyer_id: string
+          buyer_ip: string | null
+          buyer_signed: boolean | null
+          buyer_signed_at: string | null
+          contract_html: string | null
+          created_at: string
+          escrow_id: string | null
+          id: string
+          seller_id: string
+          seller_ip: string | null
+          seller_signed: boolean | null
+          seller_signed_at: string | null
+          status: Database["public"]["Enums"]["contract_status"]
+          updated_at: string
+        }
+        Insert: {
+          auction_id: string
+          buyer_id: string
+          buyer_ip?: string | null
+          buyer_signed?: boolean | null
+          buyer_signed_at?: string | null
+          contract_html?: string | null
+          created_at?: string
+          escrow_id?: string | null
+          id?: string
+          seller_id: string
+          seller_ip?: string | null
+          seller_signed?: boolean | null
+          seller_signed_at?: string | null
+          status?: Database["public"]["Enums"]["contract_status"]
+          updated_at?: string
+        }
+        Update: {
+          auction_id?: string
+          buyer_id?: string
+          buyer_ip?: string | null
+          buyer_signed?: boolean | null
+          buyer_signed_at?: string | null
+          contract_html?: string | null
+          created_at?: string
+          escrow_id?: string | null
+          id?: string
+          seller_id?: string
+          seller_ip?: string | null
+          seller_signed?: boolean | null
+          seller_signed_at?: string | null
+          status?: Database["public"]["Enums"]["contract_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_contracts_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_contracts_escrow_id_fkey"
+            columns: ["escrow_id"]
+            isOneToOne: false
+            referencedRelation: "auction_escrow"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auction_deposits: {
+        Row: {
+          amount: number
+          auction_id: string
+          authorized_at: string | null
+          captured_at: string | null
+          created_at: string
+          id: string
+          released_at: string | null
+          status: string
+          stripe_payment_intent_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          auction_id: string
+          authorized_at?: string | null
+          captured_at?: string | null
+          created_at?: string
+          id?: string
+          released_at?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          auction_id?: string
+          authorized_at?: string | null
+          captured_at?: string | null
+          created_at?: string
+          id?: string
+          released_at?: string | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_deposits_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auction_escrow: {
+        Row: {
+          auction_id: string
+          buyer_id: string
+          buyer_premium: number
+          contract_signed: boolean | null
+          created_at: string
+          id: string
+          keys_handed_over: boolean | null
+          platform_revenue: number
+          released_at: string | null
+          seller_fee: number
+          seller_id: string
+          status: Database["public"]["Enums"]["escrow_status"]
+          total_amount: number
+          updated_at: string
+          v5c_received: boolean | null
+        }
+        Insert: {
+          auction_id: string
+          buyer_id: string
+          buyer_premium?: number
+          contract_signed?: boolean | null
+          created_at?: string
+          id?: string
+          keys_handed_over?: boolean | null
+          platform_revenue?: number
+          released_at?: string | null
+          seller_fee?: number
+          seller_id: string
+          status?: Database["public"]["Enums"]["escrow_status"]
+          total_amount: number
+          updated_at?: string
+          v5c_received?: boolean | null
+        }
+        Update: {
+          auction_id?: string
+          buyer_id?: string
+          buyer_premium?: number
+          contract_signed?: boolean | null
+          created_at?: string
+          id?: string
+          keys_handed_over?: boolean | null
+          platform_revenue?: number
+          released_at?: string | null
+          seller_fee?: number
+          seller_id?: string
+          status?: Database["public"]["Enums"]["escrow_status"]
+          total_amount?: number
+          updated_at?: string
+          v5c_received?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_escrow_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auctions: {
+        Row: {
+          anti_snipe_extension_mins: number
+          bid_count: number | null
+          buyer_premium_pct: number
+          collection_address: string | null
+          condition_report: Json | null
+          created_at: string
+          current_bid: number | null
+          delivery_available: boolean | null
+          delivery_cost_estimate: number | null
+          ends_at: string | null
+          format: Database["public"]["Enums"]["auction_format"]
+          hpi_clear: boolean | null
+          id: string
+          inspection_rating: number | null
+          listing_id: string
+          live_event_date: string | null
+          live_event_name: string | null
+          lot_number: number | null
+          original_end_time: string | null
+          ownership_verified: boolean | null
+          reserve_price: number | null
+          seller_fee_pct: number
+          seller_id: string
+          seller_verified: boolean | null
+          starting_price: number
+          starts_at: string | null
+          status: Database["public"]["Enums"]["auction_status"]
+          updated_at: string
+          watchers_count: number | null
+          winning_bid_id: string | null
+        }
+        Insert: {
+          anti_snipe_extension_mins?: number
+          bid_count?: number | null
+          buyer_premium_pct?: number
+          collection_address?: string | null
+          condition_report?: Json | null
+          created_at?: string
+          current_bid?: number | null
+          delivery_available?: boolean | null
+          delivery_cost_estimate?: number | null
+          ends_at?: string | null
+          format?: Database["public"]["Enums"]["auction_format"]
+          hpi_clear?: boolean | null
+          id?: string
+          inspection_rating?: number | null
+          listing_id: string
+          live_event_date?: string | null
+          live_event_name?: string | null
+          lot_number?: number | null
+          original_end_time?: string | null
+          ownership_verified?: boolean | null
+          reserve_price?: number | null
+          seller_fee_pct?: number
+          seller_id: string
+          seller_verified?: boolean | null
+          starting_price?: number
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["auction_status"]
+          updated_at?: string
+          watchers_count?: number | null
+          winning_bid_id?: string | null
+        }
+        Update: {
+          anti_snipe_extension_mins?: number
+          bid_count?: number | null
+          buyer_premium_pct?: number
+          collection_address?: string | null
+          condition_report?: Json | null
+          created_at?: string
+          current_bid?: number | null
+          delivery_available?: boolean | null
+          delivery_cost_estimate?: number | null
+          ends_at?: string | null
+          format?: Database["public"]["Enums"]["auction_format"]
+          hpi_clear?: boolean | null
+          id?: string
+          inspection_rating?: number | null
+          listing_id?: string
+          live_event_date?: string | null
+          live_event_name?: string | null
+          lot_number?: number | null
+          original_end_time?: string | null
+          ownership_verified?: boolean | null
+          reserve_price?: number | null
+          seller_fee_pct?: number
+          seller_id?: string
+          seller_verified?: boolean | null
+          starting_price?: number
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["auction_status"]
+          updated_at?: string
+          watchers_count?: number | null
+          winning_bid_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auctions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auctions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bug_reports: {
         Row: {
           created_at: string
@@ -1229,7 +1615,31 @@ export type Database = {
     }
     Enums: {
       app_role: "buyer" | "seller" | "dealer" | "agent" | "admin"
+      auction_format: "timed" | "live_event"
+      auction_status:
+        | "draft"
+        | "pending_inspection"
+        | "approved"
+        | "live"
+        | "ended"
+        | "sold"
+        | "reserve_not_met"
+        | "cancelled"
+      contract_status:
+        | "draft"
+        | "pending_buyer"
+        | "pending_seller"
+        | "signed"
+        | "completed"
+        | "cancelled"
       dealer_tier: "starter" | "professional" | "enterprise"
+      escrow_status:
+        | "pending_deposit"
+        | "deposit_held"
+        | "full_payment_held"
+        | "released_to_seller"
+        | "refunded"
+        | "disputed"
       listing_status: "draft" | "active" | "sold" | "expired" | "under_review"
       pipeline_stage:
         | "lead"
@@ -1373,7 +1783,34 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["buyer", "seller", "dealer", "agent", "admin"],
+      auction_format: ["timed", "live_event"],
+      auction_status: [
+        "draft",
+        "pending_inspection",
+        "approved",
+        "live",
+        "ended",
+        "sold",
+        "reserve_not_met",
+        "cancelled",
+      ],
+      contract_status: [
+        "draft",
+        "pending_buyer",
+        "pending_seller",
+        "signed",
+        "completed",
+        "cancelled",
+      ],
       dealer_tier: ["starter", "professional", "enterprise"],
+      escrow_status: [
+        "pending_deposit",
+        "deposit_held",
+        "full_payment_held",
+        "released_to_seller",
+        "refunded",
+        "disputed",
+      ],
       listing_status: ["draft", "active", "sold", "expired", "under_review"],
       pipeline_stage: [
         "lead",

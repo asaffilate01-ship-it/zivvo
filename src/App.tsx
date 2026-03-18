@@ -49,6 +49,9 @@ const CarValuation = lazy(() => import("./pages/CarValuation"));
 const SellMyCar = lazy(() => import("./pages/SellMyCar"));
 const CarReviews = lazy(() => import("./pages/CarReviews"));
 const PopularCars = lazy(() => import("./pages/PopularCars"));
+const Auctions = lazy(() => import("./pages/Auctions"));
+const AuctionDetail = lazy(() => import("./pages/AuctionDetail"));
+const CreateAuction = lazy(() => import("./pages/CreateAuction"));
 
 const queryClient = new QueryClient();
 
@@ -89,6 +92,16 @@ const App = () => (
                       <Route path="/reviews" element={<CarReviews />} />
                       <Route path="/cars" element={<PopularCars />} />
                       <Route path="/cars/:make" element={<PopularCars />} />
+                      <Route path="/auctions" element={<Auctions />} />
+                      <Route path="/auction/:id" element={<AuctionDetail />} />
+                      <Route
+                        path="/auctions/create"
+                        element={
+                          <ProtectedRoute>
+                            <CreateAuction />
+                          </ProtectedRoute>
+                        }
+                      />
                       <Route
                         path="/inbox"
                         element={

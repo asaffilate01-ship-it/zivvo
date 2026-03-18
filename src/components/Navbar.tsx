@@ -44,6 +44,7 @@ const Navbar = () => {
 
   const navLinks = [
     { to: "/browse", label: "Browse" },
+    { to: "/auctions", label: "Auctions" },
     { to: "/sell-my-car", label: "Sell" },
     { to: "/valuation", label: "Valuation" },
     { to: "/reviews", label: "Reviews" },
@@ -70,6 +71,7 @@ const Navbar = () => {
 
   const mobileLinks = [
     { to: "/browse", label: "Browse Cars", icon: Car },
+    { to: "/auctions", label: "Auctions", icon: Car },
     { to: "/sell-my-car", label: "Sell Your Car", icon: Plus },
     { to: "/valuation", label: "Free Valuation", icon: Car },
     { to: "/reviews", label: "Car Reviews", icon: BookOpen },
