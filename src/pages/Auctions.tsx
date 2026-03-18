@@ -14,10 +14,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Gavel, Shield, Clock, Search, Star, TrendingUp, Users, CheckCircle2, Timer } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
+import { countryConfigs, formatPrice } from "@/lib/countryConfig";
 
-const formatCurrency = (amount: number, country: string) => {
-  const c = country === "US" ? "USD" : country === "NG" ? "NGN" : "GBP";
-  return new Intl.NumberFormat(country === "US" ? "en-US" : country === "NG" ? "en-NG" : "en-GB", { style: "currency", currency: c, maximumFractionDigits: 0 }).format(amount);
+const fmtCurrency = (amount: number, country: string) => {
+  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
+  return formatPrice(amount, cfg);
 };
 
 const getTimeLeft = (endsAt: string) => {
