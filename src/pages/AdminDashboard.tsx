@@ -1126,17 +1126,28 @@ const AdminDashboard = () => {
                 <Separator />
                 <div className="flex gap-2 pt-2">
                   {selectedAuction.status === "pending_inspection" && (
-                    <>
-                      {[1,2,3,4,5].map(r => (
-                        <Button key={r} size="sm" variant="outline" onClick={() => { approveAuction(selectedAuction.id, r); setSelectedAuction(null); }}>⭐{r}</Button>
-                      ))}
-                    </>
+                    <Button size="sm" variant="default" className="gap-1" onClick={() => { setInspectingAuction(selectedAuction); setSelectedAuction(null); }}>
+                      <ClipboardCheck className="h-3 w-3" /> Full Inspection
+                    </Button>
                   )}
                   {selectedAuction.status !== "cancelled" && (
                     <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Cancel</Button>
                   )}
                 </div>
               </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Full Inspection Panel Dialog */}
+        <Dialog open={!!inspectingAuction} onOpenChange={() => setInspectingAuction(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle className="font-display flex items-center gap-2"><ClipboardCheck className="h-5 w-5" /> Vehicle Inspection</DialogTitle>
+              <DialogDescription>Complete the full inspection report before approving this auction</DialogDescription>
+            </DialogHeader>
+            {inspectingAuction && (
+              <AdminInspectionPanel auction={inspectingAuction} onComplete={() => { setInspectingAuction(null); fetchAll(); }} />
             )}
           </DialogContent>
         </Dialog>
