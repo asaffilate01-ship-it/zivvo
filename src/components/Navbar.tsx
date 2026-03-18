@@ -44,6 +44,7 @@ const Navbar = () => {
 
   const navLinks = [
     { to: "/browse", label: "Browse" },
+    { to: "/auctions", label: "Auctions" },
     { to: "/sell-my-car", label: "Sell" },
     { to: "/valuation", label: "Valuation" },
     { to: "/reviews", label: "Reviews" },
