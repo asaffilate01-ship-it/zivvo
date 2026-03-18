@@ -586,11 +586,12 @@ const AdminDashboard = () => {
                             <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: £{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
                           </div>
                           <div className="flex gap-2">
-                            {[1,2,3,4,5].map(r => (
-                              <Button key={r} size="sm" variant="outline" onClick={() => approveAuction(a.id, r)} title={`Approve with ${r}/5 rating`}>
-                                ⭐{r}
-                              </Button>
-                            ))}
+                            <Button size="sm" variant="default" className="gap-1" onClick={() => setInspectingAuction(a)}>
+                              <ClipboardCheck className="h-3 w-3" /> Full Inspection
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => approveAuction(a.id, 3)} title="Quick approve with 3/5">
+                              ⭐ Quick 3/5
+                            </Button>
                             <Button size="sm" variant="outline" className="text-destructive" onClick={() => rejectAuction(a.id)}>
                               <XCircle className="mr-1 h-3 w-3" /> Reject
                             </Button>
