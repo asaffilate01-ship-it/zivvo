@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.reverse-geocode]
 verify_jwt = false
+
+[functions.maps-key]
+verify_jwt = false
