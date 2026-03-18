@@ -99,7 +99,7 @@ const DealerPricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Dealer Plans & Pricing" description={`Choose a dealer plan to scale your car dealership on AutoSouq. Starting from ${formatPrice(plans[0].price, config)}/month.`} />
+      <SEOHead title="Dealer Plans & Pricing" description={`Choose a dealer plan to scale your dealership on AutoSouq. Starting from ${formatPrice(plans[0].price, config)}/month.`} />
       <Navbar />
 
       <section className="container mx-auto px-4 py-16">
@@ -109,8 +109,8 @@ const DealerPricing = () => {
             Scale Your Dealership
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
-            Choose a plan that fits your business. All plans include marketplace access, 
-            verified dealer badge, and a dedicated dashboard.
+            Individual sellers: list for just {formatPrice(config.individualPlan.price, config)} per car ({config.individualPlan.durationDays / 30}-month listing).
+            Dealers: choose a plan below starting from {formatPrice(plans[0].price, config)}/month.
           </p>
           {subscription.subscribed && (
             <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-success bg-success/10 px-4 py-2 text-sm text-success">
