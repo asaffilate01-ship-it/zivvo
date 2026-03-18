@@ -16,7 +16,7 @@ const blogPosts: Record<string, {
     excerpt: "Don't get caught out. Our comprehensive checklist covers everything.",
     category: "Buying Guide",
     image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=1200&q=80",
-    author: "AutoVault Team", date: "2026-03-10", readTime: "8 min read",
+    author: "AutoSouq Team", date: "2026-03-10", readTime: "8 min read",
     content: [
       "Buying a used car can be one of the smartest financial decisions you make — but only if you do it right. Every year, thousands of buyers end up with vehicles that have hidden problems, outstanding finance, or a questionable history.",
       "Our comprehensive checklist breaks down every step of the used car buying process, from your initial online search to the final handshake. We've compiled this from data across thousands of successful and unsuccessful transactions on AutoVault.",
