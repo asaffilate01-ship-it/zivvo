@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog } from "lucide-react";
+import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
