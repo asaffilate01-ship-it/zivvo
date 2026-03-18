@@ -57,7 +57,7 @@ const blogPosts = [
     excerpt: "Safety ratings, boot space, and running costs — we rank the best SUVs for families based on real owner data and expert reviews.",
     category: "Reviews",
     image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80",
-    author: "AutoVault Team",
+    author: "AutoSouq Team",
     date: "2026-02-15",
     readTime: "7 min read",
   },
