@@ -61,7 +61,7 @@ const AdminDashboard = () => {
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
-    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes] = await Promise.all([
+    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes, auctionsRes, escrowsRes, auditRes] = await Promise.all([
       supabase.from("dealers").select("*").order("created_at", { ascending: false }),
       supabase.from("car_listings").select("*").order("created_at", { ascending: false }).limit(200),
       supabase.from("agent_commissions").select("*").order("created_at", { ascending: false }),
@@ -70,6 +70,9 @@ const AdminDashboard = () => {
       supabase.from("listing_reports").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("contact_messages").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("bug_reports").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("auctions").select("*, car_listings!inner(title, make, model, year, registration)").order("created_at", { ascending: false }),
+      supabase.from("auction_escrow").select("*").order("created_at", { ascending: false }),
+      supabase.from("auction_audit_log").select("*").order("created_at", { ascending: false }).limit(200),
     ]);
     if (dealersRes.data) setDealers(dealersRes.data);
     if (listingsRes.data) setListings(listingsRes.data);
@@ -79,6 +82,9 @@ const AdminDashboard = () => {
     if (reportsRes.data) setListingReports(reportsRes.data);
     if (contactsRes.data) setContactMessages(contactsRes.data);
     if (bugsRes.data) setBugReports(bugsRes.data);
+    if (auctionsRes.data) setAuctions(auctionsRes.data);
+    if (escrowsRes.data) setAuctionEscrows(escrowsRes.data);
+    if (auditRes.data) setAuctionAuditLog(auditRes.data);
     setLoading(false);
   };
 
