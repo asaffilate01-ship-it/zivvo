@@ -375,6 +375,9 @@ export type Database = {
           authorized_at: string | null
           captured_at: string | null
           created_at: string
+          finance_amount: number | null
+          finance_provider: string | null
+          finance_reference: string | null
           id: string
           released_at: string | null
           status: string
@@ -388,6 +391,9 @@ export type Database = {
           authorized_at?: string | null
           captured_at?: string | null
           created_at?: string
+          finance_amount?: number | null
+          finance_provider?: string | null
+          finance_reference?: string | null
           id?: string
           released_at?: string | null
           status?: string
@@ -401,6 +407,9 @@ export type Database = {
           authorized_at?: string | null
           captured_at?: string | null
           created_at?: string
+          finance_amount?: number | null
+          finance_provider?: string | null
+          finance_reference?: string | null
           id?: string
           released_at?: string | null
           status?: string
@@ -427,6 +436,7 @@ export type Database = {
           created_at: string
           id: string
           keys_handed_over: boolean | null
+          payment_deadline: string | null
           platform_revenue: number
           released_at: string | null
           seller_fee: number
@@ -444,6 +454,7 @@ export type Database = {
           created_at?: string
           id?: string
           keys_handed_over?: boolean | null
+          payment_deadline?: string | null
           platform_revenue?: number
           released_at?: string | null
           seller_fee?: number
@@ -461,6 +472,7 @@ export type Database = {
           created_at?: string
           id?: string
           keys_handed_over?: boolean | null
+          payment_deadline?: string | null
           platform_revenue?: number
           released_at?: string | null
           seller_fee?: number

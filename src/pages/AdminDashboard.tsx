@@ -13,7 +13,7 @@ import {
   Users, Building2, Car, DollarSign, ShieldCheck, XCircle,
   CheckCircle, Search, TrendingUp, BarChart3, Download, Calendar,
   Eye, Loader2, UserPlus, Ban, MoreHorizontal, Flag, Mail, Bug,
-  Gavel, Shield, FileText, Package, Clock,
+  Gavel, Shield, FileText, Package, Clock, ClipboardCheck,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import DashboardChart from "@/components/DashboardChart";
 import SalesPipeline from "@/components/SalesPipeline";
+import AdminInspectionPanel from "@/components/AdminInspectionPanel";
 
 
 
@@ -57,6 +58,7 @@ const AdminDashboard = () => {
   const [selectedDealer, setSelectedDealer] = useState<any>(null);
   const [selectedAuction, setSelectedAuction] = useState<any>(null);
   const [roleDialog, setRoleDialog] = useState<{ userId: string; currentRoles: string[] } | null>(null);
+  const [inspectingAuction, setInspectingAuction] = useState<any>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -584,11 +586,12 @@ const AdminDashboard = () => {
                             <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: £{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
                           </div>
                           <div className="flex gap-2">
-                            {[1,2,3,4,5].map(r => (
-                              <Button key={r} size="sm" variant="outline" onClick={() => approveAuction(a.id, r)} title={`Approve with ${r}/5 rating`}>
-                                ⭐{r}
-                              </Button>
-                            ))}
+                            <Button size="sm" variant="default" className="gap-1" onClick={() => setInspectingAuction(a)}>
+                              <ClipboardCheck className="h-3 w-3" /> Full Inspection
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => approveAuction(a.id, 3)} title="Quick approve with 3/5">
+                              ⭐ Quick 3/5
+                            </Button>
                             <Button size="sm" variant="outline" className="text-destructive" onClick={() => rejectAuction(a.id)}>
                               <XCircle className="mr-1 h-3 w-3" /> Reject
                             </Button>
@@ -1123,17 +1126,28 @@ const AdminDashboard = () => {
                 <Separator />
                 <div className="flex gap-2 pt-2">
                   {selectedAuction.status === "pending_inspection" && (
-                    <>
-                      {[1,2,3,4,5].map(r => (
-                        <Button key={r} size="sm" variant="outline" onClick={() => { approveAuction(selectedAuction.id, r); setSelectedAuction(null); }}>⭐{r}</Button>
-                      ))}
-                    </>
+                    <Button size="sm" variant="default" className="gap-1" onClick={() => { setInspectingAuction(selectedAuction); setSelectedAuction(null); }}>
+                      <ClipboardCheck className="h-3 w-3" /> Full Inspection
+                    </Button>
                   )}
                   {selectedAuction.status !== "cancelled" && (
                     <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Cancel</Button>
                   )}
                 </div>
               </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Full Inspection Panel Dialog */}
+        <Dialog open={!!inspectingAuction} onOpenChange={() => setInspectingAuction(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle className="font-display flex items-center gap-2"><ClipboardCheck className="h-5 w-5" /> Vehicle Inspection</DialogTitle>
+              <DialogDescription>Complete the full inspection report before approving this auction</DialogDescription>
+            </DialogHeader>
+            {inspectingAuction && (
+              <AdminInspectionPanel auction={inspectingAuction} onComplete={() => { setInspectingAuction(null); fetchAll(); }} />
             )}
           </DialogContent>
         </Dialog>

@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.notify-auction]
 verify_jwt = false
+
+[functions.winner-payment]
+verify_jwt = false

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,6 +7,8 @@ import { useCountry } from "@/contexts/CountryContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import StripeDepositForm from "@/components/StripeDepositForm";
+import FinancePreApprovalForm from "@/components/FinancePreApprovalForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +24,7 @@ import { toast } from "sonner";
 import {
   Gavel, Shield, Star, Clock, CheckCircle2, AlertTriangle, Key, FileText, Truck,
   ChevronLeft, ChevronRight, Eye, Users, TrendingUp, History, Car, Wrench, Paintbrush,
-  Heart, HeartOff, Zap, CreditCard, Package, Send,
+  Heart, HeartOff, Zap, CreditCard, Package, Send, Banknote, Loader2, Timer,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
@@ -34,6 +36,7 @@ const formatCurrency = (amount: number, country: string) => {
 
 const AuctionDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { country } = useCountry();
   const queryClient = useQueryClient();
@@ -44,8 +47,18 @@ const AuctionDetail = () => {
   const [timeLeft, setTimeLeft] = useState("");
   const [showBidConfirm, setShowBidConfirm] = useState(false);
   const [showContract, setShowContract] = useState(false);
-  const [showDepositDialog, setShowDepositDialog] = useState(false);
+  const [showDepositForm, setShowDepositForm] = useState(false);
+  const [showFinanceForm, setShowFinanceForm] = useState(false);
   const [showDeliveryRequest, setShowDeliveryRequest] = useState(false);
+  const [payingWinner, setPayingWinner] = useState(false);
+
+  // Handle payment success redirect
+  useEffect(() => {
+    if (searchParams.get("payment") === "success") {
+      toast.success("Payment successful! Your purchase is being processed.");
+      queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
+    }
+  }, [searchParams]);
 
   const { data: auction, isLoading } = useQuery({
     queryKey: ["auction", id],
@@ -255,28 +268,26 @@ const AuctionDetail = () => {
 
   const requestDeposit = useMutation({
     mutationFn: async () => {
+      // Now handled by StripeDepositForm component
+      setShowDepositForm(true);
+    },
+  });
+
+  const payWinnerBalance = useMutation({
+    mutationFn: async () => {
       if (!user || !auction) throw new Error("Login required");
-      const { data, error } = await supabase.functions.invoke("deposit-checkout", {
-        body: { auction_id: auction.id, amount: 500 },
+      const { data, error } = await supabase.functions.invoke("winner-payment", {
+        body: { auction_id: auction.id },
       });
       if (error) throw error;
-      if (data?.already_authorized) {
-        toast.success("Deposit already authorized!");
-        queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+      if (data?.fully_paid) {
+        toast.success("Payment complete! Deposit covered the full amount.");
+        queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
         return;
       }
-      // For now, simulate confirming the deposit (in production, use Stripe Elements)
-      if (data?.deposit_id) {
-        const { error: confirmErr } = await supabase.functions.invoke("confirm-deposit", {
-          body: { deposit_id: data.deposit_id, payment_intent_id: data.payment_intent_id },
-        });
-        if (confirmErr) throw confirmErr;
-        queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+      if (data?.url) {
+        window.open(data.url, "_blank");
       }
-    },
-    onSuccess: () => {
-      toast.success("Deposit pre-authorized! You can now bid.");
-      setShowDepositDialog(false);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -519,26 +530,61 @@ const AuctionDetail = () => {
 
                   {isLive && !isSeller && user && (
                     <>
-                      {/* Deposit required banner */}
-                      {!hasDeposit && (
+                      {/* Deposit / Finance verification */}
+                      {!hasDeposit && !showDepositForm && !showFinanceForm && (
                         <div className="mb-3 p-3 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
                           <div className="flex items-start gap-2">
                             <CreditCard className="w-4 h-4 text-amber-600 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Deposit Required</p>
-                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Pre-authorize £500 to start bidding. This is held, not charged.</p>
-                              <Button size="sm" className="mt-2 gap-1" onClick={() => requestDeposit.mutate()} disabled={requestDeposit.isPending}>
-                                <CreditCard className="w-3 h-3" /> {requestDeposit.isPending ? "Processing..." : "Pre-authorize £500"}
-                              </Button>
+                              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Verification Required</p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Choose one option to start bidding:</p>
+                              <div className="flex gap-2 mt-2">
+                                <Button size="sm" className="gap-1 flex-1" onClick={() => setShowDepositForm(true)}>
+                                  <CreditCard className="w-3 h-3" /> Card Deposit
+                                </Button>
+                                <Button size="sm" variant="outline" className="gap-1 flex-1" onClick={() => setShowFinanceForm(true)}>
+                                  <Banknote className="w-3 h-3" /> Finance
+                                </Button>
+                              </div>
                             </div>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Stripe Elements deposit form */}
+                      {showDepositForm && !hasDeposit && (
+                        <div className="mb-3">
+                          <StripeDepositForm
+                            auctionId={auction.id}
+                            onSuccess={() => {
+                              setShowDepositForm(false);
+                              queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+                            }}
+                            onCancel={() => setShowDepositForm(false)}
+                          />
+                        </div>
+                      )}
+
+                      {/* Finance pre-approval form */}
+                      {showFinanceForm && !hasDeposit && (
+                        <div className="mb-3">
+                          <FinancePreApprovalForm
+                            auctionId={auction.id}
+                            onApproved={() => {
+                              setShowFinanceForm(false);
+                              queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+                            }}
+                          />
+                          <Button variant="ghost" size="sm" className="w-full mt-1" onClick={() => setShowFinanceForm(false)}>Cancel</Button>
                         </div>
                       )}
 
                       {hasDeposit && (
                         <div className="mb-3 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">Deposit pre-authorized — Ready to bid</span>
+                          <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+                            {deposit?.type === "finance_preapproval" ? "Finance pre-approved" : "Deposit pre-authorized"} — Ready to bid
+                          </span>
                         </div>
                       )}
 
@@ -624,6 +670,36 @@ const AuctionDetail = () => {
                   ))}
                 </CardContent>
               </Card>
+
+              {/* Post-Sale: Winner Payment Button */}
+              {(isSold || auction.status === "ended") && isWinner && escrow && escrow.status === "pending_deposit" && (
+                <Card className="border-amber-200 dark:border-amber-800">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-amber-600" /> Payment Required</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="text-sm space-y-1">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Total Due</span><span className="font-bold">{formatCurrency(Number(escrow.total_amount), country)}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Deposit Held</span><span>{deposit ? formatCurrency(Number(deposit.amount), country) : "—"}</span></div>
+                      <Separator />
+                      <div className="flex justify-between font-bold"><span>Remaining Balance</span><span className="text-primary">{formatCurrency(Number(escrow.total_amount) - (deposit ? Number(deposit.amount) : 0), country)}</span></div>
+                    </div>
+                    {(escrow as any).payment_deadline && (
+                      <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                        <Timer className="w-4 h-4 text-amber-600" />
+                        <div>
+                          <p className="text-xs font-medium text-amber-800 dark:text-amber-200">Payment Deadline</p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">{new Date((escrow as any).payment_deadline).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    )}
+                    <Button className="w-full gap-2" onClick={() => payWinnerBalance.mutate()} disabled={payWinnerBalance.isPending}>
+                      {payWinnerBalance.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                      {payWinnerBalance.isPending ? "Processing..." : "Pay Remaining Balance"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Post-Sale: Contract section for winner/seller */}
               {(isSold || auction.status === "ended") && (isWinner || isSeller) && contract && (
