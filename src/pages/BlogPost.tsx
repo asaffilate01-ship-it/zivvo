@@ -150,7 +150,34 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={`${post.title} — AutoSouq Blog`} description={post.excerpt} />
+      <SEOHead
+        title={`${post.title} — AutoSouq Blog`}
+        description={post.excerpt}
+        type="article"
+        image={post.image}
+        imageAlt={post.title}
+        publishedTime={post.date}
+        author={post.author}
+        keywords={`${post.category}, used cars, AutoSouq, ${post.title.split(" ").slice(0, 3).join(", ")}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": post.title,
+          "description": post.excerpt,
+          "image": post.image,
+          "datePublished": post.date,
+          "author": { "@type": "Organization", "name": post.author },
+          "publisher": {
+            "@type": "Organization",
+            "name": "AutoSouq",
+            "logo": { "@type": "ImageObject", "url": "https://autosouq.app/icon-512.png" }
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `https://autosouq.app/blog/${id}`
+          }
+        }}
+      />
       
       {/* Reading progress bar */}
       <div className="fixed top-0 left-0 z-50 h-1 bg-primary/20 w-full">
