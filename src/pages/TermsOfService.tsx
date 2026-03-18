@@ -13,7 +13,7 @@ const TermsOfService = () => (
       <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
         <section>
           <h2 className="font-display text-lg font-semibold text-foreground">1. Acceptance of Terms</h2>
-          <p className="mt-2">By accessing or using AutoVault, you agree to be bound by these Terms of Service. If you do not agree, you may not use our platform.</p>
+          <p className="mt-2">By accessing or using AutoSouq, you agree to be bound by these Terms of Service. If you do not agree, you may not use our platform.</p>
         </section>
 
         <section>
