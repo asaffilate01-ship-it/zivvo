@@ -235,6 +235,9 @@ const Auctions = () => {
           </Tabs>
         </div>
 
+        {/* Live Events */}
+        <LiveEventBanner />
+
         {/* Trust Strip */}
         <section className="border-t border-border bg-muted/30 py-12">
           <div className="container mx-auto px-4">

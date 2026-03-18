@@ -263,6 +263,11 @@ const Profile = () => {
             ))}
           </TabsContent>
 
+          <TabsContent value="auctions" className="mt-4 space-y-6">
+            <MyAuctions />
+            <AuctionAnalytics />
+          </TabsContent>
+
           <TabsContent value="referrals" className="mt-4">
             <ReferralPanel />
           </TabsContent>
