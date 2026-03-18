@@ -129,8 +129,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 75, priceId: "price_ae_individual", label: "per listing" },
     dealerPlans: [
       { name: "Starter", price: 199, priceId: "price_ae_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
-      { name: "Professional", price: 399, priceId: "price_ae_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Vehicle history integration"] },
-      { name: "Enterprise", price: 799, priceId: "price_ae_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-emirate support"] },
+      { name: "Professional", price: 399, priceId: "price_ae_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Vehicle history integration", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Enterprise", price: 799, priceId: "price_ae_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-emirate support", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "Plate Number", mileage: "Kilometre Reading", postcode: "P.O. Box", petrol: "Petrol" },
   },
