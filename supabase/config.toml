@@ -35,3 +35,9 @@ verify_jwt = false
 
 [functions.winner-payment]
 verify_jwt = false
+
+[functions.arbitrage-payment]
+verify_jwt = false
+
+[functions.notify-arbitrage]
+verify_jwt = false

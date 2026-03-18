@@ -20,9 +20,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import SellerOffers from "@/components/SellerOffers";
 import {
   ArrowRightLeft, TrendingUp, Shield, Clock, CheckCircle2, XCircle,
-  DollarSign, Truck, FileText, Search, Plus, Eye, Building2,
+  DollarSign, Truck, FileText, Search, Plus, Eye, Building2, CreditCard,
+  Loader2 as Spinner, Banknote, Receipt,
 } from "lucide-react";
 
 const fmt = (amount: number, country: string) => {
@@ -48,9 +50,13 @@ const TradeStock = () => {
   const { country } = useCountry();
   const queryClient = useQueryClient();
   const isAdmin = hasRole("admin");
-  const [tab, setTab] = useState(isAdmin ? "all" : "available");
+  const isSeller = hasRole("seller");
+  const [tab, setTab] = useState(isAdmin ? "all" : isSeller ? "my_offers" : "available");
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [payingDealId, setPayingDealId] = useState<string | null>(null);
+  const [payoutDialog, setPayoutDialog] = useState<any>(null);
+  const [payoutRef, setPayoutRef] = useState("");
 
   // Create deal form state
   const [selectedListing, setSelectedListing] = useState("");
@@ -175,7 +181,6 @@ const TradeStock = () => {
   // Dealer accept deal
   const acceptDeal = useMutation({
     mutationFn: async (dealId: string) => {
-      // Get dealer record
       const { data: dealer } = await supabase
         .from("dealers")
         .select("id")
@@ -200,9 +205,70 @@ const TradeStock = () => {
         action: "dealer_accepted",
         details: { dealer_id: dealer.id },
       });
+
+      // Trigger notification
+      await supabase.functions.invoke("notify-arbitrage", {
+        body: { deal_id: dealId, action: "dealer_accepted" },
+      });
     },
     onSuccess: () => {
-      toast.success("Deal accepted! We'll arrange the transfer.");
+      toast.success("Deal accepted! Proceed to payment.");
+      queryClient.invalidateQueries({ queryKey: ["arbitrage-deals"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  // Dealer payment
+  const payForDeal = useMutation({
+    mutationFn: async (dealId: string) => {
+      setPayingDealId(dealId);
+      const { data, error } = await supabase.functions.invoke("arbitrage-payment", {
+        body: { deal_id: dealId },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      } else {
+        throw new Error("Failed to create payment session");
+      }
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      setPayingDealId(null);
+    },
+    onSettled: () => setPayingDealId(null),
+  });
+
+  // Admin: mark seller paid with ref
+  const markSellerPaid = useMutation({
+    mutationFn: async ({ dealId, ref }: { dealId: string; ref: string }) => {
+      const { error } = await supabase
+        .from("arbitrage_deals")
+        .update({
+          status: "seller_paid" as any,
+          seller_paid_at: new Date().toISOString(),
+          seller_payment_ref: ref,
+        })
+        .eq("id", dealId);
+      if (error) throw error;
+
+      await supabase.from("arbitrage_audit_log").insert({
+        deal_id: dealId,
+        actor_id: user!.id,
+        actor_role: "admin",
+        action: "seller_paid",
+        details: { payment_ref: ref },
+      });
+
+      // Notify seller
+      await supabase.functions.invoke("notify-arbitrage", {
+        body: { deal_id: dealId, action: "seller_paid" },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Seller marked as paid!");
+      setPayoutDialog(null);
+      setPayoutRef("");
       queryClient.invalidateQueries({ queryKey: ["arbitrage-deals"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -306,14 +372,20 @@ const TradeStock = () => {
           </div>
 
           <Tabs value={tab} onValueChange={setTab}>
-            <TabsList>
+            <TabsList className="flex-wrap">
               <TabsTrigger value="available" className="gap-1"><Building2 className="w-4 h-4" /> Available Stock</TabsTrigger>
+              <TabsTrigger value="my_offers" className="gap-1"><Receipt className="w-4 h-4" /> My Offers</TabsTrigger>
               <TabsTrigger value="my_deals" className="gap-1"><CheckCircle2 className="w-4 h-4" /> My Deals</TabsTrigger>
               {isAdmin && <TabsTrigger value="all" className="gap-1"><Eye className="w-4 h-4" /> All Deals</TabsTrigger>}
               {isAdmin && <TabsTrigger value="audit" className="gap-1"><FileText className="w-4 h-4" /> Audit Log</TabsTrigger>}
             </TabsList>
 
-            <TabsContent value={tab} className="mt-6">
+            {/* Seller offers tab */}
+            <TabsContent value="my_offers" className="mt-6">
+              <SellerOffers />
+            </TabsContent>
+
+            <TabsContent value={tab === "my_offers" ? "__skip__" : tab} className={tab === "my_offers" ? "hidden" : "mt-6"}>
               {tab === "audit" ? (
                 <Card>
                   <CardContent className="p-4">
@@ -386,9 +458,17 @@ const TradeStock = () => {
                           )}
 
                           {/* Dealer actions */}
-                          {showDealerActions && (
+                          {showDealerActions && deal.status === "listed_to_dealers" && (
                             <Button className="w-full gap-2" onClick={() => acceptDeal.mutate(deal.id)} disabled={acceptDeal.isPending}>
                               <CheckCircle2 className="w-4 h-4" /> {acceptDeal.isPending ? "Accepting..." : "Accept & Purchase"}
+                            </Button>
+                          )}
+
+                          {/* Dealer: pay for accepted deal */}
+                          {!isAdmin && deal.status === "dealer_accepted" && (
+                            <Button className="w-full gap-2" onClick={() => payForDeal.mutate(deal.id)} disabled={payingDealId === deal.id}>
+                              {payingDealId === deal.id ? <Spinner className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+                              {payingDealId === deal.id ? "Opening Payment..." : `Pay ${fmt(deal.dealer_price, deal.country)}`}
                             </Button>
                           )}
 
@@ -396,24 +476,36 @@ const TradeStock = () => {
                           {showAdminActions && (
                             <div className="flex flex-wrap gap-2">
                               {deal.status === "sourced" && (
-                                <Button size="sm" variant="outline" onClick={() => updateStatus.mutate({ dealId: deal.id, newStatus: "offer_sent", extra: { seller_offer_sent_at: new Date().toISOString() } })}>
+                                <Button size="sm" variant="outline" onClick={async () => {
+                                  await updateStatus.mutateAsync({ dealId: deal.id, newStatus: "offer_sent", extra: { seller_offer_sent_at: new Date().toISOString() } });
+                                  await supabase.functions.invoke("notify-arbitrage", { body: { deal_id: deal.id, action: "offer_sent" } });
+                                }}>
                                   Send to Seller
                                 </Button>
                               )}
                               {deal.status === "seller_accepted" && (
-                                <Button size="sm" onClick={() => updateStatus.mutate({ dealId: deal.id, newStatus: "listed_to_dealers", extra: { dealer_offer_sent_at: new Date().toISOString() } })}>
+                                <Button size="sm" onClick={async () => {
+                                  await updateStatus.mutateAsync({ dealId: deal.id, newStatus: "listed_to_dealers", extra: { dealer_offer_sent_at: new Date().toISOString() } });
+                                  await supabase.functions.invoke("notify-arbitrage", { body: { deal_id: deal.id, action: "listed_to_dealers" } });
+                                }}>
                                   List to Dealers
                                 </Button>
                               )}
                               {deal.status === "dealer_accepted" && (
-                                <Button size="sm" onClick={() => updateStatus.mutate({ dealId: deal.id, newStatus: "seller_paid", extra: { seller_paid_at: new Date().toISOString() } })}>
-                                  Mark Seller Paid
+                                <Button size="sm" className="gap-1" onClick={() => setPayoutDialog(deal)}>
+                                  <Banknote className="w-3.5 h-3.5" /> Pay Seller
                                 </Button>
                               )}
                               {deal.status === "seller_paid" && (
-                                <Button size="sm" variant="default" onClick={() => updateStatus.mutate({ dealId: deal.id, newStatus: "completed" })}>
+                                <Button size="sm" variant="default" onClick={async () => {
+                                  await updateStatus.mutateAsync({ dealId: deal.id, newStatus: "completed" });
+                                  await supabase.functions.invoke("notify-arbitrage", { body: { deal_id: deal.id, action: "completed" } });
+                                }}>
                                   Complete Deal
                                 </Button>
+                              )}
+                              {deal.seller_payment_ref && (
+                                <span className="text-[10px] text-muted-foreground self-center">Ref: {deal.seller_payment_ref}</span>
                               )}
                               {!["completed", "cancelled", "seller_rejected"].includes(deal.status) && (
                                 <Button size="sm" variant="destructive" onClick={() => updateStatus.mutate({ dealId: deal.id, newStatus: "cancelled" })}>
@@ -430,6 +522,44 @@ const TradeStock = () => {
               )}
             </TabsContent>
           </Tabs>
+
+          {/* Seller payout dialog */}
+          <Dialog open={!!payoutDialog} onOpenChange={() => { setPayoutDialog(null); setPayoutRef(""); }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Mark Seller as Paid</DialogTitle>
+                <DialogDescription>
+                  Record the payment reference for {payoutDialog?.car_listings?.title || "this vehicle"}.
+                  Seller receives {payoutDialog ? fmt(payoutDialog.seller_price, payoutDialog.country) : ""}.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3 py-2">
+                <div>
+                  <Label>Payment Reference / Bank Transfer Ref</Label>
+                  <Input
+                    value={payoutRef}
+                    onChange={(e) => setPayoutRef(e.target.value)}
+                    placeholder="e.g. BACS-2026-03-18-001"
+                  />
+                </div>
+                <div className="bg-muted/50 rounded-lg p-3 text-sm space-y-1">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Seller Price</span><span>{payoutDialog ? fmt(payoutDialog.seller_price, payoutDialog.country) : ""}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Platform Revenue</span><span className="text-primary">{payoutDialog ? fmt(payoutDialog.platform_markup, payoutDialog.country) : ""}</span></div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setPayoutDialog(null)}>Cancel</Button>
+                <Button
+                  onClick={() => payoutDialog && markSellerPaid.mutate({ dealId: payoutDialog.id, ref: payoutRef })}
+                  disabled={!payoutRef.trim() || markSellerPaid.isPending}
+                  className="gap-2"
+                >
+                  {markSellerPaid.isPending ? <Spinner className="w-4 h-4 animate-spin" /> : <Banknote className="w-4 h-4" />}
+                  {markSellerPaid.isPending ? "Processing..." : "Confirm Payment Sent"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* How it works */}
           <section className="mt-16 pb-8">
