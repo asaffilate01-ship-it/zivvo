@@ -193,6 +193,14 @@ const App = () => (
                           </ProtectedRoute>
                         }
                       />
+                      <Route
+                        path="/analytics"
+                        element={
+                          <ProtectedRoute requiredRole="admin">
+                            <PlatformAnalytics />
+                          </ProtectedRoute>
+                        }
+                      />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
