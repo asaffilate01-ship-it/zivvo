@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
+import PriceIndicatorBadge from "@/components/PriceIndicatorBadge";
+import DealerPerformanceBadge from "@/components/DealerPerformanceBadge";
 
 interface CarCardProps {
   car: {
