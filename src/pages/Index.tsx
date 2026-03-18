@@ -186,7 +186,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <motion.div {...fadeUp}>
-              <Badge variant="outline" className="mb-4 text-xs">Why AutoVault</Badge>
+              <Badge variant="outline" className="mb-4 text-xs">Why AutoSouq</Badge>
               <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
                 Buy with
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> Complete Confidence</span>

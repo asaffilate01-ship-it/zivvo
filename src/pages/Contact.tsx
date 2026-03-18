@@ -46,7 +46,7 @@ const Contact = () => {
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           {[
-            { icon: Mail, title: "Email", detail: "support@autovault.co", sub: "We respond within 24 hours" },
+            { icon: Mail, title: "Email", detail: "support@autosouq.app", sub: "We respond within 24 hours" },
             { icon: Phone, title: "Phone", detail: "+44 20 7123 4567", sub: "Mon-Fri 9am-6pm GMT" },
             { icon: MapPin, title: "Office", detail: "London, United Kingdom", sub: "By appointment only" },
           ].map((item) => (

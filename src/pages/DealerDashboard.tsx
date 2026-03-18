@@ -62,7 +62,7 @@ const DealerDashboard = () => {
   // Handle checkout success
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
-      toast({ title: "Subscription activated!", description: "Welcome to AutoVault Dealer!" });
+      toast({ title: "Subscription activated!", description: "Welcome to AutoSouq Dealer!" });
       refreshSubscription();
     }
   }, [searchParams]);

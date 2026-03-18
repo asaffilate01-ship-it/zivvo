@@ -109,7 +109,7 @@ const CompareCars = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Compare Cars Side by Side"
-        description="Compare up to 3 vehicles side by side — specs, price, features, and more on AutoVault."
+        description="Compare up to 3 vehicles side by side — specs, price, features, and more on AutoSouq."
       />
       <Navbar />
 

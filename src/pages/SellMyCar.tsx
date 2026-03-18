@@ -153,7 +153,7 @@ const SellMyCar = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Sell My Car — Free Listing" description="Sell your car fast with AutoVault. Free listings, verified buyers, and instant valuation." />
+      <SEOHead title="Sell My Car — Free Listing" description="Sell your car fast with AutoSouq. Free listings, verified buyers, and instant valuation." />
       <Navbar />
 
       <div className="container mx-auto px-4 py-12">

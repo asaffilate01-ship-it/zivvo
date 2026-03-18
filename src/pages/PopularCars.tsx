@@ -103,7 +103,7 @@ const PopularCars = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title={`Used ${makeName} Cars For Sale`}
-        description={`Browse verified used ${makeName} cars on AutoVault. Finance checks, full history, and transparent pricing.`}
+        description={`Browse verified used ${makeName} cars on AutoSouq. Finance checks, full history, and transparent pricing.`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
