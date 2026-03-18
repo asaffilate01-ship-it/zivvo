@@ -19,7 +19,7 @@ const blogPosts: Record<string, {
     author: "AutoSouq Team", date: "2026-03-10", readTime: "8 min read",
     content: [
       "Buying a used car can be one of the smartest financial decisions you make — but only if you do it right. Every year, thousands of buyers end up with vehicles that have hidden problems, outstanding finance, or a questionable history.",
-      "Our comprehensive checklist breaks down every step of the used car buying process, from your initial online search to the final handshake. We've compiled this from data across thousands of successful and unsuccessful transactions on AutoVault.",
+      "Our comprehensive checklist breaks down every step of the used car buying process, from your initial online search to the final handshake. We've compiled this from data across thousands of successful and unsuccessful transactions on AutoSouq.",
       "## Before You View\n\n1. **Set your budget** — include insurance, tax, and running costs\n2. **Research the model** — check common faults on owner forums\n3. **Run an HPI check** — verify no outstanding finance, theft, or write-offs\n4. **Check the MOT history** — look for advisory patterns online",
       "## At the Viewing\n\n1. **Walk around the exterior** — check panel gaps, paint mismatches, rust\n2. **Open all doors, boot, and bonnet** — listen for creaks\n3. **Check tyre condition** — uneven wear suggests alignment issues\n4. **Start the engine cold** — listen for knocks or rattles\n5. **Test all electrics** — windows, mirrors, lights, infotainment",
       "## The Test Drive\n\nDrive for at least 15 minutes on varied roads. Check brakes, steering response, gearbox smoothness, and listen for any unusual noises. Pay attention to how the car feels at motorway speeds.",
