@@ -13,7 +13,24 @@ import {
   Users, Building2, Car, DollarSign, ShieldCheck, XCircle,
   CheckCircle, Search, TrendingUp, BarChart3, Download, Calendar,
   Eye, Loader2, UserPlus, Ban, MoreHorizontal, Flag, Mail, Bug,
+  Gavel, Shield, FileText, Package, Clock,
 } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+import DashboardChart from "@/components/DashboardChart";
+import SalesPipeline from "@/components/SalesPipeline";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
