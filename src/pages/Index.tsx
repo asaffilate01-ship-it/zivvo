@@ -62,6 +62,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
+  const [platformStats, setPlatformStats] = useState({ users: 0, listings: 0, soldValue: 0, avgRating: 0 });
 
   useEffect(() => {
     const fetchData = async () => {
