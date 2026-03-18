@@ -372,8 +372,9 @@ const TradeStock = () => {
           </div>
 
           <Tabs value={tab} onValueChange={setTab}>
-            <TabsList>
+            <TabsList className="flex-wrap">
               <TabsTrigger value="available" className="gap-1"><Building2 className="w-4 h-4" /> Available Stock</TabsTrigger>
+              <TabsTrigger value="my_offers" className="gap-1"><Receipt className="w-4 h-4" /> My Offers</TabsTrigger>
               <TabsTrigger value="my_deals" className="gap-1"><CheckCircle2 className="w-4 h-4" /> My Deals</TabsTrigger>
               {isAdmin && <TabsTrigger value="all" className="gap-1"><Eye className="w-4 h-4" /> All Deals</TabsTrigger>}
               {isAdmin && <TabsTrigger value="audit" className="gap-1"><FileText className="w-4 h-4" /> Audit Log</TabsTrigger>}
