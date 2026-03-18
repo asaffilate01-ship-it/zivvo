@@ -1026,6 +1026,56 @@ export type Database = {
           },
         ]
       }
+      dealer_portal_configs: {
+        Row: {
+          api_key: string | null
+          api_secret: string | null
+          config: Json | null
+          created_at: string
+          dealer_id: string
+          dealer_ref: string | null
+          feed_url: string | null
+          id: string
+          is_enabled: boolean
+          portal: Database["public"]["Enums"]["portal_name"]
+          updated_at: string
+        }
+        Insert: {
+          api_key?: string | null
+          api_secret?: string | null
+          config?: Json | null
+          created_at?: string
+          dealer_id: string
+          dealer_ref?: string | null
+          feed_url?: string | null
+          id?: string
+          is_enabled?: boolean
+          portal: Database["public"]["Enums"]["portal_name"]
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string | null
+          api_secret?: string | null
+          config?: Json | null
+          created_at?: string
+          dealer_id?: string
+          dealer_ref?: string | null
+          feed_url?: string | null
+          id?: string
+          is_enabled?: boolean
+          portal?: Database["public"]["Enums"]["portal_name"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_portal_configs_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dealers: {
         Row: {
           address: string | null
@@ -1975,6 +2025,70 @@ export type Database = {
           },
         ]
       }
+      syndication_log: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          error_message: string | null
+          external_id: string | null
+          external_url: string | null
+          id: string
+          last_synced_at: string | null
+          listing_id: string
+          portal: Database["public"]["Enums"]["portal_name"]
+          status: Database["public"]["Enums"]["syndication_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          error_message?: string | null
+          external_id?: string | null
+          external_url?: string | null
+          id?: string
+          last_synced_at?: string | null
+          listing_id: string
+          portal: Database["public"]["Enums"]["portal_name"]
+          status?: Database["public"]["Enums"]["syndication_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          error_message?: string | null
+          external_id?: string | null
+          external_url?: string | null
+          id?: string
+          last_synced_at?: string | null
+          listing_id?: string
+          portal?: Database["public"]["Enums"]["portal_name"]
+          status?: Database["public"]["Enums"]["syndication_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "syndication_log_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "syndication_log_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "syndication_log_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -2347,12 +2461,25 @@ export type Database = {
         | "negotiation"
         | "sold"
         | "lost"
+      portal_name:
+        | "autotrader"
+        | "ebay_motors"
+        | "pistonheads"
+        | "gumtree"
+        | "cazoo"
+        | "motors_co_uk"
       subscription_status:
         | "active"
         | "past_due"
         | "canceled"
         | "trialing"
         | "incomplete"
+      syndication_status:
+        | "pending"
+        | "synced"
+        | "failed"
+        | "removed"
+        | "updating"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2531,12 +2658,27 @@ export const Constants = {
         "sold",
         "lost",
       ],
+      portal_name: [
+        "autotrader",
+        "ebay_motors",
+        "pistonheads",
+        "gumtree",
+        "cazoo",
+        "motors_co_uk",
+      ],
       subscription_status: [
         "active",
         "past_due",
         "canceled",
         "trialing",
         "incomplete",
+      ],
+      syndication_status: [
+        "pending",
+        "synced",
+        "failed",
+        "removed",
+        "updating",
       ],
     },
   },

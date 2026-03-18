@@ -21,6 +21,8 @@ import DashboardChart from "@/components/DashboardChart";
 import DealerPageBuilder from "@/components/DealerPageBuilder";
 import SellerAnalytics from "@/components/SellerAnalytics";
 import SalesPipeline from "@/components/SalesPipeline";
+import PortalSyndication from "@/components/PortalSyndication";
+import ListingSyndicationStatus from "@/components/ListingSyndicationStatus";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -326,6 +328,11 @@ const DealerDashboard = () => {
           <SalesPipeline mode="dealer" dealerId={dealer.id} />
         </div>
 
+        {/* Portal Syndication */}
+        <div className="mt-8">
+          <PortalSyndication dealerId={dealer.id} />
+        </div>
+
         {/* Analytics Section */}
         <div className="mt-8">
           <h2 className="font-display text-lg font-bold text-foreground mb-4">Analytics & Insights</h2>
@@ -390,8 +397,9 @@ const DealerDashboard = () => {
                         <Link to={`/car/${listing.id}`} className="font-medium text-card-foreground hover:text-primary">{listing.title}</Link>
                         <p className="text-sm text-muted-foreground">{listing.views_count || 0} views · {listing.enquiries_count || 0} enquiries</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
+                      {listing.status === "active" && dealer && (
+                        <ListingSyndicationStatus listingId={listing.id} dealerId={dealer.id} />
+                      )}
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
                       <span className="font-display font-semibold text-card-foreground">{formatPrice(Number(listing.price), config)}</span>
                       {listing.status === "active" && (
