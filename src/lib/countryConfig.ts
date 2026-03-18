@@ -52,8 +52,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 20, priceId: "price_1TCLoVFFogsDQVs4s6IkvnYI", label: "per listing" },
     dealerPlans: [
       { name: "Small", price: 49, priceId: "price_1TCLoWFFogsDQVs4gyc8snRs", maxListings: 5, features: ["Up to 5 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard placement", "Verified dealer badge"] },
-      { name: "Medium", price: 99, priceId: "price_1TCLoYFFogsDQVs451H4MgtU", maxListings: 15, features: ["Up to 15 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured placements", "Priority support", "Finance check integration", "Performance score badge", "Call tracking & recording"] },
-      { name: "Large", price: 199, priceId: "price_1TCLoZFFogsDQVs4S4PepD0G", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics & market insights", "Multi-location support", "Virtual viewings", "Call tracking & recording", "Priority featured placements"] },
+      { name: "Medium", price: 99, priceId: "price_1TCLoYFFogsDQVs451H4MgtU", maxListings: 15, features: ["Up to 15 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured placements", "Priority support", "Finance check integration", "Performance score badge", "Call tracking & recording", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Large", price: 199, priceId: "price_1TCLoZFFogsDQVs4S4PepD0G", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics & market insights", "Multi-location support", "Virtual viewings", "Call tracking & recording", "Priority featured placements", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "Registration", mileage: "Mileage", postcode: "Postcode", petrol: "Petrol" },
   },
