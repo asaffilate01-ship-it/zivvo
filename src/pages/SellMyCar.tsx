@@ -160,7 +160,7 @@ const SellMyCar = () => {
         <div className="mx-auto max-w-3xl">
           {/* Hero */}
           <div className="text-center mb-10">
-            <Badge variant="outline" className="mb-3 text-xs">{formatPrice(config.individualPlan.price, config)} for {config.individualPlan.durationDays / 30} months</Badge>
+            <Badge variant="outline" className="mb-3 text-xs">{formatPrice(config.individualPlan.price, config)} {config.individualPlan.label}</Badge>
             <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
               Sell Your Car
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> The Easy Way</span>
