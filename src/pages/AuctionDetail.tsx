@@ -711,7 +711,7 @@ const AuctionDetail = () => {
                     <Separator />
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Escrow Status</span>
+                      <span className="text-sm font-medium">Protection Status</span>
                       <Badge variant="outline" className="capitalize">{(escrow.status as string).replace(/_/g, " ")}</Badge>
                     </div>
 
