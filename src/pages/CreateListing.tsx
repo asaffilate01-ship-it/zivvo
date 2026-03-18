@@ -216,6 +216,20 @@ const CreateListing = () => {
         }
       }
 
+      // Upload video file if provided
+      let videoUrl = form.video_url || null;
+      if (videoFile) {
+        const ext = videoFile.name.split(".").pop();
+        const videoPath = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error: videoErr } = await supabase.storage
+          .from("car-videos")
+          .upload(videoPath, videoFile);
+        if (!videoErr) {
+          const { data: vUrlData } = supabase.storage.from("car-videos").getPublicUrl(videoPath);
+          videoUrl = vUrlData.publicUrl;
+        }
+      }
+
       const allImages = [...existingImages, ...uploadedUrls];
       const title = form.title || `${form.year} ${form.make} ${form.model}`;
 
