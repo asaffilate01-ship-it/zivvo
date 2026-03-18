@@ -220,14 +220,19 @@ const TradeStock = () => {
       <Navbar />
       <main className="min-h-screen bg-background">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-foreground to-foreground/90 text-primary-foreground py-12">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-3 mb-3">
-              <ArrowRightLeft className="w-6 h-6 text-primary" />
-              <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">Trade Stock</Badge>
+        <section className="gradient-dark text-white py-16 md:py-20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.15),transparent_60%)]" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
+                <ArrowRightLeft className="w-5 h-5 text-primary" />
+              </div>
+              <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/30">Trade Stock</Badge>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold font-display mb-2">Wholesale Vehicle Arbitrage</h1>
-            <p className="text-primary-foreground/70 max-w-2xl">
+            <h1 className="text-3xl md:text-5xl font-bold font-display mb-3 tracking-tight">
+              Wholesale Vehicle<br className="hidden md:block" /> Arbitrage
+            </h1>
+            <p className="text-white/70 max-w-2xl text-base md:text-lg leading-relaxed">
               We source verified vehicles from sellers, inspect them, and offer them to our dealer network at a small markup.
               You get trade-ready stock — we handle the seller, paperwork, and logistics.
             </p>
