@@ -3,7 +3,6 @@ export type CountryCode = "GB" | "US" | "PK" | "AE";
 export interface IndividualPlan {
   price: number;
   priceId: string;
-  durationDays: number;
   label: string;
 }
 
