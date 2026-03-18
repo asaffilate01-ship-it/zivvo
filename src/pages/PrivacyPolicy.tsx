@@ -86,7 +86,7 @@ const PrivacyPolicy = () => (
 
         <section>
           <h2 className="font-display text-lg font-semibold text-foreground">9. Contact</h2>
-          <p className="mt-2">For privacy-related enquiries, email us at privacy@autovault.co.</p>
+          <p className="mt-2">For privacy-related enquiries, email us at privacy@autosouq.app.</p>
         </section>
       </div>
     </div>

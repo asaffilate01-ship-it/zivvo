@@ -74,7 +74,7 @@ const TermsOfService = () => (
 
         <section>
           <h2 className="font-display text-lg font-semibold text-foreground">9. Contact</h2>
-          <p className="mt-2">For questions about these terms, contact us at legal@autovault.co.</p>
+          <p className="mt-2">For questions about these terms, contact us at legal@autosouq.app.</p>
         </section>
       </div>
     </div>
