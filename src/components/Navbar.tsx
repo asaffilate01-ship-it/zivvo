@@ -70,7 +70,9 @@ const Navbar = () => {
 
   const mobileLinks = [
     { to: "/browse", label: "Browse Cars", icon: Car },
-    { to: "/sell", label: "Sell Your Car", icon: Plus },
+    { to: "/sell-my-car", label: "Sell Your Car", icon: Plus },
+    { to: "/valuation", label: "Free Valuation", icon: Car },
+    { to: "/reviews", label: "Car Reviews", icon: BookOpen },
     { to: "/dealers", label: "For Dealers", icon: Building2 },
     { to: "/blog", label: "Blog & Guides", icon: BookOpen },
     { to: "/saved", label: "Saved Cars", icon: Heart },

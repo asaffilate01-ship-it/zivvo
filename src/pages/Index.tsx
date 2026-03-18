@@ -436,6 +436,7 @@ const Index = () => {
       </section>
 
       <Footer />
+      <AIChatWidget />
     </div>
   );
 };
