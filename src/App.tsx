@@ -46,6 +46,9 @@ const Blog = lazy(() => import("./pages/Blog"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const CarValuation = lazy(() => import("./pages/CarValuation"));
+const SellMyCar = lazy(() => import("./pages/SellMyCar"));
+const CarReviews = lazy(() => import("./pages/CarReviews"));
+const PopularCars = lazy(() => import("./pages/PopularCars"));
 
 const queryClient = new QueryClient();
 
