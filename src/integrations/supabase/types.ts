@@ -707,6 +707,66 @@ export type Database = {
         }
         Relationships: []
       }
+      call_logs: {
+        Row: {
+          caller_id: string | null
+          caller_number: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          listing_id: string | null
+          masked_number: string | null
+          recording_url: string | null
+          seller_id: string
+          seller_number: string | null
+          status: string
+          twilio_call_sid: string | null
+        }
+        Insert: {
+          caller_id?: string | null
+          caller_number?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          listing_id?: string | null
+          masked_number?: string | null
+          recording_url?: string | null
+          seller_id: string
+          seller_number?: string | null
+          status?: string
+          twilio_call_sid?: string | null
+        }
+        Update: {
+          caller_id?: string | null
+          caller_number?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          listing_id?: string | null
+          masked_number?: string | null
+          recording_url?: string | null
+          seller_id?: string
+          seller_number?: string | null
+          status?: string
+          twilio_call_sid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_logs_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "call_logs_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       car_listings: {
         Row: {
           body_type: string | null
@@ -918,6 +978,53 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      dealer_performance: {
+        Row: {
+          avg_response_time_mins: number | null
+          avg_sale_speed_days: number | null
+          created_at: string
+          dealer_id: string
+          id: string
+          last_calculated_at: string | null
+          rating_score: number | null
+          response_rate_pct: number | null
+          total_enquiries: number | null
+          total_sales: number | null
+        }
+        Insert: {
+          avg_response_time_mins?: number | null
+          avg_sale_speed_days?: number | null
+          created_at?: string
+          dealer_id: string
+          id?: string
+          last_calculated_at?: string | null
+          rating_score?: number | null
+          response_rate_pct?: number | null
+          total_enquiries?: number | null
+          total_sales?: number | null
+        }
+        Update: {
+          avg_response_time_mins?: number | null
+          avg_sale_speed_days?: number | null
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          last_calculated_at?: string | null
+          rating_score?: number | null
+          response_rate_pct?: number | null
+          total_enquiries?: number | null
+          total_sales?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dealer_performance_dealer_id_fkey"
+            columns: ["dealer_id"]
+            isOneToOne: true
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dealers: {
         Row: {
@@ -1220,6 +1327,132 @@ export type Database = {
             foreignKeyName: "inspection_reports_listing_id_fkey"
             columns: ["listing_id"]
             isOneToOne: true
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_fingerprints: {
+        Row: {
+          color: string | null
+          created_at: string
+          expires_at: string | null
+          fingerprint_hash: string
+          id: string
+          listing_id: string
+          make: string
+          mileage_band: string | null
+          model: string
+          paid_at: string | null
+          payment_id: string | null
+          registration: string | null
+          seller_id: string
+          year: number
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          expires_at?: string | null
+          fingerprint_hash: string
+          id?: string
+          listing_id: string
+          make: string
+          mileage_band?: string | null
+          model: string
+          paid_at?: string | null
+          payment_id?: string | null
+          registration?: string | null
+          seller_id: string
+          year: number
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          expires_at?: string | null
+          fingerprint_hash?: string
+          id?: string
+          listing_id?: string
+          make?: string
+          mileage_band?: string | null
+          model?: string
+          paid_at?: string | null
+          payment_id?: string | null
+          registration?: string | null
+          seller_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_fingerprints_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_fingerprints_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          expires_at: string | null
+          fingerprint_hash: string | null
+          id: string
+          listing_duration_days: number
+          listing_id: string
+          seller_id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          fingerprint_hash?: string | null
+          id?: string
+          listing_duration_days?: number
+          listing_id: string
+          seller_id: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          expires_at?: string | null
+          fingerprint_hash?: string | null
+          id?: string
+          listing_duration_days?: number
+          listing_id?: string
+          seller_id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_payments_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_payments_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
             referencedRelation: "car_listings_public"
             referencedColumns: ["id"]
           },
@@ -2042,6 +2275,17 @@ export type Database = {
       }
     }
     Functions: {
+      compute_vehicle_fingerprint: {
+        Args: {
+          _color: string
+          _make: string
+          _mileage: number
+          _model: string
+          _reg: string
+          _year: number
+        }
+        Returns: string
+      }
       get_models_for_make: {
         Args: { _country?: string; _make: string }
         Returns: {
