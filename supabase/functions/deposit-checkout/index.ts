@@ -32,7 +32,7 @@ serve(async (req) => {
     if (!auction_id || !amount) throw new Error("auction_id and amount required");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2025-08-27.basil",
+      apiVersion: "2023-10-16",
     });
 
     // Check if user already has an authorized deposit for this auction

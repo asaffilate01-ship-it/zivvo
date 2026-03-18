@@ -60,7 +60,7 @@ serve(async (req) => {
 
       // Release deposits for non-winners via Stripe
       const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-        apiVersion: "2025-08-27.basil",
+        apiVersion: "2023-10-16",
       });
 
       // Get all authorized deposits for this auction

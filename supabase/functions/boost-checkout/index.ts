@@ -35,7 +35,7 @@ serve(async (req) => {
     const { listingId, listingTitle, days, amount, currency } = await req.json();
     if (!listingId || !days || !amount) throw new Error("Missing required fields");
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2025-08-27.basil" });
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2023-10-16" });
 
     // Find or reference existing customer
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
