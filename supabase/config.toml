@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.notify-price-drop]
 verify_jwt = false
+
+[functions.syndicate-listing]
+verify_jwt = false

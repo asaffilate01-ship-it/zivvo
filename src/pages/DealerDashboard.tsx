@@ -21,6 +21,8 @@ import DashboardChart from "@/components/DashboardChart";
 import DealerPageBuilder from "@/components/DealerPageBuilder";
 import SellerAnalytics from "@/components/SellerAnalytics";
 import SalesPipeline from "@/components/SalesPipeline";
+import PortalSyndication from "@/components/PortalSyndication";
+import ListingSyndicationStatus from "@/components/ListingSyndicationStatus";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
