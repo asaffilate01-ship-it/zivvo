@@ -111,7 +111,7 @@ const CreateAuction = () => {
 
   return (
     <>
-      <SEOHead title="Create Auction | Sell Your Car at Auction" description="List your verified vehicle for auction with professional inspection and escrow protection." />
+      <SEOHead title="Create Auction | Sell Your Car at Auction" description="List your verified vehicle for auction with professional inspection and payment protection." />
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-3xl">
