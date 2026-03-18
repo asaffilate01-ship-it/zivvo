@@ -220,14 +220,19 @@ const TradeStock = () => {
       <Navbar />
       <main className="min-h-screen bg-background">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-foreground to-foreground/90 text-primary-foreground py-12">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-3 mb-3">
-              <ArrowRightLeft className="w-6 h-6 text-primary" />
-              <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">Trade Stock</Badge>
+        <section className="gradient-dark text-white py-16 md:py-20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--primary)/0.15),transparent_60%)]" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
+                <ArrowRightLeft className="w-5 h-5 text-primary" />
+              </div>
+              <Badge className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/30">Trade Stock</Badge>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold font-display mb-2">Wholesale Vehicle Arbitrage</h1>
-            <p className="text-primary-foreground/70 max-w-2xl">
+            <h1 className="text-3xl md:text-5xl font-bold font-display mb-3 tracking-tight">
+              Wholesale Vehicle<br className="hidden md:block" /> Arbitrage
+            </h1>
+            <p className="text-white/70 max-w-2xl text-base md:text-lg leading-relaxed">
               We source verified vehicles from sellers, inspect them, and offer them to our dealer network at a small markup.
               You get trade-ready stock — we handle the seller, paperwork, and logistics.
             </p>
@@ -426,22 +431,26 @@ const TradeStock = () => {
 
           {/* How it works */}
           <section className="mt-16 pb-8">
-            <h2 className="text-xl font-bold text-center mb-8">How Arbitrage Works</h2>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="text-center mb-10">
+              <Badge variant="outline" className="mb-3">How It Works</Badge>
+              <h2 className="text-2xl md:text-3xl font-bold font-display">Arbitrage in 5 Steps</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
               {[
                 { icon: Search, step: "01", title: "We Source", desc: "Platform identifies undervalued or high-demand vehicles" },
                 { icon: DollarSign, step: "02", title: "We Buy", desc: "We make the seller a fair offer and acquire the car" },
                 { icon: Shield, step: "03", title: "We Verify", desc: "Full inspection, HPI check, and condition report" },
                 { icon: Building2, step: "04", title: "We Offer", desc: "Listed to our dealer network at a small markup" },
                 { icon: Truck, step: "05", title: "We Deliver", desc: "Logistics arranged, seller paid, deal completed" },
-              ].map(({ icon: Icon, step, title, desc }) => (
-                <div key={step} className="text-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
+              ].map(({ icon: Icon, step, title, desc }, idx) => (
+                <div key={step} className="relative text-center group">
+                  {idx < 4 && <div className="hidden md:block absolute top-5 left-[60%] w-[80%] h-px bg-border" />}
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
                     <Icon className="w-5 h-5 text-primary" />
                   </div>
-                  <p className="text-xs text-muted-foreground mb-1">Step {step}</p>
+                  <p className="text-[10px] font-mono text-primary font-semibold tracking-widest mb-1">STEP {step}</p>
                   <h3 className="font-semibold text-sm mb-1">{title}</h3>
-                  <p className="text-xs text-muted-foreground">{desc}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
