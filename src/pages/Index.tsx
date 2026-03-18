@@ -247,10 +247,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {[
-              { icon: Users, value: "50,000+", label: "Active Users" },
-              { icon: Car, value: "25,000+", label: "Vehicles Listed" },
-              { icon: TrendingUp, value: "£2.3B+", label: "Total Value Sold" },
-              { icon: Star, value: "4.9/5", label: "Average Rating" },
+              { icon: Users, value: platformStats.users > 0 ? platformStats.users.toLocaleString() : "—", label: "Active Users" },
+              { icon: Car, value: platformStats.listings > 0 ? platformStats.listings.toLocaleString() : "—", label: "Vehicles Listed" },
+              { icon: TrendingUp, value: platformStats.soldValue > 0 ? formatPrice(platformStats.soldValue, config) : "—", label: "Total Value Sold" },
+              { icon: Star, value: platformStats.avgRating > 0 ? `${platformStats.avgRating}/5` : "—", label: "Average Rating" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
