@@ -121,13 +121,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="AutoVault — Buy & Sell Cars with Confidence"
+        title="AutoSouq — Buy & Sell Cars with Confidence"
         description="Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing."
-        canonical="https://autovault.co"
+        canonical="https://autosouq.app"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          "name": "AutoVault",
+          "name": "AutoSouq",
           "description": "Buy & sell cars with verified dealers and private sellers.",
           "applicationCategory": "AutomotiveMarketplace",
           "operatingSystem": "Web",

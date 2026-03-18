@@ -49,7 +49,7 @@ const faqs = [
 
 const HelpCentre = () => (
   <div className="min-h-screen bg-background">
-    <SEOHead title="Help Centre — AutoVault" description="Find answers to common questions about buying, selling, and dealer subscriptions on AutoVault." />
+    <SEOHead title="Help Centre — AutoSouq" description="Find answers to common questions about buying, selling, and dealer subscriptions on AutoSouq." />
     <Navbar />
     <div className="container mx-auto max-w-3xl px-4 py-12">
       <div className="text-center">

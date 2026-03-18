@@ -97,8 +97,8 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="AutoVault Blog — Car Buying Tips, Reviews & Guides"
-        description="Expert advice on buying, selling, and maintaining your car. Guides, reviews, and industry insights from the AutoVault team."
+        title="AutoSouq Blog — Car Buying Tips, Reviews & Guides"
+        description="Expert advice on buying, selling, and maintaining your car. Guides, reviews, and industry insights from the AutoSouq team."
       />
       <Navbar />
 
