@@ -31,20 +31,8 @@ import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import DashboardChart from "@/components/DashboardChart";
 import SalesPipeline from "@/components/SalesPipeline";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-} from "@/components/ui/dialog";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
-import DashboardChart from "@/components/DashboardChart";
-import SalesPipeline from "@/components/SalesPipeline";
+
+
 
 const AdminDashboard = () => {
   const { toast } = useToast();
