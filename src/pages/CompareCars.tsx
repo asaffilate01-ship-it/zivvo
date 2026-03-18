@@ -78,7 +78,7 @@ const CompareCars = () => {
   const handleShare = async () => {
     const url = `${window.location.origin}/compare?${selectedIds.map((id) => `car=${id}`).join("&")}`;
     if (navigator.share) {
-      try { await navigator.share({ title: "Car Comparison — AutoVault", url }); } catch {}
+      try { await navigator.share({ title: "Car Comparison — AutoSouq", url }); } catch {}
     } else {
       await navigator.clipboard.writeText(url);
       toast({ title: "Comparison link copied!" });
