@@ -380,7 +380,12 @@ const TradeStock = () => {
               {isAdmin && <TabsTrigger value="audit" className="gap-1"><FileText className="w-4 h-4" /> Audit Log</TabsTrigger>}
             </TabsList>
 
-            <TabsContent value={tab} className="mt-6">
+            {/* Seller offers tab */}
+            <TabsContent value="my_offers" className="mt-6">
+              <SellerOffers />
+            </TabsContent>
+
+            <TabsContent value={tab === "my_offers" ? "__skip__" : tab} className={tab === "my_offers" ? "hidden" : "mt-6"}>
               {tab === "audit" ? (
                 <Card>
                   <CardContent className="p-4">
