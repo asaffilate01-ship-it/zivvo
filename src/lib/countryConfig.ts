@@ -52,8 +52,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 20, priceId: "price_1TCLoVFFogsDQVs4s6IkvnYI", label: "per listing" },
     dealerPlans: [
       { name: "Small", price: 49, priceId: "price_1TCLoWFFogsDQVs4gyc8snRs", maxListings: 5, features: ["Up to 5 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard placement", "Verified dealer badge"] },
-      { name: "Medium", price: 99, priceId: "price_1TCLoYFFogsDQVs451H4MgtU", maxListings: 15, features: ["Up to 15 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured placements", "Priority support", "Finance check integration", "Performance score badge", "Call tracking & recording"] },
-      { name: "Large", price: 199, priceId: "price_1TCLoZFFogsDQVs4S4PepD0G", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics & market insights", "Multi-location support", "Virtual viewings", "Call tracking & recording", "Priority featured placements"] },
+      { name: "Medium", price: 99, priceId: "price_1TCLoYFFogsDQVs451H4MgtU", maxListings: 15, features: ["Up to 15 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured placements", "Priority support", "Finance check integration", "Performance score badge", "Call tracking & recording", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Large", price: 199, priceId: "price_1TCLoZFFogsDQVs4S4PepD0G", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics & market insights", "Multi-location support", "Virtual viewings", "Call tracking & recording", "Priority featured placements", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "Registration", mileage: "Mileage", postcode: "Postcode", petrol: "Petrol" },
   },
@@ -78,8 +78,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 25, priceId: "price_us_individual", label: "per listing" },
     dealerPlans: [
       { name: "Starter", price: 59, priceId: "price_us_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard listing placement"] },
-      { name: "Professional", price: 129, priceId: "price_us_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured listing placements", "Priority support", "CARFAX integration"] },
-      { name: "Enterprise", price: 249, priceId: "price_us_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-location support"] },
+      { name: "Professional", price: 129, priceId: "price_us_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured listing placements", "Priority support", "CARFAX integration", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Enterprise", price: 249, priceId: "price_us_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-location support", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "License Plate", mileage: "Mileage", postcode: "ZIP Code", petrol: "Gasoline" },
   },
@@ -103,8 +103,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 2000, priceId: "price_pk_individual", label: "per listing" },
     dealerPlans: [
       { name: "Starter", price: 9999, priceId: "price_pk_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
-      { name: "Professional", price: 19999, priceId: "price_pk_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support"] },
-      { name: "Enterprise", price: 39999, priceId: "price_pk_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "Bulk import", "Dedicated account manager", "Advanced analytics", "Multi-city support"] },
+      { name: "Professional", price: 19999, priceId: "price_pk_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Enterprise", price: 39999, priceId: "price_pk_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "Bulk import", "Dedicated account manager", "Advanced analytics", "Multi-city support", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "Registration Number", mileage: "Kilometre Reading", postcode: "Postal Code", petrol: "Petrol" },
   },
@@ -129,8 +129,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 75, priceId: "price_ae_individual", label: "per listing" },
     dealerPlans: [
       { name: "Starter", price: 199, priceId: "price_ae_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
-      { name: "Professional", price: 399, priceId: "price_ae_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Vehicle history integration"] },
-      { name: "Enterprise", price: 799, priceId: "price_ae_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-emirate support"] },
+      { name: "Professional", price: 399, priceId: "price_ae_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Vehicle history integration", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Enterprise", price: 799, priceId: "price_ae_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "API access & bulk import", "Dedicated account manager", "Advanced analytics", "Multi-emirate support", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "Plate Number", mileage: "Kilometre Reading", postcode: "P.O. Box", petrol: "Petrol" },
   },
