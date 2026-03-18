@@ -23,3 +23,9 @@ verify_jwt = false
 
 [functions.close-auction]
 verify_jwt = false
+
+[functions.deposit-checkout]
+verify_jwt = false
+
+[functions.confirm-deposit]
+verify_jwt = false

@@ -13,6 +13,7 @@ import {
   Users, Building2, Car, DollarSign, ShieldCheck, XCircle,
   CheckCircle, Search, TrendingUp, BarChart3, Download, Calendar,
   Eye, Loader2, UserPlus, Ban, MoreHorizontal, Flag, Mail, Bug,
+  Gavel, Shield, FileText, Package, Clock,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -23,11 +24,15 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import DashboardChart from "@/components/DashboardChart";
 import SalesPipeline from "@/components/SalesPipeline";
+
+
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -39,19 +44,24 @@ const AdminDashboard = () => {
   const [listingReports, setListingReports] = useState<any[]>([]);
   const [contactMessages, setContactMessages] = useState<any[]>([]);
   const [bugReports, setBugReports] = useState<any[]>([]);
+  const [auctions, setAuctions] = useState<any[]>([]);
+  const [auctionEscrows, setAuctionEscrows] = useState<any[]>([]);
+  const [auctionAuditLog, setAuctionAuditLog] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listingSearch, setListingSearch] = useState("");
   const [listingStatusFilter, setListingStatusFilter] = useState("all");
   const [userSearch, setUserSearch] = useState("");
+  const [auctionStatusFilter, setAuctionStatusFilter] = useState("all");
   const [dateRange, setDateRange] = useState("month");
   const [loading, setLoading] = useState(true);
   const [selectedDealer, setSelectedDealer] = useState<any>(null);
+  const [selectedAuction, setSelectedAuction] = useState<any>(null);
   const [roleDialog, setRoleDialog] = useState<{ userId: string; currentRoles: string[] } | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
-    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes] = await Promise.all([
+    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes, auctionsRes, escrowsRes, auditRes] = await Promise.all([
       supabase.from("dealers").select("*").order("created_at", { ascending: false }),
       supabase.from("car_listings").select("*").order("created_at", { ascending: false }).limit(200),
       supabase.from("agent_commissions").select("*").order("created_at", { ascending: false }),
@@ -60,6 +70,9 @@ const AdminDashboard = () => {
       supabase.from("listing_reports").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("contact_messages").select("*").order("created_at", { ascending: false }).limit(100),
       supabase.from("bug_reports").select("*").order("created_at", { ascending: false }).limit(100),
+      supabase.from("auctions").select("*, car_listings!inner(title, make, model, year, registration)").order("created_at", { ascending: false }),
+      supabase.from("auction_escrow").select("*").order("created_at", { ascending: false }),
+      supabase.from("auction_audit_log").select("*").order("created_at", { ascending: false }).limit(200),
     ]);
     if (dealersRes.data) setDealers(dealersRes.data);
     if (listingsRes.data) setListings(listingsRes.data);
@@ -69,6 +82,9 @@ const AdminDashboard = () => {
     if (reportsRes.data) setListingReports(reportsRes.data);
     if (contactsRes.data) setContactMessages(contactsRes.data);
     if (bugsRes.data) setBugReports(bugsRes.data);
+    if (auctionsRes.data) setAuctions(auctionsRes.data);
+    if (escrowsRes.data) setAuctionEscrows(escrowsRes.data);
+    if (auditRes.data) setAuctionAuditLog(auditRes.data);
     setLoading(false);
   };
 
@@ -146,6 +162,37 @@ const AdminDashboard = () => {
     toast({ title: `Bug ${status}` });
     fetchAll();
   };
+
+  const approveAuction = async (auctionId: string, rating: number) => {
+    await supabase.from("auctions").update({
+      status: "live" as any,
+      inspection_rating: rating,
+      hpi_clear: true,
+      ownership_verified: true,
+      seller_verified: true,
+      starts_at: new Date().toISOString(),
+    }).eq("id", auctionId);
+    toast({ title: "Auction approved & live!" });
+    fetchAll();
+  };
+
+  const rejectAuction = async (auctionId: string) => {
+    await supabase.from("auctions").update({ status: "cancelled" as any }).eq("id", auctionId);
+    toast({ title: "Auction rejected" });
+    fetchAll();
+  };
+
+  const updateEscrowStatus = async (escrowId: string, status: string) => {
+    const update: any = { status };
+    if (status === "released_to_seller") update.released_at = new Date().toISOString();
+    await supabase.from("auction_escrow").update(update).eq("id", escrowId);
+    toast({ title: `Escrow ${status.replace(/_/g, " ")}` });
+    fetchAll();
+  };
+
+  const pendingAuctions = auctions.filter((a: any) => a.status === "pending_inspection");
+  const liveAuctions = auctions.filter((a: any) => a.status === "live");
+  const filteredAuctions = auctions.filter((a: any) => auctionStatusFilter === "all" || a.status === auctionStatusFilter);
 
   const exportCSV = (data: any[], filename: string) => {
     if (!data.length) return;
@@ -269,6 +316,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="dealers">Dealers</TabsTrigger>
             <TabsTrigger value="kyc">KYC ({pendingKYC.length})</TabsTrigger>
             <TabsTrigger value="listings">Listings</TabsTrigger>
+            <TabsTrigger value="auctions" className="gap-1"><Gavel className="h-3 w-3" /> Auctions ({pendingAuctions.length})</TabsTrigger>
             <TabsTrigger value="reports">Reports ({pendingReports.length})</TabsTrigger>
             <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
@@ -517,6 +565,173 @@ const AdminDashboard = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Auctions Tab */}
+          <TabsContent value="auctions" className="mt-4">
+            <div className="space-y-4">
+              {/* Pending Inspection Queue */}
+              {pendingAuctions.length > 0 && (
+                <Card className="border-amber-200 dark:border-amber-800">
+                  <CardHeader><CardTitle className="text-base flex items-center gap-2"><Clock className="h-4 w-4 text-amber-500" /> Pending Inspection ({pendingAuctions.length})</CardTitle></CardHeader>
+                  <CardContent className="space-y-3">
+                    {pendingAuctions.map((a: any) => {
+                      const l = a.car_listings;
+                      return (
+                        <div key={a.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border p-4">
+                          <div>
+                            <p className="font-medium text-card-foreground">{l?.year} {l?.make} {l?.model}</p>
+                            <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: £{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            {[1,2,3,4,5].map(r => (
+                              <Button key={r} size="sm" variant="outline" onClick={() => approveAuction(a.id, r)} title={`Approve with ${r}/5 rating`}>
+                                ⭐{r}
+                              </Button>
+                            ))}
+                            <Button size="sm" variant="outline" className="text-destructive" onClick={() => rejectAuction(a.id)}>
+                              <XCircle className="mr-1 h-3 w-3" /> Reject
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* All Auctions */}
+              <Card>
+                <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <CardTitle className="text-base flex items-center gap-2"><Gavel className="h-4 w-4" /> All Auctions ({auctions.length})</CardTitle>
+                  <Select value={auctionStatusFilter} onValueChange={setAuctionStatusFilter}>
+                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="pending_inspection">Pending</SelectItem>
+                      <SelectItem value="live">Live</SelectItem>
+                      <SelectItem value="sold">Sold</SelectItem>
+                      <SelectItem value="ended">Ended</SelectItem>
+                      <SelectItem value="reserve_not_met">Reserve Not Met</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Vehicle</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Rating</TableHead>
+                        <TableHead>Current Bid</TableHead>
+                        <TableHead>Bids</TableHead>
+                        <TableHead>Ends</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAuctions.slice(0, 50).map((a: any) => {
+                        const l = a.car_listings;
+                        return (
+                          <TableRow key={a.id}>
+                            <TableCell>
+                              <p className="font-medium text-card-foreground">{l?.year} {l?.make} {l?.model}</p>
+                              <p className="text-xs text-muted-foreground">{a.format} · {l?.registration || "N/A"}</p>
+                            </TableCell>
+                            <TableCell><Badge variant={a.status === "live" ? "default" : a.status === "sold" ? "secondary" : "outline"}>{a.status}</Badge></TableCell>
+                            <TableCell>{a.inspection_rating ? `${a.inspection_rating}/5` : "—"}</TableCell>
+                            <TableCell>£{Number(a.current_bid || a.starting_price).toLocaleString()}</TableCell>
+                            <TableCell>{a.bid_count || 0}</TableCell>
+                            <TableCell className="text-xs text-muted-foreground">{a.ends_at ? new Date(a.ends_at).toLocaleDateString() : "—"}</TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => setSelectedAuction(a)}><Eye className="mr-2 h-4 w-4" /> Details</DropdownMenuItem>
+                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => approveAuction(a.id, 3)}><CheckCircle className="mr-2 h-4 w-4" /> Quick Approve (3/5)</DropdownMenuItem>}
+                                  {a.status !== "cancelled" && <DropdownMenuItem onClick={() => rejectAuction(a.id)} className="text-destructive"><XCircle className="mr-2 h-4 w-4" /> Cancel</DropdownMenuItem>}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Escrow Management */}
+              <Card>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Escrow Management ({auctionEscrows.length})</CardTitle></CardHeader>
+                <CardContent className="overflow-x-auto">
+                  {auctionEscrows.length === 0 ? (
+                    <p className="py-8 text-center text-muted-foreground">No escrow records yet</p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Auction</TableHead>
+                          <TableHead>Total</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>V5C</TableHead>
+                          <TableHead>Keys</TableHead>
+                          <TableHead>Contract</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {auctionEscrows.map((e: any) => (
+                          <TableRow key={e.id}>
+                            <TableCell className="text-xs">{e.auction_id.slice(0, 8)}...</TableCell>
+                            <TableCell>£{Number(e.total_amount).toLocaleString()}</TableCell>
+                            <TableCell><Badge variant="outline" className="capitalize">{(e.status as string).replace(/_/g, " ")}</Badge></TableCell>
+                            <TableCell>{e.v5c_received ? "✅" : "⏳"}</TableCell>
+                            <TableCell>{e.keys_handed_over ? "✅" : "⏳"}</TableCell>
+                            <TableCell>{e.contract_signed ? "✅" : "⏳"}</TableCell>
+                            <TableCell>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {e.v5c_received && e.keys_handed_over && e.contract_signed && e.status !== "released_to_seller" && (
+                                    <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "released_to_seller")}><CheckCircle className="mr-2 h-4 w-4" /> Release to Seller</DropdownMenuItem>
+                                  )}
+                                  {e.status !== "refunded" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "refunded")} className="text-destructive">Refund Buyer</DropdownMenuItem>}
+                                  {e.status !== "disputed" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "disputed")}>Mark Disputed</DropdownMenuItem>}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Audit Log */}
+              <Card>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><FileText className="h-4 w-4" /> Auction Audit Log (last 200)</CardTitle></CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-72">
+                    <div className="space-y-1">
+                      {auctionAuditLog.map((log: any) => (
+                        <div key={log.id} className="flex items-center justify-between py-1.5 px-2 rounded text-xs hover:bg-muted/50">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-[9px] py-0">{log.action}</Badge>
+                            <span className="text-muted-foreground">{log.actor_role || "system"}</span>
+                          </div>
+                          <span className="text-muted-foreground">{new Date(log.created_at).toLocaleString()}</span>
+                        </div>
+                      ))}
+                      {auctionAuditLog.length === 0 && <p className="text-center text-muted-foreground py-4">No audit entries</p>}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           {/* Reports Tab */}
@@ -881,6 +1096,45 @@ const AdminDashboard = () => {
                 </Button>
               ))}
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Auction Detail Dialog */}
+        <Dialog open={!!selectedAuction} onOpenChange={() => setSelectedAuction(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="font-display flex items-center gap-2"><Gavel className="h-5 w-5" /> Auction Details</DialogTitle>
+              <DialogDescription>Full auction information and controls</DialogDescription>
+            </DialogHeader>
+            {selectedAuction && (
+              <div className="space-y-3 text-sm">
+                <div className="grid grid-cols-2 gap-2">
+                  <div><span className="text-muted-foreground">Vehicle:</span> <span className="text-foreground">{selectedAuction.car_listings?.year} {selectedAuction.car_listings?.make} {selectedAuction.car_listings?.model}</span></div>
+                  <div><span className="text-muted-foreground">Status:</span> <Badge variant="outline">{selectedAuction.status}</Badge></div>
+                  <div><span className="text-muted-foreground">Format:</span> <span className="text-foreground">{selectedAuction.format}</span></div>
+                  <div><span className="text-muted-foreground">Rating:</span> <span className="text-foreground">{selectedAuction.inspection_rating ? `${selectedAuction.inspection_rating}/5` : "Pending"}</span></div>
+                  <div><span className="text-muted-foreground">Starting:</span> <span className="text-foreground">£{Number(selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Current:</span> <span className="text-foreground font-bold">£{Number(selectedAuction.current_bid || selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Reserve:</span> <span className="text-foreground">{selectedAuction.reserve_price ? `£${Number(selectedAuction.reserve_price).toLocaleString()}` : "None"}</span></div>
+                  <div><span className="text-muted-foreground">Bids:</span> <span className="text-foreground">{selectedAuction.bid_count || 0}</span></div>
+                  <div><span className="text-muted-foreground">HPI:</span> <span>{selectedAuction.hpi_clear ? "✅ Clear" : "⏳"}</span></div>
+                  <div><span className="text-muted-foreground">Verified:</span> <span>{selectedAuction.seller_verified ? "✅" : "⏳"}</span></div>
+                </div>
+                <Separator />
+                <div className="flex gap-2 pt-2">
+                  {selectedAuction.status === "pending_inspection" && (
+                    <>
+                      {[1,2,3,4,5].map(r => (
+                        <Button key={r} size="sm" variant="outline" onClick={() => { approveAuction(selectedAuction.id, r); setSelectedAuction(null); }}>⭐{r}</Button>
+                      ))}
+                    </>
+                  )}
+                  {selectedAuction.status !== "cancelled" && (
+                    <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Cancel</Button>
+                  )}
+                </div>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
