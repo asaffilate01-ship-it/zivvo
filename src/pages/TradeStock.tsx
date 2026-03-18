@@ -50,9 +50,13 @@ const TradeStock = () => {
   const { country } = useCountry();
   const queryClient = useQueryClient();
   const isAdmin = hasRole("admin");
-  const [tab, setTab] = useState(isAdmin ? "all" : "available");
+  const isSeller = hasRole("seller");
+  const [tab, setTab] = useState(isAdmin ? "all" : isSeller ? "my_offers" : "available");
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [payingDealId, setPayingDealId] = useState<string | null>(null);
+  const [payoutDialog, setPayoutDialog] = useState<any>(null);
+  const [payoutRef, setPayoutRef] = useState("");
 
   // Create deal form state
   const [selectedListing, setSelectedListing] = useState("");
