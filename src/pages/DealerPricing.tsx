@@ -99,7 +99,7 @@ const DealerPricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Dealer Plans & Pricing" description={`Choose a dealer plan to scale your car dealership on AutoVault. Starting from ${formatPrice(plans[0].price, config)}/month.`} />
+      <SEOHead title="Dealer Plans & Pricing" description={`Choose a dealer plan to scale your car dealership on AutoSouq. Starting from ${formatPrice(plans[0].price, config)}/month.`} />
       <Navbar />
 
       <section className="container mx-auto px-4 py-16">

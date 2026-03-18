@@ -145,8 +145,8 @@ const DealerLanding = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${dealer.business_name} — AutoVault Dealer`}
-        description={config.about_text || `Browse vehicles from ${dealer.business_name} on AutoVault.`}
+        title={`${dealer.business_name} — AutoSouq Dealer`}
+        description={config.about_text || `Browse vehicles from ${dealer.business_name} on AutoSouq.`}
       />
       <Navbar />
 

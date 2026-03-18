@@ -36,7 +36,7 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Contact Us — AutoVault" description="Get in touch with the AutoVault team. We're here to help with any questions about buying, selling, or dealer subscriptions." />
+      <SEOHead title="Contact Us — AutoSouq" description="Get in touch with the AutoSouq team. We're here to help with any questions about buying, selling, or dealer subscriptions." />
       <Navbar />
       <div className="container mx-auto max-w-5xl px-4 py-12">
         <div className="text-center">
@@ -46,7 +46,7 @@ const Contact = () => {
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           {[
-            { icon: Mail, title: "Email", detail: "support@autovault.co", sub: "We respond within 24 hours" },
+            { icon: Mail, title: "Email", detail: "support@autosouq.app", sub: "We respond within 24 hours" },
             { icon: Phone, title: "Phone", detail: "+44 20 7123 4567", sub: "Mon-Fri 9am-6pm GMT" },
             { icon: MapPin, title: "Office", detail: "London, United Kingdom", sub: "By appointment only" },
           ].map((item) => (

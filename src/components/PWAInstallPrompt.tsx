@@ -52,7 +52,7 @@ const PWAInstallPrompt = () => {
             <Download className="h-5 w-5 text-primary-foreground" />
           </div>
           <div className="flex-1">
-            <p className="font-display font-semibold text-card-foreground">Install AutoVault</p>
+            <p className="font-display font-semibold text-card-foreground">Install AutoSouq</p>
             <p className="mt-0.5 text-sm text-muted-foreground">Get quick access from your home screen</p>
           </div>
           <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={handleDismiss}>

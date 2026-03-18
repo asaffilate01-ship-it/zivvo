@@ -43,13 +43,13 @@ const faqs = [
   },
   {
     q: "What is the agent programme?",
-    a: "Agents can onboard new dealers to AutoVault and earn 30% recurring commission on their subscription payments. Contact us to apply for the agent programme.",
+    a: "Agents can onboard new dealers to AutoSouq and earn 30% recurring commission on their subscription payments. Contact us to apply for the agent programme.",
   },
 ];
 
 const HelpCentre = () => (
   <div className="min-h-screen bg-background">
-    <SEOHead title="Help Centre — AutoVault" description="Find answers to common questions about buying, selling, and dealer subscriptions on AutoVault." />
+    <SEOHead title="Help Centre — AutoSouq" description="Find answers to common questions about buying, selling, and dealer subscriptions on AutoSouq." />
     <Navbar />
     <div className="container mx-auto max-w-3xl px-4 py-12">
       <div className="text-center">

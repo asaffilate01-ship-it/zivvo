@@ -17,7 +17,7 @@ const CountryContext = createContext<CountryContextType>({
 
 export const useCountry = () => useContext(CountryContext);
 
-const STORAGE_KEY = "autovault_country";
+const STORAGE_KEY = "autosouq_country";
 
 export const CountryProvider = ({ children }: { children: ReactNode }) => {
   const [country, setCountryState] = useState<CountryCode>(

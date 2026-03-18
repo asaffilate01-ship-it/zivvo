@@ -7,7 +7,7 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_ANON_KEY") ?? ""
   );
 
-  const origin = req.headers.get("origin") || "https://autovault.lovable.app";
+  const origin = req.headers.get("origin") || "https://autosouq.app";
 
   const { data: listings } = await supabase
     .from("car_listings")

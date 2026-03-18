@@ -8,11 +8,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const DEV_ACCOUNTS = [
-  { label: "Buyer", email: "buyer@autovault.test", password: "Test1234!", color: "bg-secondary text-secondary-foreground" },
-  { label: "Seller", email: "seller@autovault.test", password: "Test1234!", color: "bg-primary/10 text-primary" },
-  { label: "Dealer", email: "dealer@autovault.test", password: "Test1234!", color: "bg-accent text-accent-foreground" },
-  { label: "Agent", email: "agent@autovault.test", password: "Test1234!", color: "bg-warning/10 text-warning" },
-  { label: "Admin", email: "admin@autovault.test", password: "Test1234!", color: "bg-destructive/10 text-destructive" },
+  { label: "Buyer", email: "buyer@autosouq.test", password: "Test1234!", color: "bg-secondary text-secondary-foreground" },
+  { label: "Seller", email: "seller@autosouq.test", password: "Test1234!", color: "bg-primary/10 text-primary" },
+  { label: "Dealer", email: "dealer@autosouq.test", password: "Test1234!", color: "bg-accent text-accent-foreground" },
+  { label: "Agent", email: "agent@autosouq.test", password: "Test1234!", color: "bg-warning/10 text-warning" },
+  { label: "Admin", email: "admin@autosouq.test", password: "Test1234!", color: "bg-destructive/10 text-destructive" },
 ];
 
 const BugReportButton = () => {
