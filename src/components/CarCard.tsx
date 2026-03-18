@@ -155,7 +155,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
           <div className="p-4">
             <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1">{car.title}</h3>
             <div className="mt-1 flex items-center gap-1.5 flex-wrap">
-              <PriceIndicatorBadge price={car.price} marketAverage={(car as any).market_average} />
+              <PriceIndicatorBadge price={car.price} make={car.make} model={car.model} year={car.year} mileage={car.mileage} />
               {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
             </div>
             <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
