@@ -254,7 +254,7 @@ const Auctions = () => {
                 { step: "01", title: "Professional Inspection", desc: "Every car inspected by approved specialists with a 1-5 condition rating and full report." },
                 { step: "02", title: "HPI & History Check", desc: "Finance, stolen, write-off, mileage anomaly and ownership verification included." },
                 { step: "03", title: "Secure Bidding", desc: "Buyers pre-verified with card pre-auth or finance approval. Anti-sniping protection." },
-                { step: "04", title: "Escrow & E-Sign", desc: "Funds held in escrow. Released only after V5C, keys handover and signed contract." },
+                { step: "04", title: "Payment Protection & E-Sign", desc: "Funds held securely. Released only after V5C, keys handover and signed contract." },
               ].map(({ step, title, desc }) => (
                 <div key={step} className="text-center">
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center mx-auto mb-3 text-sm">{step}</div>
