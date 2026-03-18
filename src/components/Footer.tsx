@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Car } from "lucide-react";
+import CountrySwitcher from "@/components/CountrySwitcher";
 
 const footerSections = [
   {
@@ -7,6 +8,7 @@ const footerSections = [
     links: [
       { label: "Browse Cars", to: "/browse" },
       { label: "Sell Your Car", to: "/sell" },
+      { label: "Auctions", to: "/auctions" },
       { label: "Saved Cars", to: "/saved" },
       { label: "Compare Cars", to: "/compare" },
       { label: "Blog & Guides", to: "/blog" },
@@ -16,6 +18,7 @@ const footerSections = [
     title: "For Business",
     links: [
       { label: "Dealer Plans", to: "/dealers" },
+      { label: "Trade Stock", to: "/trade-stock" },
       { label: "Agent Program", to: "/contact" },
       { label: "Dealer Dashboard", to: "/dashboard" },
     ],
@@ -73,24 +76,31 @@ const Footer = () => {
           ))}
         </div>
 
+        {/* Country Switcher + Bottom Bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} AutoVault. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            {[
-              { label: "Privacy", to: "/privacy" },
-              { label: "Terms", to: "/terms" },
-              { label: "Cookies", to: "/privacy#cookies" },
-            ].map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                className="text-xs text-muted-foreground transition-colors hover:text-primary"
-              >
-                {item.label}
-              </Link>
-            ))}
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} AutoVault. All rights reserved.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <CountrySwitcher variant="full" />
+            <div className="flex gap-6">
+              {[
+                { label: "Privacy", to: "/privacy" },
+                { label: "Terms", to: "/terms" },
+                { label: "Cookies", to: "/privacy#cookies" },
+              ].map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className="text-xs text-muted-foreground transition-colors hover:text-primary"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

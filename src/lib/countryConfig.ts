@@ -103,7 +103,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     code: "AE",
     name: "United Arab Emirates",
     flag: "🇦🇪",
-    currency: { symbol: "£", code: "GBP", locale: "en-GB" },
+    currency: { symbol: "AED ", code: "AED", locale: "en-AE" },
     distanceUnit: "km",
     driveSide: "right",
     makes: [
