@@ -13,7 +13,7 @@ const PrivacyPolicy = () => (
       <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
         <section>
           <h2 className="font-display text-lg font-semibold text-foreground">1. Who We Are</h2>
-          <p className="mt-2">AutoVault is an online marketplace for buying and selling vehicles. This policy explains how we collect, use, store, and protect your personal data in compliance with the UK GDPR and Data Protection Act 2018.</p>
+          <p className="mt-2">AutoSouq is an online marketplace for buying and selling vehicles. This policy explains how we collect, use, store, and protect your personal data in compliance with the UK GDPR and Data Protection Act 2018.</p>
         </section>
 
         <section>
