@@ -106,6 +106,14 @@ const Auctions = () => {
                   </div>
                 ))}
               </div>
+              <div className="flex gap-3 mt-6">
+                <Button asChild size="lg" className="gap-2">
+                  <Link to="/auctions/apply"><Gavel className="w-4 h-4" /> Sell at Auction</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="gap-2">
+                  <Link to="/auctions">Browse Auctions</Link>
+                </Button>
+              </div>
             </motion.div>
           </div>
         </section>
