@@ -103,8 +103,8 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     individualPlan: { price: 2000, priceId: "price_pk_individual", label: "per listing" },
     dealerPlans: [
       { name: "Starter", price: 9999, priceId: "price_pk_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
-      { name: "Professional", price: 19999, priceId: "price_pk_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support"] },
-      { name: "Enterprise", price: 39999, priceId: "price_pk_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "Bulk import", "Dedicated account manager", "Advanced analytics", "Multi-city support"] },
+      { name: "Professional", price: 19999, priceId: "price_pk_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Portal syndication (AutoTrader, eBay & more)"] },
+      { name: "Enterprise", price: 39999, priceId: "price_pk_enterprise", maxListings: 9999, features: ["Unlimited active listings", "White-label dealer page", "Bulk import", "Dedicated account manager", "Advanced analytics", "Multi-city support", "Multi-portal syndication (6 portals)"] },
     ],
     terminology: { registration: "Registration Number", mileage: "Kilometre Reading", postcode: "Postal Code", petrol: "Petrol" },
   },
