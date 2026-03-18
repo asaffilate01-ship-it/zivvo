@@ -45,7 +45,7 @@ const WhyBuyFromUs = () => (
         className="text-center"
       >
         <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-          Why Buy From <span className="text-primary">AutoVault</span>?
+          Why Buy From <span className="text-primary">AutoSouq</span>?
         </h2>
         <p className="mx-auto mt-2 max-w-lg text-muted-foreground">
           We're building the most trusted car marketplace in the world

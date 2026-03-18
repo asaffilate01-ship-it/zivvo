@@ -120,7 +120,7 @@ const AIChatWidget = () => {
                   <Sparkles className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-primary-foreground">AutoVault AI</p>
+                  <p className="text-sm font-semibold text-primary-foreground">AutoSouq AI</p>
                   <p className="text-[10px] text-primary-foreground/60">Your car-finding assistant</p>
                 </div>
               </div>

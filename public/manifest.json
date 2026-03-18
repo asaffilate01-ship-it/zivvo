@@ -1,6 +1,6 @@
 {
-  "name": "AutoVault — Buy & Sell Cars",
-  "short_name": "AutoVault",
+  "name": "AutoSouq — Buy & Sell Cars",
+  "short_name": "AutoSouq",
   "description": "Browse thousands of verified vehicles from trusted dealers and private sellers.",
   "start_url": "/",
   "display": "standalone",

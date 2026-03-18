@@ -10,14 +10,14 @@ interface SEOHeadProps {
 }
 
 const SEOHead = ({
-  title = "AutoVault — Buy & Sell Cars with Confidence",
+  title = "AutoSouq — Buy & Sell Cars with Confidence",
   description = "Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing.",
   canonical,
   type = "website",
   image = "https://lovable.dev/opengraph-image-p98pqg.png",
   jsonLd,
 }: SEOHeadProps) => {
-  const fullTitle = title.includes("AutoVault") ? title : `${title} | AutoVault`;
+  const fullTitle = title.includes("AutoSouq") ? title : `${title} | AutoSouq`;
 
   return (
     <Helmet>

@@ -228,7 +228,7 @@ const Navbar = () => {
                   <div className="gradient-primary flex h-7 w-7 items-center justify-center rounded-lg">
                     <Car className="h-3.5 w-3.5 text-primary-foreground" />
                   </div>
-                  AutoVault
+                  AutoSouq
                 </SheetTitle>
               </SheetHeader>
 

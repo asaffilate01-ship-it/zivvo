@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Shield, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const CONSENT_KEY = "autovault_cookie_consent";
+const CONSENT_KEY = "autosouq_cookie_consent";
 
 const CookieConsent = () => {
   const [show, setShow] = useState(false);
@@ -43,7 +43,7 @@ const CookieConsent = () => {
             <div className="flex-1">
               <p className="text-sm font-medium text-card-foreground">We value your privacy</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                We use essential cookies to make AutoVault work. We'd also like to use analytics cookies to improve our service.{" "}
+                We use essential cookies to make AutoSouq work. We'd also like to use analytics cookies to improve our service.{" "}
                 <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>
               </p>
               <div className="mt-3 flex gap-2">

@@ -54,7 +54,7 @@ const RecentlySoldFeed = () => {
           className="flex items-center gap-3 mb-6"
         >
           <Badge className="bg-success/10 text-success border-success/20">Live</Badge>
-          <h2 className="font-display text-lg font-bold text-foreground">Recently Sold on AutoVault</h2>
+          <h2 className="font-display text-lg font-bold text-foreground">Recently Sold on AutoSouq</h2>
         </motion.div>
 
         <div className="relative overflow-hidden">
