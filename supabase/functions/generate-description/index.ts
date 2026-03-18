@@ -26,7 +26,7 @@ Details: ${[
 
 Write 2-3 paragraphs. Be factual, highlight key selling points, mention comfort, performance, and value. Do NOT use markdown headings. Keep it under 200 words. Sound professional but warm.`;
 
-    const response = await fetch("https://ai-gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
