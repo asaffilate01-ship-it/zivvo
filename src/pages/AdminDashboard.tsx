@@ -58,6 +58,7 @@ const AdminDashboard = () => {
   const [selectedDealer, setSelectedDealer] = useState<any>(null);
   const [selectedAuction, setSelectedAuction] = useState<any>(null);
   const [roleDialog, setRoleDialog] = useState<{ userId: string; currentRoles: string[] } | null>(null);
+  const [inspectingAuction, setInspectingAuction] = useState<any>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
