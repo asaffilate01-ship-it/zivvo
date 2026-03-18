@@ -1,4 +1,5 @@
 import { useState } from "react";
+import heroAuctions from "@/assets/hero-auctions.jpg";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
