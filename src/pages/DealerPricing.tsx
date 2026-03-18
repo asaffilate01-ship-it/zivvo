@@ -109,7 +109,7 @@ const DealerPricing = () => {
             Scale Your Dealership
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
-            Individual sellers: list for just {formatPrice(config.individualPlan.price, config)} per car ({config.individualPlan.durationDays / 30}-month listing).
+            Individual sellers: list for just {formatPrice(config.individualPlan.price, config)} per car (stays live until sold).
             Dealers: choose a plan below starting from {formatPrice(plans[0].price, config)}/month.
           </p>
           {subscription.subscribed && (
