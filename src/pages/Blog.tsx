@@ -47,7 +47,7 @@ const blogPosts = [
     excerpt: "Thousands of cars are sold each year with outstanding finance. Here's how to protect yourself and what to do if a check comes back positive.",
     category: "Safety",
     image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
-    author: "AutoVault Team",
+    author: "AutoSouq Team",
     date: "2026-02-20",
     readTime: "4 min read",
   },
