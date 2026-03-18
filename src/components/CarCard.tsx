@@ -25,6 +25,7 @@ interface CarCardProps {
     is_featured?: boolean | null;
     verified?: boolean | null;
     dealer_id?: string | null;
+    video_url?: string | null;
   };
   index?: number;
   layout?: "grid" | "list";
