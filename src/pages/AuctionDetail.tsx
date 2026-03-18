@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,6 +7,8 @@ import { useCountry } from "@/contexts/CountryContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import StripeDepositForm from "@/components/StripeDepositForm";
+import FinancePreApprovalForm from "@/components/FinancePreApprovalForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +24,7 @@ import { toast } from "sonner";
 import {
   Gavel, Shield, Star, Clock, CheckCircle2, AlertTriangle, Key, FileText, Truck,
   ChevronLeft, ChevronRight, Eye, Users, TrendingUp, History, Car, Wrench, Paintbrush,
-  Heart, HeartOff, Zap, CreditCard, Package, Send,
+  Heart, HeartOff, Zap, CreditCard, Package, Send, Banknote, Loader2, Timer,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
