@@ -84,17 +84,17 @@ const blogPosts: Record<string, {
     ],
   },
   "dealer-subscription-benefits": {
-    title: "Why Dealers Are Switching to AutoVault: A Case Study",
+    title: "Why Dealers Are Switching to AutoSouq: A Case Study",
     excerpt: "How verified dealers reach more buyers and close faster.",
     category: "For Dealers",
     image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=1200&q=80",
-    author: "AutoVault Team", date: "2026-02-10", readTime: "5 min read",
+    author: "AutoSouq Team", date: "2026-02-10", readTime: "5 min read",
     content: [
-      "Independent dealers across the UK are discovering that AutoVault's platform offers a more cost-effective way to reach serious buyers compared to traditional classified sites.",
+      "Independent dealers across the UK are discovering that AutoSouq's platform offers a more cost-effective way to reach serious buyers compared to traditional classified sites.",
       "## The Challenge\n\nSmall and medium dealers often struggle with high advertising costs, limited visibility, and difficulty building trust with online buyers.",
-      "## The AutoVault Solution\n\nOur dealer plans start from just £49/month and include verified dealer badges, custom landing pages, integrated analytics, and direct buyer messaging.",
+      "## The AutoSouq Solution\n\nOur dealer plans start from just £49/month and include verified dealer badges, custom landing pages, integrated analytics, and direct buyer messaging.",
       "## Results\n\n- **47% more enquiries** within the first month\n- **3x faster response times** with our integrated messaging\n- **Verified dealer badge** increased click-through rates by 62%\n- **Custom landing pages** gave dealers a professional online presence",
-      "## Getting Started\n\nJoin hundreds of dealers already growing their business on AutoVault. Choose from Starter, Professional, or Enterprise plans to match your dealership size.",
+      "## Getting Started\n\nJoin hundreds of dealers already growing their business on AutoSouq. Choose from Starter, Professional, or Enterprise plans to match your dealership size.",
     ],
   },
 };
