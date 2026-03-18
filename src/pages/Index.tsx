@@ -307,6 +307,9 @@ const Index = () => {
       {/* EV Section */}
       <EVSection />
 
+      {/* Why Buy From Us */}
+      <WhyBuyFromUs />
+
       {/* Car Valuation CTA */}
       <section className="container mx-auto px-4 py-12">
         <motion.div {...fadeUp}>
