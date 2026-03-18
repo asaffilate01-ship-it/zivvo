@@ -92,6 +92,16 @@ const App = () => (
                       <Route path="/reviews" element={<CarReviews />} />
                       <Route path="/cars" element={<PopularCars />} />
                       <Route path="/cars/:make" element={<PopularCars />} />
+                      <Route path="/auctions" element={<Auctions />} />
+                      <Route path="/auction/:id" element={<AuctionDetail />} />
+                      <Route
+                        path="/auctions/create"
+                        element={
+                          <ProtectedRoute>
+                            <CreateAuction />
+                          </ProtectedRoute>
+                        }
+                      />
                       <Route
                         path="/inbox"
                         element={

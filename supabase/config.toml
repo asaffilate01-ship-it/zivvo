@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.boost-checkout]
 verify_jwt = false
+
+[functions.close-auction]
+verify_jwt = false
