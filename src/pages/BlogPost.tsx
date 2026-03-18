@@ -73,7 +73,7 @@ const blogPosts: Record<string, {
     excerpt: "Safety ratings, boot space, and running costs ranked.",
     category: "Reviews",
     image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1200&q=80",
-    author: "AutoVault Team", date: "2026-02-15", readTime: "7 min read",
+    author: "AutoSouq Team", date: "2026-02-15", readTime: "7 min read",
     content: [
       "Choosing the right family SUV means balancing safety, space, running costs, and budget. We've ranked the top 10 based on real owner feedback and expert analysis.",
       "## 1. Toyota RAV4 Hybrid\n\nReliability king. The RAV4 Hybrid delivers exceptional fuel economy (50+ mpg), a spacious boot, and Toyota's legendary build quality. Five-star NCAP rating.",
