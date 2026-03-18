@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.notify-arbitrage]
 verify_jwt = false
+
+[functions.send-notification-email]
+verify_jwt = false
