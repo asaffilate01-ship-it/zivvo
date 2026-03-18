@@ -82,7 +82,13 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             <div className="flex flex-1 flex-col justify-between p-4">
               <div>
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1 sm:text-lg">{car.title}</h3>
+                  <div>
+                    <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1 sm:text-lg">{car.title}</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <PriceIndicatorBadge price={car.price} marketAverage={(car as any).market_average} />
+                      {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
+                    </div>
+                  </div>
                   <p className="shrink-0 font-display text-lg font-bold text-primary sm:text-xl">{formatPrice(Number(car.price), config)}</p>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
