@@ -125,7 +125,7 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={`${post.title} — AutoVault Blog`} description={post.excerpt} />
+      <SEOHead title={`${post.title} — AutoSouq Blog`} description={post.excerpt} />
       <Navbar />
 
       <article className="container mx-auto max-w-3xl px-4 py-8">

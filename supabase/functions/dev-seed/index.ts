@@ -7,11 +7,11 @@ const corsHeaders = {
 };
 
 const TEST_USERS = [
-  { email: "buyer@autovault.test", password: "Test1234!", full_name: "Test Buyer", roles: ["buyer"] },
-  { email: "seller@autovault.test", password: "Test1234!", full_name: "Test Seller", roles: ["buyer", "seller"] },
-  { email: "dealer@autovault.test", password: "Test1234!", full_name: "Test Dealer", roles: ["buyer", "seller", "dealer"] },
-  { email: "agent@autovault.test", password: "Test1234!", full_name: "Test Agent", roles: ["buyer", "agent"] },
-  { email: "admin@autovault.test", password: "Test1234!", full_name: "Test Admin", roles: ["buyer", "admin"] },
+  { email: "buyer@autosouq.test", password: "Test1234!", full_name: "Test Buyer", roles: ["buyer"] },
+  { email: "seller@autosouq.test", password: "Test1234!", full_name: "Test Seller", roles: ["buyer", "seller"] },
+  { email: "dealer@autosouq.test", password: "Test1234!", full_name: "Test Dealer", roles: ["buyer", "seller", "dealer"] },
+  { email: "agent@autosouq.test", password: "Test1234!", full_name: "Test Agent", roles: ["buyer", "agent"] },
+  { email: "admin@autosouq.test", password: "Test1234!", full_name: "Test Admin", roles: ["buyer", "admin"] },
 ];
 
 serve(async (req) => {
