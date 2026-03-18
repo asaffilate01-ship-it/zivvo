@@ -128,6 +128,12 @@ const Index = () => {
       {/* Budget Presets */}
       <BudgetPresets />
 
+      {/* Cars Near You */}
+      <CarsNearYou />
+
+      {/* Car of the Week */}
+      <CarOfTheWeek />
+
       {/* Featured */}
       <section className="border-y border-border bg-muted/30 py-16">
         <div className="container mx-auto px-4">
