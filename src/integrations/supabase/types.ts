@@ -247,6 +247,13 @@ export type Database = {
             referencedRelation: "auctions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "auction_audit_log_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       auction_bids: {
@@ -295,6 +302,13 @@ export type Database = {
             columns: ["auction_id"]
             isOneToOne: false
             referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_bids_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions_public"
             referencedColumns: ["id"]
           },
         ]
@@ -357,6 +371,13 @@ export type Database = {
             columns: ["auction_id"]
             isOneToOne: false
             referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_contracts_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions_public"
             referencedColumns: ["id"]
           },
           {
@@ -425,6 +446,13 @@ export type Database = {
             referencedRelation: "auctions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "auction_deposits_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       auction_escrow: {
@@ -490,6 +518,13 @@ export type Database = {
             referencedRelation: "auctions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "auction_escrow_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       auction_watchers: {
@@ -517,6 +552,13 @@ export type Database = {
             columns: ["auction_id"]
             isOneToOne: false
             referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_watchers_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1720,6 +1762,159 @@ export type Database = {
       }
     }
     Views: {
+      auction_bids_public: {
+        Row: {
+          amount: number | null
+          auction_id: string | null
+          bidder_id: string | null
+          created_at: string | null
+          id: string | null
+          is_auto_bid: boolean | null
+          is_winning: boolean | null
+        }
+        Insert: {
+          amount?: number | null
+          auction_id?: string | null
+          bidder_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_auto_bid?: boolean | null
+          is_winning?: boolean | null
+        }
+        Update: {
+          amount?: number | null
+          auction_id?: string | null
+          bidder_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_auto_bid?: boolean | null
+          is_winning?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_bids_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auction_bids_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auctions_public: {
+        Row: {
+          anti_snipe_extension_mins: number | null
+          bid_count: number | null
+          buyer_premium_pct: number | null
+          condition_report: Json | null
+          created_at: string | null
+          current_bid: number | null
+          delivery_available: boolean | null
+          delivery_cost_estimate: number | null
+          ends_at: string | null
+          format: Database["public"]["Enums"]["auction_format"] | null
+          hpi_clear: boolean | null
+          id: string | null
+          inspection_rating: number | null
+          listing_id: string | null
+          live_event_date: string | null
+          live_event_name: string | null
+          lot_number: number | null
+          original_end_time: string | null
+          ownership_verified: boolean | null
+          seller_fee_pct: number | null
+          seller_id: string | null
+          seller_verified: boolean | null
+          starting_price: number | null
+          starts_at: string | null
+          status: Database["public"]["Enums"]["auction_status"] | null
+          updated_at: string | null
+          watchers_count: number | null
+          winning_bid_id: string | null
+        }
+        Insert: {
+          anti_snipe_extension_mins?: number | null
+          bid_count?: number | null
+          buyer_premium_pct?: number | null
+          condition_report?: Json | null
+          created_at?: string | null
+          current_bid?: number | null
+          delivery_available?: boolean | null
+          delivery_cost_estimate?: number | null
+          ends_at?: string | null
+          format?: Database["public"]["Enums"]["auction_format"] | null
+          hpi_clear?: boolean | null
+          id?: string | null
+          inspection_rating?: number | null
+          listing_id?: string | null
+          live_event_date?: string | null
+          live_event_name?: string | null
+          lot_number?: number | null
+          original_end_time?: string | null
+          ownership_verified?: boolean | null
+          seller_fee_pct?: number | null
+          seller_id?: string | null
+          seller_verified?: boolean | null
+          starting_price?: number | null
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["auction_status"] | null
+          updated_at?: string | null
+          watchers_count?: number | null
+          winning_bid_id?: string | null
+        }
+        Update: {
+          anti_snipe_extension_mins?: number | null
+          bid_count?: number | null
+          buyer_premium_pct?: number | null
+          condition_report?: Json | null
+          created_at?: string | null
+          current_bid?: number | null
+          delivery_available?: boolean | null
+          delivery_cost_estimate?: number | null
+          ends_at?: string | null
+          format?: Database["public"]["Enums"]["auction_format"] | null
+          hpi_clear?: boolean | null
+          id?: string | null
+          inspection_rating?: number | null
+          listing_id?: string | null
+          live_event_date?: string | null
+          live_event_name?: string | null
+          lot_number?: number | null
+          original_end_time?: string | null
+          ownership_verified?: boolean | null
+          seller_fee_pct?: number | null
+          seller_id?: string | null
+          seller_verified?: boolean | null
+          starting_price?: number | null
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["auction_status"] | null
+          updated_at?: string | null
+          watchers_count?: number | null
+          winning_bid_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auctions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auctions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       car_listings_public: {
         Row: {
           body_type: string | null
