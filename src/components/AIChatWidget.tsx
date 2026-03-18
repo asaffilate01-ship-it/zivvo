@@ -25,7 +25,7 @@ const AIChatWidget = () => {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hi! I'm AutoVault AI 🚗 I can help you find the perfect car, answer questions about our platform, or guide you through selling your vehicle. What can I help with?",
+      content: "Hi! I'm AutoSouq AI 🚗 I can help you find the perfect car, answer questions about our platform, or guide you through selling your vehicle. What can I help with?",
     },
   ]);
   const [input, setInput] = useState("");
