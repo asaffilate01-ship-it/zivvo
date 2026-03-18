@@ -60,7 +60,7 @@ const blogPosts: Record<string, {
     excerpt: "Here's how to protect yourself from outstanding finance.",
     category: "Safety",
     image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80",
-    author: "AutoVault Team", date: "2026-02-20", readTime: "4 min read",
+    author: "AutoSouq Team", date: "2026-02-20", readTime: "4 min read",
     content: [
       "Every year, thousands of cars are sold with outstanding finance — meaning the buyer could lose the car and their money. A finance check is one of the most important steps you can take.",
       "## What Is Outstanding Finance?\n\nWhen a car is bought on finance (HP, PCP, or personal loan secured against the vehicle), the finance company retains legal ownership until the debt is fully paid. If you buy a car with outstanding finance, the finance company can legally repossess it.",
