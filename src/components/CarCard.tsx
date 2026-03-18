@@ -85,7 +85,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                   <div>
                     <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1 sm:text-lg">{car.title}</h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <PriceIndicatorBadge price={car.price} marketAverage={(car as any).market_average} />
+                      <PriceIndicatorBadge price={car.price} make={car.make} model={car.model} year={car.year} mileage={car.mileage} />
                       {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
                     </div>
                   </div>
