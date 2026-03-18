@@ -530,26 +530,61 @@ const AuctionDetail = () => {
 
                   {isLive && !isSeller && user && (
                     <>
-                      {/* Deposit required banner */}
-                      {!hasDeposit && (
+                      {/* Deposit / Finance verification */}
+                      {!hasDeposit && !showDepositForm && !showFinanceForm && (
                         <div className="mb-3 p-3 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
                           <div className="flex items-start gap-2">
                             <CreditCard className="w-4 h-4 text-amber-600 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Deposit Required</p>
-                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Pre-authorize £500 to start bidding. This is held, not charged.</p>
-                              <Button size="sm" className="mt-2 gap-1" onClick={() => requestDeposit.mutate()} disabled={requestDeposit.isPending}>
-                                <CreditCard className="w-3 h-3" /> {requestDeposit.isPending ? "Processing..." : "Pre-authorize £500"}
-                              </Button>
+                              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Verification Required</p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Choose one option to start bidding:</p>
+                              <div className="flex gap-2 mt-2">
+                                <Button size="sm" className="gap-1 flex-1" onClick={() => setShowDepositForm(true)}>
+                                  <CreditCard className="w-3 h-3" /> Card Deposit
+                                </Button>
+                                <Button size="sm" variant="outline" className="gap-1 flex-1" onClick={() => setShowFinanceForm(true)}>
+                                  <Banknote className="w-3 h-3" /> Finance
+                                </Button>
+                              </div>
                             </div>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Stripe Elements deposit form */}
+                      {showDepositForm && !hasDeposit && (
+                        <div className="mb-3">
+                          <StripeDepositForm
+                            auctionId={auction.id}
+                            onSuccess={() => {
+                              setShowDepositForm(false);
+                              queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+                            }}
+                            onCancel={() => setShowDepositForm(false)}
+                          />
+                        </div>
+                      )}
+
+                      {/* Finance pre-approval form */}
+                      {showFinanceForm && !hasDeposit && (
+                        <div className="mb-3">
+                          <FinancePreApprovalForm
+                            auctionId={auction.id}
+                            onApproved={() => {
+                              setShowFinanceForm(false);
+                              queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+                            }}
+                          />
+                          <Button variant="ghost" size="sm" className="w-full mt-1" onClick={() => setShowFinanceForm(false)}>Cancel</Button>
                         </div>
                       )}
 
                       {hasDeposit && (
                         <div className="mb-3 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">Deposit pre-authorized — Ready to bid</span>
+                          <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+                            {deposit?.type === "finance_preapproval" ? "Finance pre-approved" : "Deposit pre-authorized"} — Ready to bid
+                          </span>
                         </div>
                       )}
 
