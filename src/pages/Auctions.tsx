@@ -91,7 +91,7 @@ const Auctions = () => {
                 Every Car Inspected.<br />Every Seller Verified.
               </h1>
               <p className="text-lg md:text-xl text-primary-foreground/70 mb-8 max-w-2xl">
-                Bid with confidence. Professional inspections, HPI checks, and escrow protection on every auction. Only 3% buyer premium — the lowest in the industry.
+                Bid with confidence. Professional inspections, HPI checks, and payment protection on every auction. Only 3% buyer premium — the lowest in the industry.
               </p>
               <div className="flex flex-wrap gap-6 text-sm text-primary-foreground/60">
                 {[
