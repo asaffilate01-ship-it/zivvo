@@ -4,7 +4,7 @@ import SEOHead from "@/components/SEOHead";
 
 const PrivacyPolicy = () => (
   <div className="min-h-screen bg-background">
-    <SEOHead title="Privacy Policy — AutoVault" description="Learn how AutoVault collects, uses, and protects your personal data." />
+    <SEOHead title="Privacy Policy — AutoSouq" description="Learn how AutoSouq collects, uses, and protects your personal data." />
     <Navbar />
     <div className="container mx-auto max-w-3xl px-4 py-12">
       <h1 className="font-display text-3xl font-bold text-foreground">Privacy Policy</h1>
