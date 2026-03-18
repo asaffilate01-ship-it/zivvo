@@ -609,7 +609,7 @@ const AuctionDetail = () => {
               <Card>
                 <CardContent className="p-4 space-y-3">
                   {[
-                    { icon: Shield, label: "Escrow Protected", desc: "Funds held until handover complete" },
+                    { icon: Shield, label: "Payment Protected", desc: "Funds held until handover complete" },
                     { icon: CreditCard, label: "Deposit Pre-auth", desc: "£500 held, not charged until you win" },
                     { icon: FileText, label: "E-Sign Contract", desc: "Legally binding digital contract" },
                     { icon: CheckCircle2, label: "Full Audit Trail", desc: "Every action logged & timestamped" },
