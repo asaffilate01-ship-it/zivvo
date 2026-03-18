@@ -1,5 +1,12 @@
 export type CountryCode = "GB" | "US" | "PK" | "AE";
 
+export interface IndividualPlan {
+  price: number;
+  priceId: string;
+  durationDays: number;
+  label: string;
+}
+
 export interface CountryConfig {
   code: CountryCode;
   name: string;
@@ -12,6 +19,7 @@ export interface CountryConfig {
   fuelTypes: string[];
   transmissions: string[];
   popularCities: string[];
+  individualPlan: IndividualPlan;
   dealerPlans: { name: string; price: number; priceId: string; maxListings: number; features: string[] }[];
   terminology: {
     registration: string;
