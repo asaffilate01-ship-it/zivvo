@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
+import PriceIndicatorBadge from "@/components/PriceIndicatorBadge";
+import DealerPerformanceBadge from "@/components/DealerPerformanceBadge";
 
 interface CarCardProps {
   car: {
@@ -26,6 +28,7 @@ interface CarCardProps {
     verified?: boolean | null;
     dealer_id?: string | null;
     video_url?: string | null;
+    market_average?: number | null;
   };
   index?: number;
   layout?: "grid" | "list";
@@ -79,7 +82,13 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             <div className="flex flex-1 flex-col justify-between p-4">
               <div>
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1 sm:text-lg">{car.title}</h3>
+                  <div>
+                    <h3 className="font-display text-base font-semibold text-card-foreground line-clamp-1 sm:text-lg">{car.title}</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <PriceIndicatorBadge price={car.price} marketAverage={(car as any).market_average} />
+                      {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
+                    </div>
+                  </div>
                   <p className="shrink-0 font-display text-lg font-bold text-primary sm:text-xl">{formatPrice(Number(car.price), config)}</p>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
@@ -145,6 +154,10 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
 
           <div className="p-4">
             <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1">{car.title}</h3>
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              <PriceIndicatorBadge price={car.price} marketAverage={(car as any).market_average} />
+              {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
+            </div>
             <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
               {specs.slice(0, 3).map((s, i) => (
                 <span key={i} className="flex items-center gap-1">

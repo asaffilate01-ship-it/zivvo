@@ -1,5 +1,12 @@
 export type CountryCode = "GB" | "US" | "PK" | "AE";
 
+export interface IndividualPlan {
+  price: number;
+  priceId: string;
+  durationDays: number;
+  label: string;
+}
+
 export interface CountryConfig {
   code: CountryCode;
   name: string;
@@ -12,6 +19,7 @@ export interface CountryConfig {
   fuelTypes: string[];
   transmissions: string[];
   popularCities: string[];
+  individualPlan: IndividualPlan;
   dealerPlans: { name: string; price: number; priceId: string; maxListings: number; features: string[] }[];
   terminology: {
     registration: string;
@@ -42,10 +50,11 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     fuelTypes: sharedFuelTypes,
     transmissions: sharedTransmissions,
     popularCities: ["London", "Birmingham", "Manchester", "Leeds", "Glasgow", "Liverpool", "Bristol", "Edinburgh", "Sheffield", "Cardiff"],
+    individualPlan: { price: 20, priceId: "price_1TCLoVFFogsDQVs4s6IkvnYI", durationDays: 90, label: "3-month listing" },
     dealerPlans: [
-      { name: "Starter", price: 49, priceId: "price_1TBFMMFFogsDQVs4rwjRss69", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard listing placement"] },
-      { name: "Professional", price: 99, priceId: "price_1TBFMOFFogsDQVs4vv5Rx8lW", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured listing placements", "Priority support", "Finance check integration"] },
-      { name: "Enterprise", price: 199, priceId: "price_1TBFMOFFogsDQVs4y0kujRs8", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Priority support + account manager", "Advanced analytics", "Multi-location support"] },
+      { name: "Small", price: 49, priceId: "price_1TCLoWFFogsDQVs4gyc8snRs", maxListings: 5, features: ["Up to 5 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard placement", "Verified dealer badge"] },
+      { name: "Medium", price: 99, priceId: "price_1TCLoYFFogsDQVs451H4MgtU", maxListings: 15, features: ["Up to 15 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured placements", "Priority support", "Finance check integration", "Performance score badge", "Call tracking & recording"] },
+      { name: "Large", price: 199, priceId: "price_1TCLoZFFogsDQVs4S4PepD0G", maxListings: 9999, features: ["Unlimited active listings", "White-label landing page", "API access & bulk import", "Dedicated account manager", "Advanced analytics & market insights", "Multi-location support", "Virtual viewings", "Call tracking & recording", "Priority featured placements"] },
     ],
     terminology: { registration: "Registration", mileage: "Mileage", postcode: "Postcode", petrol: "Petrol" },
   },
@@ -67,6 +76,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     fuelTypes: ["Gasoline", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid", "Flex Fuel"],
     transmissions: ["Automatic", "Manual", "CVT"],
     popularCities: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "San Antonio", "Dallas", "Miami", "Atlanta", "Denver"],
+    individualPlan: { price: 25, priceId: "price_us_individual", durationDays: 90, label: "3-month listing" },
     dealerPlans: [
       { name: "Starter", price: 59, priceId: "price_us_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard listing placement"] },
       { name: "Professional", price: 129, priceId: "price_us_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured listing placements", "Priority support", "CARFAX integration"] },
@@ -91,6 +101,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     fuelTypes: ["Petrol", "Diesel", "CNG", "Hybrid", "Electric", "LPG"],
     transmissions: ["Automatic", "Manual"],
     popularCities: ["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Sialkot", "Gujranwala"],
+    individualPlan: { price: 2000, priceId: "price_pk_individual", durationDays: 90, label: "3-month listing" },
     dealerPlans: [
       { name: "Starter", price: 9999, priceId: "price_pk_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
       { name: "Professional", price: 19999, priceId: "price_pk_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support"] },
@@ -116,6 +127,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     fuelTypes: ["Petrol", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid"],
     transmissions: ["Automatic", "Manual"],
     popularCities: ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Ras Al Khaimah", "Fujairah", "Umm Al Quwain", "Al Ain"],
+    individualPlan: { price: 75, priceId: "price_ae_individual", durationDays: 90, label: "3-month listing" },
     dealerPlans: [
       { name: "Starter", price: 199, priceId: "price_ae_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
       { name: "Professional", price: 399, priceId: "price_ae_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support", "Vehicle history integration"] },

@@ -153,19 +153,21 @@ const SellMyCar = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Sell My Car — Free Listing" description="Sell your car fast with AutoSouq. Free listings, verified buyers, and instant valuation." />
+      <SEOHead title={`Sell My Car — ${formatPrice(config.individualPlan.price, config)} for ${config.individualPlan.durationDays / 30} Months`} description={`Sell your car on AutoSouq for just ${formatPrice(config.individualPlan.price, config)}. ${config.individualPlan.durationDays / 30}-month listing, verified buyers, instant valuation.`} />
       <Navbar />
 
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-3xl">
           {/* Hero */}
           <div className="text-center mb-10">
-            <Badge variant="outline" className="mb-3 text-xs">Free to List</Badge>
+            <Badge variant="outline" className="mb-3 text-xs">{formatPrice(config.individualPlan.price, config)} for {config.individualPlan.durationDays / 30} months</Badge>
             <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
               Sell Your Car
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> The Easy Way</span>
             </h1>
-            <p className="mt-2 text-muted-foreground">4 simple steps. No fees. Reach thousands of verified buyers.</p>
+            <p className="mt-2 text-muted-foreground">
+              List your car for just {formatPrice(config.individualPlan.price, config)} — live for {config.individualPlan.durationDays / 30} months. Reach thousands of verified buyers.
+            </p>
 
             <div className="mt-6 flex justify-center gap-8 text-xs text-muted-foreground">
               {[
