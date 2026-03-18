@@ -172,9 +172,10 @@ const Profile = () => {
         <p className="text-muted-foreground">Manage your account and listings</p>
 
         <Tabs defaultValue="profile" className="mt-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="listings">Listings ({myListings.length})</TabsTrigger>
+            <TabsTrigger value="auctions"><Gavel className="mr-1 h-3.5 w-3.5" /> Auctions</TabsTrigger>
             <TabsTrigger value="referrals"><Gift className="mr-1 h-3.5 w-3.5" /> Referrals</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
