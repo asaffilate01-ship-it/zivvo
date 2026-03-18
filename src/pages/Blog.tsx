@@ -16,7 +16,7 @@ const blogPosts = [
     title: "The Ultimate Used Car Buying Checklist for 2026",
     excerpt: "Don't get caught out. Our comprehensive checklist covers everything from bodywork inspection to finance checks before you hand over your money.",
     category: "Buying Guide",
-    image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80",
     author: "AutoSouq Team",
     date: "2026-03-10",
     readTime: "8 min read",
