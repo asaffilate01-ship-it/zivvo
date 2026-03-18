@@ -31,7 +31,7 @@ const TermsOfService = () => (
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>Sellers are responsible for the accuracy of their listing information.</li>
             <li>Listings must not contain fraudulent, misleading, or illegal content.</li>
-            <li>AutoVault reserves the right to remove any listing at its discretion.</li>
+            <li>AutoSouq reserves the right to remove any listing at its discretion.</li>
             <li>Images must be of the actual vehicle being sold.</li>
           </ul>
         </section>
