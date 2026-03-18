@@ -43,6 +43,8 @@ const CreateListing = () => {
   const [hpiCheckData, setHpiCheckData] = useState<any>(null);
   const [hpiLoading, setHpiLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     title: "",
