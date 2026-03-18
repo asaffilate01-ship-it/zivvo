@@ -151,6 +151,60 @@ serve(async (req) => {
         break;
       }
 
+      // Handle arbitrage dealer payment
+      case "checkout.session.completed": {
+        const session2 = event.data.object as Stripe.Checkout.Session;
+        if (session2.metadata?.type === "arbitrage_dealer_payment") {
+          const dealId = session2.metadata.deal_id;
+          const dealerId = session2.metadata.dealer_id;
+          logStep("Arbitrage payment completed", { dealId, dealerId });
+
+          // Update deal to seller_paid-ready state
+          const { error: arbErr } = await supabase
+            .from("arbitrage_deals")
+            .update({
+              dealer_paid_at: new Date().toISOString(),
+              dealer_payment_ref: session2.payment_intent as string || session2.id,
+            })
+            .eq("id", dealId);
+
+          if (arbErr) {
+            logStep("ERROR updating arbitrage deal payment", { error: arbErr.message });
+          } else {
+            logStep("Arbitrage deal payment recorded", { dealId });
+
+            // Notify admins
+            const { data: adminRoles } = await supabase
+              .from("user_roles")
+              .select("user_id")
+              .eq("role", "admin");
+
+            if (adminRoles) {
+              for (const admin of adminRoles) {
+                await supabase.from("notifications").insert({
+                  user_id: admin.user_id,
+                  type: "arbitrage",
+                  title: "Dealer Payment Received 💰",
+                  message: `Dealer payment completed for trade stock deal. Ready for seller payout.`,
+                  link: "/trade-stock",
+                });
+              }
+            }
+
+            // Audit log
+            await supabase.from("arbitrage_audit_log").insert({
+              deal_id: dealId,
+              actor_role: "system",
+              action: "dealer_payment_completed",
+              details: { payment_intent: session2.payment_intent, session_id: session2.id },
+            });
+          }
+          break;
+        }
+        // Fall through for non-arbitrage checkout.session.completed already handled above
+        break;
+      }
+
       default:
         logStep("Unhandled event type", { type: event.type });
     }
