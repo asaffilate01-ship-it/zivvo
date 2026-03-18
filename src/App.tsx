@@ -49,6 +49,9 @@ const CarValuation = lazy(() => import("./pages/CarValuation"));
 const SellMyCar = lazy(() => import("./pages/SellMyCar"));
 const CarReviews = lazy(() => import("./pages/CarReviews"));
 const PopularCars = lazy(() => import("./pages/PopularCars"));
+const Auctions = lazy(() => import("./pages/Auctions"));
+const AuctionDetail = lazy(() => import("./pages/AuctionDetail"));
+const CreateAuction = lazy(() => import("./pages/CreateAuction"));
 
 const queryClient = new QueryClient();
 
