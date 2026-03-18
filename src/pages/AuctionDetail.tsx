@@ -36,6 +36,7 @@ const formatCurrency = (amount: number, country: string) => {
 
 const AuctionDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { country } = useCountry();
   const queryClient = useQueryClient();
@@ -46,8 +47,18 @@ const AuctionDetail = () => {
   const [timeLeft, setTimeLeft] = useState("");
   const [showBidConfirm, setShowBidConfirm] = useState(false);
   const [showContract, setShowContract] = useState(false);
-  const [showDepositDialog, setShowDepositDialog] = useState(false);
+  const [showDepositForm, setShowDepositForm] = useState(false);
+  const [showFinanceForm, setShowFinanceForm] = useState(false);
   const [showDeliveryRequest, setShowDeliveryRequest] = useState(false);
+  const [payingWinner, setPayingWinner] = useState(false);
+
+  // Handle payment success redirect
+  useEffect(() => {
+    if (searchParams.get("payment") === "success") {
+      toast.success("Payment successful! Your purchase is being processed.");
+      queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
+    }
+  }, [searchParams]);
 
   const { data: auction, isLoading } = useQuery({
     queryKey: ["auction", id],
