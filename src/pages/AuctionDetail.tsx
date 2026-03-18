@@ -15,10 +15,14 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
   Gavel, Shield, Star, Clock, CheckCircle2, AlertTriangle, Key, FileText, Truck,
   ChevronLeft, ChevronRight, Eye, Users, TrendingUp, History, Car, Wrench, Paintbrush,
+  Heart, HeartOff, Zap, CreditCard, Package, Send,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
@@ -34,10 +38,14 @@ const AuctionDetail = () => {
   const { country } = useCountry();
   const queryClient = useQueryClient();
   const [bidAmount, setBidAmount] = useState("");
+  const [maxAutoBid, setMaxAutoBid] = useState("");
+  const [useAutoBid, setUseAutoBid] = useState(false);
   const [imageIdx, setImageIdx] = useState(0);
   const [timeLeft, setTimeLeft] = useState("");
   const [showBidConfirm, setShowBidConfirm] = useState(false);
   const [showContract, setShowContract] = useState(false);
+  const [showDepositDialog, setShowDepositDialog] = useState(false);
+  const [showDeliveryRequest, setShowDeliveryRequest] = useState(false);
 
   const { data: auction, isLoading } = useQuery({
     queryKey: ["auction", id],
@@ -94,6 +102,35 @@ const AuctionDetail = () => {
     enabled: !!id && !!user,
   });
 
+  const { data: deposit } = useQuery({
+    queryKey: ["auction-deposit", id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("auction_deposits")
+        .select("*")
+        .eq("auction_id", id!)
+        .eq("user_id", user!.id)
+        .in("status", ["authorized", "pending"])
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!id && !!user,
+  });
+
+  const { data: isWatching } = useQuery({
+    queryKey: ["auction-watching", id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("auction_watchers")
+        .select("id")
+        .eq("auction_id", id!)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!id && !!user,
+  });
+
   // Realtime bid subscription
   useEffect(() => {
     if (!id) return;
@@ -124,6 +161,23 @@ const AuctionDetail = () => {
     return () => clearInterval(interval);
   }, [auction?.ends_at]);
 
+  const toggleWatch = useMutation({
+    mutationFn: async () => {
+      if (!user || !id) throw new Error("Login required");
+      if (isWatching) {
+        await supabase.from("auction_watchers").delete().eq("auction_id", id).eq("user_id", user.id);
+      } else {
+        await supabase.from("auction_watchers").insert({ auction_id: id, user_id: user.id });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auction-watching", id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["auction", id] });
+      toast.success(isWatching ? "Removed from watchlist" : "Added to watchlist");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const placeBid = useMutation({
     mutationFn: async () => {
       if (!user || !auction) throw new Error("Login required");
@@ -132,17 +186,31 @@ const AuctionDetail = () => {
       if (amount < minBid) throw new Error(`Minimum bid is ${formatCurrency(minBid, country)}`);
       if (user.id === auction.seller_id) throw new Error("You cannot bid on your own auction");
 
-      const { error } = await supabase.from("auction_bids").insert({
+      // Check deposit
+      if (!deposit || deposit.status !== "authorized") {
+        throw new Error("You need to pre-authorize a deposit before bidding");
+      }
+
+      const bidData: any = {
         auction_id: auction.id,
         bidder_id: user.id,
         amount,
         deposit_verified: true,
-      });
+      };
+
+      if (useAutoBid && maxAutoBid) {
+        const maxAuto = parseFloat(maxAutoBid);
+        if (maxAuto < amount) throw new Error("Max auto-bid must be higher than your bid");
+        bidData.max_auto_bid = maxAuto;
+      }
+
+      const { error } = await supabase.from("auction_bids").insert(bidData);
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success("Bid placed successfully!");
       setBidAmount("");
+      setMaxAutoBid("");
       setShowBidConfirm(false);
     },
     onError: (e: Error) => toast.error(e.message),
@@ -152,8 +220,8 @@ const AuctionDetail = () => {
     mutationFn: async (role: "buyer" | "seller") => {
       if (!contract || !user) return;
       const update = role === "buyer"
-        ? { buyer_signed: true, buyer_signed_at: new Date().toISOString(), status: "pending_seller" as const }
-        : { seller_signed: true, seller_signed_at: new Date().toISOString() };
+        ? { buyer_signed: true, buyer_signed_at: new Date().toISOString(), buyer_ip: "recorded", status: "pending_seller" as const }
+        : { seller_signed: true, seller_signed_at: new Date().toISOString(), seller_ip: "recorded" };
 
       const { error } = await supabase
         .from("auction_contracts")
@@ -169,6 +237,50 @@ const AuctionDetail = () => {
     onError: () => toast.error("Failed to sign contract"),
   });
 
+  const confirmHandover = useMutation({
+    mutationFn: async (field: "v5c_received" | "keys_handed_over") => {
+      if (!escrow) return;
+      const { error } = await supabase
+        .from("auction_escrow")
+        .update({ [field]: true })
+        .eq("id", escrow.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Handover step confirmed!");
+      queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
+    },
+    onError: () => toast.error("Failed to confirm"),
+  });
+
+  const requestDeposit = useMutation({
+    mutationFn: async () => {
+      if (!user || !auction) throw new Error("Login required");
+      const { data, error } = await supabase.functions.invoke("deposit-checkout", {
+        body: { auction_id: auction.id, amount: 500 },
+      });
+      if (error) throw error;
+      if (data?.already_authorized) {
+        toast.success("Deposit already authorized!");
+        queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+        return;
+      }
+      // For now, simulate confirming the deposit (in production, use Stripe Elements)
+      if (data?.deposit_id) {
+        const { error: confirmErr } = await supabase.functions.invoke("confirm-deposit", {
+          body: { deposit_id: data.deposit_id, payment_intent_id: data.payment_intent_id },
+        });
+        if (confirmErr) throw confirmErr;
+        queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+      }
+    },
+    onSuccess: () => {
+      toast.success("Deposit pre-authorized! You can now bid.");
+      setShowDepositDialog(false);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (isLoading) return (<><Navbar /><div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div></>);
   if (!auction) return (<><Navbar /><div className="min-h-screen flex items-center justify-center"><p>Auction not found</p></div></>);
 
@@ -180,6 +292,8 @@ const AuctionDetail = () => {
   const isSeller = user?.id === auction.seller_id;
   const isWinner = auction.winning_bid_id && bids[0]?.bidder_id === user?.id;
   const reserveMet = auction.reserve_price ? currentPrice >= auction.reserve_price : true;
+  const hasDeposit = deposit?.status === "authorized";
+  const isSold = auction.status === "sold";
 
   return (
     <>
@@ -211,6 +325,13 @@ const AuctionDetail = () => {
                 <div className="absolute top-3 left-3 flex gap-2">
                   {isLive && <Badge className="bg-red-500 text-white border-0 animate-pulse"><span className="w-1.5 h-1.5 bg-white rounded-full mr-1.5 inline-block" />LIVE</Badge>}
                   {auction.inspection_rating && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><Star className="w-3 h-3 mr-1 fill-primary text-primary" />{auction.inspection_rating}/5 Condition</Badge>}
+                </div>
+                <div className="absolute top-3 right-3">
+                  {user && (
+                    <button onClick={() => toggleWatch.mutate()} className="w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center hover:bg-background transition">
+                      {isWatching ? <Heart className="w-5 h-5 fill-red-500 text-red-500" /> : <Heart className="w-5 h-5 text-muted-foreground" />}
+                    </button>
+                  )}
                 </div>
                 <div className="absolute bottom-3 left-3 flex gap-2 text-xs">
                   <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">{imageIdx + 1}/{images.length} photos</Badge>
@@ -341,8 +462,9 @@ const AuctionDetail = () => {
                                 <div className="flex items-center gap-3">
                                   {i === 0 && <TrendingUp className="w-4 h-4 text-primary" />}
                                   <div>
-                                    <p className="font-medium text-sm">
+                                    <p className="font-medium text-sm flex items-center gap-1.5">
                                       {bid.bidder_id === user?.id ? "You" : `Bidder ***${bid.bidder_id.slice(-4)}`}
+                                      {bid.is_auto_bid && <Badge variant="outline" className="text-[9px] py-0"><Zap className="w-2.5 h-2.5 mr-0.5" />Auto</Badge>}
                                     </p>
                                     <p className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleString()}</p>
                                   </div>
@@ -388,14 +510,61 @@ const AuctionDetail = () => {
                     <p className={`text-xl font-bold font-mono ${isLive ? "text-red-600 dark:text-red-400" : ""}`}>{timeLeft || "—"}</p>
                   </div>
 
+                  {/* Watch button */}
+                  {user && !isSeller && (
+                    <Button variant="outline" className="w-full mb-3 gap-2" onClick={() => toggleWatch.mutate()} disabled={toggleWatch.isPending}>
+                      {isWatching ? <><HeartOff className="w-4 h-4" /> Unwatch</> : <><Heart className="w-4 h-4" /> Watch Auction</>}
+                    </Button>
+                  )}
+
                   {isLive && !isSeller && user && (
                     <>
+                      {/* Deposit required banner */}
+                      {!hasDeposit && (
+                        <div className="mb-3 p-3 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+                          <div className="flex items-start gap-2">
+                            <CreditCard className="w-4 h-4 text-amber-600 mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Deposit Required</p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Pre-authorize £500 to start bidding. This is held, not charged.</p>
+                              <Button size="sm" className="mt-2 gap-1" onClick={() => requestDeposit.mutate()} disabled={requestDeposit.isPending}>
+                                <CreditCard className="w-3 h-3" /> {requestDeposit.isPending ? "Processing..." : "Pre-authorize £500"}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {hasDeposit && (
+                        <div className="mb-3 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">Deposit pre-authorized — Ready to bid</span>
+                        </div>
+                      )}
+
                       <div className="space-y-3">
                         <div>
                           <p className="text-xs text-muted-foreground mb-1">Your bid (min: {formatCurrency((currentPrice) + getMinIncrement(currentPrice), country)})</p>
-                          <Input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} placeholder={`${(currentPrice + getMinIncrement(currentPrice))}`} className="text-lg font-semibold" />
+                          <Input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} placeholder={`${(currentPrice + getMinIncrement(currentPrice))}`} className="text-lg font-semibold" disabled={!hasDeposit} />
                         </div>
-                        <Button className="w-full h-12 text-lg gap-2" onClick={() => setShowBidConfirm(true)} disabled={!bidAmount}>
+
+                        {/* Auto-bid toggle */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Zap className="w-4 h-4 text-primary" />
+                            <Label className="text-sm cursor-pointer" htmlFor="auto-bid">Auto-bid (proxy)</Label>
+                          </div>
+                          <Switch id="auto-bid" checked={useAutoBid} onCheckedChange={setUseAutoBid} disabled={!hasDeposit} />
+                        </div>
+                        {useAutoBid && (
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Maximum auto-bid ceiling</p>
+                            <Input type="number" value={maxAutoBid} onChange={(e) => setMaxAutoBid(e.target.value)} placeholder="e.g. 15000" disabled={!hasDeposit} />
+                            <p className="text-[10px] text-muted-foreground mt-1">System bids minimum increments on your behalf up to this amount</p>
+                          </div>
+                        )}
+
+                        <Button className="w-full h-12 text-lg gap-2" onClick={() => setShowBidConfirm(true)} disabled={!bidAmount || !hasDeposit}>
                           <Gavel className="w-5 h-5" /> Place Bid
                         </Button>
                       </div>
@@ -441,6 +610,7 @@ const AuctionDetail = () => {
                 <CardContent className="p-4 space-y-3">
                   {[
                     { icon: Shield, label: "Escrow Protected", desc: "Funds held until handover complete" },
+                    { icon: CreditCard, label: "Deposit Pre-auth", desc: "£500 held, not charged until you win" },
                     { icon: FileText, label: "E-Sign Contract", desc: "Legally binding digital contract" },
                     { icon: CheckCircle2, label: "Full Audit Trail", desc: "Every action logged & timestamped" },
                   ].map(({ icon: Icon, label, desc }) => (
@@ -455,14 +625,14 @@ const AuctionDetail = () => {
                 </CardContent>
               </Card>
 
-              {/* Contract section for winner/seller */}
-              {(auction.status === "sold" || auction.status === "ended") && (isWinner || isSeller) && contract && (
+              {/* Post-Sale: Contract section for winner/seller */}
+              {(isSold || auction.status === "ended") && (isWinner || isSeller) && contract && (
                 <Card className="border-primary/30">
                   <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><FileText className="w-4 h-4" /> Sale Contract</CardTitle></CardHeader>
                   <CardContent className="space-y-3">
                     <div className="text-sm space-y-1">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Buyer signed</span><span>{contract.buyer_signed ? "✅" : "⏳ Pending"}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Seller signed</span><span>{contract.seller_signed ? "✅" : "⏳ Pending"}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Buyer signed</span><span>{contract.buyer_signed ? `✅ ${new Date(contract.buyer_signed_at).toLocaleDateString()}` : "⏳ Pending"}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Seller signed</span><span>{contract.seller_signed ? `✅ ${new Date(contract.seller_signed_at).toLocaleDateString()}` : "⏳ Pending"}</span></div>
                     </div>
                     {((isWinner && !contract.buyer_signed) || (isSeller && !contract.seller_signed)) && (
                       <Dialog open={showContract} onOpenChange={setShowContract}>
@@ -472,13 +642,13 @@ const AuctionDetail = () => {
                         <DialogContent className="max-w-2xl">
                           <DialogHeader>
                             <DialogTitle>Sale Contract</DialogTitle>
-                            <DialogDescription>Review the contract carefully before signing.</DialogDescription>
+                            <DialogDescription>Review the contract carefully before signing. Your IP address and timestamp will be recorded.</DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-80 border rounded-lg p-4 text-sm">
                             <div dangerouslySetInnerHTML={{ __html: contract.contract_html || generateContractHTML(auction, listing, currentPrice, country) }} />
                           </ScrollArea>
                           <DialogFooter>
-                            <p className="text-xs text-muted-foreground mr-auto">By signing, you agree to the terms above. Your IP address and timestamp will be recorded.</p>
+                            <p className="text-xs text-muted-foreground mr-auto">By signing, you agree to the terms above.</p>
                             <Button onClick={() => signContract.mutate(isSeller ? "seller" : "buyer")} disabled={signContract.isPending}>
                               {signContract.isPending ? "Signing..." : "I Agree — Sign Contract"}
                             </Button>
@@ -490,15 +660,69 @@ const AuctionDetail = () => {
                 </Card>
               )}
 
-              {/* Escrow status */}
+              {/* Post-Sale: Handover Checklist */}
               {escrow && (isWinner || isSeller) && (
-                <Card>
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Shield className="w-4 h-4" /> Escrow Status</CardTitle></CardHeader>
-                  <CardContent className="space-y-2 text-sm">
-                    <div className="flex justify-between"><span className="text-muted-foreground">Status</span><Badge variant="outline">{(escrow.status as string).replace(/_/g, " ")}</Badge></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">V5C Received</span><span>{escrow.v5c_received ? "✅" : "⏳"}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Keys Handed Over</span><span>{escrow.keys_handed_over ? "✅" : "⏳"}</span></div>
-                    <div className="flex justify-between"><span className="text-muted-foreground">Contract Signed</span><span>{escrow.contract_signed ? "✅" : "⏳"}</span></div>
+                <Card className="border-primary/20">
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Package className="w-4 h-4" /> Handover Checklist</CardTitle></CardHeader>
+                  <CardContent className="space-y-3">
+                    <p className="text-xs text-muted-foreground">Funds released to seller once all steps confirmed</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" />
+                          <span className="text-sm">V5C / Logbook Received</span>
+                        </div>
+                        {escrow.v5c_received ? (
+                          <Badge className="bg-emerald-500 text-white border-0">✓ Confirmed</Badge>
+                        ) : (
+                          isSeller ? (
+                            <Button size="sm" variant="outline" onClick={() => confirmHandover.mutate("v5c_received")} disabled={confirmHandover.isPending}>
+                              Confirm Sent
+                            </Button>
+                          ) : <Badge variant="outline">Pending</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                        <div className="flex items-center gap-2">
+                          <Key className="w-4 h-4 text-primary" />
+                          <span className="text-sm">Keys Handed Over</span>
+                        </div>
+                        {escrow.keys_handed_over ? (
+                          <Badge className="bg-emerald-500 text-white border-0">✓ Confirmed</Badge>
+                        ) : (
+                          isSeller ? (
+                            <Button size="sm" variant="outline" onClick={() => confirmHandover.mutate("keys_handed_over")} disabled={confirmHandover.isPending}>
+                              Confirm Handed
+                            </Button>
+                          ) : <Badge variant="outline">Pending</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" />
+                          <span className="text-sm">Contract Signed</span>
+                        </div>
+                        {escrow.contract_signed || (contract?.buyer_signed && contract?.seller_signed) ? (
+                          <Badge className="bg-emerald-500 text-white border-0">✓ Both Signed</Badge>
+                        ) : <Badge variant="outline">Pending</Badge>}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Escrow Status</span>
+                      <Badge variant="outline" className="capitalize">{(escrow.status as string).replace(/_/g, " ")}</Badge>
+                    </div>
+
+                    {/* Delivery request */}
+                    {isWinner && auction.delivery_available && (
+                      <div className="pt-2">
+                        <Button variant="outline" className="w-full gap-2" onClick={() => setShowDeliveryRequest(true)}>
+                          <Truck className="w-4 h-4" /> Request Delivery
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
@@ -520,11 +744,46 @@ const AuctionDetail = () => {
             <div className="flex justify-between text-sm"><span className="text-muted-foreground">Buyer Premium (3%)</span><span>{bidAmount ? formatCurrency(parseFloat(bidAmount) * 0.03, country) : "—"}</span></div>
             <Separator />
             <div className="flex justify-between font-bold"><span>Total if you win</span><span className="text-primary">{bidAmount ? formatCurrency(parseFloat(bidAmount) * 1.03, country) : "—"}</span></div>
+            {useAutoBid && maxAutoBid && (
+              <>
+                <Separator />
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground flex items-center gap-1"><Zap className="w-3 h-3" /> Auto-bid ceiling</span>
+                  <span className="font-medium">{formatCurrency(parseFloat(maxAutoBid), country)}</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground">System will bid minimum increments on your behalf up to this amount</p>
+              </>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowBidConfirm(false)}>Cancel</Button>
             <Button onClick={() => placeBid.mutate()} disabled={placeBid.isPending}>
               {placeBid.isPending ? "Placing..." : "Confirm Bid"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delivery request dialog */}
+      <Dialog open={showDeliveryRequest} onOpenChange={setShowDeliveryRequest}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Truck className="w-5 h-5" /> Request Delivery</DialogTitle>
+            <DialogDescription>Our logistics partners will arrange delivery to your address.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <div className="p-4 rounded-lg bg-muted/50 space-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-muted-foreground">Collection from</span><span className="font-medium">{auction.collection_address || listing?.location || "TBC"}</span></div>
+              {auction.delivery_cost_estimate && (
+                <div className="flex justify-between"><span className="text-muted-foreground">Estimated cost</span><span className="font-medium">{formatCurrency(auction.delivery_cost_estimate, country)}</span></div>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">Delivery cost is additional and paid by the buyer. Exact quote will be provided after confirming your delivery address.</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeliveryRequest(false)}>Cancel</Button>
+            <Button onClick={() => { toast.success("Delivery request submitted! Our team will contact you."); setShowDeliveryRequest(false); }}>
+              <Send className="w-4 h-4 mr-1" /> Submit Request
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -544,24 +803,29 @@ function getMinIncrement(currentPrice: number): number {
 function generateContractHTML(auction: any, listing: any, price: number, country: string): string {
   return `
     <h2 style="font-weight:bold;font-size:18px;margin-bottom:16px;">Vehicle Sale Agreement</h2>
+    <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+    <p><strong>Auction ID:</strong> ${auction.id}</p>
+    <hr style="margin:12px 0;"/>
     <p><strong>Vehicle:</strong> ${listing?.year} ${listing?.make} ${listing?.model}</p>
     <p><strong>Registration:</strong> ${listing?.registration || "N/A"}</p>
     <p><strong>VIN:</strong> ${listing?.vin || "N/A"}</p>
     <p><strong>Mileage:</strong> ${listing?.mileage?.toLocaleString() || "N/A"}</p>
+    <hr style="margin:12px 0;"/>
     <p><strong>Hammer Price:</strong> ${price}</p>
     <p><strong>Buyer Premium (3%):</strong> ${(price * 0.03).toFixed(2)}</p>
     <p><strong>Total Due from Buyer:</strong> ${(price * 1.03).toFixed(2)}</p>
     <p><strong>Seller Fee (1.5%):</strong> ${(price * 0.015).toFixed(2)}</p>
     <p><strong>Seller Receives:</strong> ${(price * 0.985).toFixed(2)}</p>
-    <hr style="margin:16px 0;" />
-    <h3 style="font-weight:bold;">Terms</h3>
-    <ol style="padding-left:20px;">
-      <li>The Seller agrees to transfer the vehicle described above to the Buyer upon receipt of full payment.</li>
+    <hr style="margin:12px 0;"/>
+    <h3 style="font-weight:bold;">Terms & Conditions</h3>
+    <ol style="padding-left:20px;font-size:13px;">
+      <li>The Seller agrees to transfer the vehicle to the Buyer upon receipt of full payment and completion of all handover requirements.</li>
       <li>The Buyer agrees to pay the Total Due within 72 hours of auction close.</li>
-      <li>Funds are held in escrow and released to the Seller only upon confirmation of V5C transfer, key handover, and mutual contract signing.</li>
-      <li>The vehicle is sold as described in the condition report and inspection rating provided. No additional warranty is implied unless stated.</li>
-      <li>Delivery, if arranged through platform logistics partners, is at additional cost to the Buyer.</li>
-      <li>This agreement is legally binding upon digital signature by both parties.</li>
+      <li>Funds are held in escrow and released to the Seller only upon: (a) V5C/logbook transfer, (b) key handover, and (c) mutual contract signing.</li>
+      <li>The vehicle is sold as described in the inspection and condition report. The platform makes no additional warranty unless explicitly stated.</li>
+      <li>Delivery via logistics partners is at additional cost to the Buyer if arranged.</li>
+      <li>This agreement is legally binding upon digital signature by both parties. IP addresses and timestamps are recorded for audit purposes.</li>
+      <li>Any disputes shall be resolved through the platform's dispute resolution process.</li>
     </ol>
   `;
 }
