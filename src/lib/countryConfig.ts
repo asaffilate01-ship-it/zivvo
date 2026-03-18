@@ -101,6 +101,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     fuelTypes: ["Petrol", "Diesel", "CNG", "Hybrid", "Electric", "LPG"],
     transmissions: ["Automatic", "Manual"],
     popularCities: ["Karachi", "Lahore", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Peshawar", "Quetta", "Sialkot", "Gujranwala"],
+    individualPlan: { price: 2000, priceId: "price_pk_individual", durationDays: 90, label: "3-month listing" },
     dealerPlans: [
       { name: "Starter", price: 9999, priceId: "price_pk_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "WhatsApp support", "Standard listing placement"] },
       { name: "Professional", price: 19999, priceId: "price_pk_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer page", "Featured listing placements", "Priority support"] },
