@@ -1098,6 +1098,44 @@ const AdminDashboard = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Auction Detail Dialog */}
+        <Dialog open={!!selectedAuction} onOpenChange={() => setSelectedAuction(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="font-display flex items-center gap-2"><Gavel className="h-5 w-5" /> Auction Details</DialogTitle>
+              <DialogDescription>Full auction information and controls</DialogDescription>
+            </DialogHeader>
+            {selectedAuction && (
+              <div className="space-y-3 text-sm">
+                <div className="grid grid-cols-2 gap-2">
+                  <div><span className="text-muted-foreground">Vehicle:</span> <span className="text-foreground">{selectedAuction.car_listings?.year} {selectedAuction.car_listings?.make} {selectedAuction.car_listings?.model}</span></div>
+                  <div><span className="text-muted-foreground">Status:</span> <Badge variant="outline">{selectedAuction.status}</Badge></div>
+                  <div><span className="text-muted-foreground">Format:</span> <span className="text-foreground">{selectedAuction.format}</span></div>
+                  <div><span className="text-muted-foreground">Rating:</span> <span className="text-foreground">{selectedAuction.inspection_rating ? `${selectedAuction.inspection_rating}/5` : "Pending"}</span></div>
+                  <div><span className="text-muted-foreground">Starting:</span> <span className="text-foreground">£{Number(selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Current:</span> <span className="text-foreground font-bold">£{Number(selectedAuction.current_bid || selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Reserve:</span> <span className="text-foreground">{selectedAuction.reserve_price ? `£${Number(selectedAuction.reserve_price).toLocaleString()}` : "None"}</span></div>
+                  <div><span className="text-muted-foreground">Bids:</span> <span className="text-foreground">{selectedAuction.bid_count || 0}</span></div>
+                  <div><span className="text-muted-foreground">HPI:</span> <span>{selectedAuction.hpi_clear ? "✅ Clear" : "⏳"}</span></div>
+                  <div><span className="text-muted-foreground">Verified:</span> <span>{selectedAuction.seller_verified ? "✅" : "⏳"}</span></div>
+                </div>
+                <Separator />
+                <div className="flex gap-2 pt-2">
+                  {selectedAuction.status === "pending_inspection" && (
+                    <>
+                      {[1,2,3,4,5].map(r => (
+                        <Button key={r} size="sm" variant="outline" onClick={() => { approveAuction(selectedAuction.id, r); setSelectedAuction(null); }}>⭐{r}</Button>
+                      ))}
+                    </>
+                  )}
+                  {selectedAuction.status !== "cancelled" && (
+                    <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Cancel</Button>
+                  )}
+                </div>
+              </div>
+            )}
+          </DialogContent>
       </div>
       <Footer />
     </div>
