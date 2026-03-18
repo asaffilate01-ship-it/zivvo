@@ -44,7 +44,7 @@ Based on your knowledge of typical prices on major car listing sites for this ex
 
 You MUST respond using the suggest_price_rating tool.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://ai-gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,

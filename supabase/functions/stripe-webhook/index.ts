@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -8,7 +8,7 @@ const logStep = (step: string, details?: any) => {
 };
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-  apiVersion: "2025-08-27.basil",
+  apiVersion: "2023-10-16",
 });
 
 const supabase = createClient(
@@ -46,16 +46,12 @@ serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.user_id;
+        const metaType = session.metadata?.type;
 
-        if (!userId) {
-          logStep("ERROR: No user_id in session metadata");
-          break;
-        }
-
-        // Handle boost payments (one-time)
-        if (session.metadata?.type === "boost" && session.mode === "payment") {
-          const listingId = session.metadata.listing_id;
-          const days = parseInt(session.metadata.days || "7");
+        // --- Boost payments (one-time) ---
+        if (metaType === "boost" && session.mode === "payment") {
+          const listingId = session.metadata!.listing_id;
+          const days = parseInt(session.metadata!.days || "7");
           const promotedUntil = new Date();
           promotedUntil.setDate(promotedUntil.getDate() + days);
 
@@ -70,23 +66,107 @@ serve(async (req) => {
           if (boostErr) logStep("ERROR boosting listing", { error: boostErr.message });
           else logStep("Listing boosted", { listingId, until: promotedUntil.toISOString() });
 
-          await supabase.from("notifications").insert({
-            user_id: userId,
-            type: "boost",
-            title: "Listing Boosted! 🚀",
-            message: `Your listing is now promoted for ${days} days.`,
-            link: `/car/${listingId}`,
-          });
+          if (userId) {
+            await supabase.from("notifications").insert({
+              user_id: userId,
+              type: "boost",
+              title: "Listing Boosted! 🚀",
+              message: `Your listing is now promoted for ${days} days.`,
+              link: `/car/${listingId}`,
+            });
+          }
           break;
         }
 
-        // Handle subscription checkout
+        // --- Arbitrage dealer payment ---
+        if (metaType === "arbitrage_dealer_payment") {
+          const dealId = session.metadata!.deal_id;
+          const dealerId = session.metadata!.dealer_id;
+          logStep("Arbitrage payment completed", { dealId, dealerId });
+
+          const { error: arbErr } = await supabase
+            .from("arbitrage_deals")
+            .update({
+              dealer_paid_at: new Date().toISOString(),
+              dealer_payment_ref: (session.payment_intent as string) || session.id,
+            })
+            .eq("id", dealId);
+
+          if (arbErr) {
+            logStep("ERROR updating arbitrage deal payment", { error: arbErr.message });
+          } else {
+            logStep("Arbitrage deal payment recorded", { dealId });
+
+            const { data: adminRoles } = await supabase
+              .from("user_roles")
+              .select("user_id")
+              .eq("role", "admin");
+
+            if (adminRoles) {
+              for (const admin of adminRoles) {
+                await supabase.from("notifications").insert({
+                  user_id: admin.user_id,
+                  type: "arbitrage",
+                  title: "Dealer Payment Received 💰",
+                  message: `Dealer payment completed for trade stock deal. Ready for seller payout.`,
+                  link: "/trade-stock",
+                });
+              }
+            }
+
+            await supabase.from("arbitrage_audit_log").insert({
+              deal_id: dealId,
+              actor_role: "system",
+              action: "dealer_payment_completed",
+              details: { payment_intent: session.payment_intent, session_id: session.id },
+            });
+          }
+          break;
+        }
+
+        // --- Auction winner payment ---
+        if (metaType === "auction_winner_payment") {
+          const auctionId = session.metadata!.auction_id;
+          const escrowId = session.metadata!.escrow_id;
+          const buyerId = session.metadata!.buyer_id;
+          logStep("Auction winner payment completed", { auctionId, escrowId });
+
+          await supabase.from("auction_escrow").update({
+            status: "full_payment_held",
+          }).eq("id", escrowId);
+
+          await supabase.from("auction_audit_log").insert({
+            auction_id: auctionId,
+            actor_id: buyerId,
+            actor_role: "buyer",
+            action: "winner_payment_completed",
+            details: { session_id: session.id, payment_intent: session.payment_intent },
+          });
+
+          if (buyerId) {
+            await supabase.from("notifications").insert({
+              user_id: buyerId,
+              type: "auction",
+              title: "Payment Received ✅",
+              message: "Your auction payment has been received. Please sign the contract to proceed.",
+              link: `/auction/${auctionId}`,
+            });
+          }
+          break;
+        }
+
+        // --- Subscription checkout ---
+        if (!userId) {
+          logStep("ERROR: No user_id in session metadata");
+          break;
+        }
+
         const businessName = session.metadata?.business_name || "My Dealership";
         const subscriptionId = session.subscription as string;
         const customerId = session.customer as string;
 
         if (!subscriptionId) {
-          logStep("Non-subscription, non-boost checkout — skipping");
+          logStep("Non-subscription checkout without recognized type — skipping");
           break;
         }
 
@@ -151,57 +231,42 @@ serve(async (req) => {
         break;
       }
 
-      // Handle arbitrage dealer payment
-      case "checkout.session.completed": {
-        const session2 = event.data.object as Stripe.Checkout.Session;
-        if (session2.metadata?.type === "arbitrage_dealer_payment") {
-          const dealId = session2.metadata.deal_id;
-          const dealerId = session2.metadata.dealer_id;
-          logStep("Arbitrage payment completed", { dealId, dealerId });
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = subscription.customer as string;
+        const priceId = subscription.items.data[0]?.price.id;
+        const tierInfo = PRICE_TO_TIER[priceId] || { tier: "starter", maxListings: 15 };
+        const status = subscription.status === "active" ? "active" : subscription.status === "past_due" ? "past_due" : "canceled";
 
-          // Update deal to seller_paid-ready state
-          const { error: arbErr } = await supabase
-            .from("arbitrage_deals")
-            .update({
-              dealer_paid_at: new Date().toISOString(),
-              dealer_payment_ref: session2.payment_intent as string || session2.id,
-            })
-            .eq("id", dealId);
+        const { error } = await supabase
+          .from("dealers")
+          .update({
+            subscription_status: status,
+            tier: tierInfo.tier,
+            max_listings: tierInfo.maxListings,
+            is_active: status === "active",
+          })
+          .eq("stripe_customer_id", customerId);
 
-          if (arbErr) {
-            logStep("ERROR updating arbitrage deal payment", { error: arbErr.message });
-          } else {
-            logStep("Arbitrage deal payment recorded", { dealId });
+        if (error) logStep("ERROR updating subscription", { error: error.message });
+        else logStep("Subscription updated", { customerId, status, tier: tierInfo.tier });
+        break;
+      }
 
-            // Notify admins
-            const { data: adminRoles } = await supabase
-              .from("user_roles")
-              .select("user_id")
-              .eq("role", "admin");
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const customerId = subscription.customer as string;
 
-            if (adminRoles) {
-              for (const admin of adminRoles) {
-                await supabase.from("notifications").insert({
-                  user_id: admin.user_id,
-                  type: "arbitrage",
-                  title: "Dealer Payment Received 💰",
-                  message: `Dealer payment completed for trade stock deal. Ready for seller payout.`,
-                  link: "/trade-stock",
-                });
-              }
-            }
+        const { error } = await supabase
+          .from("dealers")
+          .update({
+            subscription_status: "canceled",
+            is_active: false,
+          })
+          .eq("stripe_customer_id", customerId);
 
-            // Audit log
-            await supabase.from("arbitrage_audit_log").insert({
-              deal_id: dealId,
-              actor_role: "system",
-              action: "dealer_payment_completed",
-              details: { payment_intent: session2.payment_intent, session_id: session2.id },
-            });
-          }
-          break;
-        }
-        // Fall through for non-arbitrage checkout.session.completed already handled above
+        if (error) logStep("ERROR canceling subscription", { error: error.message });
+        else logStep("Subscription canceled", { customerId });
         break;
       }
 
