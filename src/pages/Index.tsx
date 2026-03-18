@@ -9,6 +9,10 @@ import BudgetPresets from "@/components/BudgetPresets";
 import RecentlySoldFeed from "@/components/RecentlySoldFeed";
 import TrustReviewWidget from "@/components/TrustReviewWidget";
 import EVSection from "@/components/EVSection";
+import CarsNearYou from "@/components/CarsNearYou";
+import CarOfTheWeek from "@/components/CarOfTheWeek";
+import WhyBuyFromUs from "@/components/WhyBuyFromUs";
+import AIChatWidget from "@/components/AIChatWidget";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -123,6 +127,12 @@ const Index = () => {
 
       {/* Budget Presets */}
       <BudgetPresets />
+
+      {/* Cars Near You */}
+      <CarsNearYou />
+
+      {/* Car of the Week */}
+      <CarOfTheWeek />
 
       {/* Featured */}
       <section className="border-y border-border bg-muted/30 py-16">
@@ -297,6 +307,9 @@ const Index = () => {
       {/* EV Section */}
       <EVSection />
 
+      {/* Why Buy From Us */}
+      <WhyBuyFromUs />
+
       {/* Car Valuation CTA */}
       <section className="container mx-auto px-4 py-12">
         <motion.div {...fadeUp}>
@@ -423,6 +436,7 @@ const Index = () => {
       </section>
 
       <Footer />
+      <AIChatWidget />
     </div>
   );
 };

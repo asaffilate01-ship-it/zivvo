@@ -8,6 +8,7 @@ import EmptyState from "@/components/EmptyState";
 import ReportListingDialog from "@/components/ReportListingDialog";
 import SellerReviews from "@/components/SellerReviews";
 import PaymentCalculator from "@/components/PaymentCalculator";
+import PartExchangeWidget from "@/components/PartExchangeWidget";
 import MakeOfferDialog from "@/components/MakeOfferDialog";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
@@ -406,8 +407,9 @@ const CarDetail = () => {
             )}
 
             {/* Finance Calculator - Mobile */}
-            <div className="mt-8 lg:hidden">
+            <div className="mt-8 space-y-4 lg:hidden">
               <PaymentCalculator price={Number(car.price)} />
+              <PartExchangeWidget targetPrice={Number(car.price)} />
             </div>
           </div>
 
@@ -512,8 +514,9 @@ const CarDetail = () => {
               )}
 
               {/* Finance Calculator - Desktop */}
-              <div className="hidden lg:block">
+              <div className="hidden lg:block space-y-4">
                 <PaymentCalculator price={Number(car.price)} />
+                <PartExchangeWidget targetPrice={Number(car.price)} />
               </div>
 
               {/* Finance & Insurance Quotes */}
