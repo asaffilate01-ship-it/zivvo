@@ -54,6 +54,7 @@ const AuctionDetail = lazy(() => import("./pages/AuctionDetail"));
 const CreateAuction = lazy(() => import("./pages/CreateAuction"));
 const TradeStock = lazy(() => import("./pages/TradeStock"));
 const AuctionApply = lazy(() => import("./pages/AuctionApply"));
+const PlatformAnalytics = lazy(() => import("./pages/PlatformAnalytics"));
 
 const queryClient = new QueryClient();
 
