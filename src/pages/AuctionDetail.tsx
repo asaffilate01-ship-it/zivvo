@@ -268,28 +268,26 @@ const AuctionDetail = () => {
 
   const requestDeposit = useMutation({
     mutationFn: async () => {
+      // Now handled by StripeDepositForm component
+      setShowDepositForm(true);
+    },
+  });
+
+  const payWinnerBalance = useMutation({
+    mutationFn: async () => {
       if (!user || !auction) throw new Error("Login required");
-      const { data, error } = await supabase.functions.invoke("deposit-checkout", {
-        body: { auction_id: auction.id, amount: 500 },
+      const { data, error } = await supabase.functions.invoke("winner-payment", {
+        body: { auction_id: auction.id },
       });
       if (error) throw error;
-      if (data?.already_authorized) {
-        toast.success("Deposit already authorized!");
-        queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+      if (data?.fully_paid) {
+        toast.success("Payment complete! Deposit covered the full amount.");
+        queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
         return;
       }
-      // For now, simulate confirming the deposit (in production, use Stripe Elements)
-      if (data?.deposit_id) {
-        const { error: confirmErr } = await supabase.functions.invoke("confirm-deposit", {
-          body: { deposit_id: data.deposit_id, payment_intent_id: data.payment_intent_id },
-        });
-        if (confirmErr) throw confirmErr;
-        queryClient.invalidateQueries({ queryKey: ["auction-deposit", id, user?.id] });
+      if (data?.url) {
+        window.open(data.url, "_blank");
       }
-    },
-    onSuccess: () => {
-      toast.success("Deposit pre-authorized! You can now bid.");
-      setShowDepositDialog(false);
     },
     onError: (e: Error) => toast.error(e.message),
   });
