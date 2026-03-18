@@ -61,6 +61,153 @@ export type Database = {
           },
         ]
       }
+      arbitrage_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_role: string | null
+          created_at: string
+          deal_id: string
+          details: Json | null
+          id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          deal_id: string
+          details?: Json | null
+          id?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_role?: string | null
+          created_at?: string
+          deal_id?: string
+          details?: Json | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arbitrage_audit_log_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "arbitrage_deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      arbitrage_deals: {
+        Row: {
+          admin_notes: string | null
+          buyer_dealer_id: string | null
+          collection_arranged: boolean | null
+          country: string
+          created_at: string
+          dealer_accepted_at: string | null
+          dealer_offer_sent_at: string | null
+          dealer_paid_at: string | null
+          dealer_payment_ref: string | null
+          dealer_price: number
+          delivery_arranged: boolean | null
+          delivery_cost: number | null
+          id: string
+          listing_id: string
+          markup_pct: number | null
+          platform_markup: number
+          rejection_reason: string | null
+          seller_accepted_at: string | null
+          seller_id: string
+          seller_offer_sent_at: string | null
+          seller_paid_at: string | null
+          seller_payment_ref: string | null
+          seller_price: number
+          sourced_by: string | null
+          status: Database["public"]["Enums"]["arbitrage_status"]
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          buyer_dealer_id?: string | null
+          collection_arranged?: boolean | null
+          country?: string
+          created_at?: string
+          dealer_accepted_at?: string | null
+          dealer_offer_sent_at?: string | null
+          dealer_paid_at?: string | null
+          dealer_payment_ref?: string | null
+          dealer_price: number
+          delivery_arranged?: boolean | null
+          delivery_cost?: number | null
+          id?: string
+          listing_id: string
+          markup_pct?: number | null
+          platform_markup?: number
+          rejection_reason?: string | null
+          seller_accepted_at?: string | null
+          seller_id: string
+          seller_offer_sent_at?: string | null
+          seller_paid_at?: string | null
+          seller_payment_ref?: string | null
+          seller_price: number
+          sourced_by?: string | null
+          status?: Database["public"]["Enums"]["arbitrage_status"]
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          buyer_dealer_id?: string | null
+          collection_arranged?: boolean | null
+          country?: string
+          created_at?: string
+          dealer_accepted_at?: string | null
+          dealer_offer_sent_at?: string | null
+          dealer_paid_at?: string | null
+          dealer_payment_ref?: string | null
+          dealer_price?: number
+          delivery_arranged?: boolean | null
+          delivery_cost?: number | null
+          id?: string
+          listing_id?: string
+          markup_pct?: number | null
+          platform_markup?: number
+          rejection_reason?: string | null
+          seller_accepted_at?: string | null
+          seller_id?: string
+          seller_offer_sent_at?: string | null
+          seller_paid_at?: string | null
+          seller_payment_ref?: string | null
+          seller_price?: number
+          sourced_by?: string | null
+          status?: Database["public"]["Enums"]["arbitrage_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arbitrage_deals_buyer_dealer_id_fkey"
+            columns: ["buyer_dealer_id"]
+            isOneToOne: false
+            referencedRelation: "dealers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "arbitrage_deals_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "arbitrage_deals_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auction_audit_log: {
         Row: {
           action: string
@@ -1615,6 +1762,17 @@ export type Database = {
     }
     Enums: {
       app_role: "buyer" | "seller" | "dealer" | "agent" | "admin"
+      arbitrage_status:
+        | "sourced"
+        | "offer_sent"
+        | "seller_accepted"
+        | "seller_rejected"
+        | "acquired"
+        | "listed_to_dealers"
+        | "dealer_accepted"
+        | "seller_paid"
+        | "completed"
+        | "cancelled"
       auction_format: "timed" | "live_event"
       auction_status:
         | "draft"
@@ -1783,6 +1941,18 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["buyer", "seller", "dealer", "agent", "admin"],
+      arbitrage_status: [
+        "sourced",
+        "offer_sent",
+        "seller_accepted",
+        "seller_rejected",
+        "acquired",
+        "listed_to_dealers",
+        "dealer_accepted",
+        "seller_paid",
+        "completed",
+        "cancelled",
+      ],
       auction_format: ["timed", "live_event"],
       auction_status: [
         "draft",

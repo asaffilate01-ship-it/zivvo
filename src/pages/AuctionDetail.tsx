@@ -21,10 +21,11 @@ import {
   ChevronLeft, ChevronRight, Eye, Users, TrendingUp, History, Car, Wrench, Paintbrush,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { countryConfigs, formatPrice } from "@/lib/countryConfig";
 
 const formatCurrency = (amount: number, country: string) => {
-  const c = country === "US" ? "USD" : country === "NG" ? "NGN" : "GBP";
-  return new Intl.NumberFormat(country === "US" ? "en-US" : country === "NG" ? "en-NG" : "en-GB", { style: "currency", currency: c, maximumFractionDigits: 0 }).format(amount);
+  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
+  return formatPrice(amount, cfg);
 };
 
 const AuctionDetail = () => {
