@@ -201,7 +201,7 @@ const Auctions = () => {
                               <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
                                 <div className="bg-background/90 backdrop-blur-sm rounded-lg px-3 py-1.5">
                                   <p className="text-xs text-muted-foreground">{auction.bid_count || 0} bids</p>
-                                  <p className="font-bold text-foreground">{formatCurrency(currentPrice, country)}</p>
+                                  <p className="font-bold text-foreground">{fmtCurrency(currentPrice, country)}</p>
                                 </div>
                                 <div className={`rounded-lg px-3 py-1.5 backdrop-blur-sm ${isEnding ? "bg-red-500/90 text-white" : "bg-background/90"}`}>
                                   <p className="text-xs opacity-70">Time left</p>
