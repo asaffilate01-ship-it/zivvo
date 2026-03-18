@@ -154,7 +154,10 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
 
           <div className="p-4">
             <h3 className="font-display text-lg font-semibold text-card-foreground line-clamp-1">{car.title}</h3>
-            <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              <PriceIndicatorBadge price={car.price} marketAverage={(car as any).market_average} />
+              {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
+            </div>
               {specs.slice(0, 3).map((s, i) => (
                 <span key={i} className="flex items-center gap-1">
                   <s.icon className="h-3.5 w-3.5" /> {s.value}
