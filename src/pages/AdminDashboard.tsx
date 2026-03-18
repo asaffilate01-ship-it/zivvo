@@ -1136,6 +1136,7 @@ const AdminDashboard = () => {
               </div>
             )}
           </DialogContent>
+        </Dialog>
       </div>
       <Footer />
     </div>
