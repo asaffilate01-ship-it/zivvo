@@ -163,6 +163,37 @@ const AdminDashboard = () => {
     fetchAll();
   };
 
+  const approveAuction = async (auctionId: string, rating: number) => {
+    await supabase.from("auctions").update({
+      status: "live" as any,
+      inspection_rating: rating,
+      hpi_clear: true,
+      ownership_verified: true,
+      seller_verified: true,
+      starts_at: new Date().toISOString(),
+    }).eq("id", auctionId);
+    toast({ title: "Auction approved & live!" });
+    fetchAll();
+  };
+
+  const rejectAuction = async (auctionId: string) => {
+    await supabase.from("auctions").update({ status: "cancelled" as any }).eq("id", auctionId);
+    toast({ title: "Auction rejected" });
+    fetchAll();
+  };
+
+  const updateEscrowStatus = async (escrowId: string, status: string) => {
+    const update: any = { status };
+    if (status === "released_to_seller") update.released_at = new Date().toISOString();
+    await supabase.from("auction_escrow").update(update).eq("id", escrowId);
+    toast({ title: `Escrow ${status.replace(/_/g, " ")}` });
+    fetchAll();
+  };
+
+  const pendingAuctions = auctions.filter((a: any) => a.status === "pending_inspection");
+  const liveAuctions = auctions.filter((a: any) => a.status === "live");
+  const filteredAuctions = auctions.filter((a: any) => auctionStatusFilter === "all" || a.status === auctionStatusFilter);
+
   const exportCSV = (data: any[], filename: string) => {
     if (!data.length) return;
     const headers = Object.keys(data[0]).join(",");
