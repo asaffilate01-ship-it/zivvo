@@ -76,6 +76,7 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     fuelTypes: ["Gasoline", "Diesel", "Electric", "Hybrid", "Plug-in Hybrid", "Flex Fuel"],
     transmissions: ["Automatic", "Manual", "CVT"],
     popularCities: ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "San Antonio", "Dallas", "Miami", "Atlanta", "Denver"],
+    individualPlan: { price: 25, priceId: "price_us_individual", durationDays: 90, label: "3-month listing" },
     dealerPlans: [
       { name: "Starter", price: 59, priceId: "price_us_starter", maxListings: 15, features: ["Up to 15 active listings", "Basic analytics dashboard", "Marketplace presence", "Email support", "Standard listing placement"] },
       { name: "Professional", price: 129, priceId: "price_us_professional", maxListings: 50, features: ["Up to 50 active listings", "Full analytics & reports", "Custom dealer landing page", "Featured listing placements", "Priority support", "CARFAX integration"] },
