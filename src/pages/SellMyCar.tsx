@@ -153,7 +153,7 @@ const SellMyCar = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={`Sell My Car — ${formatPrice(config.individualPlan.price, config)} for ${config.individualPlan.durationDays / 30} Months`} description={`Sell your car on AutoSouq for just ${formatPrice(config.individualPlan.price, config)}. ${config.individualPlan.durationDays / 30}-month listing, verified buyers, instant valuation.`} />
+      <SEOHead title={`Sell My Car — ${formatPrice(config.individualPlan.price, config)} Per Listing`} description={`Sell your car on AutoSouq for just ${formatPrice(config.individualPlan.price, config)} per listing. Verified buyers, instant valuation.`} />
       <Navbar />
 
       <div className="container mx-auto px-4 py-12">
