@@ -38,7 +38,7 @@ const TermsOfService = () => (
 
         <section>
           <h2 className="font-display text-lg font-semibold text-foreground">4. Transactions</h2>
-          <p className="mt-2">AutoVault is a marketplace platform. We are not a party to any transaction between buyers and sellers. We do not guarantee the condition, legality, or safety of listed vehicles. Buyers should conduct their own due diligence.</p>
+          <p className="mt-2">AutoSouq is a marketplace platform. We are not a party to any transaction between buyers and sellers. We do not guarantee the condition, legality, or safety of listed vehicles. Buyers should conduct their own due diligence.</p>
         </section>
 
         <section>
