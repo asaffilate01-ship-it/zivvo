@@ -186,7 +186,7 @@ const AdminDashboard = () => {
     const update: any = { status };
     if (status === "released_to_seller") update.released_at = new Date().toISOString();
     await supabase.from("auction_escrow").update(update).eq("id", escrowId);
-    toast({ title: `Escrow ${status.replace(/_/g, " ")}` });
+    toast({ title: `Payment protection ${status.replace(/_/g, " ")}` });
     fetchAll();
   };
 
@@ -663,12 +663,12 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Escrow Management */}
+              {/* Payment Protection Management */}
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Escrow Management ({auctionEscrows.length})</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Payment Protection ({auctionEscrows.length})</CardTitle></CardHeader>
                 <CardContent className="overflow-x-auto">
                   {auctionEscrows.length === 0 ? (
-                    <p className="py-8 text-center text-muted-foreground">No escrow records yet</p>
+                    <p className="py-8 text-center text-muted-foreground">No payment protection records yet</p>
                   ) : (
                     <Table>
                       <TableHeader>

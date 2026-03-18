@@ -111,7 +111,7 @@ const CreateAuction = () => {
 
   return (
     <>
-      <SEOHead title="Create Auction | Sell Your Car at Auction" description="List your verified vehicle for auction with professional inspection and escrow protection." />
+      <SEOHead title="Create Auction | Sell Your Car at Auction" description="List your verified vehicle for auction with professional inspection and payment protection." />
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -136,7 +136,7 @@ const CreateAuction = () => {
                   <li>2. Our approved specialist inspects and rates your car (1-5)</li>
                   <li>3. HPI check & ownership verification completed</li>
                   <li>4. Auction goes live — verified buyers bid with pre-authorised funds</li>
-                  <li>5. Sale completed via escrow + e-signed contract</li>
+                  <li>5. Sale completed via Payment Protection + e-signed contract</li>
                 </ol>
                 <p className="mt-2 text-xs">Platform fee: <strong>1.5% seller fee</strong> on successful sale. Buyer pays 3% premium.</p>
               </div>

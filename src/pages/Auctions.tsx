@@ -91,13 +91,13 @@ const Auctions = () => {
                 Every Car Inspected.<br />Every Seller Verified.
               </h1>
               <p className="text-lg md:text-xl text-primary-foreground/70 mb-8 max-w-2xl">
-                Bid with confidence. Professional inspections, HPI checks, and escrow protection on every auction. Only 3% buyer premium — the lowest in the industry.
+                Bid with confidence. Professional inspections, HPI checks, and payment protection on every auction. Only 3% buyer premium — the lowest in the industry.
               </p>
               <div className="flex flex-wrap gap-6 text-sm text-primary-foreground/60">
                 {[
                   { icon: Shield, label: "HPI & Ownership Checked" },
                   { icon: Star, label: "1-5 Condition Rating" },
-                  { icon: CheckCircle2, label: "Escrow Protected" },
+                  { icon: CheckCircle2, label: "Payment Protected" },
                   { icon: Users, label: "Verified Buyers & Sellers" },
                 ].map(({ icon: Icon, label }) => (
                   <div key={label} className="flex items-center gap-2">
@@ -105,6 +105,14 @@ const Auctions = () => {
                     <span>{label}</span>
                   </div>
                 ))}
+              </div>
+              <div className="flex gap-3 mt-6">
+                <Button asChild size="lg" className="gap-2">
+                  <Link to="/auctions/apply"><Gavel className="w-4 h-4" /> Sell at Auction</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="gap-2">
+                  <Link to="/auctions">Browse Auctions</Link>
+                </Button>
               </div>
             </motion.div>
           </div>

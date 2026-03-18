@@ -72,7 +72,7 @@ serve(async (req) => {
           const totalAmount = hammerPrice + buyerPremium;
           const platformRevenue = buyerPremium + sellerFee;
 
-          // Create escrow record
+          // Create payment protection record
           await supabase.from("auction_escrow").insert({
             auction_id: auction.id,
             buyer_id: winningBid.bidder_id,
@@ -106,7 +106,7 @@ serve(async (req) => {
             <ol style="padding-left:20px;font-size:13px;">
               <li>The Seller agrees to transfer the vehicle to the Buyer upon receipt of full payment and completion of all handover requirements.</li>
               <li>The Buyer agrees to pay the Total Due within 72 hours of auction close.</li>
-              <li>Funds are held in escrow and released to the Seller only upon: (a) V5C/logbook transfer, (b) key handover, and (c) mutual contract signing.</li>
+              <li>Funds are held under Payment Protection and released to the Seller only upon: (a) V5C/logbook transfer, (b) key handover, and (c) mutual contract signing.</li>
               <li>The vehicle is sold as described in the inspection and condition report. The platform makes no additional warranty unless explicitly stated.</li>
               <li>Delivery via logistics partners is at additional cost to the Buyer if arranged.</li>
               <li>This agreement is legally binding upon digital signature by both parties. IP addresses and timestamps are recorded for audit purposes.</li>

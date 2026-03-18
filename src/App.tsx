@@ -53,6 +53,7 @@ const Auctions = lazy(() => import("./pages/Auctions"));
 const AuctionDetail = lazy(() => import("./pages/AuctionDetail"));
 const CreateAuction = lazy(() => import("./pages/CreateAuction"));
 const TradeStock = lazy(() => import("./pages/TradeStock"));
+const AuctionApply = lazy(() => import("./pages/AuctionApply"));
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,14 @@ const App = () => (
                         element={
                           <ProtectedRoute>
                             <CreateAuction />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/auctions/apply"
+                        element={
+                          <ProtectedRoute>
+                            <AuctionApply />
                           </ProtectedRoute>
                         }
                       />
