@@ -33,6 +33,12 @@ const defaultCenter: Record<string, { lat: number; lng: number }> = {
   PK: { lat: 30.3, lng: 69.3 },
 };
 
+declare global {
+  interface Window {
+    google?: typeof google;
+  }
+}
+
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "";
 
 // Load the Google Maps script once
