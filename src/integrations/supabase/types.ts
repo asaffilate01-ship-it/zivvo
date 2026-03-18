@@ -1015,6 +1015,66 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_tracking: {
+        Row: {
+          buyer_id: string
+          collected_at: string | null
+          courier_name: string | null
+          courier_reference: string | null
+          created_at: string
+          delivered_at: string | null
+          delivery_address: string | null
+          delivery_cost: number | null
+          id: string
+          notes: string | null
+          pickup_address: string | null
+          reference_id: string
+          reference_type: string
+          scheduled_date: string | null
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          collected_at?: string | null
+          courier_name?: string | null
+          courier_reference?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_address?: string | null
+          delivery_cost?: number | null
+          id?: string
+          notes?: string | null
+          pickup_address?: string | null
+          reference_id: string
+          reference_type: string
+          scheduled_date?: string | null
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          collected_at?: string | null
+          courier_name?: string | null
+          courier_reference?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          delivery_address?: string | null
+          delivery_cost?: number | null
+          id?: string
+          notes?: string | null
+          pickup_address?: string | null
+          reference_id?: string
+          reference_type?: string
+          scheduled_date?: string | null
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       enquiries: {
         Row: {
           created_at: string
