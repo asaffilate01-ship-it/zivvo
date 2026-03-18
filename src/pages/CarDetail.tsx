@@ -514,8 +514,9 @@ const CarDetail = () => {
               )}
 
               {/* Finance Calculator - Desktop */}
-              <div className="hidden lg:block">
+              <div className="hidden lg:block space-y-4">
                 <PaymentCalculator price={Number(car.price)} />
+                <PartExchangeWidget targetPrice={Number(car.price)} />
               </div>
 
               {/* Finance & Insurance Quotes */}
