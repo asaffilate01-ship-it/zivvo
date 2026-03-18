@@ -1,34 +1,19 @@
-import { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { Link } from "react-router-dom";
+/// <reference types="google.maps" />
+import { useEffect, useRef, useState } from "react";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
+import { Loader2 } from "lucide-react";
 
-// Fix default marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
-
-// Simple geocoding from city names to approximate coordinates
 const cityCoords: Record<string, [number, number]> = {
-  // UK
   "London": [51.5074, -0.1278], "Manchester": [53.4808, -2.2426], "Birmingham": [52.4862, -1.8904],
   "Leeds": [53.8008, -1.5491], "Glasgow": [55.8642, -4.2518], "Edinburgh": [55.9533, -3.1883],
   "Liverpool": [53.4084, -2.9916], "Bristol": [51.4545, -2.5879], "Sheffield": [53.3811, -1.4701],
   "Newcastle": [54.9783, -1.6178], "Nottingham": [52.9548, -1.1581], "Cardiff": [51.4816, -3.1791],
-  // UAE
   "Dubai": [25.2048, 55.2708], "Abu Dhabi": [24.4539, 54.3773], "Sharjah": [25.3463, 55.4209],
   "Ajman": [25.4052, 55.5136], "Al Ain": [24.1917, 55.7606],
-  // US
   "New York": [40.7128, -74.0060], "Los Angeles": [34.0522, -118.2437], "Chicago": [41.8781, -87.6298],
   "Houston": [29.7604, -95.3698], "Miami": [25.7617, -80.1918], "San Francisco": [37.7749, -122.4194],
   "Dallas": [32.7767, -96.7970], "Atlanta": [33.749, -84.388], "Boston": [42.3601, -71.0589],
-  // PK
   "Lahore": [31.5204, 74.3587], "Karachi": [24.8607, 67.0011], "Islamabad": [33.6844, 73.0479],
   "Rawalpindi": [33.5651, 73.0169], "Faisalabad": [31.4504, 73.1350], "Peshawar": [34.0151, 71.5249],
 };
@@ -41,11 +26,30 @@ const getCoords = (location: string): [number, number] | null => {
   return null;
 };
 
-const defaultCenter: Record<string, [number, number]> = {
-  GB: [53.5, -1.5],
-  AE: [25.0, 55.2],
-  US: [39.8, -98.5],
-  PK: [30.3, 69.3],
+const defaultCenter: Record<string, { lat: number; lng: number }> = {
+  GB: { lat: 53.5, lng: -1.5 },
+  AE: { lat: 25.0, lng: 55.2 },
+  US: { lat: 39.8, lng: -98.5 },
+  PK: { lat: 30.3, lng: 69.3 },
+};
+
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY || "";
+
+let googleMapsPromise: Promise<void> | null = null;
+const loadGoogleMaps = (): Promise<void> => {
+  if (googleMapsPromise) return googleMapsPromise;
+  if ((window as any).google?.maps) return Promise.resolve();
+
+  googleMapsPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load Google Maps"));
+    document.head.appendChild(script);
+  });
+  return googleMapsPromise;
 };
 
 interface BrowseMapViewProps {
@@ -55,49 +59,98 @@ interface BrowseMapViewProps {
 
 const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
   const { config } = useCountry();
-  const center = defaultCenter[country] || [51.5, -0.1];
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState(false);
+
+  const center = defaultCenter[country] || { lat: 51.5, lng: -0.1 };
   const zoom = country === "US" ? 4 : country === "PK" ? 5 : 6;
 
-  const markersData = listings
-    .map((car) => {
+  useEffect(() => {
+    if (!GOOGLE_MAPS_API_KEY) {
+      setMapError(true);
+      return;
+    }
+    loadGoogleMaps()
+      .then(() => setMapLoaded(true))
+      .catch(() => setMapError(true));
+  }, []);
+
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current || mapInstanceRef.current) return;
+    const g = (window as any).google;
+    mapInstanceRef.current = new g.maps.Map(mapRef.current, {
+      center,
+      zoom,
+      disableDefaultUI: false,
+      zoomControl: true,
+      mapTypeControl: false,
+      streetViewControl: false,
+    });
+  }, [mapLoaded]);
+
+  useEffect(() => {
+    const g = (window as any).google;
+    const map = mapInstanceRef.current;
+    if (!map || !mapLoaded || !g) return;
+
+    // Clear old markers
+    markersRef.current.forEach((m: any) => m.setMap(null));
+    markersRef.current = [];
+
+    const infoWindow = new g.maps.InfoWindow();
+
+    listings.forEach((car) => {
       const coords = getCoords(car.location || "");
-      if (!coords) return null;
-      // Add slight random offset to prevent exact overlap
+      if (!coords) return;
+
       const jitter = () => (Math.random() - 0.5) * 0.02;
-      return { ...car, lat: coords[0] + jitter(), lng: coords[1] + jitter() };
-    })
-    .filter(Boolean) as any[];
+      const position = { lat: coords[0] + jitter(), lng: coords[1] + jitter() };
+
+      const marker = new g.maps.Marker({
+        map,
+        position,
+        title: car.title,
+      });
+
+      marker.addListener("click", () => {
+        const imgHtml = car.images?.[0]
+          ? `<img src="${car.images[0]}" alt="${car.title}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;" />`
+          : "";
+        infoWindow.setContent(`
+          <div style="min-width:180px;font-family:system-ui,sans-serif;">
+            ${imgHtml}
+            <p style="font-size:13px;font-weight:600;margin:0 0 4px;">${car.title}</p>
+            <p style="font-size:13px;font-weight:700;color:#2563eb;margin:0 0 2px;">${formatPrice(car.price, config)}</p>
+            <p style="font-size:11px;color:#666;margin:0 0 6px;">${car.location || ""}</p>
+            <a href="/car/${car.id}" style="font-size:11px;color:#2563eb;text-decoration:none;">View Details →</a>
+          </div>
+        `);
+        infoWindow.open(map, marker);
+      });
+
+      markersRef.current.push(marker);
+    });
+  }, [listings, mapLoaded, config]);
+
+  if (mapError) {
+    return (
+      <div className="flex h-[500px] w-full items-center justify-center rounded-xl border border-border bg-muted/30">
+        <p className="text-sm text-muted-foreground">Map unavailable. Please configure the Google Maps API key.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-[500px] w-full overflow-hidden rounded-xl border border-border">
-      <MapContainer
-        center={center}
-        zoom={zoom}
-        className="h-full w-full"
-        scrollWheelZoom={true}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {markersData.map((car) => (
-          <Marker key={car.id} position={[car.lat, car.lng]}>
-            <Popup>
-              <div className="min-w-[180px]">
-                {car.images?.[0] && (
-                  <img src={car.images[0]} alt={car.title} className="mb-2 h-20 w-full rounded object-cover" />
-                )}
-                <p className="text-sm font-semibold">{car.title}</p>
-                <p className="text-sm font-bold text-primary">{formatPrice(car.price, config)}</p>
-                <p className="text-xs text-muted-foreground">{car.location}</p>
-                <Link to={`/car/${car.id}`} className="mt-1 block text-xs text-primary hover:underline">
-                  View Details →
-                </Link>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+    <div className="relative h-[500px] w-full overflow-hidden rounded-xl border border-border">
+      {!mapLoaded && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-muted/50">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      )}
+      <div ref={mapRef} className="h-full w-full" />
     </div>
   );
 };
