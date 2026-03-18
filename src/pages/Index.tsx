@@ -216,6 +216,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Trust Review Widget */}
+      <TrustReviewWidget />
+
       {/* Social Proof Strip */}
       <section className="border-y border-border bg-muted/30 py-10">
         <div className="container mx-auto px-4">
