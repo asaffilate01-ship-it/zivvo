@@ -43,7 +43,7 @@ const faqs = [
   },
   {
     q: "What is the agent programme?",
-    a: "Agents can onboard new dealers to AutoVault and earn 30% recurring commission on their subscription payments. Contact us to apply for the agent programme.",
+    a: "Agents can onboard new dealers to AutoSouq and earn 30% recurring commission on their subscription payments. Contact us to apply for the agent programme.",
   },
 ];
 
