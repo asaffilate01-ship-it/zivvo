@@ -181,7 +181,6 @@ const TradeStock = () => {
   // Dealer accept deal
   const acceptDeal = useMutation({
     mutationFn: async (dealId: string) => {
-      // Get dealer record
       const { data: dealer } = await supabase
         .from("dealers")
         .select("id")
@@ -206,9 +205,70 @@ const TradeStock = () => {
         action: "dealer_accepted",
         details: { dealer_id: dealer.id },
       });
+
+      // Trigger notification
+      await supabase.functions.invoke("notify-arbitrage", {
+        body: { deal_id: dealId, action: "dealer_accepted" },
+      });
     },
     onSuccess: () => {
-      toast.success("Deal accepted! We'll arrange the transfer.");
+      toast.success("Deal accepted! Proceed to payment.");
+      queryClient.invalidateQueries({ queryKey: ["arbitrage-deals"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  // Dealer payment
+  const payForDeal = useMutation({
+    mutationFn: async (dealId: string) => {
+      setPayingDealId(dealId);
+      const { data, error } = await supabase.functions.invoke("arbitrage-payment", {
+        body: { deal_id: dealId },
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, "_blank");
+      } else {
+        throw new Error("Failed to create payment session");
+      }
+    },
+    onError: (e: Error) => {
+      toast.error(e.message);
+      setPayingDealId(null);
+    },
+    onSettled: () => setPayingDealId(null),
+  });
+
+  // Admin: mark seller paid with ref
+  const markSellerPaid = useMutation({
+    mutationFn: async ({ dealId, ref }: { dealId: string; ref: string }) => {
+      const { error } = await supabase
+        .from("arbitrage_deals")
+        .update({
+          status: "seller_paid" as any,
+          seller_paid_at: new Date().toISOString(),
+          seller_payment_ref: ref,
+        })
+        .eq("id", dealId);
+      if (error) throw error;
+
+      await supabase.from("arbitrage_audit_log").insert({
+        deal_id: dealId,
+        actor_id: user!.id,
+        actor_role: "admin",
+        action: "seller_paid",
+        details: { payment_ref: ref },
+      });
+
+      // Notify seller
+      await supabase.functions.invoke("notify-arbitrage", {
+        body: { deal_id: dealId, action: "seller_paid" },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Seller marked as paid!");
+      setPayoutDialog(null);
+      setPayoutRef("");
       queryClient.invalidateQueries({ queryKey: ["arbitrage-deals"] });
     },
     onError: (e: Error) => toast.error(e.message),
