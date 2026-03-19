@@ -49,7 +49,12 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
       })
       .then(({ data, error }) => {
         if (cancelled) return;
-        if (!error && data?.rating) {
+        if (error || data?.error) {
+          // Silently fail – don't show badge when AI credits exhausted or rate limited
+          setLoading(false);
+          return;
+        }
+        if (data?.rating) {
           const res = { rating: data.rating as PriceRating, explanation: data.explanation || "", market_average: data.market_average || 0 };
           priceCache.set(cacheKey, res);
           setResult(res);
