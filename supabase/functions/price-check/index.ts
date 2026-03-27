@@ -1,5 +1,59 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+type PriceRating = "great" | "good" | "fair" | "high";
+
+interface PriceCheckResult {
+  rating: PriceRating;
+  market_average: number;
+  market_low: number;
+  market_high: number;
+  explanation: string;
+  source: "ai" | "fallback";
+  warning?: string;
+}
+
+const allowedRatings = new Set<PriceRating>(["great", "good", "fair", "high"]);
+
+const roundTo = (value: number, step = 50) => Math.max(step, Math.round(value / step) * step);
+
+const buildFallbackEstimate = ({
+  make,
+  model,
+  year,
+  mileage,
+  price,
+}: {
+  make: string;
+  model: string;
+  year: number;
+  mileage?: number | null;
+  price: number;
+}): Omit<PriceCheckResult, "source" | "warning"> => {
+  const currentYear = new Date().getUTCFullYear();
+  const age = Math.max(0, currentYear - Number(year || currentYear));
+  const agePenalty = Math.min(0.45, age * 0.045);
+  const mileageValue = Number(mileage ?? 0);
+  const mileagePenalty = Math.min(0.18, mileageValue / 100000 * 0.18);
+  const baselineMarket = Math.max(1000, Number(price) * (1 + agePenalty + mileagePenalty));
+  const spread = Math.max(1500, baselineMarket * 0.12);
+  const marketLow = Math.max(500, baselineMarket - spread);
+  const marketHigh = baselineMarket + spread;
+  const ratio = Number(price) / baselineMarket;
+
+  let rating: PriceRating = "fair";
+  if (ratio <= 0.85) rating = "great";
+  else if (ratio <= 0.95) rating = "good";
+  else if (ratio > 1.05) rating = "high";
+
+  return {
+    rating,
+    market_average: roundTo(baselineMarket),
+    market_low: roundTo(marketLow),
+    market_high: roundTo(marketHigh),
+    explanation: `${year} ${make} ${model} estimated using fallback pricing due to temporary AI unavailability.`,
+  };
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
@@ -17,6 +71,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const fallback = buildFallbackEstimate({ make, model, year, mileage, price });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -89,26 +145,54 @@ You MUST respond using the suggest_price_rating tool.`;
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted" }), {
-          status: 402,
+        return new Response(JSON.stringify({
+          ...fallback,
+          source: "fallback",
+          warning: "AI credits exhausted",
+        }), {
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const text = await response.text();
       console.error("AI gateway error:", response.status, text);
-      throw new Error("AI gateway error");
+      return new Response(JSON.stringify({
+        ...fallback,
+        source: "fallback",
+        warning: "AI unavailable",
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const data = await response.json();
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
     if (!toolCall?.function?.arguments) {
-      throw new Error("No tool call response from AI");
+      return new Response(JSON.stringify({
+        ...fallback,
+        source: "fallback",
+        warning: "AI response missing",
+      }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    const result = JSON.parse(toolCall.function.arguments);
+    const parsed = JSON.parse(toolCall.function.arguments) as Partial<PriceCheckResult>;
+    const normalized: PriceCheckResult = {
+      rating: allowedRatings.has(parsed.rating as PriceRating) ? (parsed.rating as PriceRating) : fallback.rating,
+      market_average: Number(parsed.market_average) > 0 ? Number(parsed.market_average) : fallback.market_average,
+      market_low: Number(parsed.market_low) > 0 ? Number(parsed.market_low) : fallback.market_low,
+      market_high: Number(parsed.market_high) > 0 ? Number(parsed.market_high) : fallback.market_high,
+      explanation: typeof parsed.explanation === "string" && parsed.explanation.trim().length > 0
+        ? parsed.explanation
+        : fallback.explanation,
+      source: "ai",
+    };
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify(normalized), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

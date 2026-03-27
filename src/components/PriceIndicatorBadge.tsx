@@ -6,6 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 type PriceRating = "great" | "good" | "fair" | "high";
 
+type PriceCheckResult = {
+  rating: PriceRating;
+  explanation: string;
+  market_average: number;
+  source?: "ai" | "fallback";
+  warning?: string;
+};
+
 interface PriceIndicatorBadgeProps {
   price: number;
   make: string;
@@ -23,11 +31,13 @@ const ratingConfig: Record<PriceRating, { label: string; icon: typeof Award; cla
   high: { label: "Above Market", icon: TrendingUp, className: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/20" },
 };
 
-// Simple in-memory cache to avoid repeated AI calls for the same vehicle
-const priceCache = new Map<string, { rating: PriceRating; explanation: string; market_average: number }>();
+// In-memory caches to prevent duplicate checks and repeated failing calls
+const priceCache = new Map<string, PriceCheckResult>();
+const inFlightChecks = new Map<string, Promise<PriceCheckResult | null>>();
+let aiCreditsExhausted = false;
 
 const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB", className = "" }: PriceIndicatorBadgeProps) => {
-  const [result, setResult] = useState<{ rating: PriceRating; explanation: string; market_average: number } | null>(null);
+  const [result, setResult] = useState<PriceCheckResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -40,28 +50,77 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
       return;
     }
 
+    if (aiCreditsExhausted) {
+      setResult(null);
+      return;
+    }
+
+    if (inFlightChecks.has(cacheKey)) {
+      setLoading(true);
+      inFlightChecks
+        .get(cacheKey)!
+        .then((res) => {
+          if (cancelled) return;
+          if (res) setResult(res);
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
 
-    supabase.functions
+    const requestPromise = supabase.functions
       .invoke("price-check", {
         body: { make, model, year, mileage, price, country },
       })
       .then(({ data, error }) => {
-        if (cancelled) return;
         if (error || data?.error) {
-          // Silently fail – don't show badge when AI credits exhausted or rate limited
-          setLoading(false);
-          return;
+          const isCreditsError =
+            data?.error === "AI credits exhausted" ||
+            `${error?.message ?? ""}`.includes("402");
+
+          if (isCreditsError) {
+            aiCreditsExhausted = true;
+          }
+
+          return null;
         }
+
         if (data?.rating) {
-          const res = { rating: data.rating as PriceRating, explanation: data.explanation || "", market_average: data.market_average || 0 };
+          const res: PriceCheckResult = {
+            rating: data.rating as PriceRating,
+            explanation: data.explanation || "",
+            market_average: data.market_average || 0,
+            source: data.source,
+            warning: data.warning,
+          };
+
+          if (data.warning === "AI credits exhausted") {
+            aiCreditsExhausted = true;
+          }
+
           priceCache.set(cacheKey, res);
-          setResult(res);
+          return res;
         }
+
+        return null;
       })
-      .catch(() => {})
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .catch(() => null);
+
+    inFlightChecks.set(cacheKey, requestPromise);
+
+    requestPromise
+      .then((res) => {
+        if (cancelled) return;
+        if (res) setResult(res);
+      })
+      .finally(() => {
+        inFlightChecks.delete(cacheKey);
+        if (!cancelled) setLoading(false);
+      });
 
     return () => { cancelled = true; };
   }, [make, model, year, mileage, price, country]);
