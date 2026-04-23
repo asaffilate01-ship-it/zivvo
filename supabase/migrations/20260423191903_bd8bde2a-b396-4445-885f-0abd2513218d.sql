@@ -1,0 +1,1 @@
+UPDATE public.car_listings SET images = ARRAY['https://kmbhlrcrplvfmicoxmul.supabase.co/storage/v1/object/public/car-images/seed/audi-a4-s-line-2023.jpg'] WHERE id = 'e90e96c3-3e82-4ebc-aba2-5ae8f7e0bb24';

@@ -55,6 +55,8 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
       return;
     }
 
+    let cancelled = false;
+
     if (inFlightChecks.has(cacheKey)) {
       setLoading(true);
       inFlightChecks
@@ -66,10 +68,9 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
         .finally(() => {
           if (!cancelled) setLoading(false);
         });
-      return;
+      return () => { cancelled = true; };
     }
 
-    let cancelled = false;
     setLoading(true);
 
     const requestPromise = supabase.functions
