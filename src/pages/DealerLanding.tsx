@@ -16,6 +16,8 @@ import {
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 
 export interface LandingConfig {
   hero_title?: string;
@@ -64,6 +66,7 @@ const USP_ICONS: Record<string, any> = {
 
 const DealerLanding = () => {
   const { slug } = useParams();
+  const { config: countryCfg } = useCountry();
   const [dealer, setDealer] = useState<any>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
@@ -334,7 +337,7 @@ const DealerLanding = () => {
               { icon: Clock, value: config.opening_hours || "Mon–Sat 9–6", label: "Opening Hours" },
               {
                 icon: Shield,
-                value: priceRange ? `From ${priceRange.min.toLocaleString()}` : "100%",
+                value: priceRange ? `From ${formatPrice(priceRange.min, countryCfg)}` : "100%",
                 label: priceRange ? "Starting Price" : "Verified Dealer",
               },
             ].map((stat, i) => (
