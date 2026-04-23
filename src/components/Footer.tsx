@@ -8,7 +8,6 @@ const footerSections = [
     links: [
       { label: "Browse Cars", to: "/browse" },
       { label: "Sell Your Car", to: "/sell" },
-      { label: "Auctions", to: "/auctions" },
       { label: "Saved Cars", to: "/saved" },
       { label: "Compare Cars", to: "/compare" },
       { label: "Blog & Guides", to: "/blog" },
