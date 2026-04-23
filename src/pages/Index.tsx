@@ -13,6 +13,7 @@ import CarsNearYou from "@/components/CarsNearYou";
 import CarOfTheWeek from "@/components/CarOfTheWeek";
 import WhyBuyFromUs from "@/components/WhyBuyFromUs";
 import AIChatWidget from "@/components/AIChatWidget";
+import Icon3D from "@/components/Icon3D";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -199,9 +200,9 @@ const Index = () => {
 
               <div className="mt-10 space-y-6">
                 {[
-                  { icon: Shield, title: "Verified Listings", desc: "Every dealer is vetted. Verified badges mean the vehicle has passed our checks for legality and outstanding finance." },
-                  { icon: Search, title: "Finance & Legal Check", desc: "Instantly check if a vehicle has outstanding finance, is reported stolen, or has been written off." },
-                  { icon: FileCheck, title: "Full History Reports", desc: "Access complete MOT history, mileage verification, and previous owner details with a single click." },
+                  { icon: Shield, variant: "primary" as const, title: "Verified Listings", desc: "Every dealer is vetted. Verified badges mean the vehicle has passed our checks for legality and outstanding finance." },
+                  { icon: Search, variant: "info" as const, title: "Finance & Legal Check", desc: "Instantly check if a vehicle has outstanding finance, is reported stolen, or has been written off." },
+                  { icon: FileCheck, variant: "success" as const, title: "Full History Reports", desc: "Access complete MOT history, mileage verification, and previous owner details with a single click." },
                 ].map((item, i) => (
                   <motion.div
                     key={item.title}
@@ -209,11 +210,9 @@ const Index = () => {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.12 }}
                     viewport={{ once: true }}
-                    className="flex gap-4"
+                    className="group flex gap-4"
                   >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-                      <item.icon className="h-5 w-5 text-primary" />
-                    </div>
+                    <Icon3D icon={item.icon} variant={item.variant} size="lg" />
                     <div>
                       <h3 className="font-display text-base font-semibold text-foreground">{item.title}</h3>
                       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
@@ -252,10 +251,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {[
-              { icon: Users, value: platformStats.users > 0 ? platformStats.users.toLocaleString() : "—", label: "Active Users" },
-              { icon: Car, value: platformStats.listings > 0 ? platformStats.listings.toLocaleString() : "—", label: "Vehicles Listed" },
-              { icon: TrendingUp, value: platformStats.soldValue > 0 ? formatPrice(platformStats.soldValue, config) : "—", label: "Total Value Sold" },
-              { icon: Star, value: platformStats.avgRating > 0 ? `${platformStats.avgRating}/5` : "—", label: "Average Rating" },
+              { icon: Users, variant: "primary" as const, value: platformStats.users > 0 ? platformStats.users.toLocaleString() : "—", label: "Active Users" },
+              { icon: Car, variant: "info" as const, value: platformStats.listings > 0 ? platformStats.listings.toLocaleString() : "—", label: "Vehicles Listed" },
+              { icon: TrendingUp, variant: "success" as const, value: platformStats.soldValue > 0 ? formatPrice(platformStats.soldValue, config) : "—", label: "Total Value Sold" },
+              { icon: Star, variant: "warning" as const, value: platformStats.avgRating > 0 ? `${platformStats.avgRating}/5` : "—", label: "Average Rating" },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -263,11 +262,9 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
                 viewport={{ once: true }}
-                className="flex items-center gap-3"
+                className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card/50 p-3 backdrop-blur-sm hover-lift"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                  <stat.icon className="h-5 w-5 text-primary" />
-                </div>
+                <Icon3D icon={stat.icon} variant={stat.variant} size="md" />
                 <div>
                   <p className="font-display text-lg font-bold text-foreground md:text-xl">{stat.value}</p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
