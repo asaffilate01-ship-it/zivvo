@@ -28,6 +28,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
+import testimonialSarah from "@/assets/testimonial-sarah.jpg";
+import testimonialJames from "@/assets/testimonial-james.jpg";
+import testimonialEmma from "@/assets/testimonial-emma.jpg";
+import testimonialDavid from "@/assets/testimonial-david.jpg";
 import trustImage from "@/assets/trust-verify.jpg";
 
 const getCategories = (bodyTypes: string[]) => {
@@ -41,10 +45,10 @@ const getCategories = (bodyTypes: string[]) => {
 };
 
 const testimonials = [
-  { name: "Sarah K.", location: "London", rating: 5, text: "Sold my BMW in 3 days. The verified badge made buyers trust my listing instantly." },
-  { name: "James T.", location: "Manchester", rating: 5, text: "The finance check feature saved me from buying a car with outstanding debt." },
-  { name: "Aisha M.", location: "Dubai", rating: 5, text: "As a dealer, AutoSouq brings us qualified leads every day." },
-  { name: "David R.", location: "New York", rating: 5, text: "Found my dream Porsche through AutoSouq. Transparent and verified." },
+  { name: "Sarah K.", location: "London", rating: 5, avatar: testimonialSarah, text: "Sold my BMW in 3 days. The verified badge made buyers trust my listing instantly." },
+  { name: "James T.", location: "Manchester", rating: 5, avatar: testimonialJames, text: "The finance check feature saved me from buying a car with outstanding debt." },
+  { name: "Emma W.", location: "Birmingham", rating: 5, avatar: testimonialEmma, text: "As a dealer, AutoSouq brings us qualified leads every day. Brilliant platform." },
+  { name: "David R.", location: "Edinburgh", rating: 5, avatar: testimonialDavid, text: "Found my dream Porsche through AutoSouq. Transparent, verified and hassle-free." },
 ];
 
 const fadeUp = {
@@ -299,9 +303,14 @@ const Index = () => {
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
               <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  {t.name.charAt(0)}
-                </div>
+                <img
+                  src={t.avatar}
+                  alt={`${t.name} from ${t.location}`}
+                  loading="lazy"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
                 <div>
                   <p className="text-sm font-semibold text-card-foreground">{t.name}</p>
                   <p className="text-xs text-muted-foreground">{t.location}</p>
