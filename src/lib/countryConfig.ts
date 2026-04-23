@@ -154,4 +154,4 @@ export const getCountryFromCode = (code: string): CountryCode => {
   return map[code.toUpperCase()] || "GB";
 };
 
-export const allCountries: CountryCode[] = ["GB", "US", "PK", "AE"];
+export const allCountries: CountryCode[] = ["GB"];
