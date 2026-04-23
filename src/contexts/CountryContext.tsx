@@ -32,26 +32,8 @@ export const CountryProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const detectCountry = async () => {
-      try {
-        // Use a free IP geolocation API
-        const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(4000) });
-        if (res.ok) {
-          const data = await res.json();
-          const code = data.country_code;
-          if (code) {
-            const mapped = getCountryFromCode(code);
-            setCountryState(mapped);
-            localStorage.setItem(STORAGE_KEY, mapped);
-          }
-        }
-      } catch {
-        // Fallback to GB on error/timeout
-      }
-      setDetecting(false);
-    };
-
-    detectCountry();
+    // Geo-detection disabled while only GB is active
+    setDetecting(false);
   }, []);
 
   const setCountry = useCallback((code: CountryCode) => {
