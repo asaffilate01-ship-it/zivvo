@@ -53,9 +53,18 @@
     --info-foreground: 0 0% 100%;
 
     --gradient-primary: linear-gradient(135deg, hsl(16 90% 54%), hsl(350 80% 55%));
+    --gradient-primary-soft: linear-gradient(135deg, hsl(16 90% 54% / 0.18), hsl(350 80% 55% / 0.12));
     --gradient-dark: linear-gradient(135deg, hsl(220 25% 10%), hsl(220 20% 18%));
+    --gradient-mesh: radial-gradient(at 20% 20%, hsl(16 90% 54% / 0.18) 0px, transparent 50%),
+                     radial-gradient(at 80% 0%, hsl(350 80% 55% / 0.15) 0px, transparent 50%),
+                     radial-gradient(at 80% 80%, hsl(210 100% 52% / 0.12) 0px, transparent 50%);
     --shadow-card: 0 4px 24px -4px hsl(220 20% 10% / 0.08);
     --shadow-elevated: 0 12px 40px -8px hsl(220 20% 10% / 0.15);
+    --shadow-glow: 0 0 40px hsl(16 90% 54% / 0.35);
+    --shadow-3d: 0 14px 30px -10px hsl(16 90% 54% / 0.45),
+                 0 6px 12px -4px hsl(220 20% 10% / 0.18),
+                 inset 0 1px 0 hsl(0 0% 100% / 0.4),
+                 inset 0 -2px 6px hsl(220 20% 10% / 0.18);
   }
 
   .dark {
@@ -117,8 +126,14 @@
   .gradient-primary {
     background: var(--gradient-primary);
   }
+  .gradient-primary-soft {
+    background: var(--gradient-primary-soft);
+  }
   .gradient-dark {
     background: var(--gradient-dark);
+  }
+  .gradient-mesh {
+    background-image: var(--gradient-mesh);
   }
   .shadow-card {
     box-shadow: var(--shadow-card);
@@ -126,6 +141,33 @@
   .shadow-elevated {
     box-shadow: var(--shadow-elevated);
   }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  .shadow-3d {
+    box-shadow: var(--shadow-3d);
+  }
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated;
+  }
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(-2deg); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
 
 /* Smooth scroll */
