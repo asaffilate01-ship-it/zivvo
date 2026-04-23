@@ -334,7 +334,7 @@ const DealerLanding = () => {
               { icon: Clock, value: config.opening_hours || "Mon–Sat 9–6", label: "Opening Hours" },
               {
                 icon: Shield,
-                value: priceRange ? `From ${priceRange.min.toLocaleString()}` : "100%",
+                value: priceRange ? `From ${formatPrice(priceRange.min, config)}` : "100%",
                 label: priceRange ? "Starting Price" : "Verified Dealer",
               },
             ].map((stat, i) => (
