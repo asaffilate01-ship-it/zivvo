@@ -34,6 +34,9 @@ import testimonialJames from "@/assets/testimonial-james.jpg";
 import testimonialEmma from "@/assets/testimonial-emma.jpg";
 import testimonialDavid from "@/assets/testimonial-david.jpg";
 import trustImage from "@/assets/trust-verify.jpg";
+import blogChecklist from "@/assets/blog-buying-checklist.jpg";
+import blogEvHybrid from "@/assets/blog-ev-hybrid.jpg";
+import blogSellTips from "@/assets/blog-sell-tips.jpg";
 
 const getCategories = (bodyTypes: string[]) => {
   const iconMap: Record<string, any> = { SUV: Truck, Electric: Zap, Hybrid: Globe };
@@ -374,9 +377,9 @@ const Index = () => {
           </motion.div>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {[
-              { title: "Used Car Buying Checklist 2026", cat: "Buying Guide", img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=400&q=80" },
-              { title: "Electric vs Hybrid: Which Is Right?", cat: "EV Guide", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=400&q=80" },
-              { title: "10 Tips to Sell Your Car Fast", cat: "Selling Tips", img: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400&q=80" },
+              { title: "Used Car Buying Checklist 2026", cat: "Buying Guide", img: blogChecklist },
+              { title: "Electric vs Hybrid: Which Is Right?", cat: "EV Guide", img: blogEvHybrid },
+              { title: "10 Tips to Sell Your Car Fast", cat: "Selling Tips", img: blogSellTips },
             ].map((post, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }}>
                 <Link to="/blog" className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:shadow-elevated block">
