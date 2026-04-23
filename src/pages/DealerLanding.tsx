@@ -16,6 +16,8 @@ import {
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 
 export interface LandingConfig {
   hero_title?: string;
