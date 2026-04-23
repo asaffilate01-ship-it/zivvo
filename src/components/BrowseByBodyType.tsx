@@ -4,20 +4,28 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useCountry } from "@/contexts/CountryContext";
+import bodySaloon from "@/assets/body-saloon.jpg";
+import bodySuv from "@/assets/body-suv.jpg";
+import bodyCoupe from "@/assets/body-coupe.jpg";
+import bodyHatchback from "@/assets/body-hatchback.jpg";
+import bodyEstate from "@/assets/body-estate.jpg";
+import bodyConvertible from "@/assets/body-convertible.jpg";
+import bodyPickup from "@/assets/body-pickup.jpg";
+import bodyVan from "@/assets/body-van.jpg";
 
 const bodyTypeImages: Record<string, string> = {
-  "Saloon": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&q=80",
-  "Sedan": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&q=80",
-  "SUV": "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&q=80",
-  "Coupe": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80",
-  "Hatchback": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=400&q=80",
-  "Estate": "https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=400&q=80",
-  "Convertible": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400&q=80",
-  "Pickup": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80",
-  "Truck": "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80",
-  "Van": "https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=400&q=80",
-  "Minivan": "https://images.unsplash.com/photo-1632245889029-e406faaa34cd?w=400&q=80",
-  "Crossover": "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&q=80",
+  "Saloon": bodySaloon,
+  "Sedan": bodySaloon,
+  "SUV": bodySuv,
+  "Coupe": bodyCoupe,
+  "Hatchback": bodyHatchback,
+  "Estate": bodyEstate,
+  "Convertible": bodyConvertible,
+  "Pickup": bodyPickup,
+  "Truck": bodyPickup,
+  "Van": bodyVan,
+  "Minivan": bodyVan,
+  "Crossover": bodySuv,
 };
 
 const gradients: Record<string, string> = {
@@ -79,7 +87,7 @@ const BrowseByBodyType = ({ counts = {} }: Props) => {
             >
               <div className="relative aspect-[16/10] overflow-hidden">
                 <img
-                  src={bodyTypeImages[label] || "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&q=80"}
+                  src={bodyTypeImages[label] || bodySaloon}
                   alt={label}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="lazy"
