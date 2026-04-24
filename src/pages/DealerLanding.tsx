@@ -855,6 +855,47 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* ─── Part-Exchange / Trade-In CTA ─── */}
+      <section className="border-t border-border py-12">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid gap-6 rounded-3xl border border-border bg-card p-6 md:grid-cols-[1fr,auto] md:items-center md:p-8"
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+                style={{ backgroundColor: `${accent}15` }}
+              >
+                <HandCoins className="h-6 w-6" style={{ color: accent }} />
+              </div>
+              <div>
+                <Badge variant="outline" className="mb-2 text-[10px]">Part-Exchange</Badge>
+                <h3 className={`${fontClass} text-lg font-bold text-foreground md:text-xl`}>
+                  Trade in your current car
+                </h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  Get an instant valuation and use it as part-payment toward any vehicle in our showroom.
+                  Free, no-obligation offers — usually within minutes.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 md:justify-end">
+              <Link to="/valuation">
+                <Button className="border-0 text-white" style={{ backgroundColor: accent }}>
+                  Get my valuation <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </Link>
+              <Button variant="outline" onClick={() => setEnquiryOpen(true)}>
+                Talk to us
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ─── Finance CTA ─── */}
       {config.show_finance_cta !== false && (
         <section className="border-t border-border">
