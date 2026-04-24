@@ -429,6 +429,48 @@ const DealerLanding = () => {
         </section>
       )}
 
+      {/* ─── Brands We Stock ─── */}
+      {uniqueMakes.length >= 3 && (
+        <section className="border-b border-border bg-card py-10">
+          <div className="container mx-auto px-4">
+            <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 text-center">
+              <Badge variant="outline" className="mb-2 text-xs">Brands We Stock</Badge>
+              <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Shop by manufacturer</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Tap a brand to filter our inventory instantly</p>
+            </motion.div>
+            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+              <button
+                type="button"
+                onClick={() => { setFilterMake("all"); document.getElementById("inventory")?.scrollIntoView({ behavior: "smooth" }); }}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${filterMake === "all" ? "text-white border-transparent" : "border-border bg-background text-foreground hover:-translate-y-0.5 hover:shadow-sm"}`}
+                style={filterMake === "all" ? { backgroundColor: accent } : undefined}
+              >
+                All ({listings.length})
+              </button>
+              {uniqueMakes.map((make) => {
+                const count = listings.filter((c) => c.make === make).length;
+                const active = filterMake === make;
+                return (
+                  <button
+                    key={make}
+                    type="button"
+                    onClick={() => { setFilterMake(active ? "all" : make!); document.getElementById("inventory")?.scrollIntoView({ behavior: "smooth" }); }}
+                    className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${active ? "text-white border-transparent" : "border-border bg-background text-foreground hover:-translate-y-0.5 hover:shadow-sm"}`}
+                    style={active ? { backgroundColor: accent } : undefined}
+                  >
+                    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${active ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"}`}>
+                      {make!.charAt(0)}
+                    </span>
+                    <span>{make}</span>
+                    <span className={`text-xs ${active ? "text-white/80" : "text-muted-foreground"}`}>· {count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── Inventory at a Glance ─── */}
       {listings.length >= 4 && (
         <section className="border-b border-border py-10">
