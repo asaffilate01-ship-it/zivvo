@@ -37,6 +37,8 @@ import InspectionBadge from "@/components/InspectionBadge";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import ShareSheet from "@/components/ShareSheet";
 import MediaGallery from "@/components/MediaGallery";
+import LiveMap, { distanceKm } from "@/components/LiveMap";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
   const [revealed, setRevealed] = useState(false);
