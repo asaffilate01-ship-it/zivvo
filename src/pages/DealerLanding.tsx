@@ -124,6 +124,7 @@ const DealerLanding = () => {
     }
     if (filterFuel !== "all") result = result.filter((c) => c.fuel_type === filterFuel);
     if (filterBody !== "all") result = result.filter((c) => c.body_type === filterBody);
+    if (budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
     result.sort((a, b) => {
       if (sortBy === "price-low") return (a.price || 0) - (b.price || 0);
       if (sortBy === "price-high") return (b.price || 0) - (a.price || 0);
@@ -132,7 +133,26 @@ const DealerLanding = () => {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
     setFilteredListings(result);
-  }, [listings, searchQuery, sortBy, filterFuel, filterBody]);
+  }, [listings, searchQuery, sortBy, filterFuel, filterBody, budgetMax]);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = `${dealer?.business_name || "Dealer"} on AutoSouq`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+        return;
+      } catch { /* user cancelled */ }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShared(true);
+      toast({ title: "Link copied", description: "Share it with your friends." });
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      toast({ title: "Copy failed", description: "Please copy from the address bar.", variant: "destructive" });
+    }
+  };
 
   const uniqueFuels = [...new Set(listings.map((c) => c.fuel_type).filter(Boolean))];
   const uniqueBodies = [...new Set(listings.map((c) => c.body_type).filter(Boolean))];
