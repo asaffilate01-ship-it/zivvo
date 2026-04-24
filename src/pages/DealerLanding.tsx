@@ -14,7 +14,9 @@ import {
   Star, Clock, Shield, Search, ArrowRight, MessageCircle, ChevronDown,
   Fuel, SlidersHorizontal, Award, ThumbsUp, Wrench, Heart, Sparkles,
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
-  Share2, Copy, Check, Eye,
+  Share2, Copy, Check, Eye, Calendar, CreditCard, Truck, FileCheck,
+  HandCoins, ShieldCheck, TrendingUp, Search as SearchIcon, Gauge,
+  ChevronUp,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
@@ -355,32 +357,102 @@ const DealerLanding = () => {
         <section className="border-b border-border bg-card">
           <div className="container mx-auto grid grid-cols-2 gap-px md:grid-cols-4">
             {[
-              { icon: Car, value: String(listings.length), label: "Vehicles in Stock" },
-              { icon: Star, value: "4.9", label: "Customer Rating" },
-              { icon: Clock, value: config.opening_hours || "Mon–Sat 9–6", label: "Opening Hours" },
+              { icon: Car, value: listings.length, label: "Vehicles in Stock", isString: false },
+              { icon: Star, value: 4.9, label: "Customer Rating", isString: false, decimals: 1, suffix: "/5" },
+              { icon: Clock, value: config.opening_hours || "Mon–Sat 9–6", label: "Opening Hours", isString: true },
               {
                 icon: Shield,
                 value: priceRange ? `From ${formatPrice(priceRange.min, countryCfg)}` : "100%",
                 label: priceRange ? "Starting Price" : "Verified Dealer",
+                isString: true,
               },
-            ].map((stat, i) => (
+            ].map((stat: any, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
                 viewport={{ once: true }}
-                className="flex items-center gap-3 px-6 py-5"
+                className="group flex items-center gap-3 px-6 py-5 transition-colors hover:bg-muted/30"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${accent}15` }}>
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${accent}15` }}
+                >
                   <stat.icon className="h-5 w-5" style={{ color: accent }} />
                 </div>
                 <div>
-                  <p className={`${fontClass} text-lg font-bold text-foreground`}>{stat.value}</p>
+                  <p className={`${fontClass} text-lg font-bold text-foreground`}>
+                    {stat.isString ? stat.value : <CountUp end={stat.value as number} decimals={stat.decimals || 0} suffix={stat.suffix || ""} />}
+                  </p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
                 </div>
               </motion.div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Inventory at a Glance ─── */}
+      {listings.length >= 4 && (
+        <section className="border-b border-border py-10">
+          <div className="container mx-auto px-4">
+            <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 flex items-end justify-between gap-4 flex-wrap">
+              <div>
+                <Badge variant="outline" className="mb-2 text-xs">At a Glance</Badge>
+                <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Browse our stock</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Quick filters to find your perfect car</p>
+              </div>
+            </motion.div>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {(() => {
+                const bodyCounts: Record<string, number> = {};
+                listings.forEach((c) => {
+                  if (c.body_type) bodyCounts[c.body_type] = (bodyCounts[c.body_type] || 0) + 1;
+                });
+                return Object.entries(bodyCounts)
+                  .sort(([, a], [, b]) => b - a)
+                  .slice(0, 4)
+                  .map(([body, count], i) => (
+                    <motion.button
+                      key={body}
+                      type="button"
+                      onClick={() => {
+                        setFilterBody(body);
+                        document.getElementById("inventory")?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      viewport={{ once: true }}
+                      className="group rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+                      style={{ borderColor: filterBody === body ? accent : "hsl(var(--border))" }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div
+                          className="flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
+                          style={{ backgroundColor: `${accent}12` }}
+                        >
+                          <Car className="h-5 w-5" style={{ color: accent }} />
+                        </div>
+                        <span className={`${fontClass} text-2xl font-bold text-foreground`}>{count}</span>
+                      </div>
+                      <p className={`${fontClass} mt-3 font-semibold text-foreground`}>{body}</p>
+                      <p className="text-xs text-muted-foreground">View all {body.toLowerCase()}s →</p>
+                    </motion.button>
+                  ));
+              })()}
+            </div>
+
+            {/* Quick price highlights */}
+            {priceRange && listings.length >= 6 && (
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <QuickStatTile icon={TrendingUp} label="Price range" value={`${formatPrice(priceRange.min, countryCfg)} – ${formatPrice(priceRange.max, countryCfg)}`} accent={accent} />
+                <QuickStatTile icon={Calendar} label="Newest model year" value={String(Math.max(...listings.map((c) => c.year || 0)))} accent={accent} />
+                <QuickStatTile icon={Gauge} label="Avg. mileage" value={`${Math.round(listings.reduce((s, c) => s + (c.mileage || 0), 0) / Math.max(listings.length, 1)).toLocaleString()} ${countryCfg.distanceUnit}`} accent={accent} />
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -582,6 +654,74 @@ const DealerLanding = () => {
         </section>
       )}
 
+      {/* ─── How Buying Works ─── */}
+      <section className="border-b border-border py-14 md:py-20">
+        <div className="container mx-auto px-4">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <Badge variant="outline" className="mb-3 text-xs">Simple Process</Badge>
+            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>How buying from us works</h2>
+            <p className="mt-2 text-muted-foreground max-w-lg mx-auto">From browsing to driving away — a simple, transparent journey in 4 steps.</p>
+          </motion.div>
+
+          <div className="relative grid gap-8 md:grid-cols-4">
+            <div className="hidden md:block absolute top-7 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+            {[
+              { icon: SearchIcon, title: "Browse", desc: "Explore our verified inventory, with detailed specs and full photo galleries." },
+              { icon: MessageCircle, title: "Enquire", desc: "Ask questions, request a video walkaround or book a test drive." },
+              { icon: FileCheck, title: "Reserve", desc: "Secure your car with a small refundable deposit. We handle the paperwork." },
+              { icon: Truck, title: "Drive away", desc: "Collect in person or have it delivered to your door, fully prepared and inspected." },
+            ].map((step, i) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="relative text-center"
+              >
+                <div className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card shadow-sm">
+                  <step.icon className="h-6 w-6" style={{ color: accent }} />
+                  <span
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold text-white shadow"
+                    style={{ backgroundColor: accent }}
+                  >
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className={`${fontClass} text-base font-bold text-foreground`}>{step.title}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Trust badges row ─── */}
+      <section className="border-b border-border bg-muted/20 py-10">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {[
+              { icon: ShieldCheck, label: "All cars HPI checked" },
+              { icon: BadgeCheck, label: "Verified dealer" },
+              { icon: HandCoins, label: "Part-exchange welcome" },
+              { icon: CreditCard, label: "Finance available" },
+            ].map((b, i) => (
+              <motion.div
+                key={b.label}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                viewport={{ once: true }}
+                className="flex items-center gap-2.5 text-sm font-medium text-foreground"
+              >
+                <b.icon className="h-5 w-5 shrink-0" style={{ color: accent }} />
+                <span>{b.label}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── Inventory ─── */}
       <section id="inventory" className="py-12 md:py-16">
         <div className="container mx-auto px-4">
@@ -712,6 +852,47 @@ const DealerLanding = () => {
               )}
             </>
           )}
+        </div>
+      </section>
+
+      {/* ─── Part-Exchange / Trade-In CTA ─── */}
+      <section className="border-t border-border py-12">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="grid gap-6 rounded-3xl border border-border bg-card p-6 md:grid-cols-[1fr,auto] md:items-center md:p-8"
+          >
+            <div className="flex items-start gap-4">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+                style={{ backgroundColor: `${accent}15` }}
+              >
+                <HandCoins className="h-6 w-6" style={{ color: accent }} />
+              </div>
+              <div>
+                <Badge variant="outline" className="mb-2 text-[10px]">Part-Exchange</Badge>
+                <h3 className={`${fontClass} text-lg font-bold text-foreground md:text-xl`}>
+                  Trade in your current car
+                </h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  Get an instant valuation and use it as part-payment toward any vehicle in our showroom.
+                  Free, no-obligation offers — usually within minutes.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 md:justify-end">
+              <Link to="/valuation">
+                <Button className="border-0 text-white" style={{ backgroundColor: accent }}>
+                  Get my valuation <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </Link>
+              <Button variant="outline" onClick={() => setEnquiryOpen(true)}>
+                Talk to us
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -903,5 +1084,51 @@ const ContactBar = ({ dealer, config, showPhone, showEmail, showAddress, isOnDar
     )}
   </div>
 );
+
+const QuickStatTile = ({ icon: Icon, label, value, accent }: { icon: any; label: string; value: string; accent: string }) => (
+  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${accent}12` }}>
+      <Icon className="h-4 w-4" style={{ color: accent }} />
+    </div>
+    <div className="min-w-0">
+      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="truncate text-sm font-semibold text-foreground">{value}</p>
+    </div>
+  </div>
+);
+
+const CountUp = ({ end, duration = 1200, decimals = 0, suffix = "" }: { end: number; duration?: number; decimals?: number; suffix?: string }) => {
+  const [val, setVal] = useState(0);
+  const [started, setStarted] = useState(false);
+  const id = `countup-${String(end).replace(".", "_")}-${suffix.replace(/\W/g, "")}`;
+
+  useEffect(() => {
+    if (started) return;
+    const el = document.getElementById(id);
+    if (!el) { setStarted(true); return; }
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) setStarted(true); }),
+      { threshold: 0.3 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [id, started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setVal(end * eased);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [started, end, duration]);
+
+  return <span id={id}>{val.toFixed(decimals)}{suffix}</span>;
+};
 
 export default DealerLanding;
