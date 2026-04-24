@@ -1174,6 +1174,92 @@ const DealerLanding = () => {
         </section>
       )}
 
+      {/* ─── Newsletter & Opening Hours ─── */}
+      {config.newsletter_enabled !== false && (
+        <section className="border-t border-border py-14">
+          <div className="container mx-auto grid gap-6 px-4 md:grid-cols-2">
+            {/* Newsletter card */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative overflow-hidden rounded-3xl border border-border bg-card p-7 shadow-card"
+            >
+              <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-10" style={{ backgroundColor: accent }} />
+              <div className="relative">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${accent}15` }}>
+                  <Send className="h-5 w-5" style={{ color: accent }} />
+                </div>
+                <h3 className={`${fontClass} mt-4 text-xl font-bold text-foreground`}>Stock alerts & special offers</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  Be first to know when new vehicles arrive at {dealer.business_name}. No spam, unsubscribe anytime.
+                </p>
+                <form onSubmit={handleNewsletterSubmit} className="mt-5 flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    className="flex-1"
+                    aria-label="Email address"
+                    required
+                  />
+                  <Button type="submit" className="border-0 text-white" style={{ backgroundColor: accent }}>
+                    {newsletterSent ? <><Check className="mr-1 h-4 w-4" /> Subscribed</> : <>Subscribe <ArrowRight className="ml-1 h-4 w-4" /></>}
+                  </Button>
+                </form>
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  By subscribing you agree to our privacy policy. We never share your data.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Opening hours card */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-3xl border border-border bg-card p-7 shadow-card"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${accent}15` }}>
+                    <Clock className="h-5 w-5" style={{ color: accent }} />
+                  </div>
+                  <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Opening hours</h3>
+                </div>
+                <OpenNowBadge hours={config.opening_hours_table} accent={accent} />
+              </div>
+              <ul className="mt-5 divide-y divide-border text-sm">
+                {(config.opening_hours_table && config.opening_hours_table.length > 0
+                  ? config.opening_hours_table
+                  : [
+                      { day: "Monday", hours: "9:00 – 18:00" },
+                      { day: "Tuesday", hours: "9:00 – 18:00" },
+                      { day: "Wednesday", hours: "9:00 – 18:00" },
+                      { day: "Thursday", hours: "9:00 – 18:00" },
+                      { day: "Friday", hours: "9:00 – 18:00" },
+                      { day: "Saturday", hours: "10:00 – 17:00" },
+                      { day: "Sunday", hours: "By appointment" },
+                    ]
+                ).map((row) => (
+                  <li key={row.day} className="flex items-center justify-between py-2.5">
+                    <span className="font-medium text-foreground">{row.day}</span>
+                    <span className="text-muted-foreground">{row.hours}</span>
+                  </li>
+                ))}
+              </ul>
+              {showAddress && dealer.city && (
+                <div className="mt-5 flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+                  <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: accent }} />
+                  <span>Visit us at <strong className="text-foreground">{dealer.city}{dealer.country ? `, ${dealer.country}` : ""}</strong>. Walk-ins welcome during opening hours.</span>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* ─── CTA Footer ─── */}
       <section className="border-t border-border relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}08, ${accent}15)` }}>
         <div className="container mx-auto px-4 py-14 text-center relative">
