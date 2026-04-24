@@ -887,11 +887,11 @@ function generateContractHTML(auction: any, listing: any, price: number, country
     <p><strong>VIN:</strong> ${listing?.vin || "N/A"}</p>
     <p><strong>Mileage:</strong> ${listing?.mileage?.toLocaleString() || "N/A"}</p>
     <hr style="margin:12px 0;"/>
-    <p><strong>Hammer Price:</strong> ${price}</p>
-    <p><strong>Buyer Premium (3%):</strong> ${(price * 0.03).toFixed(2)}</p>
-    <p><strong>Total Due from Buyer:</strong> ${(price * 1.03).toFixed(2)}</p>
-    <p><strong>Seller Fee (1.5%):</strong> ${(price * 0.015).toFixed(2)}</p>
-    <p><strong>Seller Receives:</strong> ${(price * 0.985).toFixed(2)}</p>
+    <p><strong>Hammer Price:</strong> £${price}</p>
+    <p><strong>Buyer Premium (3%):</strong> £${(price * 0.03).toFixed(2)}</p>
+    <p><strong>Total Due from Buyer:</strong> £${(price * 1.03).toFixed(2)}</p>
+    <p><strong>Seller Fee (1.5%):</strong> £${(price * 0.015).toFixed(2)}</p>
+    <p><strong>Seller Receives:</strong> £${(price * 0.985).toFixed(2)}</p>
     <hr style="margin:12px 0;"/>
     <h3 style="font-weight:bold;">Terms & Conditions</h3>
     <ol style="padding-left:20px;font-size:13px;">

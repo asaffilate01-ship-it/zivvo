@@ -106,8 +106,8 @@ const AgentDashboard = () => {
         {/* KPI Cards */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Total Earned", value: `$${totalEarned.toLocaleString()}`, icon: DollarSign, color: "text-primary" },
-            { label: "Pending Payout", value: `$${totalPending.toLocaleString()}`, icon: Clock, color: "text-accent-foreground" },
+            { label: "Total Earned", value: `£${totalEarned.toLocaleString()}`, icon: DollarSign, color: "text-primary" },
+            { label: "Pending Payout", value: `£${totalPending.toLocaleString()}`, icon: Clock, color: "text-accent-foreground" },
             { label: "Active Dealers", value: activeDealer, icon: Building2, color: "text-primary" },
             { label: "Pending Onboarding", value: pendingOnboarding, icon: AlertCircle, color: "text-destructive" },
           ].map((stat, i) => (
@@ -255,11 +255,11 @@ const AgentDashboard = () => {
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Total Earned (All Time)</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-primary">${totalEarned.toLocaleString()}</p>
+                    <p className="mt-1 font-display text-2xl font-bold text-primary">£{totalEarned.toLocaleString()}</p>
                   </div>
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Pending</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-card-foreground">${totalPending.toLocaleString()}</p>
+                    <p className="mt-1 font-display text-2xl font-bold text-card-foreground">£{totalPending.toLocaleString()}</p>
                   </div>
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Commission Rate</p>
