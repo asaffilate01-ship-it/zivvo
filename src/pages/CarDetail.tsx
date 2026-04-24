@@ -549,4 +549,41 @@ const CarDetail = () => {
   );
 };
 
+const LocationMapCard = ({
+  lat, lng, title, location,
+}: { lat: number; lng: number; title: string; location: string }) => {
+  const { location: userLoc } = useUserLocation("auto");
+  const distance = userLoc ? distanceKm(userLoc, { lat, lng }) : null;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+  return (
+    <div className="mt-4 space-y-2">
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-medium text-foreground">Vehicle location</span>
+        {distance !== null && (
+          <span className="text-muted-foreground">
+            ~{distance < 10 ? distance.toFixed(1) : Math.round(distance)} km from you
+          </span>
+        )}
+      </div>
+      <LiveMap
+        markers={[{ id: "car", lat, lng, title }]}
+        fallbackCenter={{ lat, lng }}
+        fallbackZoom={12}
+        height="220px"
+        showUserLocation
+        fitToMarkers
+      />
+      <a
+        href={directionsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block text-xs font-medium text-primary hover:underline"
+      >
+        Get directions →
+      </a>
+    </div>
+  );
+};
+
 export default CarDetail;
