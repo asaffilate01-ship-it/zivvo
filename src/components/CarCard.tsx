@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video } from "lucide-react";
+import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video, Truck, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -10,6 +10,17 @@ import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import PriceIndicatorBadge from "@/components/PriceIndicatorBadge";
 import DealerPerformanceBadge from "@/components/DealerPerformanceBadge";
+
+// Rough monthly finance estimate: 10% deposit, 60 months, 9.9% APR
+const estimateMonthly = (price: number) => {
+  const deposit = price * 0.1;
+  const principal = price - deposit;
+  const apr = 0.099;
+  const n = 60;
+  const r = apr / 12;
+  const m = (principal * r) / (1 - Math.pow(1 + r, -n));
+  return Math.round(m);
+};
 
 interface CarCardProps {
   car: {
