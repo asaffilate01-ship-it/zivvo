@@ -115,6 +115,17 @@ const SellMyCar = () => {
         }
       }
 
+      // Geocode the location to live coordinates (best effort)
+      let latitude: number | null = null;
+      let longitude: number | null = null;
+      if (form.location) {
+        try {
+          const { geocodeAddress } = await import("@/lib/googleMapsLoader");
+          const geo = await geocodeAddress(form.location, country);
+          if (geo) { latitude = geo.lat; longitude = geo.lng; }
+        } catch { /* non-blocking */ }
+      }
+
       const { error } = await supabase.from("car_listings").insert({
         seller_id: user.id,
         title: form.title || `${form.make} ${form.model} ${form.year}`,
@@ -129,6 +140,8 @@ const SellMyCar = () => {
         color: form.color || null,
         description: form.description || null,
         location: form.location || null,
+        latitude,
+        longitude,
         images: uploadedUrls,
         country,
         registration: form.registration || null,

@@ -236,6 +236,17 @@ const CreateListing = () => {
       // Force under_review when publishing (admin must approve with logbook + HPI)
       const finalStatus = status === "active" ? "under_review" : status;
 
+      // Geocode the location to live coordinates (best effort)
+      let latitude: number | null = null;
+      let longitude: number | null = null;
+      if (form.location) {
+        try {
+          const { geocodeAddress } = await import("@/lib/googleMapsLoader");
+          const geo = await geocodeAddress(form.location, country);
+          if (geo) { latitude = geo.lat; longitude = geo.lng; }
+        } catch { /* non-blocking */ }
+      }
+
       const listingData: Record<string, any> = {
         title,
         make: form.make,
@@ -253,6 +264,8 @@ const CreateListing = () => {
         vin: form.vin || null,
         description: form.description || null,
         location: form.location || null,
+        latitude,
+        longitude,
         images: allImages,
         status: finalStatus,
         country,

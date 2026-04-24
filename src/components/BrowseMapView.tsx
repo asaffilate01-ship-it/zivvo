@@ -1,10 +1,8 @@
-/// <reference types="google.maps" />
-import { useEffect, useRef, useState } from "react";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
-import { Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import LiveMap, { type LiveMapMarker } from "@/components/LiveMap";
 
+// City fallback for legacy listings without lat/lng
 const cityCoords: Record<string, [number, number]> = {
   "London": [51.5074, -0.1278], "Manchester": [53.4808, -2.2426], "Birmingham": [52.4862, -1.8904],
   "Leeds": [53.8008, -1.5491], "Glasgow": [55.8642, -4.2518], "Edinburgh": [55.9533, -3.1883],
@@ -19,7 +17,7 @@ const cityCoords: Record<string, [number, number]> = {
   "Rawalpindi": [33.5651, 73.0169], "Faisalabad": [31.4504, 73.1350], "Peshawar": [34.0151, 71.5249],
 };
 
-const getCoords = (location: string): [number, number] | null => {
+const getFallbackCoords = (location: string): [number, number] | null => {
   if (!location) return null;
   for (const [city, coords] of Object.entries(cityCoords)) {
     if (location.toLowerCase().includes(city.toLowerCase())) return coords;
@@ -34,35 +32,6 @@ const defaultCenter: Record<string, { lat: number; lng: number }> = {
   PK: { lat: 30.3, lng: 69.3 },
 };
 
-let googleMapsPromise: Promise<void> | null = null;
-let cachedApiKey: string | null = null;
-
-const fetchAndLoadGoogleMaps = async (): Promise<void> => {
-  if ((window as any).google?.maps) return;
-  if (googleMapsPromise) return googleMapsPromise;
-
-  googleMapsPromise = (async () => {
-    // Fetch the key from edge function
-    if (!cachedApiKey) {
-      const { data, error } = await supabase.functions.invoke("maps-key");
-      if (error || !data?.key) throw new Error("Could not fetch Maps API key");
-      cachedApiKey = data.key;
-    }
-
-    return new Promise<void>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${cachedApiKey}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Failed to load Google Maps"));
-      document.head.appendChild(script);
-    });
-  })();
-
-  return googleMapsPromise;
-};
-
 interface BrowseMapViewProps {
   listings: any[];
   country: string;
@@ -70,90 +39,59 @@ interface BrowseMapViewProps {
 
 const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
   const { config } = useCountry();
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [mapError, setMapError] = useState(false);
-
   const center = defaultCenter[country] || { lat: 51.5, lng: -0.1 };
   const zoom = country === "US" ? 4 : country === "PK" ? 5 : 6;
 
-  useEffect(() => {
-    fetchAndLoadGoogleMaps()
-      .then(() => setMapLoaded(true))
-      .catch(() => setMapError(true));
-  }, []);
+  const escape = (s: string) => s.replace(/[<>"']/g, (c) =>
+    ({ "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] || c)
+  );
 
-  useEffect(() => {
-    if (!mapLoaded || !mapRef.current || mapInstanceRef.current) return;
-    const g = (window as any).google;
-    mapInstanceRef.current = new g.maps.Map(mapRef.current, {
-      center,
-      zoom,
-      disableDefaultUI: false,
-      zoomControl: true,
-      mapTypeControl: false,
-      streetViewControl: false,
-    });
-  }, [mapLoaded]);
+  const markers: LiveMapMarker[] = listings.flatMap((car) => {
+    let lat: number | null = null;
+    let lng: number | null = null;
+    if (typeof car.latitude === "number" && typeof car.longitude === "number") {
+      lat = car.latitude;
+      lng = car.longitude;
+    } else {
+      const fb = getFallbackCoords(car.location || "");
+      if (fb) {
+        // Tiny jitter so multiple cars in same city don't fully overlap
+        const jitter = () => (Math.random() - 0.5) * 0.02;
+        lat = fb[0] + jitter();
+        lng = fb[1] + jitter();
+      }
+    }
+    if (lat === null || lng === null) return [];
 
-  useEffect(() => {
-    const g = (window as any).google;
-    const map = mapInstanceRef.current;
-    if (!map || !mapLoaded || !g) return;
-
-    markersRef.current.forEach((m: any) => m.setMap(null));
-    markersRef.current = [];
-
-    const infoWindow = new g.maps.InfoWindow();
-
-    listings.forEach((car) => {
-      const coords = getCoords(car.location || "");
-      if (!coords) return;
-
-      const jitter = () => (Math.random() - 0.5) * 0.02;
-      const position = { lat: coords[0] + jitter(), lng: coords[1] + jitter() };
-
-      const marker = new g.maps.Marker({ map, position, title: car.title });
-
-      marker.addListener("click", () => {
-        const imgHtml = car.images?.[0]
-          ? `<img src="${car.images[0]}" alt="${car.title}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;" />`
-          : "";
-        infoWindow.setContent(`
-          <div style="min-width:180px;font-family:system-ui,sans-serif;">
-            ${imgHtml}
-            <p style="font-size:13px;font-weight:600;margin:0 0 4px;">${car.title}</p>
-            <p style="font-size:13px;font-weight:700;color:#2563eb;margin:0 0 2px;">${formatPrice(car.price, config)}</p>
-            <p style="font-size:11px;color:#666;margin:0 0 6px;">${car.location || ""}</p>
-            <a href="/car/${car.id}" style="font-size:11px;color:#2563eb;text-decoration:none;">View Details →</a>
-          </div>
-        `);
-        infoWindow.open(map, marker);
-      });
-
-      markersRef.current.push(marker);
-    });
-  }, [listings, mapLoaded, config]);
-
-  if (mapError) {
-    return (
-      <div className="flex h-[500px] w-full items-center justify-center rounded-xl border border-border bg-muted/30">
-        <p className="text-sm text-muted-foreground">Map unavailable. Please check your Google Maps API key.</p>
-      </div>
-    );
-  }
+    const imgHtml = car.images?.[0]
+      ? `<img src="${escape(car.images[0])}" alt="${escape(car.title || "")}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-bottom:8px;" />`
+      : "";
+    return [{
+      id: car.id,
+      lat,
+      lng,
+      title: car.title,
+      infoHtml: `
+        <div style="min-width:180px;font-family:system-ui,sans-serif;">
+          ${imgHtml}
+          <p style="font-size:13px;font-weight:600;margin:0 0 4px;">${escape(car.title || "")}</p>
+          <p style="font-size:13px;font-weight:700;color:#2563eb;margin:0 0 2px;">${escape(formatPrice(car.price, config))}</p>
+          <p style="font-size:11px;color:#666;margin:0 0 6px;">${escape(car.location || "")}</p>
+          <a href="/car/${escape(car.id)}" style="font-size:11px;color:#2563eb;text-decoration:none;">View Details →</a>
+        </div>
+      `,
+    }];
+  });
 
   return (
-    <div className="relative h-[500px] w-full overflow-hidden rounded-xl border border-border">
-      {!mapLoaded && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-muted/50">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        </div>
-      )}
-      <div ref={mapRef} className="h-full w-full" />
-    </div>
+    <LiveMap
+      markers={markers}
+      fallbackCenter={center}
+      fallbackZoom={zoom}
+      height="500px"
+      showUserLocation
+      fitToMarkers={markers.length > 0}
+    />
   );
 };
 

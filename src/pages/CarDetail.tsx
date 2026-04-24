@@ -37,6 +37,8 @@ import InspectionBadge from "@/components/InspectionBadge";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import ShareSheet from "@/components/ShareSheet";
 import MediaGallery from "@/components/MediaGallery";
+import LiveMap, { distanceKm } from "@/components/LiveMap";
+import { useUserLocation } from "@/hooks/useUserLocation";
 
 const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
   const [revealed, setRevealed] = useState(false);
@@ -149,6 +151,11 @@ const CarDetail = () => {
   const sellerName = dealer?.business_name || "Private Seller";
   const sellerLocation = car.location || dealer?.city || "";
   const showWhatsApp = (country === "AE" || country === "PK");
+
+  // Resolve coordinates from listing first, then dealer
+  const carLat = (car as any).latitude ?? (dealer as any)?.latitude ?? null;
+  const carLng = (car as any).longitude ?? (dealer as any)?.longitude ?? null;
+  const hasCoords = typeof carLat === "number" && typeof carLng === "number";
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -423,6 +430,15 @@ const CarDetail = () => {
                   </div>
                 )}
 
+                {hasCoords && (
+                  <LocationMapCard
+                    lat={carLat as number}
+                    lng={carLng as number}
+                    title={car.title}
+                    location={sellerLocation}
+                  />
+                )}
+
                 <div className="mt-5 space-y-2">
                   <PhoneRevealButton phone={dealer?.business_phone} />
                   {showWhatsApp && <WhatsAppButton phone={dealer?.business_phone} listingTitle={car.title} />}
@@ -529,6 +545,43 @@ const CarDetail = () => {
       </div>
 
       <Footer />
+    </div>
+  );
+};
+
+const LocationMapCard = ({
+  lat, lng, title, location,
+}: { lat: number; lng: number; title: string; location: string }) => {
+  const { location: userLoc } = useUserLocation("auto");
+  const distance = userLoc ? distanceKm(userLoc, { lat, lng }) : null;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+  return (
+    <div className="mt-4 space-y-2">
+      <div className="flex items-center justify-between text-xs">
+        <span className="font-medium text-foreground">Vehicle location</span>
+        {distance !== null && (
+          <span className="text-muted-foreground">
+            ~{distance < 10 ? distance.toFixed(1) : Math.round(distance)} km from you
+          </span>
+        )}
+      </div>
+      <LiveMap
+        markers={[{ id: "car", lat, lng, title }]}
+        fallbackCenter={{ lat, lng }}
+        fallbackZoom={12}
+        height="220px"
+        showUserLocation
+        fitToMarkers
+      />
+      <a
+        href={directionsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block text-xs font-medium text-primary hover:underline"
+      >
+        Get directions →
+      </a>
     </div>
   );
 };
