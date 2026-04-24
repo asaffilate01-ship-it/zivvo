@@ -1289,6 +1289,24 @@ const DealerLanding = () => {
                 </a>
               )}
             </div>
+
+            {/* Business credentials row */}
+            {(config.established_year || config.company_number || config.vat_number || config.fca_number) && (
+              <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-3 border-t border-border/50 pt-6 md:grid-cols-4">
+                {config.established_year && (
+                  <BusinessFact label="Established" value={String(config.established_year)} accent={accent} />
+                )}
+                {config.company_number && (
+                  <BusinessFact label="Company No." value={config.company_number} accent={accent} />
+                )}
+                {config.vat_number && (
+                  <BusinessFact label="VAT No." value={config.vat_number} accent={accent} />
+                )}
+                {config.fca_number && (
+                  <BusinessFact label="FCA Reference" value={config.fca_number} accent={accent} />
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
