@@ -14,10 +14,15 @@ import {
   Star, Clock, Shield, Search, ArrowRight, MessageCircle, ChevronDown,
   Fuel, SlidersHorizontal, Award, ThumbsUp, Wrench, Heart, Sparkles,
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
+  Share2, Copy, Check, Eye,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
+import { useToast } from "@/hooks/use-toast";
+import DealerEnquiryDialog from "@/components/dealer/DealerEnquiryDialog";
+import DealerStickyBar from "@/components/dealer/DealerStickyBar";
+import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
 
 export interface LandingConfig {
   hero_title?: string;
