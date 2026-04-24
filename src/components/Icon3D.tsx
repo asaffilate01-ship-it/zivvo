@@ -21,11 +21,11 @@ const variantBg: Record<Variant, string> = {
 };
 
 const variantGlow: Record<Variant, string> = {
-  primary: "shadow-[0_14px_30px_-10px_hsl(var(--primary)/0.55),0_6px_12px_-4px_hsl(220_20%_10%/0.18),inset_0_1px_0_hsl(0_0%_100%/0.45),inset_0_-3px_8px_hsl(220_20%_10%/0.22)]",
-  accent: "shadow-[0_14px_30px_-10px_hsl(var(--accent)/0.55),0_6px_12px_-4px_hsl(220_20%_10%/0.18),inset_0_1px_0_hsl(0_0%_100%/0.45),inset_0_-3px_8px_hsl(220_20%_10%/0.22)]",
-  success: "shadow-[0_14px_30px_-10px_hsl(var(--success)/0.55),0_6px_12px_-4px_hsl(220_20%_10%/0.18),inset_0_1px_0_hsl(0_0%_100%/0.45),inset_0_-3px_8px_hsl(220_20%_10%/0.22)]",
-  warning: "shadow-[0_14px_30px_-10px_hsl(var(--warning)/0.55),0_6px_12px_-4px_hsl(220_20%_10%/0.18),inset_0_1px_0_hsl(0_0%_100%/0.45),inset_0_-3px_8px_hsl(220_20%_10%/0.22)]",
-  info: "shadow-[0_14px_30px_-10px_hsl(var(--info)/0.55),0_6px_12px_-4px_hsl(220_20%_10%/0.18),inset_0_1px_0_hsl(0_0%_100%/0.45),inset_0_-3px_8px_hsl(220_20%_10%/0.22)]",
+  primary: "shadow-[0_8px_18px_-8px_hsl(var(--primary)/0.3),inset_0_1px_0_hsl(0_0%_100%/0.18)]",
+  accent: "shadow-[0_8px_18px_-8px_hsl(var(--accent)/0.3),inset_0_1px_0_hsl(0_0%_100%/0.18)]",
+  success: "shadow-[0_8px_18px_-8px_hsl(var(--success)/0.3),inset_0_1px_0_hsl(0_0%_100%/0.18)]",
+  warning: "shadow-[0_8px_18px_-8px_hsl(var(--warning)/0.3),inset_0_1px_0_hsl(0_0%_100%/0.18)]",
+  info: "shadow-[0_8px_18px_-8px_hsl(var(--info)/0.3),inset_0_1px_0_hsl(0_0%_100%/0.18)]",
 };
 
 const sizeClasses: Record<Size, { wrap: string; icon: string; radius: string }> = {
@@ -49,7 +49,7 @@ const Icon3D = ({ icon: Icon, variant = "primary", size = "md", className, float
       {/* Soft outer glow */}
       <div
         className={cn(
-          "pointer-events-none absolute -inset-1 opacity-60 blur-xl transition-opacity duration-300 group-hover/icon3d:opacity-90",
+          "pointer-events-none absolute -inset-0.5 opacity-25 blur-md transition-opacity duration-300 group-hover/icon3d:opacity-40",
           s.radius,
           "bg-gradient-to-br",
           variantBg[variant]
@@ -69,12 +69,12 @@ const Icon3D = ({ icon: Icon, variant = "primary", size = "md", className, float
         {/* Specular highlight */}
         <span
           className={cn(
-            "pointer-events-none absolute inset-x-1 top-1 h-1/2 bg-gradient-to-b from-white/45 to-transparent",
+            "pointer-events-none absolute inset-x-1 top-1 h-1/3 bg-gradient-to-b from-white/15 to-transparent",
             s.radius
           )}
           aria-hidden="true"
         />
-        <Icon className={cn("relative drop-shadow-[0_1px_2px_hsl(220_20%_10%/0.35)]", s.icon)} strokeWidth={2.25} />
+        <Icon className={cn("relative", s.icon)} strokeWidth={2} />
       </div>
     </div>
   );
