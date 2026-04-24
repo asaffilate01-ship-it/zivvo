@@ -1385,6 +1385,33 @@ const QuickStatTile = ({ icon: Icon, label, value, accent }: { icon: any; label:
   </div>
 );
 
+const OpenNowBadge = ({ hours, accent }: { hours?: Array<{ day: string; hours: string }>; accent: string }) => {
+  // Simple "Open now" indicator. Defaults to true unless explicit "Closed" today.
+  const now = new Date();
+  const dayName = now.toLocaleDateString("en-GB", { weekday: "long" });
+  const todayRow = hours?.find((h) => h.day.toLowerCase().startsWith(dayName.toLowerCase().slice(0, 3)));
+  const todayHours = todayRow?.hours || "";
+  const isClosed = /closed/i.test(todayHours);
+  let isOpen = !isClosed;
+  const match = todayHours.match(/(\d{1,2}):?(\d{0,2})\s*[–\-to]+\s*(\d{1,2}):?(\d{0,2})/);
+  if (match) {
+    const start = parseInt(match[1], 10) * 60 + parseInt(match[2] || "0", 10);
+    const end = parseInt(match[3], 10) * 60 + parseInt(match[4] || "0", 10);
+    const cur = now.getHours() * 60 + now.getMinutes();
+    isOpen = cur >= start && cur <= end;
+  }
+  return (
+    <Badge
+      variant="outline"
+      className="gap-1.5 text-[11px] font-semibold"
+      style={isOpen ? { borderColor: `${accent}40`, color: accent, backgroundColor: `${accent}10` } : undefined}
+    >
+      <span className={`h-2 w-2 rounded-full ${isOpen ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground"}`} />
+      {isOpen ? "Open now" : "Closed"}
+    </Badge>
+  );
+};
+
 const CountUp = ({ end, duration = 1200, decimals = 0, suffix = "" }: { end: number; duration?: number; decimals?: number; suffix?: string }) => {
   const [val, setVal] = useState(0);
   const [started, setStarted] = useState(false);
