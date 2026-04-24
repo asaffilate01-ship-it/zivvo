@@ -102,6 +102,13 @@ const DealerDashboard = () => {
     try {
       const { data, error } = await supabase.functions.invoke("customer-portal");
       if (error) throw error;
+      if (data?.error === "NO_SUBSCRIPTION") {
+        toast({
+          title: "No subscription found",
+          description: data.message || "Please subscribe to a plan first to manage your subscription.",
+        });
+        return;
+      }
       if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
