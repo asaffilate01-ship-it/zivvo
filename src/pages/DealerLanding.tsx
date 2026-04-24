@@ -1044,4 +1044,50 @@ const ContactBar = ({ dealer, config, showPhone, showEmail, showAddress, isOnDar
   </div>
 );
 
+const QuickStatTile = ({ icon: Icon, label, value, accent }: { icon: any; label: string; value: string; accent: string }) => (
+  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4">
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${accent}12` }}>
+      <Icon className="h-4 w-4" style={{ color: accent }} />
+    </div>
+    <div className="min-w-0">
+      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="truncate text-sm font-semibold text-foreground">{value}</p>
+    </div>
+  </div>
+);
+
+const CountUp = ({ end, duration = 1200, decimals = 0, suffix = "" }: { end: number; duration?: number; decimals?: number; suffix?: string }) => {
+  const [val, setVal] = useState(0);
+  const [started, setStarted] = useState(false);
+  const id = `countup-${String(end).replace(".", "_")}-${suffix.replace(/\W/g, "")}`;
+
+  useEffect(() => {
+    if (started) return;
+    const el = document.getElementById(id);
+    if (!el) { setStarted(true); return; }
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) setStarted(true); }),
+      { threshold: 0.3 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [id, started]);
+
+  useEffect(() => {
+    if (!started) return;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setVal(end * eased);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [started, end, duration]);
+
+  return <span id={id}>{val.toFixed(decimals)}{suffix}</span>;
+};
+
 export default DealerLanding;
