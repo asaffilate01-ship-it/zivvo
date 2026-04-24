@@ -16,7 +16,7 @@ import {
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
   Share2, Copy, Check, Eye, Calendar, CreditCard, Truck, FileCheck,
   HandCoins, ShieldCheck, TrendingUp, Search as SearchIcon, Gauge,
-  ChevronUp,
+  ChevronUp, HelpCircle, Send, Trophy, Zap, Users, PoundSterling,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
@@ -26,6 +26,8 @@ import DealerEnquiryDialog from "@/components/dealer/DealerEnquiryDialog";
 import DealerStickyBar from "@/components/dealer/DealerStickyBar";
 import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
 import LiveMap from "@/components/LiveMap";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 export interface LandingConfig {
   hero_title?: string;
@@ -57,6 +59,17 @@ export interface LandingConfig {
   secondary_cta_url?: string;
   font_style?: "modern" | "classic" | "bold";
   show_featured_banner?: boolean;
+  // Newer fields
+  opening_hours_table?: Array<{ day: string; hours: string }>;
+  faqs?: Array<{ q: string; a: string }>;
+  finance_apr?: string;
+  finance_disclaimer?: string;
+  vat_number?: string;
+  company_number?: string;
+  fca_number?: string;
+  established_year?: number;
+  awards?: Array<{ name: string; image?: string }>;
+  newsletter_enabled?: boolean;
 }
 
 const USP_ICONS: Record<string, any> = {
@@ -85,10 +98,14 @@ const DealerLanding = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [filterFuel, setFilterFuel] = useState("all");
   const [filterBody, setFilterBody] = useState("all");
+  const [filterMake, setFilterMake] = useState("all");
   const [budgetMax, setBudgetMax] = useState<number | null>(null);
   const [showAllCars, setShowAllCars] = useState(false);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [shared, setShared] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterSent, setNewsletterSent] = useState(false);
+  const { items: recentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
     const fetchDealer = async () => {
@@ -127,6 +144,7 @@ const DealerLanding = () => {
     }
     if (filterFuel !== "all") result = result.filter((c) => c.fuel_type === filterFuel);
     if (filterBody !== "all") result = result.filter((c) => c.body_type === filterBody);
+    if (filterMake !== "all") result = result.filter((c) => c.make === filterMake);
     if (budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
     result.sort((a, b) => {
       if (sortBy === "price-low") return (a.price || 0) - (b.price || 0);
@@ -136,7 +154,7 @@ const DealerLanding = () => {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
     setFilteredListings(result);
-  }, [listings, searchQuery, sortBy, filterFuel, filterBody, budgetMax]);
+  }, [listings, searchQuery, sortBy, filterFuel, filterBody, filterMake, budgetMax]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -157,8 +175,26 @@ const DealerLanding = () => {
     }
   };
 
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail || !/^\S+@\S+\.\S+$/.test(newsletterEmail)) {
+      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("newsletter_subscribers").insert({ email: newsletterEmail });
+    if (error && !error.message.toLowerCase().includes("duplicate")) {
+      toast({ title: "Couldn't subscribe", description: error.message, variant: "destructive" });
+      return;
+    }
+    setNewsletterSent(true);
+    toast({ title: "You're subscribed!", description: "We'll let you know when new stock arrives." });
+    setNewsletterEmail("");
+    setTimeout(() => setNewsletterSent(false), 4000);
+  };
+
   const uniqueFuels = [...new Set(listings.map((c) => c.fuel_type).filter(Boolean))];
   const uniqueBodies = [...new Set(listings.map((c) => c.body_type).filter(Boolean))];
+  const uniqueMakes = [...new Set(listings.map((c) => c.make).filter(Boolean))];
   const displayedListings = showAllCars ? filteredListings : filteredListings.slice(0, 12);
   const fontClass = config.font_style === "classic" ? "font-serif" : config.font_style === "bold" ? "font-black tracking-tight" : "font-display";
 
@@ -389,6 +425,48 @@ const DealerLanding = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Brands We Stock ─── */}
+      {uniqueMakes.length >= 3 && (
+        <section className="border-b border-border bg-card py-10">
+          <div className="container mx-auto px-4">
+            <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 text-center">
+              <Badge variant="outline" className="mb-2 text-xs">Brands We Stock</Badge>
+              <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Shop by manufacturer</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Tap a brand to filter our inventory instantly</p>
+            </motion.div>
+            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+              <button
+                type="button"
+                onClick={() => { setFilterMake("all"); document.getElementById("inventory")?.scrollIntoView({ behavior: "smooth" }); }}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${filterMake === "all" ? "text-white border-transparent" : "border-border bg-background text-foreground hover:-translate-y-0.5 hover:shadow-sm"}`}
+                style={filterMake === "all" ? { backgroundColor: accent } : undefined}
+              >
+                All ({listings.length})
+              </button>
+              {uniqueMakes.map((make) => {
+                const count = listings.filter((c) => c.make === make).length;
+                const active = filterMake === make;
+                return (
+                  <button
+                    key={make}
+                    type="button"
+                    onClick={() => { setFilterMake(active ? "all" : make!); document.getElementById("inventory")?.scrollIntoView({ behavior: "smooth" }); }}
+                    className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${active ? "text-white border-transparent" : "border-border bg-background text-foreground hover:-translate-y-0.5 hover:shadow-sm"}`}
+                    style={active ? { backgroundColor: accent } : undefined}
+                  >
+                    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold ${active ? "bg-white/20 text-white" : "bg-muted text-muted-foreground"}`}>
+                      {make!.charAt(0)}
+                    </span>
+                    <span>{make}</span>
+                    <span className={`text-xs ${active ? "text-white/80" : "text-muted-foreground"}`}>· {count}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </section>
       )}
@@ -722,6 +800,46 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* ─── Accreditations / Memberships ─── */}
+      <section className="border-b border-border py-10">
+        <div className="container mx-auto px-4">
+          <p className="mb-5 text-center text-xs uppercase tracking-[0.18em] text-muted-foreground font-semibold">
+            Trusted accreditations & partners
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12">
+            {(config.awards && config.awards.length > 0
+              ? config.awards
+              : [
+                  { name: "FCA Authorised" },
+                  { name: "RAC Approved" },
+                  { name: "AA Inspected" },
+                  { name: "HPI Checked" },
+                  { name: "Trustpilot 5★" },
+                  { name: "Auto Trader Partner" },
+                ]
+            ).map((a, i) => (
+              <motion.div
+                key={a.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.05 }}
+                viewport={{ once: true }}
+                className="flex items-center gap-2 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all"
+              >
+                {a.image ? (
+                  <img src={a.image} alt={a.name} className="h-8 w-auto object-contain" />
+                ) : (
+                  <>
+                    <Trophy className="h-4 w-4" style={{ color: accent }} />
+                    <span className={`${fontClass} text-sm font-bold text-foreground tracking-wide`}>{a.name}</span>
+                  </>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── Inventory ─── */}
       <section id="inventory" className="py-12 md:py-16">
         <div className="container mx-auto px-4">
@@ -855,6 +973,41 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* ─── Recently Viewed ─── */}
+      {recentlyViewed.length > 0 && (
+        <section className="border-t border-border bg-muted/20 py-10">
+          <div className="container mx-auto px-4">
+            <div className="mb-5 flex items-end justify-between">
+              <div>
+                <Badge variant="outline" className="mb-2 text-xs"><Eye className="mr-1 h-3 w-3" /> Recently Viewed</Badge>
+                <h2 className={`${fontClass} text-xl font-bold text-foreground md:text-2xl`}>Pick up where you left off</h2>
+              </div>
+            </div>
+            <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 snap-x">
+              {recentlyViewed.slice(0, 8).map((c) => (
+                <Link
+                  key={c.id}
+                  to={`/car/${c.id}`}
+                  className="group relative w-[220px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-muted">
+                    {c.image && (
+                      <img src={c.image} alt={c.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="truncate text-sm font-semibold text-foreground">{c.title}</p>
+                    <p className={`${fontClass} mt-1 text-base font-bold`} style={{ color: accent }}>
+                      {formatPrice(c.price, countryCfg)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── Part-Exchange / Trade-In CTA ─── */}
       <section className="border-t border-border py-12">
         <div className="container mx-auto px-4">
@@ -896,6 +1049,19 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* ─── Finance Representative Bar ─── */}
+      {config.show_finance_cta !== false && (
+        <section className="border-t border-border bg-muted/30 py-5">
+          <div className="container mx-auto flex flex-wrap items-center justify-center gap-3 px-4 text-center text-xs text-muted-foreground md:text-sm">
+            <PoundSterling className="h-4 w-4 shrink-0" style={{ color: accent }} />
+            <span>
+              <strong className="text-foreground">Representative {config.finance_apr || "9.9%"} APR.</strong>{" "}
+              {config.finance_disclaimer || "We are a credit broker, not a lender. Finance is subject to status. Terms and conditions apply."}
+            </span>
+          </div>
+        </section>
+      )}
+
       {/* ─── Finance CTA ─── */}
       {config.show_finance_cta !== false && (
         <section className="border-t border-border">
@@ -930,6 +1096,42 @@ const DealerLanding = () => {
           </div>
         </section>
       )}
+
+      {/* ─── FAQ ─── */}
+      <section className="border-t border-border py-14 md:py-20">
+        <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-[1fr,1.5fr]">
+          <motion.div initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <Badge variant="outline" className="mb-3 text-xs"><HelpCircle className="mr-1 h-3 w-3" /> FAQ</Badge>
+            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Frequently asked questions</h2>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              Everything you need to know about buying from {dealer.business_name}. Can't find what you're looking for? Get in touch — we're happy to help.
+            </p>
+            <Button onClick={() => setEnquiryOpen(true)} className="mt-5 border-0 text-white" style={{ backgroundColor: accent }}>
+              <MessageCircle className="mr-1 h-4 w-4" /> Ask us a question
+            </Button>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <Accordion type="single" collapsible className="w-full">
+              {(config.faqs && config.faqs.length > 0
+                ? config.faqs
+                : [
+                    { q: "Do you offer finance?", a: `Yes — we work with a panel of trusted lenders to offer competitive PCP, HP and personal loan packages on every vehicle. Representative ${config.finance_apr || "9.9%"} APR. We are a credit broker, not a lender.` },
+                    { q: "Will you take my car in part-exchange?", a: "Absolutely. We accept part-exchanges on any vehicle in our showroom. Get an instant online valuation or bring your car in — our team will give you a fair, no-obligation offer in minutes." },
+                    { q: "Are your cars HPI checked?", a: "Every vehicle we sell is fully HPI checked, has a verified mileage history and comes with a comprehensive multi-point inspection. You can review the full report on each listing." },
+                    { q: "Can you deliver the car to me?", a: "Yes — we offer nationwide UK delivery. Delivery costs are calculated based on distance and vehicle, and your car arrives fully prepared, valeted and ready to drive." },
+                    { q: "What warranty do you provide?", a: "All our vehicles come with a minimum 3-month comprehensive warranty as standard, with extended warranty options available at point of sale." },
+                    { q: "Can I reserve a car online?", a: "Yes — secure any vehicle in our stock with a small refundable deposit. Your car will be held for you while we arrange viewing, finance or delivery." },
+                  ]
+              ).map((faq, i) => (
+                <AccordionItem key={i} value={`item-${i}`}>
+                  <AccordionTrigger className={`${fontClass} text-left text-base font-semibold`}>{faq.q}</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">{faq.a}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+        </div>
+      </section>
 
       {/* ─── Testimonials ─── */}
       {config.show_testimonials !== false && config.testimonials && config.testimonials.length > 0 && (
@@ -972,6 +1174,92 @@ const DealerLanding = () => {
         </section>
       )}
 
+      {/* ─── Newsletter & Opening Hours ─── */}
+      {config.newsletter_enabled !== false && (
+        <section className="border-t border-border py-14">
+          <div className="container mx-auto grid gap-6 px-4 md:grid-cols-2">
+            {/* Newsletter card */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative overflow-hidden rounded-3xl border border-border bg-card p-7 shadow-card"
+            >
+              <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-10" style={{ backgroundColor: accent }} />
+              <div className="relative">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${accent}15` }}>
+                  <Send className="h-5 w-5" style={{ color: accent }} />
+                </div>
+                <h3 className={`${fontClass} mt-4 text-xl font-bold text-foreground`}>Stock alerts & special offers</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  Be first to know when new vehicles arrive at {dealer.business_name}. No spam, unsubscribe anytime.
+                </p>
+                <form onSubmit={handleNewsletterSubmit} className="mt-5 flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    className="flex-1"
+                    aria-label="Email address"
+                    required
+                  />
+                  <Button type="submit" className="border-0 text-white" style={{ backgroundColor: accent }}>
+                    {newsletterSent ? <><Check className="mr-1 h-4 w-4" /> Subscribed</> : <>Subscribe <ArrowRight className="ml-1 h-4 w-4" /></>}
+                  </Button>
+                </form>
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  By subscribing you agree to our privacy policy. We never share your data.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Opening hours card */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-3xl border border-border bg-card p-7 shadow-card"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${accent}15` }}>
+                    <Clock className="h-5 w-5" style={{ color: accent }} />
+                  </div>
+                  <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Opening hours</h3>
+                </div>
+                <OpenNowBadge hours={config.opening_hours_table} accent={accent} />
+              </div>
+              <ul className="mt-5 divide-y divide-border text-sm">
+                {(config.opening_hours_table && config.opening_hours_table.length > 0
+                  ? config.opening_hours_table
+                  : [
+                      { day: "Monday", hours: "9:00 – 18:00" },
+                      { day: "Tuesday", hours: "9:00 – 18:00" },
+                      { day: "Wednesday", hours: "9:00 – 18:00" },
+                      { day: "Thursday", hours: "9:00 – 18:00" },
+                      { day: "Friday", hours: "9:00 – 18:00" },
+                      { day: "Saturday", hours: "10:00 – 17:00" },
+                      { day: "Sunday", hours: "By appointment" },
+                    ]
+                ).map((row) => (
+                  <li key={row.day} className="flex items-center justify-between py-2.5">
+                    <span className="font-medium text-foreground">{row.day}</span>
+                    <span className="text-muted-foreground">{row.hours}</span>
+                  </li>
+                ))}
+              </ul>
+              {showAddress && dealer.city && (
+                <div className="mt-5 flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+                  <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: accent }} />
+                  <span>Visit us at <strong className="text-foreground">{dealer.city}{dealer.country ? `, ${dealer.country}` : ""}</strong>. Walk-ins welcome during opening hours.</span>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* ─── CTA Footer ─── */}
       <section className="border-t border-border relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${accent}08, ${accent}15)` }}>
         <div className="container mx-auto px-4 py-14 text-center relative">
@@ -1001,6 +1289,24 @@ const DealerLanding = () => {
                 </a>
               )}
             </div>
+
+            {/* Business credentials row */}
+            {(config.established_year || config.company_number || config.vat_number || config.fca_number) && (
+              <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-3 border-t border-border/50 pt-6 md:grid-cols-4">
+                {config.established_year && (
+                  <BusinessFact label="Established" value={String(config.established_year)} accent={accent} />
+                )}
+                {config.company_number && (
+                  <BusinessFact label="Company No." value={config.company_number} accent={accent} />
+                )}
+                {config.vat_number && (
+                  <BusinessFact label="VAT No." value={config.vat_number} accent={accent} />
+                )}
+                {config.fca_number && (
+                  <BusinessFact label="FCA Reference" value={config.fca_number} accent={accent} />
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -1096,6 +1402,40 @@ const QuickStatTile = ({ icon: Icon, label, value, accent }: { icon: any; label:
     </div>
   </div>
 );
+
+const BusinessFact = ({ label, value, accent }: { label: string; value: string; accent: string }) => (
+  <div className="rounded-xl border border-border bg-card/50 p-3 text-left">
+    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
+    <p className="mt-0.5 truncate text-sm font-bold" style={{ color: accent }}>{value}</p>
+  </div>
+);
+
+const OpenNowBadge = ({ hours, accent }: { hours?: Array<{ day: string; hours: string }>; accent: string }) => {
+  // Simple "Open now" indicator. Defaults to true unless explicit "Closed" today.
+  const now = new Date();
+  const dayName = now.toLocaleDateString("en-GB", { weekday: "long" });
+  const todayRow = hours?.find((h) => h.day.toLowerCase().startsWith(dayName.toLowerCase().slice(0, 3)));
+  const todayHours = todayRow?.hours || "";
+  const isClosed = /closed/i.test(todayHours);
+  let isOpen = !isClosed;
+  const match = todayHours.match(/(\d{1,2}):?(\d{0,2})\s*[–\-to]+\s*(\d{1,2}):?(\d{0,2})/);
+  if (match) {
+    const start = parseInt(match[1], 10) * 60 + parseInt(match[2] || "0", 10);
+    const end = parseInt(match[3], 10) * 60 + parseInt(match[4] || "0", 10);
+    const cur = now.getHours() * 60 + now.getMinutes();
+    isOpen = cur >= start && cur <= end;
+  }
+  return (
+    <Badge
+      variant="outline"
+      className="gap-1.5 text-[11px] font-semibold"
+      style={isOpen ? { borderColor: `${accent}40`, color: accent, backgroundColor: `${accent}10` } : undefined}
+    >
+      <span className={`h-2 w-2 rounded-full ${isOpen ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground"}`} />
+      {isOpen ? "Open now" : "Closed"}
+    </Badge>
+  );
+};
 
 const CountUp = ({ end, duration = 1200, decimals = 0, suffix = "" }: { end: number; duration?: number; decimals?: number; suffix?: string }) => {
   const [val, setVal] = useState(0);
