@@ -1049,6 +1049,19 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* ─── Finance Representative Bar ─── */}
+      {config.show_finance_cta !== false && (
+        <section className="border-t border-border bg-muted/30 py-5">
+          <div className="container mx-auto flex flex-wrap items-center justify-center gap-3 px-4 text-center text-xs text-muted-foreground md:text-sm">
+            <PoundSterling className="h-4 w-4 shrink-0" style={{ color: accent }} />
+            <span>
+              <strong className="text-foreground">Representative {config.finance_apr || "9.9%"} APR.</strong>{" "}
+              {config.finance_disclaimer || "We are a credit broker, not a lender. Finance is subject to status. Terms and conditions apply."}
+            </span>
+          </div>
+        </section>
+      )}
+
       {/* ─── Finance CTA ─── */}
       {config.show_finance_cta !== false && (
         <section className="border-t border-border">
