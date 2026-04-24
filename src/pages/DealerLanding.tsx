@@ -357,32 +357,102 @@ const DealerLanding = () => {
         <section className="border-b border-border bg-card">
           <div className="container mx-auto grid grid-cols-2 gap-px md:grid-cols-4">
             {[
-              { icon: Car, value: String(listings.length), label: "Vehicles in Stock" },
-              { icon: Star, value: "4.9", label: "Customer Rating" },
-              { icon: Clock, value: config.opening_hours || "Mon–Sat 9–6", label: "Opening Hours" },
+              { icon: Car, value: listings.length, label: "Vehicles in Stock", isString: false },
+              { icon: Star, value: 4.9, label: "Customer Rating", isString: false, decimals: 1, suffix: "/5" },
+              { icon: Clock, value: config.opening_hours || "Mon–Sat 9–6", label: "Opening Hours", isString: true },
               {
                 icon: Shield,
                 value: priceRange ? `From ${formatPrice(priceRange.min, countryCfg)}` : "100%",
                 label: priceRange ? "Starting Price" : "Verified Dealer",
+                isString: true,
               },
-            ].map((stat, i) => (
+            ].map((stat: any, i) => (
               <motion.div
                 key={stat.label}
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08 }}
                 viewport={{ once: true }}
-                className="flex items-center gap-3 px-6 py-5"
+                className="group flex items-center gap-3 px-6 py-5 transition-colors hover:bg-muted/30"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${accent}15` }}>
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${accent}15` }}
+                >
                   <stat.icon className="h-5 w-5" style={{ color: accent }} />
                 </div>
                 <div>
-                  <p className={`${fontClass} text-lg font-bold text-foreground`}>{stat.value}</p>
+                  <p className={`${fontClass} text-lg font-bold text-foreground`}>
+                    {stat.isString ? stat.value : <CountUp end={stat.value as number} decimals={stat.decimals || 0} suffix={stat.suffix || ""} />}
+                  </p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
                 </div>
               </motion.div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Inventory at a Glance ─── */}
+      {listings.length >= 4 && (
+        <section className="border-b border-border py-10">
+          <div className="container mx-auto px-4">
+            <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 flex items-end justify-between gap-4 flex-wrap">
+              <div>
+                <Badge variant="outline" className="mb-2 text-xs">At a Glance</Badge>
+                <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Browse our stock</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Quick filters to find your perfect car</p>
+              </div>
+            </motion.div>
+
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {(() => {
+                const bodyCounts: Record<string, number> = {};
+                listings.forEach((c) => {
+                  if (c.body_type) bodyCounts[c.body_type] = (bodyCounts[c.body_type] || 0) + 1;
+                });
+                return Object.entries(bodyCounts)
+                  .sort(([, a], [, b]) => b - a)
+                  .slice(0, 4)
+                  .map(([body, count], i) => (
+                    <motion.button
+                      key={body}
+                      type="button"
+                      onClick={() => {
+                        setFilterBody(body);
+                        document.getElementById("inventory")?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      viewport={{ once: true }}
+                      className="group rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
+                      style={{ borderColor: filterBody === body ? accent : "hsl(var(--border))" }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div
+                          className="flex h-10 w-10 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
+                          style={{ backgroundColor: `${accent}12` }}
+                        >
+                          <Car className="h-5 w-5" style={{ color: accent }} />
+                        </div>
+                        <span className={`${fontClass} text-2xl font-bold text-foreground`}>{count}</span>
+                      </div>
+                      <p className={`${fontClass} mt-3 font-semibold text-foreground`}>{body}</p>
+                      <p className="text-xs text-muted-foreground">View all {body.toLowerCase()}s →</p>
+                    </motion.button>
+                  ));
+              })()}
+            </div>
+
+            {/* Quick price highlights */}
+            {priceRange && listings.length >= 6 && (
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <QuickStatTile icon={TrendingUp} label="Price range" value={`${formatPrice(priceRange.min, countryCfg)} – ${formatPrice(priceRange.max, countryCfg)}`} accent={accent} />
+                <QuickStatTile icon={Calendar} label="Newest model year" value={String(Math.max(...listings.map((c) => c.year || 0)))} accent={accent} />
+                <QuickStatTile icon={Gauge} label="Avg. mileage" value={`${Math.round(listings.reduce((s, c) => s + (c.mileage || 0), 0) / Math.max(listings.length, 1)).toLocaleString()} ${countryCfg.distanceUnit}`} accent={accent} />
+              </div>
+            )}
           </div>
         </section>
       )}
