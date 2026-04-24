@@ -12,6 +12,8 @@ import EVSection from "@/components/EVSection";
 import CarsNearYou from "@/components/CarsNearYou";
 import CarOfTheWeek from "@/components/CarOfTheWeek";
 import WhyBuyFromUs from "@/components/WhyBuyFromUs";
+import HowItWorks from "@/components/HowItWorks";
+import TrustBrandStrip from "@/components/TrustBrandStrip";
 import AIChatWidget from "@/components/AIChatWidget";
 import Icon3D from "@/components/Icon3D";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
@@ -143,6 +145,12 @@ const Index = () => {
       />
       <Navbar />
       <HeroSearch />
+
+      {/* Trust strip — instant credibility under the hero */}
+      <TrustBrandStrip />
+
+      {/* How it works — buyer journey */}
+      <HowItWorks />
 
       {/* Browse by Body Type */}
       <BrowseByBodyType counts={categoryCounts} />
