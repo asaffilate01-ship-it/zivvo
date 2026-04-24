@@ -1403,6 +1403,13 @@ const QuickStatTile = ({ icon: Icon, label, value, accent }: { icon: any; label:
   </div>
 );
 
+const BusinessFact = ({ label, value, accent }: { label: string; value: string; accent: string }) => (
+  <div className="rounded-xl border border-border bg-card/50 p-3 text-left">
+    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
+    <p className="mt-0.5 truncate text-sm font-bold" style={{ color: accent }}>{value}</p>
+  </div>
+);
+
 const OpenNowBadge = ({ hours, accent }: { hours?: Array<{ day: string; hours: string }>; accent: string }) => {
   // Simple "Open now" indicator. Defaults to true unless explicit "Closed" today.
   const now = new Date();
