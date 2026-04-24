@@ -430,6 +430,15 @@ const CarDetail = () => {
                   </div>
                 )}
 
+                {hasCoords && (
+                  <LocationMapCard
+                    lat={carLat as number}
+                    lng={carLng as number}
+                    title={car.title}
+                    location={sellerLocation}
+                  />
+                )}
+
                 <div className="mt-5 space-y-2">
                   <PhoneRevealButton phone={dealer?.business_phone} />
                   {showWhatsApp && <WhatsAppButton phone={dealer?.business_phone} listingTitle={car.title} />}
