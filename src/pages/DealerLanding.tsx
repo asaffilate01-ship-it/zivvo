@@ -706,7 +706,12 @@ const DealerLanding = () => {
                   Flexible finance options available on all vehicles. Get a quick quote with no impact on your credit score.
                 </p>
                 <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <Button size="lg" className="bg-white hover:bg-white/90 font-semibold shadow-lg" style={{ color: accent }}>
+                  <Button
+                    size="lg"
+                    onClick={() => setEnquiryOpen(true)}
+                    className="bg-white hover:bg-white/90 font-semibold shadow-lg"
+                    style={{ color: accent }}
+                  >
                     Get a Finance Quote <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </div>
