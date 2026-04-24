@@ -58,8 +58,6 @@ const CarDetail = () => {
   const { id } = useParams();
   const [car, setCar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [currentImage, setCurrentImage] = useState(0);
-  const [galleryOpen, setGalleryOpen] = useState(false);
   const [dealer, setDealer] = useState<any>(null);
   const { isSaved, toggle } = useSavedCars();
   const { user } = useAuth();
