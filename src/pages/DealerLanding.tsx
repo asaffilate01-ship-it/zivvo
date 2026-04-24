@@ -554,12 +554,59 @@ const DealerLanding = () => {
       {/* ─── Inventory ─── */}
       <section id="inventory" className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8">
-            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Our Inventory</h2>
-            <p className="mt-1 text-muted-foreground">
-              {listings.length} vehicle{listings.length !== 1 ? "s" : ""} available
-            </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8 flex flex-wrap items-end justify-between gap-3"
+          >
+            <div>
+              <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Our Inventory</h2>
+              <p className="mt-1 text-muted-foreground">
+                {listings.length} vehicle{listings.length !== 1 ? "s" : ""} available
+                {filteredListings.length !== listings.length && (
+                  <> · <span className="text-foreground font-medium">{filteredListings.length} match{filteredListings.length !== 1 ? "es" : ""}</span></>
+                )}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5">
+              {shared ? <Check className="h-3.5 w-3.5 text-success" /> : <Share2 className="h-3.5 w-3.5" />}
+              {shared ? "Copied" : "Share"}
+            </Button>
           </motion.div>
+
+          {/* Budget chips */}
+          {listings.length > 3 && priceRange && (
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">Budget:</span>
+              {[5000, 10000, 20000, 35000, 50000]
+                .filter((v) => v <= priceRange.max * 1.1 && v >= priceRange.min * 0.5)
+                .map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setBudgetMax(budgetMax === v ? null : v)}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      budgetMax === v
+                        ? "border-transparent text-white"
+                        : "border-border bg-card text-foreground hover:bg-muted"
+                    }`}
+                    style={budgetMax === v ? { backgroundColor: accent } : undefined}
+                  >
+                    Under {formatPrice(v, countryCfg)}
+                  </button>
+                ))}
+              {budgetMax !== null && (
+                <button
+                  type="button"
+                  onClick={() => setBudgetMax(null)}
+                  className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Filters */}
           {listings.length > 0 && (
