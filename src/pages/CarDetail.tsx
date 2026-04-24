@@ -152,6 +152,11 @@ const CarDetail = () => {
   const sellerLocation = car.location || dealer?.city || "";
   const showWhatsApp = (country === "AE" || country === "PK");
 
+  // Resolve coordinates from listing first, then dealer
+  const carLat = (car as any).latitude ?? (dealer as any)?.latitude ?? null;
+  const carLng = (car as any).longitude ?? (dealer as any)?.longitude ?? null;
+  const hasCoords = typeof carLat === "number" && typeof carLng === "number";
+
   const handleShare = async () => {
     const url = window.location.href;
     if (navigator.share) {
