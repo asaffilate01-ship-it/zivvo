@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import DealerEnquiryDialog from "@/components/dealer/DealerEnquiryDialog";
 import DealerStickyBar from "@/components/dealer/DealerStickyBar";
 import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
+import LiveMap from "@/components/LiveMap";
 
 export interface LandingConfig {
   hero_title?: string;
@@ -523,6 +524,34 @@ const DealerLanding = () => {
                 >
                   <MessageCircle className="mr-1 h-4 w-4" /> Enquire Now
                 </Button>
+
+                {showAddress && typeof (dealer as any).latitude === "number" && typeof (dealer as any).longitude === "number" && (
+                  <div className="mt-5 space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Find us</p>
+                    <LiveMap
+                      markers={[{
+                        id: dealer.id,
+                        lat: (dealer as any).latitude,
+                        lng: (dealer as any).longitude,
+                        title: dealer.business_name,
+                      }]}
+                      fallbackCenter={{ lat: (dealer as any).latitude, lng: (dealer as any).longitude }}
+                      fallbackZoom={14}
+                      height="200px"
+                      showUserLocation
+                      fitToMarkers
+                    />
+                    <a
+                      href={`https://www.google.com/maps/dir/?api=1&destination=${(dealer as any).latitude},${(dealer as any).longitude}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block text-xs font-medium hover:underline"
+                      style={{ color: accent }}
+                    >
+                      Get directions →
+                    </a>
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>
