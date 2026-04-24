@@ -287,7 +287,7 @@ const AdminDashboard = () => {
             { label: "Total Users", value: totalUsers, icon: Users, color: "text-primary" },
             { label: "Total Dealers", value: dealers.length, icon: Building2, color: "text-info" },
             { label: "Active Listings", value: activeListings.length, icon: Car, color: "text-success" },
-            { label: "Monthly Revenue", value: `$${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
+            { label: "Monthly Revenue", value: `£${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
             { label: "Pending Reports", value: pendingReports.length, icon: Flag, color: "text-destructive" },
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
@@ -1014,7 +1014,7 @@ const AdminDashboard = () => {
                   <div className="mt-6 border-t border-border pt-4">
                     <div className="flex justify-between font-display font-bold">
                       <span className="text-card-foreground">Total MRR</span>
-                      <span className="text-primary">${totalRevenue.toLocaleString()}</span>
+                      <span className="text-primary">£{totalRevenue.toLocaleString()}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -1038,7 +1038,7 @@ const AdminDashboard = () => {
                             <p className="text-sm font-medium text-card-foreground">Commission #{c.id.slice(0, 8)}</p>
                             <p className="text-xs text-muted-foreground">{c.status} · {c.period_start ? new Date(c.period_start).toLocaleDateString() : ""}</p>
                           </div>
-                          <span className="font-display font-semibold text-primary">${Number(c.amount).toFixed(2)}</span>
+                          <span className="font-display font-semibold text-primary">£{Number(c.amount).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
