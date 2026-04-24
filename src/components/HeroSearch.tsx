@@ -174,6 +174,11 @@ const HeroSearch = () => {
                 </div>
               </div>
             </form>
+
+            {/* Recent searches */}
+            <div className="mt-4">
+              <RecentSearchesChips variant="dark" />
+            </div>
           </motion.div>
         </div>
       </div>
@@ -182,3 +187,4 @@ const HeroSearch = () => {
 };
 
 export default HeroSearch;
+
