@@ -72,6 +72,7 @@ const USP_ICONS: Record<string, any> = {
 const DealerLanding = () => {
   const { slug } = useParams();
   const { config: countryCfg } = useCountry();
+  const { toast } = useToast();
   const [dealer, setDealer] = useState<any>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
@@ -81,7 +82,10 @@ const DealerLanding = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [filterFuel, setFilterFuel] = useState("all");
   const [filterBody, setFilterBody] = useState("all");
+  const [budgetMax, setBudgetMax] = useState<number | null>(null);
   const [showAllCars, setShowAllCars] = useState(false);
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     const fetchDealer = async () => {
