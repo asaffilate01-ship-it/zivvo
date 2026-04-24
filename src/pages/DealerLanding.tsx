@@ -14,7 +14,9 @@ import {
   Star, Clock, Shield, Search, ArrowRight, MessageCircle, ChevronDown,
   Fuel, SlidersHorizontal, Award, ThumbsUp, Wrench, Heart, Sparkles,
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
-  Share2, Copy, Check, Eye,
+  Share2, Copy, Check, Eye, Calendar, CreditCard, Truck, FileCheck,
+  HandCoins, ShieldCheck, TrendingUp, Search as SearchIcon, Gauge,
+  ChevronUp,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
