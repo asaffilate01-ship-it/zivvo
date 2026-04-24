@@ -787,9 +787,11 @@ export type Database = {
           inspection_score: number | null
           is_featured: boolean | null
           is_promoted: boolean | null
+          latitude: number | null
           legal_check_clear: boolean | null
           location: string | null
           logbook_url: string | null
+          longitude: number | null
           make: string
           mileage: number | null
           model: string
@@ -828,9 +830,11 @@ export type Database = {
           inspection_score?: number | null
           is_featured?: boolean | null
           is_promoted?: boolean | null
+          latitude?: number | null
           legal_check_clear?: boolean | null
           location?: string | null
           logbook_url?: string | null
+          longitude?: number | null
           make: string
           mileage?: number | null
           model: string
@@ -869,9 +873,11 @@ export type Database = {
           inspection_score?: number | null
           is_featured?: boolean | null
           is_promoted?: boolean | null
+          latitude?: number | null
           legal_check_clear?: boolean | null
           location?: string | null
           logbook_url?: string | null
+          longitude?: number | null
           make?: string
           mileage?: number | null
           model?: string
@@ -1093,7 +1099,9 @@ export type Database = {
           kyc_submitted_at: string | null
           kyc_verified: boolean | null
           landing_page_config: Json | null
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           max_listings: number | null
           onboarded_by_agent: string | null
           postcode: string | null
@@ -1124,7 +1132,9 @@ export type Database = {
           kyc_submitted_at?: string | null
           kyc_verified?: boolean | null
           landing_page_config?: Json | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           max_listings?: number | null
           onboarded_by_agent?: string | null
           postcode?: string | null
@@ -1155,7 +1165,9 @@ export type Database = {
           kyc_submitted_at?: string | null
           kyc_verified?: boolean | null
           landing_page_config?: Json | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           max_listings?: number | null
           onboarded_by_agent?: string | null
           postcode?: string | null
