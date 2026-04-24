@@ -1097,6 +1097,42 @@ const DealerLanding = () => {
         </section>
       )}
 
+      {/* ─── FAQ ─── */}
+      <section className="border-t border-border py-14 md:py-20">
+        <div className="container mx-auto grid gap-10 px-4 lg:grid-cols-[1fr,1.5fr]">
+          <motion.div initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <Badge variant="outline" className="mb-3 text-xs"><HelpCircle className="mr-1 h-3 w-3" /> FAQ</Badge>
+            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Frequently asked questions</h2>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              Everything you need to know about buying from {dealer.business_name}. Can't find what you're looking for? Get in touch — we're happy to help.
+            </p>
+            <Button onClick={() => setEnquiryOpen(true)} className="mt-5 border-0 text-white" style={{ backgroundColor: accent }}>
+              <MessageCircle className="mr-1 h-4 w-4" /> Ask us a question
+            </Button>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <Accordion type="single" collapsible className="w-full">
+              {(config.faqs && config.faqs.length > 0
+                ? config.faqs
+                : [
+                    { q: "Do you offer finance?", a: `Yes — we work with a panel of trusted lenders to offer competitive PCP, HP and personal loan packages on every vehicle. Representative ${config.finance_apr || "9.9%"} APR. We are a credit broker, not a lender.` },
+                    { q: "Will you take my car in part-exchange?", a: "Absolutely. We accept part-exchanges on any vehicle in our showroom. Get an instant online valuation or bring your car in — our team will give you a fair, no-obligation offer in minutes." },
+                    { q: "Are your cars HPI checked?", a: "Every vehicle we sell is fully HPI checked, has a verified mileage history and comes with a comprehensive multi-point inspection. You can review the full report on each listing." },
+                    { q: "Can you deliver the car to me?", a: "Yes — we offer nationwide UK delivery. Delivery costs are calculated based on distance and vehicle, and your car arrives fully prepared, valeted and ready to drive." },
+                    { q: "What warranty do you provide?", a: "All our vehicles come with a minimum 3-month comprehensive warranty as standard, with extended warranty options available at point of sale." },
+                    { q: "Can I reserve a car online?", a: "Yes — secure any vehicle in our stock with a small refundable deposit. Your car will be held for you while we arrange viewing, finance or delivery." },
+                  ]
+              ).map((faq, i) => (
+                <AccordionItem key={i} value={`item-${i}`}>
+                  <AccordionTrigger className={`${fontClass} text-left text-base font-semibold`}>{faq.q}</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">{faq.a}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ─── Testimonials ─── */}
       {config.show_testimonials !== false && config.testimonials && config.testimonials.length > 0 && (
         <section className="border-t border-border bg-muted/30 py-12 md:py-16">
