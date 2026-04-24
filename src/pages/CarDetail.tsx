@@ -36,6 +36,7 @@ import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
 import InspectionBadge from "@/components/InspectionBadge";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import ShareSheet from "@/components/ShareSheet";
+import MediaGallery from "@/components/MediaGallery";
 
 const PhoneRevealButton = ({ phone }: { phone?: string | null }) => {
   const [revealed, setRevealed] = useState(false);
@@ -219,48 +220,20 @@ const CarDetail = () => {
         <div className="grid gap-8 lg:grid-cols-3">
           {/* LEFT COLUMN */}
           <div className="lg:col-span-2">
-            {/* Image Gallery */}
-            <div className="relative overflow-hidden rounded-2xl cursor-pointer" onClick={() => setGalleryOpen(true)}>
-              <motion.img
-                key={currentImage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                src={images[currentImage]}
-                alt={`${car.title} - Image ${currentImage + 1}`}
-                className="aspect-[16/10] w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent" />
-
-              {images.length > 1 && (
+            {/* Image Gallery — tabbed media with fullscreen */}
+            <MediaGallery
+              images={images}
+              videoUrl={car.video_url}
+              title={car.title}
+              badges={
                 <>
-                  <Button variant="ghost" size="icon" className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1)); }}>
-                    <ChevronLeft className="h-5 w-5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1)); }}>
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
-                  <div className="absolute bottom-3 right-3 rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
-                    📷 {currentImage + 1} / {images.length}
-                  </div>
+                  {car.is_featured && <Badge className="gradient-primary border-0 text-primary-foreground">Featured</Badge>}
+                  {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0">Promoted</Badge>}
+                  {car.verified && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" /> Verified</Badge>}
+                  {inspectionReport && <InspectionBadge score={inspectionReport.score} totalPoints={inspectionReport.total_points} />}
                 </>
-              )}
-
-              <div className="absolute left-3 top-3 flex gap-2">
-                {car.is_featured && <Badge className="gradient-primary border-0 text-primary-foreground">Featured</Badge>}
-                {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0">Promoted</Badge>}
-                {car.verified && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" /> Verified</Badge>}
-                {inspectionReport && <InspectionBadge score={inspectionReport.score} totalPoints={inspectionReport.total_points} />}
-              </div>
-            </div>
-
-            {/* Thumbnails */}
-            <div className="mt-3 flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
-              {images.map((img: string, i: number) => (
-                <button key={i} onClick={() => setCurrentImage(i)} className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${i === currentImage ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                  <img src={img} alt="" className="h-full w-full object-cover" loading="lazy" />
-                </button>
-              ))}
-            </div>
+              }
+            />
 
             {/* Mobile title/price */}
             <div className="mt-6 lg:hidden">
