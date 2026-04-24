@@ -46,7 +46,7 @@ const blogPosts: Record<string, {
     title: "How to Sell Your Car Fast: 10 Expert Tips",
     excerpt: "Data-backed advice from thousands of successful sales on AutoSouq.",
     category: "Selling Tips",
-    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80",
     author: "AutoSouq Team", date: "2026-02-28", readTime: "5 min read",
     content: [
       "Selling your car doesn't have to be a drawn-out process. Based on data from thousands of successful sales on AutoSouq, here are the strategies that consistently lead to faster sales at better prices.",
