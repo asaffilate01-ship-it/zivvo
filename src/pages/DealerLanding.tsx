@@ -59,6 +59,17 @@ export interface LandingConfig {
   secondary_cta_url?: string;
   font_style?: "modern" | "classic" | "bold";
   show_featured_banner?: boolean;
+  // Newer fields
+  opening_hours_table?: Array<{ day: string; hours: string }>;
+  faqs?: Array<{ q: string; a: string }>;
+  finance_apr?: string;
+  finance_disclaimer?: string;
+  vat_number?: string;
+  company_number?: string;
+  fca_number?: string;
+  established_year?: number;
+  awards?: Array<{ name: string; image?: string }>;
+  newsletter_enabled?: boolean;
 }
 
 const USP_ICONS: Record<string, any> = {
