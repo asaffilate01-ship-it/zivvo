@@ -654,6 +654,74 @@ const DealerLanding = () => {
         </section>
       )}
 
+      {/* ─── How Buying Works ─── */}
+      <section className="border-b border-border py-14 md:py-20">
+        <div className="container mx-auto px-4">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <Badge variant="outline" className="mb-3 text-xs">Simple Process</Badge>
+            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>How buying from us works</h2>
+            <p className="mt-2 text-muted-foreground max-w-lg mx-auto">From browsing to driving away — a simple, transparent journey in 4 steps.</p>
+          </motion.div>
+
+          <div className="relative grid gap-8 md:grid-cols-4">
+            <div className="hidden md:block absolute top-7 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+            {[
+              { icon: SearchIcon, title: "Browse", desc: "Explore our verified inventory, with detailed specs and full photo galleries." },
+              { icon: MessageCircle, title: "Enquire", desc: "Ask questions, request a video walkaround or book a test drive." },
+              { icon: FileCheck, title: "Reserve", desc: "Secure your car with a small refundable deposit. We handle the paperwork." },
+              { icon: Truck, title: "Drive away", desc: "Collect in person or have it delivered to your door, fully prepared and inspected." },
+            ].map((step, i) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="relative text-center"
+              >
+                <div className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card shadow-sm">
+                  <step.icon className="h-6 w-6" style={{ color: accent }} />
+                  <span
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold text-white shadow"
+                    style={{ backgroundColor: accent }}
+                  >
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className={`${fontClass} text-base font-bold text-foreground`}>{step.title}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Trust badges row ─── */}
+      <section className="border-b border-border bg-muted/20 py-10">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {[
+              { icon: ShieldCheck, label: "All cars HPI checked" },
+              { icon: BadgeCheck, label: "Verified dealer" },
+              { icon: HandCoins, label: "Part-exchange welcome" },
+              { icon: CreditCard, label: "Finance available" },
+            ].map((b, i) => (
+              <motion.div
+                key={b.label}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                viewport={{ once: true }}
+                className="flex items-center gap-2.5 text-sm font-medium text-foreground"
+              >
+                <b.icon className="h-5 w-5 shrink-0" style={{ color: accent }} />
+                <span>{b.label}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── Inventory ─── */}
       <section id="inventory" className="py-12 md:py-16">
         <div className="container mx-auto px-4">
