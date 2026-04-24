@@ -144,6 +144,7 @@ const DealerLanding = () => {
     }
     if (filterFuel !== "all") result = result.filter((c) => c.fuel_type === filterFuel);
     if (filterBody !== "all") result = result.filter((c) => c.body_type === filterBody);
+    if (filterMake !== "all") result = result.filter((c) => c.make === filterMake);
     if (budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
     result.sort((a, b) => {
       if (sortBy === "price-low") return (a.price || 0) - (b.price || 0);
@@ -153,7 +154,7 @@ const DealerLanding = () => {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
     setFilteredListings(result);
-  }, [listings, searchQuery, sortBy, filterFuel, filterBody, budgetMax]);
+  }, [listings, searchQuery, sortBy, filterFuel, filterBody, filterMake, budgetMax]);
 
   const handleShare = async () => {
     const url = window.location.href;
