@@ -175,8 +175,26 @@ const DealerLanding = () => {
     }
   };
 
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail || !/^\S+@\S+\.\S+$/.test(newsletterEmail)) {
+      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("newsletter_subscribers").insert({ email: newsletterEmail });
+    if (error && !error.message.toLowerCase().includes("duplicate")) {
+      toast({ title: "Couldn't subscribe", description: error.message, variant: "destructive" });
+      return;
+    }
+    setNewsletterSent(true);
+    toast({ title: "You're subscribed!", description: "We'll let you know when new stock arrives." });
+    setNewsletterEmail("");
+    setTimeout(() => setNewsletterSent(false), 4000);
+  };
+
   const uniqueFuels = [...new Set(listings.map((c) => c.fuel_type).filter(Boolean))];
   const uniqueBodies = [...new Set(listings.map((c) => c.body_type).filter(Boolean))];
+  const uniqueMakes = [...new Set(listings.map((c) => c.make).filter(Boolean))];
   const displayedListings = showAllCars ? filteredListings : filteredListings.slice(0, 12);
   const fontClass = config.font_style === "classic" ? "font-serif" : config.font_style === "bold" ? "font-black tracking-tight" : "font-display";
 
