@@ -800,6 +800,46 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* ─── Accreditations / Memberships ─── */}
+      <section className="border-b border-border py-10">
+        <div className="container mx-auto px-4">
+          <p className="mb-5 text-center text-xs uppercase tracking-[0.18em] text-muted-foreground font-semibold">
+            Trusted accreditations & partners
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12">
+            {(config.awards && config.awards.length > 0
+              ? config.awards
+              : [
+                  { name: "FCA Authorised" },
+                  { name: "RAC Approved" },
+                  { name: "AA Inspected" },
+                  { name: "HPI Checked" },
+                  { name: "Trustpilot 5★" },
+                  { name: "Auto Trader Partner" },
+                ]
+            ).map((a, i) => (
+              <motion.div
+                key={a.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.05 }}
+                viewport={{ once: true }}
+                className="flex items-center gap-2 grayscale opacity-70 hover:opacity-100 hover:grayscale-0 transition-all"
+              >
+                {a.image ? (
+                  <img src={a.image} alt={a.name} className="h-8 w-auto object-contain" />
+                ) : (
+                  <>
+                    <Trophy className="h-4 w-4" style={{ color: accent }} />
+                    <span className={`${fontClass} text-sm font-bold text-foreground tracking-wide`}>{a.name}</span>
+                  </>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── Inventory ─── */}
       <section id="inventory" className="py-12 md:py-16">
         <div className="container mx-auto px-4">
