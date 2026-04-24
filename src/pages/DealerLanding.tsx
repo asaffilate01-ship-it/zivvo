@@ -516,11 +516,13 @@ const DealerLanding = () => {
                   )}
                 </div>
 
-                <a href="#inventory">
-                  <Button className="mt-5 w-full border-0 text-white" style={{ backgroundColor: accent }}>
-                    <MessageCircle className="mr-1 h-4 w-4" /> Enquire Now
-                  </Button>
-                </a>
+                <Button
+                  onClick={() => setEnquiryOpen(true)}
+                  className="mt-5 w-full border-0 text-white"
+                  style={{ backgroundColor: accent }}
+                >
+                  <MessageCircle className="mr-1 h-4 w-4" /> Enquire Now
+                </Button>
               </div>
             </motion.div>
           </div>
