@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video } from "lucide-react";
+import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video, Truck, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -10,6 +10,17 @@ import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import PriceIndicatorBadge from "@/components/PriceIndicatorBadge";
 import DealerPerformanceBadge from "@/components/DealerPerformanceBadge";
+
+// Rough monthly finance estimate: 10% deposit, 60 months, 9.9% APR
+const estimateMonthly = (price: number) => {
+  const deposit = price * 0.1;
+  const principal = price - deposit;
+  const apr = 0.099;
+  const n = 60;
+  const r = apr / 12;
+  const m = (principal * r) / (1 - Math.pow(1 + r, -n));
+  return Math.round(m);
+};
 
 interface CarCardProps {
   car: {
@@ -97,6 +108,20 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                     </span>
                   ))}
                 </div>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                  {Number(car.price) > 1000 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                      <Wallet className="h-3 w-3" />
+                      From {formatPrice(estimateMonthly(Number(car.price)), config)}/mo
+                    </span>
+                  )}
+                  {car.dealer_id && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 font-medium text-success">
+                      <Truck className="h-3 w-3" />
+                      Home delivery
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
                 {car.location && (
@@ -164,6 +189,23 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                 </span>
               ))}
             </div>
+
+            {/* Finance + delivery row */}
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+              {Number(car.price) > 1000 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                  <Wallet className="h-3 w-3" />
+                  From {formatPrice(estimateMonthly(Number(car.price)), config)}/mo
+                </span>
+              )}
+              {car.dealer_id && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 font-medium text-success">
+                  <Truck className="h-3 w-3" />
+                  Home delivery
+                </span>
+              )}
+            </div>
+
             <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
               {car.location && (
                 <div className="flex items-center gap-1.5 text-sm text-muted-foreground">

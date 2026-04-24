@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, SlidersHorizontal, ChevronRight } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCountry } from "@/contexts/CountryContext";
 import SearchAutocomplete from "@/components/SearchAutocomplete";
+import RecentSearchesChips from "@/components/RecentSearchesChips";
+import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { formatPrice } from "@/lib/countryConfig";
 import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-cars.jpg";
@@ -12,6 +14,7 @@ import heroImage from "@/assets/hero-cars.jpg";
 const HeroSearch = () => {
   const navigate = useNavigate();
   const { config } = useCountry();
+  const { add: addRecentSearch } = useRecentSearches();
   const [keyword, setKeyword] = useState("");
   const [make, setMake] = useState("");
   const [bodyType, setBodyType] = useState("");
@@ -24,8 +27,17 @@ const HeroSearch = () => {
     if (make) params.set("make", make);
     if (bodyType) params.set("body", bodyType);
     if (priceRange) params.set("priceMax", priceRange);
+
+    const labelParts: string[] = [];
+    if (make) labelParts.push(make);
+    if (bodyType) labelParts.push(bodyType);
+    if (keyword) labelParts.push(keyword);
+    const label = labelParts.join(" · ") || "All cars";
+    addRecentSearch(label, params.toString());
+
     navigate(`/browse?${params.toString()}`);
   };
+
 
   return (
     <section className="relative min-h-[600px] overflow-hidden md:min-h-[680px]">
@@ -162,6 +174,11 @@ const HeroSearch = () => {
                 </div>
               </div>
             </form>
+
+            {/* Recent searches */}
+            <div className="mt-4">
+              <RecentSearchesChips variant="dark" />
+            </div>
           </motion.div>
         </div>
       </div>
@@ -170,3 +187,4 @@ const HeroSearch = () => {
 };
 
 export default HeroSearch;
+
