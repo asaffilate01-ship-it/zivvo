@@ -973,6 +973,41 @@ const DealerLanding = () => {
         </div>
       </section>
 
+      {/* ─── Recently Viewed ─── */}
+      {recentlyViewed.length > 0 && (
+        <section className="border-t border-border bg-muted/20 py-10">
+          <div className="container mx-auto px-4">
+            <div className="mb-5 flex items-end justify-between">
+              <div>
+                <Badge variant="outline" className="mb-2 text-xs"><Eye className="mr-1 h-3 w-3" /> Recently Viewed</Badge>
+                <h2 className={`${fontClass} text-xl font-bold text-foreground md:text-2xl`}>Pick up where you left off</h2>
+              </div>
+            </div>
+            <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 snap-x">
+              {recentlyViewed.slice(0, 8).map((c) => (
+                <Link
+                  key={c.id}
+                  to={`/car/${c.id}`}
+                  className="group relative w-[220px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-muted">
+                    {c.image && (
+                      <img src={c.image} alt={c.title} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="truncate text-sm font-semibold text-foreground">{c.title}</p>
+                    <p className={`${fontClass} mt-1 text-base font-bold`} style={{ color: accent }}>
+                      {formatPrice(c.price, countryCfg)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ─── Part-Exchange / Trade-In CTA ─── */}
       <section className="border-t border-border py-12">
         <div className="container mx-auto px-4">
