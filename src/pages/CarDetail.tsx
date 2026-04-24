@@ -530,51 +530,6 @@ const CarDetail = () => {
         )}
       </div>
 
-      {/* Fullscreen Gallery Overlay */}
-      <AnimatePresence>
-        {galleryOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 backdrop-blur-sm"
-            onClick={() => setGalleryOpen(false)}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setGalleryOpen(false);
-              if (e.key === "ArrowLeft") setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1));
-              if (e.key === "ArrowRight") setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1));
-            }}
-            ref={(el) => el?.focus()}
-          >
-            <Button variant="ghost" size="icon" className="absolute right-4 top-4 text-background hover:bg-background/20" onClick={() => setGalleryOpen(false)}>
-              ✕
-            </Button>
-            <img
-              src={images[currentImage]}
-              alt={car.title}
-              className="max-h-[90vh] max-w-[95vw] object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-            {images.length > 1 && (
-              <>
-                <Button variant="ghost" size="icon" className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/20 text-background hover:bg-background/40" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === 0 ? images.length - 1 : p - 1)); }}>
-                  <ChevronLeft className="h-6 w-6" />
-                </Button>
-                <Button variant="ghost" size="icon" className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/20 text-background hover:bg-background/40" onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p === images.length - 1 ? 0 : p + 1)); }}>
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  {images.map((_: string, i: number) => (
-                    <button key={i} onClick={(e) => { e.stopPropagation(); setCurrentImage(i); }} className={`h-2 w-2 rounded-full transition-all ${i === currentImage ? "bg-background w-6" : "bg-background/40"}`} />
-                  ))}
-                </div>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <Footer />
     </div>
   );
