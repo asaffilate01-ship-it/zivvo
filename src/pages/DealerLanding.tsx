@@ -14,10 +14,15 @@ import {
   Star, Clock, Shield, Search, ArrowRight, MessageCircle, ChevronDown,
   Fuel, SlidersHorizontal, Award, ThumbsUp, Wrench, Heart, Sparkles,
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
+  Share2, Copy, Check, Eye,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
+import { useToast } from "@/hooks/use-toast";
+import DealerEnquiryDialog from "@/components/dealer/DealerEnquiryDialog";
+import DealerStickyBar from "@/components/dealer/DealerStickyBar";
+import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
 
 export interface LandingConfig {
   hero_title?: string;
@@ -67,6 +72,7 @@ const USP_ICONS: Record<string, any> = {
 const DealerLanding = () => {
   const { slug } = useParams();
   const { config: countryCfg } = useCountry();
+  const { toast } = useToast();
   const [dealer, setDealer] = useState<any>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
@@ -76,7 +82,10 @@ const DealerLanding = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [filterFuel, setFilterFuel] = useState("all");
   const [filterBody, setFilterBody] = useState("all");
+  const [budgetMax, setBudgetMax] = useState<number | null>(null);
   const [showAllCars, setShowAllCars] = useState(false);
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const [shared, setShared] = useState(false);
 
   useEffect(() => {
     const fetchDealer = async () => {
@@ -115,6 +124,7 @@ const DealerLanding = () => {
     }
     if (filterFuel !== "all") result = result.filter((c) => c.fuel_type === filterFuel);
     if (filterBody !== "all") result = result.filter((c) => c.body_type === filterBody);
+    if (budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
     result.sort((a, b) => {
       if (sortBy === "price-low") return (a.price || 0) - (b.price || 0);
       if (sortBy === "price-high") return (b.price || 0) - (a.price || 0);
@@ -123,7 +133,26 @@ const DealerLanding = () => {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
     setFilteredListings(result);
-  }, [listings, searchQuery, sortBy, filterFuel, filterBody]);
+  }, [listings, searchQuery, sortBy, filterFuel, filterBody, budgetMax]);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = `${dealer?.business_name || "Dealer"} on AutoSouq`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+        return;
+      } catch { /* user cancelled */ }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShared(true);
+      toast({ title: "Link copied", description: "Share it with your friends." });
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      toast({ title: "Copy failed", description: "Please copy from the address bar.", variant: "destructive" });
+    }
+  };
 
   const uniqueFuels = [...new Set(listings.map((c) => c.fuel_type).filter(Boolean))];
   const uniqueBodies = [...new Set(listings.map((c) => c.body_type).filter(Boolean))];
@@ -131,14 +160,7 @@ const DealerLanding = () => {
   const fontClass = config.font_style === "classic" ? "font-serif" : config.font_style === "bold" ? "font-black tracking-tight" : "font-display";
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex items-center justify-center py-32">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </div>
-    );
+    return <DealerLandingSkeleton />;
   }
 
   if (!dealer) {
@@ -494,11 +516,13 @@ const DealerLanding = () => {
                   )}
                 </div>
 
-                <a href="#inventory">
-                  <Button className="mt-5 w-full border-0 text-white" style={{ backgroundColor: accent }}>
-                    <MessageCircle className="mr-1 h-4 w-4" /> Enquire Now
-                  </Button>
-                </a>
+                <Button
+                  onClick={() => setEnquiryOpen(true)}
+                  className="mt-5 w-full border-0 text-white"
+                  style={{ backgroundColor: accent }}
+                >
+                  <MessageCircle className="mr-1 h-4 w-4" /> Enquire Now
+                </Button>
               </div>
             </motion.div>
           </div>
@@ -532,12 +556,59 @@ const DealerLanding = () => {
       {/* ─── Inventory ─── */}
       <section id="inventory" className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-8">
-            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Our Inventory</h2>
-            <p className="mt-1 text-muted-foreground">
-              {listings.length} vehicle{listings.length !== 1 ? "s" : ""} available
-            </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8 flex flex-wrap items-end justify-between gap-3"
+          >
+            <div>
+              <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>Our Inventory</h2>
+              <p className="mt-1 text-muted-foreground">
+                {listings.length} vehicle{listings.length !== 1 ? "s" : ""} available
+                {filteredListings.length !== listings.length && (
+                  <> · <span className="text-foreground font-medium">{filteredListings.length} match{filteredListings.length !== 1 ? "es" : ""}</span></>
+                )}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleShare} className="gap-1.5">
+              {shared ? <Check className="h-3.5 w-3.5 text-success" /> : <Share2 className="h-3.5 w-3.5" />}
+              {shared ? "Copied" : "Share"}
+            </Button>
           </motion.div>
+
+          {/* Budget chips */}
+          {listings.length > 3 && priceRange && (
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">Budget:</span>
+              {[5000, 10000, 20000, 35000, 50000]
+                .filter((v) => v <= priceRange.max * 1.1 && v >= priceRange.min * 0.5)
+                .map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setBudgetMax(budgetMax === v ? null : v)}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      budgetMax === v
+                        ? "border-transparent text-white"
+                        : "border-border bg-card text-foreground hover:bg-muted"
+                    }`}
+                    style={budgetMax === v ? { backgroundColor: accent } : undefined}
+                  >
+                    Under {formatPrice(v, countryCfg)}
+                  </button>
+                ))}
+              {budgetMax !== null && (
+                <button
+                  type="button"
+                  onClick={() => setBudgetMax(null)}
+                  className="text-xs text-muted-foreground underline-offset-2 hover:underline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Filters */}
           {listings.length > 0 && (
@@ -635,7 +706,12 @@ const DealerLanding = () => {
                   Flexible finance options available on all vehicles. Get a quick quote with no impact on your credit score.
                 </p>
                 <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <Button size="lg" className="bg-white hover:bg-white/90 font-semibold shadow-lg" style={{ color: accent }}>
+                  <Button
+                    size="lg"
+                    onClick={() => setEnquiryOpen(true)}
+                    className="bg-white hover:bg-white/90 font-semibold shadow-lg"
+                    style={{ color: accent }}
+                  >
                     Get a Finance Quote <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </div>
@@ -719,19 +795,39 @@ const DealerLanding = () => {
         </div>
       </section>
 
-      {/* ─── WhatsApp FAB ─── */}
+      {/* ─── WhatsApp FAB (desktop only — sticky bar handles mobile) ─── */}
       {config.whatsapp_number && (
         <a
           href={`https://wa.me/${config.whatsapp_number.replace(/[^0-9]/g, "")}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl hover:bg-[#20BD5A] transition-all hover:scale-110"
+          className="fixed bottom-6 right-6 z-50 hidden h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl transition-all hover:scale-110 hover:bg-[#20BD5A] md:flex"
         >
           <MessageCircle className="h-6 w-6" />
         </a>
       )}
 
+      {/* ─── Sticky mobile contact bar ─── */}
+      <DealerStickyBar
+        phone={showPhone ? dealer.business_phone : null}
+        email={showEmail ? dealer.business_email : null}
+        whatsapp={config.whatsapp_number}
+        accent={accent}
+        onEnquireClick={() => setEnquiryOpen(true)}
+      />
+
+      {/* ─── Enquiry dialog ─── */}
+      <DealerEnquiryDialog
+        open={enquiryOpen}
+        onOpenChange={setEnquiryOpen}
+        dealerName={dealer.business_name}
+        dealerEmail={showEmail ? dealer.business_email : null}
+        accent={accent}
+      />
+
       <Footer />
+      {/* Spacer for mobile sticky bar */}
+      <div className="h-14 md:hidden" aria-hidden="true" />
     </div>
   );
 };
