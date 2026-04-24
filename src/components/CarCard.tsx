@@ -108,6 +108,20 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                     </span>
                   ))}
                 </div>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                  {Number(car.price) > 1000 && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                      <Wallet className="h-3 w-3" />
+                      From {formatPrice(estimateMonthly(Number(car.price)), config)}/mo
+                    </span>
+                  )}
+                  {car.dealer_id && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 font-medium text-success">
+                      <Truck className="h-3 w-3" />
+                      Home delivery
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
                 {car.location && (
