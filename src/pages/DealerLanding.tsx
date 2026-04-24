@@ -16,7 +16,7 @@ import {
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
   Share2, Copy, Check, Eye, Calendar, CreditCard, Truck, FileCheck,
   HandCoins, ShieldCheck, TrendingUp, Search as SearchIcon, Gauge,
-  ChevronUp,
+  ChevronUp, HelpCircle, Send, Trophy, Zap, Users, PoundSterling,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
@@ -26,6 +26,8 @@ import DealerEnquiryDialog from "@/components/dealer/DealerEnquiryDialog";
 import DealerStickyBar from "@/components/dealer/DealerStickyBar";
 import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
 import LiveMap from "@/components/LiveMap";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 export interface LandingConfig {
   hero_title?: string;
