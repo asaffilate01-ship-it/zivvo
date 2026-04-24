@@ -36,7 +36,7 @@ const blogPosts = [
     title: "How to Sell Your Car Fast: 10 Expert Tips",
     excerpt: "From pricing strategy to photo tips, learn what makes listings sell faster. Data-backed advice from thousands of successful sales on AutoSouq.",
     category: "Selling Tips",
-    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80",
     author: "AutoSouq Team",
     date: "2026-02-28",
     readTime: "5 min read",
