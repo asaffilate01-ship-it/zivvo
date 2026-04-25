@@ -206,6 +206,7 @@ const HeroSearch = () => {
                         {DISTANCE_STEPS.map((d) => (
                           <SelectItem key={d} value={String(d)}>Within {d} {config.distanceUnit}</SelectItem>
                         ))}
+                        <SelectItem value="nationwide">Nationwide (whole country)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
