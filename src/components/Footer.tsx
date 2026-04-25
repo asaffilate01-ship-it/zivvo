@@ -47,10 +47,25 @@ const Footer = () => {
   return (
     <footer className="border-t border-border bg-card">
       <div className="container mx-auto px-4 py-14">
-        <div className="grid gap-10 md:grid-cols-5">
+        <div className="grid gap-10 md:grid-cols-6">
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2.5" aria-label="Zivvo home">
+              <img src={zivvoLogo} alt="Zivvo — Vehicle Marketplace" className="h-10 w-auto" />
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
+              The trusted marketplace for buying and selling vehicles. Verified listings, transparent history, and secure transactions.
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Zivvo Ltd · Registered in England & Wales · Company No. 00000000<br />
+              Registered office: 1 Example Street, London, EC1A 1AA<br />
+              ICO Registration: ZA000000 · VAT: GB 000 0000 00
+            </p>
+            <div className="mt-5 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-success" />
+              All systems operational
+            </div>
+          </div>
               <img src={zivvoLogo} alt="Zivvo — Vehicle Marketplace" className="h-10 w-auto" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
