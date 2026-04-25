@@ -51,7 +51,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2.5" aria-label="Zivvo home">
-              <img src={zivvoLogo} alt="Zivvo — Vehicle Marketplace" className="h-10 w-auto" />
+              <img src={zivvoLogo} alt="Zivvo — Vehicle Marketplace" className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               The trusted marketplace for buying and selling vehicles. Verified listings, transparent history, and secure transactions.
