@@ -14,6 +14,9 @@ import CarOfTheWeek from "@/components/CarOfTheWeek";
 import WhyBuyFromUs from "@/components/WhyBuyFromUs";
 import HowItWorks from "@/components/HowItWorks";
 import TrustBrandStrip from "@/components/TrustBrandStrip";
+import HomeServicesRow from "@/components/HomeServicesRow";
+import HistoryCheckPromo from "@/components/HistoryCheckPromo";
+import SEOLinkBlock from "@/components/SEOLinkBlock";
 import AIChatWidget from "@/components/AIChatWidget";
 import Icon3D from "@/components/Icon3D";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
@@ -148,6 +151,9 @@ const Index = () => {
 
       {/* Trust strip — instant credibility under the hero */}
       <TrustBrandStrip />
+
+      {/* Services row — Finance / Sell / HPI */}
+      <HomeServicesRow />
 
       {/* How it works — buyer journey */}
       <HowItWorks />
@@ -338,6 +344,9 @@ const Index = () => {
       {/* EV Section */}
       <EVSection />
 
+      {/* Vehicle history check promo */}
+      <HistoryCheckPromo />
+
       {/* Why Buy From Us */}
       <WhyBuyFromUs />
 
@@ -370,6 +379,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* SEO link block — make/body/popular/local */}
+      <SEOLinkBlock />
 
       {/* Blog Teaser */}
       <section className="py-16">
