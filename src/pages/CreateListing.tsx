@@ -97,6 +97,7 @@ const CreateListing = () => {
           description: data.description || "",
           location: data.location || "",
           video_url: (data as any).video_url || "",
+          vat_qualifying: !!(data as any).vat_qualifying,
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
