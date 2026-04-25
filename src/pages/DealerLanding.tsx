@@ -435,7 +435,7 @@ const DealerLanding = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={budgetMax || "any"} onValueChange={(v) => setBudgetMax(v === "any" ? "" : v)}>
+                <Select value={budgetMax === null ? "any" : String(budgetMax)} onValueChange={(v) => setBudgetMax(v === "any" ? null : Number(v))}>
                   <SelectTrigger><SelectValue placeholder="Max Price" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Any Price</SelectItem>
