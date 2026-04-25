@@ -1279,7 +1279,14 @@ const DealerLanding = () => {
             <>
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {displayedListings.map((car, i) => (
-                  <CarCard key={car.id} car={car} index={i} />
+                  <div key={car.id}>
+                    <CarCard car={car} index={i} />
+                    <ListingMiniActions
+                      listingId={car.id}
+                      dealerId={dealer?.id}
+                      onFinance={() => setFinanceCar({ id: car.id, price: car.price })}
+                    />
+                  </div>
                 ))}
               </div>
               {!showAllCars && filteredListings.length > 12 && (
