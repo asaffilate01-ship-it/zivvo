@@ -23,6 +23,12 @@ import SellerAnalytics from "@/components/SellerAnalytics";
 import SalesPipeline from "@/components/SalesPipeline";
 import PortalSyndication from "@/components/PortalSyndication";
 import ListingSyndicationStatus from "@/components/ListingSyndicationStatus";
+import StockBookManager from "@/components/dealer/StockBookManager";
+import VehicleCostsManager from "@/components/dealer/VehicleCostsManager";
+import StaffManager from "@/components/dealer/StaffManager";
+import ReservationsManager from "@/components/dealer/ReservationsManager";
+import AdShopEditor from "@/components/dealer/AdShopEditor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
