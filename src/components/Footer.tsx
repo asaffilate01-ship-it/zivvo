@@ -66,16 +66,6 @@ const Footer = () => {
               All systems operational
             </div>
           </div>
-              <img src={zivvoLogo} alt="Zivvo — Vehicle Marketplace" className="h-10 w-auto" />
-            </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              The trusted marketplace for buying and selling vehicles. Verified listings, transparent history, and secure transactions.
-            </p>
-            <div className="mt-5 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="h-2 w-2 rounded-full bg-success" />
-              All systems operational
-            </div>
-          </div>
 
           {/* Links */}
           {footerSections.map((section) => (
