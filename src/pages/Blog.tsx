@@ -17,7 +17,7 @@ const blogPosts = [
     excerpt: "Don't get caught out. Our comprehensive checklist covers everything from bodywork inspection to finance checks before you hand over your money.",
     category: "Buying Guide",
     image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80",
-    author: "AutoSouq Team",
+    author: "Zivvo Team",
     date: "2026-03-10",
     readTime: "8 min read",
   },
@@ -27,17 +27,17 @@ const blogPosts = [
     excerpt: "With EV infrastructure growing rapidly, we break down the real-world costs, range, and practicality of going electric versus hybrid.",
     category: "EV Guide",
     image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80",
-    author: "AutoSouq Team",
+    author: "Zivvo Team",
     date: "2026-03-05",
     readTime: "6 min read",
   },
   {
     id: "how-to-sell-car-fast",
     title: "How to Sell Your Car Fast: 10 Expert Tips",
-    excerpt: "From pricing strategy to photo tips, learn what makes listings sell faster. Data-backed advice from thousands of successful sales on AutoSouq.",
+    excerpt: "From pricing strategy to photo tips, learn what makes listings sell faster. Data-backed advice from thousands of successful sales on Zivvo.",
     category: "Selling Tips",
     image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80",
-    author: "AutoSouq Team",
+    author: "Zivvo Team",
     date: "2026-02-28",
     readTime: "5 min read",
   },
@@ -47,7 +47,7 @@ const blogPosts = [
     excerpt: "Thousands of cars are sold each year with outstanding finance. Here's how to protect yourself and what to do if a check comes back positive.",
     category: "Safety",
     image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
-    author: "AutoSouq Team",
+    author: "Zivvo Team",
     date: "2026-02-20",
     readTime: "4 min read",
   },
@@ -57,17 +57,17 @@ const blogPosts = [
     excerpt: "Safety ratings, boot space, and running costs — we rank the best SUVs for families based on real owner data and expert reviews.",
     category: "Reviews",
     image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80",
-    author: "AutoSouq Team",
+    author: "Zivvo Team",
     date: "2026-02-15",
     readTime: "7 min read",
   },
   {
     id: "dealer-subscription-benefits",
-    title: "Why Dealers Are Switching to AutoSouq: A Case Study",
-    excerpt: "See how verified dealers on AutoSouq are reaching more buyers, closing faster, and building trust with our platform tools.",
+    title: "Why Dealers Are Switching to Zivvo: A Case Study",
+    excerpt: "See how verified dealers on Zivvo are reaching more buyers, closing faster, and building trust with our platform tools.",
     category: "For Dealers",
     image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&q=80",
-    author: "AutoSouq Team",
+    author: "Zivvo Team",
     date: "2026-02-10",
     readTime: "5 min read",
   },
@@ -97,19 +97,19 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="AutoSouq Blog — Car Buying Tips, Reviews & Guides"
-        description="Expert advice on buying, selling, and maintaining your car. Guides, reviews, and industry insights from the AutoSouq team."
-        keywords="car buying guide, used car tips, sell car fast, EV guide, car reviews, AutoSouq blog"
+        title="Zivvo Blog — Car Buying Tips, Reviews & Guides"
+        description="Expert advice on buying, selling, and maintaining your car. Guides, reviews, and industry insights from the Zivvo team."
+        keywords="car buying guide, used car tips, sell car fast, EV guide, car reviews, Zivvo blog"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Blog",
-          "name": "AutoSouq Blog",
+          "name": "Zivvo Blog",
           "description": "Expert advice on buying, selling, and maintaining your car.",
-          "url": "https://autosouq.app/blog",
+          "url": "https://zivvo.co.uk/blog",
           "publisher": {
             "@type": "Organization",
-            "name": "AutoSouq",
-            "logo": { "@type": "ImageObject", "url": "https://autosouq.app/icon-512.png" }
+            "name": "Zivvo",
+            "logo": { "@type": "ImageObject", "url": "https://zivvo.co.uk/icon-512.png" }
           }
         }}
       />

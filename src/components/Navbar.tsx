@@ -7,6 +7,7 @@ import {
   LayoutDashboard, ShieldCheck, Users, Building2, HelpCircle, Phone, BookOpen,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
+import zivvoLogo from "@/assets/zivvo-logo.png";
 import CountrySwitcher from "@/components/CountrySwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -84,11 +85,8 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-14 items-center justify-between px-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="gradient-primary flex h-8 w-8 items-center justify-center rounded-lg">
-            <Car className="h-4 w-4 text-primary-foreground" />
-          </div>
-          <span className="font-display text-lg font-bold tracking-tight text-foreground">AutoSouq</span>
+        <Link to="/" className="flex items-center gap-2" aria-label="Zivvo home">
+          <img src={zivvoLogo} alt="Zivvo" className="h-8 w-auto" />
         </Link>
 
         {/* Desktop nav links */}
@@ -223,10 +221,7 @@ const Navbar = () => {
             <SheetContent side="right" className="w-72 p-0">
               <SheetHeader className="border-b border-border p-4">
                 <SheetTitle className="flex items-center gap-2">
-                  <div className="gradient-primary flex h-7 w-7 items-center justify-center rounded-lg">
-                    <Car className="h-3.5 w-3.5 text-primary-foreground" />
-                  </div>
-                  AutoSouq
+                  <img src={zivvoLogo} alt="Zivvo" className="h-7 w-auto" />
                 </SheetTitle>
               </SheetHeader>
 

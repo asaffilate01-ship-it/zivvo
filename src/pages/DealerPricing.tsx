@@ -145,7 +145,7 @@ const DealerPricing = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Dealer Plans & Pricing"
-        description={`Choose a dealer plan to scale your dealership on AutoSouq. Starting from ${formatPrice(plans[0].price, config)}/month.`}
+        description={`Choose a dealer plan to scale your dealership on Zivvo. Starting from ${formatPrice(plans[0].price, config)}/month.`}
       />
       <Navbar />
 
@@ -498,7 +498,7 @@ const DealerPricing = () => {
             Ready to grow your dealership?
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Join thousands of dealers already using AutoSouq to reach more buyers and sell faster.
+            Join thousands of dealers already using Zivvo to reach more buyers and sell faster.
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button

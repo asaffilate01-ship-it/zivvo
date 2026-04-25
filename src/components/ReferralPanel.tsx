@@ -52,7 +52,7 @@ const ReferralPanel = () => {
   const shareLink = () => {
     const link = `${window.location.origin}/signup?ref=${code}`;
     if (navigator.share) {
-      navigator.share({ title: "Join AutoSouq", text: "Sign up using my referral link!", url: link });
+      navigator.share({ title: "Join Zivvo", text: "Sign up using my referral link!", url: link });
     } else {
       copyLink();
     }

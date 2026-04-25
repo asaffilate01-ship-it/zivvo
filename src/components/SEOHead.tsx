@@ -16,25 +16,25 @@ interface SEOHeadProps {
   locale?: string;
 }
 
-const SITE_URL = "https://autosouq.app";
+const SITE_URL = "https://zivvo.co.uk";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
 const SEOHead = ({
-  title = "AutoSouq — Buy & Sell Cars with Confidence",
+  title = "Zivvo — Buy & Sell Cars with Confidence",
   description = "Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing across UK, UAE, USA & Pakistan.",
   canonical,
   type = "website",
   image = DEFAULT_IMAGE,
-  imageAlt = "AutoSouq — Used car marketplace",
+  imageAlt = "Zivvo — Used car marketplace",
   jsonLd,
   noindex = false,
   publishedTime,
   modifiedTime,
-  author = "AutoSouq",
+  author = "Zivvo",
   keywords,
   locale = "en_GB",
 }: SEOHeadProps) => {
-  const fullTitle = title.includes("AutoSouq") ? title : `${title} | AutoSouq`;
+  const fullTitle = title.includes("Zivvo") ? title : `${title} | Zivvo`;
   const canonicalUrl = canonical || (typeof window !== "undefined" ? `${SITE_URL}${window.location.pathname}` : SITE_URL);
   const jsonLdArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
@@ -47,7 +47,7 @@ const SEOHead = ({
       {noindex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph */}
-      <meta property="og:site_name" content="AutoSouq" />
+      <meta property="og:site_name" content="Zivvo" />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:type" content={type} />
@@ -63,8 +63,8 @@ const SEOHead = ({
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@AutoSouq" />
-      <meta name="twitter:creator" content="@AutoSouq" />
+      <meta name="twitter:site" content="@Zivvo" />
+      <meta name="twitter:creator" content="@Zivvo" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />

@@ -25,7 +25,7 @@ const AIChatWidget = () => {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hi! I'm AutoSouq AI 🚗 I can help you find the perfect car, answer questions about our platform, or guide you through selling your vehicle. What can I help with?",
+      content: "Hi! I'm Zivvo AI 🚗 I can help you find the perfect car, answer questions about our platform, or guide you through selling your vehicle. What can I help with?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -120,7 +120,7 @@ const AIChatWidget = () => {
                   <Sparkles className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-primary-foreground">AutoSouq AI</p>
+                  <p className="text-sm font-semibold text-primary-foreground">Zivvo AI</p>
                   <p className="text-[10px] text-primary-foreground/60">Your car-finding assistant</p>
                 </div>
               </div>

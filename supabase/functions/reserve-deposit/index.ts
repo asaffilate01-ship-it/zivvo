@@ -47,7 +47,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: insErr?.message || "Could not create reservation" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const origin = req.headers.get("origin") || "https://autosouq.app";
+    const origin = req.headers.get("origin") || "https://zivvo.co.uk";
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],

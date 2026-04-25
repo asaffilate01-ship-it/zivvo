@@ -71,7 +71,7 @@ const DealerDashboard = () => {
   // Handle checkout success
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
-      toast({ title: "Subscription activated!", description: "Welcome to AutoSouq Dealer!" });
+      toast({ title: "Subscription activated!", description: "Welcome to Zivvo Dealer!" });
       refreshSubscription();
     }
   }, [searchParams]);

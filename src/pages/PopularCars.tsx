@@ -58,7 +58,7 @@ const PopularCars = () => {
       <div className="min-h-screen bg-background">
         <SEOHead
           title="Popular Cars — Browse by Make"
-          description="Browse the most popular car makes on AutoSouq. Find BMW, Mercedes, Audi, Tesla, and more."
+          description="Browse the most popular car makes on Zivvo. Find BMW, Mercedes, Audi, Tesla, and more."
         />
         <Navbar />
         <div className="container mx-auto px-4 py-12">
@@ -103,7 +103,7 @@ const PopularCars = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title={`Used ${makeName} Cars For Sale`}
-        description={`Browse verified used ${makeName} cars on AutoSouq. Finance checks, full history, and transparent pricing.`}
+        description={`Browse verified used ${makeName} cars on Zivvo. Finance checks, full history, and transparent pricing.`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",

@@ -56,8 +56,8 @@ const getCategories = (bodyTypes: string[]) => {
 const testimonials = [
   { name: "Sarah K.", location: "London", rating: 5, avatar: testimonialSarah, text: "Sold my BMW in 3 days. The verified badge made buyers trust my listing instantly." },
   { name: "James T.", location: "Manchester", rating: 5, avatar: testimonialJames, text: "The finance check feature saved me from buying a car with outstanding debt." },
-  { name: "Emma W.", location: "Birmingham", rating: 5, avatar: testimonialEmma, text: "As a dealer, AutoSouq brings us qualified leads every day. Brilliant platform." },
-  { name: "David R.", location: "Edinburgh", rating: 5, avatar: testimonialDavid, text: "Found my dream Porsche through AutoSouq. Transparent, verified and hassle-free." },
+  { name: "Emma W.", location: "Birmingham", rating: 5, avatar: testimonialEmma, text: "As a dealer, Zivvo brings us qualified leads every day. Brilliant platform." },
+  { name: "David R.", location: "Edinburgh", rating: 5, avatar: testimonialDavid, text: "Found my dream Porsche through Zivvo. Transparent, verified and hassle-free." },
 ];
 
 const fadeUp = {
@@ -134,13 +134,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="AutoSouq — Buy & Sell Cars with Confidence"
+        title="Zivvo — Buy & Sell Cars with Confidence"
         description="Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing."
-        canonical="https://autosouq.app"
+        canonical="https://zivvo.co.uk"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebApplication",
-          "name": "AutoSouq",
+          "name": "Zivvo",
           "description": "Buy & sell cars with verified dealers and private sellers.",
           "applicationCategory": "AutomotiveMarketplace",
           "operatingSystem": "Web",
@@ -208,7 +208,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <motion.div {...fadeUp}>
-              <Badge variant="outline" className="mb-4 text-xs">Why AutoSouq</Badge>
+              <Badge variant="outline" className="mb-4 text-xs">Why Zivvo</Badge>
               <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
                 Buy with
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> Complete Confidence</span>
