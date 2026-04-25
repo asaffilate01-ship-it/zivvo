@@ -30,6 +30,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
+import ReserveNowButton from "@/components/dealer/ReserveNowButton";
 import VehicleChecks from "@/components/VehicleChecks";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
