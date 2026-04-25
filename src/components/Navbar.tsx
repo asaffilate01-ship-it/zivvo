@@ -221,7 +221,7 @@ const Navbar = () => {
             <SheetContent side="right" className="w-72 p-0">
               <SheetHeader className="border-b border-border p-4">
                 <SheetTitle className="flex items-center gap-2">
-                  <img src={zivvoLogo} alt="Zivvo" className="h-7 w-auto" />
+                  <img src={zivvoLogo} alt="Zivvo" className="h-12 w-auto" />
                 </SheetTitle>
               </SheetHeader>
 
