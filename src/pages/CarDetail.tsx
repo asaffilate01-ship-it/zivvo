@@ -31,6 +31,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
 import ReserveNowButton from "@/components/dealer/ReserveNowButton";
+import TestDriveDialog from "@/components/dealer/TestDriveDialog";
+import TransportQuoteDialog from "@/components/dealer/TransportQuoteDialog";
 import VehicleChecks from "@/components/VehicleChecks";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
@@ -398,7 +400,12 @@ const CarDetail = () => {
               {/* Price Card */}
               <div className="hidden rounded-2xl border border-border bg-card p-6 shadow-card lg:block">
                 <h1 className="font-display text-xl font-bold text-card-foreground">{car.title}</h1>
-                <p className="mt-3 font-display text-3xl font-bold text-primary">{formatPrice(Number(car.price), config)}</p>
+                <p className="mt-3 font-display text-3xl font-bold text-primary">
+                  {formatPrice(Number(car.price), config)}
+                  {(car as any).vat_qualifying && (
+                    <span className="ml-2 text-sm font-medium text-muted-foreground">+ VAT</span>
+                  )}
+                </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Finance from ~{formatPrice(Math.round(Number(car.price) / 48), config)}/mo
                 </p>
