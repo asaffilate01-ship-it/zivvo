@@ -830,6 +830,7 @@ export type Database = {
           transmission: string | null
           updated_at: string
           vat_qualifying: boolean
+          vat_scheme: string
           verified: boolean | null
           video_url: string | null
           views_count: number | null
@@ -877,6 +878,7 @@ export type Database = {
           transmission?: string | null
           updated_at?: string
           vat_qualifying?: boolean
+          vat_scheme?: string
           verified?: boolean | null
           video_url?: string | null
           views_count?: number | null
@@ -924,6 +926,7 @@ export type Database = {
           transmission?: string | null
           updated_at?: string
           vat_qualifying?: boolean
+          vat_scheme?: string
           verified?: boolean | null
           video_url?: string | null
           views_count?: number | null
