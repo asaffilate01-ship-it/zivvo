@@ -1049,6 +1049,11 @@ const AdminDashboard = () => {
               </Card>
             </div>
           </TabsContent>
+
+          {/* DMS Health Tab */}
+          <TabsContent value="dms" className="mt-4">
+            <AdminDmsHealthPanel />
+          </TabsContent>
         </Tabs>
 
         {/* Dealer Detail Dialog */}
