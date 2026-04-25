@@ -40,6 +40,7 @@ interface CarCardProps {
     dealer_id?: string | null;
     video_url?: string | null;
     vat_qualifying?: boolean | null;
+    source?: string | null;
   };
   index?: number;
   layout?: "grid" | "list";
