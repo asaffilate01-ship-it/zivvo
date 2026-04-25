@@ -1685,6 +1685,21 @@ const DealerLanding = () => {
       <Footer />
       {/* Spacer for mobile sticky bar */}
       <div className="h-14 md:hidden" aria-hidden="true" />
+
+      <Dialog open={!!financeCar} onOpenChange={(o) => !o && setFinanceCar(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Finance estimator</DialogTitle></DialogHeader>
+          {financeCar && (
+            <FinanceCalculator
+              price={Number(financeCar.price) || 0}
+              defaultApr={Number(config.finance_apr) || 9.9}
+              onApply={() => {
+                window.location.href = `/car/${financeCar.id}#finance`;
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
