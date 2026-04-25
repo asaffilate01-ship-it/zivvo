@@ -30,6 +30,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import JustArrivedRail from "@/components/dealer/JustArrivedRail";
 import VehicleFinderForm from "@/components/dealer/VehicleFinderForm";
+import ListingMiniActions from "@/components/dealer/ListingMiniActions";
+import FinanceCalculator from "@/components/dealer/FinanceCalculator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export interface LandingConfig {
   hero_title?: string;
