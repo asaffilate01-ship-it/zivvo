@@ -444,6 +444,9 @@ const CarDetail = () => {
                   {showWhatsApp && <WhatsAppButton phone={dealer?.business_phone} listingTitle={car.title} />}
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
                   <MakeOfferDialog listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} askingPrice={Number(car.price)} />
+                  {car.dealer_id && (
+                    <ReserveNowButton listingId={car.id} dealerId={car.dealer_id} listingTitle={car.title} />
+                  )}
                   <Button
                     variant="outline"
                     className="w-full"
