@@ -55,6 +55,11 @@ const CreateAuction = lazy(() => import("./pages/CreateAuction"));
 const TradeStock = lazy(() => import("./pages/TradeStock"));
 const AuctionApply = lazy(() => import("./pages/AuctionApply"));
 const PlatformAnalytics = lazy(() => import("./pages/PlatformAnalytics"));
+const GDPR = lazy(() => import("./pages/GDPR"));
+const ComplaintsPolicy = lazy(() => import("./pages/ComplaintsPolicy"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const Accessibility = lazy(() => import("./pages/Accessibility"));
+const ModernSlavery = lazy(() => import("./pages/ModernSlavery"));
 
 const queryClient = new QueryClient();
 
@@ -85,6 +90,11 @@ const App = () => (
                       <Route path="/saved" element={<SavedCars />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/gdpr" element={<GDPR />} />
+                      <Route path="/complaints" element={<ComplaintsPolicy />} />
+                      <Route path="/cookies" element={<CookiePolicy />} />
+                      <Route path="/accessibility" element={<Accessibility />} />
+                      <Route path="/modern-slavery" element={<ModernSlavery />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/help" element={<HelpCentre />} />
                       <Route path="/compare" element={<CompareCars />} />
