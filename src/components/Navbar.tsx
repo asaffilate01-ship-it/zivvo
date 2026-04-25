@@ -83,10 +83,10 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2" aria-label="Zivvo home">
-          <img src={zivvoLogo} alt="Zivvo" className="h-8 w-auto" />
+          <img src={zivvoLogo} alt="Zivvo" className="h-14 w-auto" />
         </Link>
 
         {/* Desktop nav links */}
