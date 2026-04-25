@@ -398,77 +398,259 @@ const DealerLanding = () => {
         )}
       </section>
 
-      {/* ─── Quick Search Panel (Carlingo-style) ─── */}
+      {/* ─── Quick Action Panel (Jim Reid–style tabbed search) ─── */}
       {listings.length > 0 && (
-        <section className="relative -mt-4 md:-mt-12 z-10 px-4">
+        <section className="relative -mt-6 md:-mt-16 z-10 px-4">
           <div className="container mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
-              className="mx-auto max-w-5xl rounded-2xl border border-border bg-card p-5 shadow-2xl md:p-7"
+              className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
             >
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className={`${fontClass} text-lg font-bold text-foreground md:text-xl`}>
-                  <SearchIcon className="mr-2 inline h-5 w-5" style={{ color: accent }} />
-                  Search our stock
-                </h2>
-                <Badge variant="outline" className="hidden md:inline-flex">
-                  {listings.length} cars available
-                </Badge>
+              {/* Tab strip */}
+              <div role="tablist" className="grid grid-cols-4 border-b border-border">
+                {[
+                  { id: "buy" as const, label: "Buy", icon: Car },
+                  { id: "sell" as const, label: "Sell", icon: PoundSterling },
+                  { id: "finance" as const, label: "Finance", icon: HandCoins },
+                  { id: "service" as const, label: "Service", icon: Wrench },
+                ].map((t) => {
+                  const active = searchTab === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setSearchTab(t.id)}
+                      className={`group relative flex flex-col items-center justify-center gap-1.5 px-3 py-4 text-xs font-semibold transition-colors md:flex-row md:gap-2 md:py-5 md:text-sm ${
+                        active ? "text-white" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                      }`}
+                      style={active ? { backgroundColor: accent } : undefined}
+                    >
+                      <t.icon className="h-4 w-4 md:h-5 md:w-5" />
+                      {t.label}
+                    </button>
+                  );
+                })}
               </div>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                <Select value={filterMake} onValueChange={setFilterMake}>
-                  <SelectTrigger><SelectValue placeholder="Any Make" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any Make</SelectItem>
-                    {uniqueMakes.map((m) => (
-                      <SelectItem key={m} value={m}>{m}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={filterBody} onValueChange={setFilterBody}>
-                  <SelectTrigger><SelectValue placeholder="Any Body" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any Body Type</SelectItem>
-                    {[...new Set(listings.map((c) => c.body_type).filter(Boolean))].map((b) => (
-                      <SelectItem key={b} value={b}>{b}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={filterFuel} onValueChange={setFilterFuel}>
-                  <SelectTrigger><SelectValue placeholder="Any Fuel" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any Fuel Type</SelectItem>
-                    {[...new Set(listings.map((c) => c.fuel_type).filter(Boolean))].map((f) => (
-                      <SelectItem key={f} value={f}>{f}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={budgetMax === null ? "any" : String(budgetMax)} onValueChange={(v) => setBudgetMax(v === "any" ? null : Number(v))}>
-                  <SelectTrigger><SelectValue placeholder="Max Price" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any Price</SelectItem>
-                    {[5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000, 100000].map((p) => (
-                      <SelectItem key={p} value={String(p)}>Up to {formatPrice(p, countryCfg)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+              {/* Tab body */}
+              <div className="p-5 md:p-7">
+                {searchTab === "buy" && (
+                  <div>
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <h2 className={`${fontClass} text-lg font-bold text-foreground md:text-xl`}>
+                        You could be moments away from finding your next car…
+                      </h2>
+                      <Badge variant="outline" className="hidden whitespace-nowrap md:inline-flex">
+                        {listings.length} cars available
+                      </Badge>
+                    </div>
+
+                    {/* Make / Model / Fuel row */}
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                      <Select value={filterMake} onValueChange={(v) => { setFilterMake(v); setFilterModel("all"); }}>
+                        <SelectTrigger><SelectValue placeholder="Any Make" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any Make</SelectItem>
+                          {uniqueMakes.map((m) => (
+                            <SelectItem key={m} value={m}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={filterModel} onValueChange={setFilterModel} disabled={filterMake === "all"}>
+                        <SelectTrigger><SelectValue placeholder={filterMake === "all" ? "Pick a make first" : "Any Model"} /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any Model</SelectItem>
+                          {[...new Set(listings.filter((c) => c.make === filterMake).map((c) => c.model).filter(Boolean))].map((m) => (
+                            <SelectItem key={m as string} value={m as string}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={filterFuel} onValueChange={setFilterFuel}>
+                        <SelectTrigger><SelectValue placeholder="Any Fuel" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any Fuel Type</SelectItem>
+                          {[...new Set(listings.map((c) => c.fuel_type).filter(Boolean))].map((f) => (
+                            <SelectItem key={f as string} value={f as string}>{f}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Full Price ⇄ Monthly Budget toggle */}
+                    <div className="mt-4 flex rounded-full bg-muted p-1">
+                      {(["price", "monthly"] as const).map((mode) => {
+                        const active = budgetMode === mode;
+                        return (
+                          <button
+                            key={mode}
+                            type="button"
+                            onClick={() => setBudgetMode(mode)}
+                            className={`flex-1 rounded-full px-4 py-1.5 text-xs font-semibold transition-all md:text-sm ${
+                              active ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {mode === "price" ? "Full Price" : "Monthly Budget"}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-3">
+                      {budgetMode === "price" ? (
+                        <>
+                          <Select value="any" onValueChange={() => {}} disabled>
+                            <SelectTrigger><SelectValue placeholder="Any Min Price" /></SelectTrigger>
+                            <SelectContent><SelectItem value="any">Any Min Price</SelectItem></SelectContent>
+                          </Select>
+                          <Select value={budgetMax === null ? "any" : String(budgetMax)} onValueChange={(v) => setBudgetMax(v === "any" ? null : Number(v))}>
+                            <SelectTrigger><SelectValue placeholder="Any Max Price" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="any">Any Max Price</SelectItem>
+                              {[5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000, 100000].map((p) => (
+                                <SelectItem key={p} value={String(p)}>Up to {formatPrice(p, countryCfg)}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </>
+                      ) : (
+                        <>
+                          <Select value="any" onValueChange={() => {}} disabled>
+                            <SelectTrigger><SelectValue placeholder="Any Min /mo" /></SelectTrigger>
+                            <SelectContent><SelectItem value="any">Any Min /mo</SelectItem></SelectContent>
+                          </Select>
+                          <Select value={monthlyMax === null ? "any" : String(monthlyMax)} onValueChange={(v) => setMonthlyMax(v === "any" ? null : Number(v))}>
+                            <SelectTrigger><SelectValue placeholder="Any Max /mo" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="any">Any Max /mo</SelectItem>
+                              {[150, 200, 250, 300, 400, 500, 750, 1000].map((p) => (
+                                <SelectItem key={p} value={String(p)}>Up to {formatPrice(p, countryCfg)} /mo</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </>
+                      )}
+                    </div>
+
+                    <a href="#inventory">
+                      <Button
+                        size="lg"
+                        className="mt-4 w-full border-0 text-white shadow-lg transition-all hover:shadow-xl hover:brightness-110"
+                        style={{ backgroundColor: accent }}
+                      >
+                        <Search className="mr-2 h-4 w-4" />
+                        Search ({filteredListings.length})
+                      </Button>
+                    </a>
+
+                    <p className="mt-3 text-center text-[11px] leading-relaxed text-muted-foreground">
+                      Representative {config.finance_apr || "11.9"}% APR. We are a credit broker, not a lender.
+                      {config.finance_disclaimer ? ` ${config.finance_disclaimer}` : " Finance subject to status. Indicative monthly figures only."}
+                    </p>
+                  </div>
+                )}
+
+                {searchTab === "sell" && (
+                  <div className="space-y-4 text-center">
+                    <div
+                      className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"
+                      style={{ backgroundColor: `${accent}15` }}
+                    >
+                      <PoundSterling className="h-7 w-7" style={{ color: accent }} />
+                    </div>
+                    <div>
+                      <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Free valuation of your car or van</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Get an instant, no-obligation quote from {dealer.business_name}. Part-exchange welcome.
+                      </p>
+                    </div>
+                    <div className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
+                      <Input placeholder="Enter your reg (e.g. AB12 CDE)" className="uppercase" />
+                      <Link to="/valuation" className="sm:w-auto">
+                        <Button size="lg" className="w-full border-0 text-white" style={{ backgroundColor: accent }}>
+                          Value My Car <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {searchTab === "finance" && (
+                  <div className="space-y-4 text-center">
+                    <div
+                      className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"
+                      style={{ backgroundColor: `${accent}15` }}
+                    >
+                      <HandCoins className="h-7 w-7" style={{ color: accent }} />
+                    </div>
+                    <div>
+                      <h3 className={`${fontClass} text-xl font-bold text-foreground`}>
+                        Flexible finance from {config.finance_apr || "11.9"}% APR
+                      </h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        PCP, HP and personal loan options. Quick decisions, no impact on your credit score for a quote.
+                      </p>
+                    </div>
+                    <div className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
+                      <a href="#finance" className="flex-1">
+                        <Button size="lg" variant="outline" className="w-full">See finance examples</Button>
+                      </a>
+                      <Button
+                        size="lg"
+                        className="flex-1 border-0 text-white"
+                        style={{ backgroundColor: accent }}
+                        onClick={() => setEnquiryOpen(true)}
+                      >
+                        Apply Now <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      Finance subject to status. T&Cs apply. We are a credit broker, not a lender.
+                    </p>
+                  </div>
+                )}
+
+                {searchTab === "service" && (
+                  <div className="space-y-4 text-center">
+                    <div
+                      className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"
+                      style={{ backgroundColor: `${accent}15` }}
+                    >
+                      <Wrench className="h-7 w-7" style={{ color: accent }} />
+                    </div>
+                    <div>
+                      <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Servicing & aftercare</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Full service, MOT, repairs and warranty work — all carried out by our trusted in-house team.
+                      </p>
+                    </div>
+                    <div className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
+                      <Button
+                        size="lg"
+                        className="flex-1 border-0 text-white"
+                        style={{ backgroundColor: accent }}
+                        onClick={() => setEnquiryOpen(true)}
+                      >
+                        Book a Service
+                      </Button>
+                      {(dealer as any)?.business_phone && (
+                        <a href={`tel:${(dealer as any).business_phone}`} className="flex-1">
+                          <Button size="lg" variant="outline" className="w-full">
+                            <Phone className="mr-2 h-4 w-4" /> Call Workshop
+                          </Button>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-              <a href="#inventory">
-                <Button
-                  size="lg"
-                  className="mt-4 w-full border-0 text-white shadow-lg transition-all hover:shadow-xl hover:brightness-110"
-                  style={{ backgroundColor: accent }}
-                >
-                  <Search className="mr-2 h-4 w-4" />
-                  Search {filteredListings.length} {filteredListings.length === 1 ? "car" : "cars"}
-                </Button>
-              </a>
             </motion.div>
           </div>
         </section>
       )}
+
 
       {/* ─── Why Choose Us — Feature Row (Carlingo-style) ─── */}
       <section className="border-b border-border bg-background py-14 md:py-20">
