@@ -28,6 +28,11 @@ import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
 import LiveMap from "@/components/LiveMap";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import JustArrivedRail from "@/components/dealer/JustArrivedRail";
+import VehicleFinderForm from "@/components/dealer/VehicleFinderForm";
+import ListingMiniActions from "@/components/dealer/ListingMiniActions";
+import FinanceCalculator from "@/components/dealer/FinanceCalculator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export interface LandingConfig {
   hero_title?: string;
@@ -108,6 +113,7 @@ const DealerLanding = () => {
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [shared, setShared] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [financeCar, setFinanceCar] = useState<{ id: string; price: number } | null>(null);
   const [newsletterSent, setNewsletterSent] = useState(false);
   const { items: recentlyViewed } = useRecentlyViewed();
 
@@ -651,6 +657,9 @@ const DealerLanding = () => {
         </section>
       )}
 
+
+      {/* ─── Just Arrived rail ─── */}
+      {dealer?.id && <JustArrivedRail dealerId={dealer.id} />}
 
       {/* ─── Why Choose Us — Feature Row (Carlingo-style) ─── */}
       <section className="border-b border-border bg-background py-14 md:py-20">
@@ -1274,7 +1283,14 @@ const DealerLanding = () => {
             <>
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {displayedListings.map((car, i) => (
-                  <CarCard key={car.id} car={car} index={i} />
+                  <div key={car.id}>
+                    <CarCard car={car} index={i} />
+                    <ListingMiniActions
+                      listingId={car.id}
+                      dealerId={dealer?.id}
+                      onFinance={() => setFinanceCar({ id: car.id, price: car.price })}
+                    />
+                  </div>
                 ))}
               </div>
               {!showAllCars && filteredListings.length > 12 && (
@@ -1320,6 +1336,15 @@ const DealerLanding = () => {
                 </Link>
               ))}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── Vehicle Finder ─── */}
+      {dealer?.id && (
+        <section className="border-t border-border bg-muted/20 py-12 md:py-16">
+          <div className="container mx-auto max-w-3xl px-4">
+            <VehicleFinderForm dealerId={dealer.id} dealerName={dealer.business_name} />
           </div>
         </section>
       )}
@@ -1660,6 +1685,21 @@ const DealerLanding = () => {
       <Footer />
       {/* Spacer for mobile sticky bar */}
       <div className="h-14 md:hidden" aria-hidden="true" />
+
+      <Dialog open={!!financeCar} onOpenChange={(o) => !o && setFinanceCar(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Finance estimator</DialogTitle></DialogHeader>
+          {financeCar && (
+            <FinanceCalculator
+              price={Number(financeCar.price) || 0}
+              defaultApr={Number(config.finance_apr) || 9.9}
+              onApply={() => {
+                window.location.href = `/car/${financeCar.id}#finance`;
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

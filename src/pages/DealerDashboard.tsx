@@ -27,6 +27,7 @@ import StockBookManager from "@/components/dealer/StockBookManager";
 import VehicleCostsManager from "@/components/dealer/VehicleCostsManager";
 import StaffManager from "@/components/dealer/StaffManager";
 import ReservationsManager from "@/components/dealer/ReservationsManager";
+import BookingsManager from "@/components/dealer/BookingsManager";
 import AdShopEditor from "@/components/dealer/AdShopEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -343,6 +344,7 @@ const DealerDashboard = () => {
               <TabsTrigger value="stock-book">Stock Book</TabsTrigger>
               <TabsTrigger value="costs">Costs & Profit</TabsTrigger>
               <TabsTrigger value="reservations">Reservations</TabsTrigger>
+              <TabsTrigger value="bookings">Bookings</TabsTrigger>
               <TabsTrigger value="staff">Staff</TabsTrigger>
               <TabsTrigger value="ad-shop">Ad Shop</TabsTrigger>
               <TabsTrigger value="pipeline">Sales Pipeline</TabsTrigger>
@@ -352,6 +354,7 @@ const DealerDashboard = () => {
             <TabsContent value="stock-book" className="mt-4"><StockBookManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="costs" className="mt-4"><VehicleCostsManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="reservations" className="mt-4"><ReservationsManager dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="bookings" className="mt-4"><BookingsManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="staff" className="mt-4"><StaffManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="ad-shop" className="mt-4">
               <AdShopEditor dealerId={dealer.id} logoUrl={(dealer as any).logo_url} businessName={dealer.business_name} />

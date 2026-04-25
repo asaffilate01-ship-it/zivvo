@@ -64,6 +64,7 @@ const CreateListing = () => {
     description: "",
     location: "",
     video_url: "",
+    vat_qualifying: false,
   });
 
   // Load existing listing for editing
@@ -96,6 +97,7 @@ const CreateListing = () => {
           description: data.description || "",
           location: data.location || "",
           video_url: (data as any).video_url || "",
+          vat_qualifying: !!(data as any).vat_qualifying,
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
@@ -272,6 +274,7 @@ const CreateListing = () => {
         logbook_url: logbookUrl,
         hpi_check_data: hpiCheckData,
         video_url: videoUrl,
+        vat_qualifying: !!form.vat_qualifying,
       };
 
       if (editId) {
@@ -480,6 +483,18 @@ const CreateListing = () => {
             <CardTitle className="text-base">Description & Media</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/30">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={form.vat_qualifying}
+                onChange={(e) => updateField("vat_qualifying", e.target.checked as any)}
+              />
+              <span className="text-sm">
+                <span className="font-medium">VAT qualifying</span>
+                <span className="block text-xs text-muted-foreground">Show "+ VAT" next to price (for VAT-registered businesses).</span>
+              </span>
+            </label>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label>Description</Label>

@@ -39,6 +39,7 @@ interface CarCardProps {
     verified?: boolean | null;
     dealer_id?: string | null;
     video_url?: string | null;
+    vat_qualifying?: boolean | null;
   };
   index?: number;
   layout?: "grid" | "list";
@@ -99,7 +100,10 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                       {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
                     </div>
                   </div>
-                  <p className="shrink-0 font-display text-lg font-bold text-primary sm:text-xl">{formatPrice(Number(car.price), config)}</p>
+                  <p className="shrink-0 font-display text-lg font-bold text-primary sm:text-xl">
+                    {formatPrice(Number(car.price), config)}
+                    {car.vat_qualifying && <span className="ml-1 text-xs font-medium text-muted-foreground">+ VAT</span>}
+                  </p>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
                   {specs.map((s, i) => (
@@ -160,7 +164,10 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
               <Heart className={`h-4 w-4 ${liked ? "fill-accent text-accent" : "text-foreground"}`} />
             </Button>
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
-              <p className="font-display text-2xl font-bold text-primary-foreground">{formatPrice(Number(car.price), config)}</p>
+              <p className="font-display text-2xl font-bold text-primary-foreground">
+                {formatPrice(Number(car.price), config)}
+                {car.vat_qualifying && <span className="ml-1 text-xs font-medium opacity-90">+ VAT</span>}
+              </p>
               <div className="flex items-center gap-1.5">
                 {(car as any).video_url && (
                   <span className="flex items-center gap-0.5 rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm">
