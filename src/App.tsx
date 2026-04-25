@@ -90,6 +90,11 @@ const App = () => (
                       <Route path="/saved" element={<SavedCars />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsOfService />} />
+                      <Route path="/gdpr" element={<GDPR />} />
+                      <Route path="/complaints" element={<ComplaintsPolicy />} />
+                      <Route path="/cookies" element={<CookiePolicy />} />
+                      <Route path="/accessibility" element={<Accessibility />} />
+                      <Route path="/modern-slavery" element={<ModernSlavery />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/help" element={<HelpCentre />} />
                       <Route path="/compare" element={<CompareCars />} />
