@@ -149,7 +149,13 @@ const DealerLanding = () => {
     if (filterFuel !== "all") result = result.filter((c) => c.fuel_type === filterFuel);
     if (filterBody !== "all") result = result.filter((c) => c.body_type === filterBody);
     if (filterMake !== "all") result = result.filter((c) => c.make === filterMake);
-    if (budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
+    if (filterModel !== "all") result = result.filter((c) => c.model === filterModel);
+    if (budgetMode === "price" && budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
+    // Approx monthly @ representative APR over 48 months — used purely for filtering
+    if (budgetMode === "monthly" && monthlyMax !== null) {
+      const approxMonthly = (price: number) => Math.round((price * 0.0245)); // ~£245/mo per £10k
+      result = result.filter((c) => approxMonthly(c.price || 0) <= monthlyMax);
+    }
     result.sort((a, b) => {
       if (sortBy === "price-low") return (a.price || 0) - (b.price || 0);
       if (sortBy === "price-high") return (b.price || 0) - (a.price || 0);
@@ -158,7 +164,7 @@ const DealerLanding = () => {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
     setFilteredListings(result);
-  }, [listings, searchQuery, sortBy, filterFuel, filterBody, filterMake, budgetMax]);
+  }, [listings, searchQuery, sortBy, filterFuel, filterBody, filterMake, filterModel, budgetMax, budgetMode, monthlyMax]);
 
   const handleShare = async () => {
     const url = window.location.href;
