@@ -388,6 +388,130 @@ const DealerLanding = () => {
         )}
       </section>
 
+      {/* ─── Quick Search Panel (Carlingo-style) ─── */}
+      {listings.length > 0 && (
+        <section className="relative -mt-4 md:-mt-12 z-10 px-4">
+          <div className="container mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="mx-auto max-w-5xl rounded-2xl border border-border bg-card p-5 shadow-2xl md:p-7"
+            >
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <h2 className={`${fontClass} text-lg font-bold text-foreground md:text-xl`}>
+                  <SearchIcon className="mr-2 inline h-5 w-5" style={{ color: accent }} />
+                  Search our stock
+                </h2>
+                <Badge variant="outline" className="hidden md:inline-flex">
+                  {listings.length} cars available
+                </Badge>
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                <Select value={filterMake} onValueChange={setFilterMake}>
+                  <SelectTrigger><SelectValue placeholder="Any Make" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Make</SelectItem>
+                    {uniqueMakes.map((m) => (
+                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={filterBody} onValueChange={setFilterBody}>
+                  <SelectTrigger><SelectValue placeholder="Any Body" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Body Type</SelectItem>
+                    {[...new Set(listings.map((c) => c.body_type).filter(Boolean))].map((b) => (
+                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={filterFuel} onValueChange={setFilterFuel}>
+                  <SelectTrigger><SelectValue placeholder="Any Fuel" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Fuel Type</SelectItem>
+                    {[...new Set(listings.map((c) => c.fuel_type).filter(Boolean))].map((f) => (
+                      <SelectItem key={f} value={f}>{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={budgetMax || "any"} onValueChange={(v) => setBudgetMax(v === "any" ? "" : v)}>
+                  <SelectTrigger><SelectValue placeholder="Max Price" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Any Price</SelectItem>
+                    {[5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000, 100000].map((p) => (
+                      <SelectItem key={p} value={String(p)}>Up to {formatPrice(p, countryCfg)}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <a href="#inventory">
+                <Button
+                  size="lg"
+                  className="mt-4 w-full border-0 text-white shadow-lg transition-all hover:shadow-xl hover:brightness-110"
+                  style={{ backgroundColor: accent }}
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Search {filteredListings.length} {filteredListings.length === 1 ? "car" : "cars"}
+                </Button>
+              </a>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── Why Choose Us — Feature Row (Carlingo-style) ─── */}
+      <section className="border-b border-border bg-background py-14 md:py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-10 text-center"
+          >
+            <h2 className={`${fontClass} text-3xl font-bold text-foreground md:text-4xl`}>
+              Our cars speak for themselves
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Every vehicle prepared with care — so you can drive away with confidence.
+            </p>
+          </motion.div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: ShieldCheck, title: "Handpicked stock", desc: `Browse ${listings.length || "our"} quality vehicles, personally selected and ready to drive.`, href: "#inventory" },
+              { icon: FileCheck, title: "Multi-point inspection", desc: "Every car undergoes a thorough mechanical and cosmetic check before sale.", href: "#inventory" },
+              { icon: HandCoins, title: "Flexible finance", desc: config.finance_apr ? `Spread the cost from ${config.finance_apr}% APR. Quick decisions.` : "Spread the cost with affordable monthly payments. Apply in minutes.", href: "#inventory" },
+              { icon: Trophy, title: config.established_year ? `Trusted since ${config.established_year}` : "90-day warranty", desc: config.established_year ? "Years of expertise serving happy customers in your area." : "Drive away with peace of mind — every car covered as standard.", href: "#about" },
+            ].map((f, i) => (
+              <motion.a
+                key={f.title}
+                href={f.href}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08 }}
+                className="group relative flex flex-col rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-transparent hover:shadow-xl"
+              >
+                <div
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
+                  style={{ backgroundColor: `${accent}15` }}
+                >
+                  <f.icon className="h-7 w-7" style={{ color: accent }} />
+                </div>
+                <h3 className={`${fontClass} mb-1.5 text-lg font-bold text-foreground`}>{f.title}</h3>
+                <p className="flex-1 text-sm text-muted-foreground">{f.desc}</p>
+                <div
+                  className="mt-4 inline-flex items-center text-sm font-semibold transition-transform group-hover:translate-x-1"
+                  style={{ color: accent }}
+                >
+                  Learn more <ArrowRight className="ml-1 h-4 w-4" />
+                </div>
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── Stats Strip ─── */}
       {config.show_stats !== false && (
         <section className="border-b border-border bg-card">
