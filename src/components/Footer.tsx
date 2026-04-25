@@ -27,8 +27,18 @@ const footerSections = [
     links: [
       { label: "Help Centre", to: "/help" },
       { label: "Contact Us", to: "/contact" },
+      { label: "Complaints", to: "/complaints" },
+      { label: "Accessibility", to: "/accessibility" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
       { label: "Privacy Policy", to: "/privacy" },
       { label: "Terms of Service", to: "/terms" },
+      { label: "Cookie Policy", to: "/cookies" },
+      { label: "GDPR & Data Rights", to: "/gdpr" },
+      { label: "Modern Slavery", to: "/modern-slavery" },
     ],
   },
 ];
