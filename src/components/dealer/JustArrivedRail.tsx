@@ -19,7 +19,7 @@ interface Item {
 }
 
 const JustArrivedRail = ({ dealerId, days = 14 }: Props) => {
-  const { country } = useCountry();
+  const { config } = useCountry();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -70,7 +70,7 @@ const JustArrivedRail = ({ dealerId, days = 14 }: Props) => {
                     {c.year}{c.mileage ? ` · ${c.mileage.toLocaleString()} mi` : ""}
                   </div>
                   <div className="font-bold text-primary">
-                    {formatPrice(c.price, country)}
+                    {formatPrice(c.price, config)}
                     {c.vat_qualifying && <span className="text-xs text-muted-foreground ml-1">+ VAT</span>}
                   </div>
                 </div>

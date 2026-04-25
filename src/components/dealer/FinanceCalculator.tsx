@@ -23,7 +23,7 @@ const calc = (principal: number, apr: number, months: number) => {
 };
 
 const FinanceCalculator = ({ price, defaultApr = 9.9, onApply, compact }: Props) => {
-  const { country } = useCountry();
+  const { config } = useCountry();
   const [deposit, setDeposit] = useState<number>(Math.round(price * 0.1));
   const [term, setTerm] = useState<number>(60);
   const [apr, setApr] = useState<number>(defaultApr);
@@ -44,18 +44,18 @@ const FinanceCalculator = ({ price, defaultApr = 9.9, onApply, compact }: Props)
         <div className="rounded-lg bg-primary/10 p-4 text-center">
           <div className="text-xs uppercase text-muted-foreground tracking-wide">Estimated monthly</div>
           <div className="text-3xl font-bold text-primary mt-1">
-            {formatPrice(Math.round(monthly), country)}
+            {formatPrice(Math.round(monthly), config)}
             <span className="text-sm font-normal text-muted-foreground">/mo</span>
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            {term} months · {apr.toFixed(1)}% APR · Total {formatPrice(Math.round(totalPayable), country)}
+            {term} months · {apr.toFixed(1)}% APR · Total {formatPrice(Math.round(totalPayable), config)}
           </div>
         </div>
 
         <div>
           <div className="flex justify-between text-sm mb-2">
             <Label>Deposit</Label>
-            <span className="text-muted-foreground">{formatPrice(deposit, country)}</span>
+            <span className="text-muted-foreground">{formatPrice(deposit, config)}</span>
           </div>
           <Slider value={[deposit]} min={0} max={Math.max(Math.round(price * 0.5), 1)} step={100}
             onValueChange={(v) => setDeposit(v[0])} />
@@ -81,7 +81,7 @@ const FinanceCalculator = ({ price, defaultApr = 9.9, onApply, compact }: Props)
         )}
 
         <p className="text-[10px] text-muted-foreground leading-relaxed">
-          Representative example. Subject to status. Total interest payable {formatPrice(Math.max(0, Math.round(totalInterest)), country)}.
+          Representative example. Subject to status. Total interest payable {formatPrice(Math.max(0, Math.round(totalInterest)), config)}.
           Finance subject to a credit check and affordability assessment.
         </p>
       </CardContent>
