@@ -826,6 +826,7 @@ export type Database = {
           title: string
           transmission: string | null
           updated_at: string
+          vat_qualifying: boolean
           verified: boolean | null
           video_url: string | null
           views_count: number | null
@@ -869,6 +870,7 @@ export type Database = {
           title: string
           transmission?: string | null
           updated_at?: string
+          vat_qualifying?: boolean
           verified?: boolean | null
           video_url?: string | null
           views_count?: number | null
@@ -912,6 +914,7 @@ export type Database = {
           title?: string
           transmission?: string | null
           updated_at?: string
+          vat_qualifying?: boolean
           verified?: boolean | null
           video_url?: string | null
           views_count?: number | null
@@ -2380,6 +2383,102 @@ export type Database = {
           },
         ]
       }
+      test_drive_bookings: {
+        Row: {
+          buyer_id: string | null
+          created_at: string
+          dealer_id: string | null
+          email: string
+          id: string
+          listing_id: string
+          message: string | null
+          name: string
+          phone: string | null
+          preferred_date: string | null
+          preferred_time: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          email: string
+          id?: string
+          listing_id: string
+          message?: string | null
+          name: string
+          phone?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          email?: string
+          id?: string
+          listing_id?: string
+          message?: string | null
+          name?: string
+          phone?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transport_quotes: {
+        Row: {
+          buyer_id: string | null
+          created_at: string
+          dealer_id: string | null
+          delivery_postcode: string
+          email: string
+          id: string
+          listing_id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          quoted_price: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          delivery_postcode: string
+          email: string
+          id?: string
+          listing_id: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          quoted_price?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string | null
+          created_at?: string
+          dealer_id?: string | null
+          delivery_postcode?: string
+          email?: string
+          id?: string
+          listing_id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          quoted_price?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -2443,6 +2542,69 @@ export type Database = {
           supplier?: string | null
           updated_at?: string
           vat_amount?: number
+        }
+        Relationships: []
+      }
+      vehicle_finder_requests: {
+        Row: {
+          body_type: string | null
+          budget_max: number | null
+          buyer_id: string | null
+          created_at: string
+          dealer_id: string
+          email: string
+          fuel_type: string | null
+          id: string
+          make: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          status: string
+          transmission: string | null
+          updated_at: string
+          year_from: number | null
+          year_to: number | null
+        }
+        Insert: {
+          body_type?: string | null
+          budget_max?: number | null
+          buyer_id?: string | null
+          created_at?: string
+          dealer_id: string
+          email: string
+          fuel_type?: string | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          transmission?: string | null
+          updated_at?: string
+          year_from?: number | null
+          year_to?: number | null
+        }
+        Update: {
+          body_type?: string | null
+          budget_max?: number | null
+          buyer_id?: string | null
+          created_at?: string
+          dealer_id?: string
+          email?: string
+          fuel_type?: string | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          status?: string
+          transmission?: string | null
+          updated_at?: string
+          year_from?: number | null
+          year_to?: number | null
         }
         Relationships: []
       }
