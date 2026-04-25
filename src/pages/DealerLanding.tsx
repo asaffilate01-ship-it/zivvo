@@ -28,6 +28,8 @@ import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
 import LiveMap from "@/components/LiveMap";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import JustArrivedRail from "@/components/dealer/JustArrivedRail";
+import VehicleFinderForm from "@/components/dealer/VehicleFinderForm";
 
 export interface LandingConfig {
   hero_title?: string;
@@ -651,6 +653,9 @@ const DealerLanding = () => {
         </section>
       )}
 
+
+      {/* ─── Just Arrived rail ─── */}
+      {dealer?.id && <JustArrivedRail dealerId={dealer.id} />}
 
       {/* ─── Why Choose Us — Feature Row (Carlingo-style) ─── */}
       <section className="border-b border-border bg-background py-14 md:py-20">
