@@ -86,7 +86,7 @@ const Navbar = () => {
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2" aria-label="Zivvo home">
-          <img src={zivvoLogo} alt="Zivvo" className="h-14 w-auto" />
+          <img src={zivvoLogo} alt="Zivvo" className="h-14 w-auto dark:invert dark:brightness-0 dark:contrast-200" />
         </Link>
 
         {/* Desktop nav links */}
@@ -221,7 +221,7 @@ const Navbar = () => {
             <SheetContent side="right" className="w-72 p-0">
               <SheetHeader className="border-b border-border p-4">
                 <SheetTitle className="flex items-center gap-2">
-                  <img src={zivvoLogo} alt="Zivvo" className="h-12 w-auto" />
+                  <img src={zivvoLogo} alt="Zivvo" className="h-12 w-auto dark:invert dark:brightness-0 dark:contrast-200" />
                 </SheetTitle>
               </SheetHeader>
 
