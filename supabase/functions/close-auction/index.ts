@@ -24,7 +24,7 @@ async function cancelPaymentIntent(paymentIntentId: string, stripeKey: string): 
 }
 
 async function releaseDeposits(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   deposits: any[],
   stripeKey: string,
   excludeUserId?: string
