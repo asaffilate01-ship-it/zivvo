@@ -46,13 +46,15 @@ Deno.serve(async (req) => {
     savedCars?.forEach((sc) => userIds.add(sc.user_id));
 
     // Check saved searches for make/model match
-    savedSearches?.forEach((ss) => {
+    (savedSearches as Array<{ user_id: string; name: string; filters: any }> | null)?.forEach((ss) => {
       try {
-        const filters = typeof ss.filters === "string" ? JSON.parse(ss.filters) : ss.filters;
-        const makeMatch = !filters.make || filters.make.toLowerCase() === listing.make.toLowerCase();
-        const modelMatch = !filters.model || filters.model.toLowerCase() === listing.model.toLowerCase();
+        const filters: any = typeof ss.filters === "string" ? JSON.parse(ss.filters) : (ss.filters ?? {});
+        const makeMatch = !filters.make || String(filters.make).toLowerCase() === String(listing.make).toLowerCase();
+        const modelMatch = !filters.model || String(filters.model).toLowerCase() === String(listing.model).toLowerCase();
         if (makeMatch && modelMatch) userIds.add(ss.user_id);
-      } catch {}
+      } catch (_e) {
+        // ignore malformed filters
+      }
     });
 
     // Create notifications for all matching users
