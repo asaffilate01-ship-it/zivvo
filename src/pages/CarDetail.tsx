@@ -30,6 +30,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import EnquiryForm from "@/components/EnquiryForm";
+import ReserveNowButton from "@/components/dealer/ReserveNowButton";
 import VehicleChecks from "@/components/VehicleChecks";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
@@ -444,6 +445,9 @@ const CarDetail = () => {
                   {showWhatsApp && <WhatsAppButton phone={dealer?.business_phone} listingTitle={car.title} />}
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
                   <MakeOfferDialog listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} askingPrice={Number(car.price)} />
+                  {car.dealer_id && (
+                    <ReserveNowButton listingId={car.id} dealerId={car.dealer_id} listingTitle={car.title} />
+                  )}
                   <Button
                     variant="outline"
                     className="w-full"

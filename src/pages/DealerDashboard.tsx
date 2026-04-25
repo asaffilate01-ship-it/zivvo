@@ -23,6 +23,12 @@ import SellerAnalytics from "@/components/SellerAnalytics";
 import SalesPipeline from "@/components/SalesPipeline";
 import PortalSyndication from "@/components/PortalSyndication";
 import ListingSyndicationStatus from "@/components/ListingSyndicationStatus";
+import StockBookManager from "@/components/dealer/StockBookManager";
+import VehicleCostsManager from "@/components/dealer/VehicleCostsManager";
+import StaffManager from "@/components/dealer/StaffManager";
+import ReservationsManager from "@/components/dealer/ReservationsManager";
+import AdShopEditor from "@/components/dealer/AdShopEditor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -329,21 +335,31 @@ const DealerDashboard = () => {
           ))}
         </div>
 
-        {/* Sales Pipeline */}
+        {/* DMS Tools */}
         <div className="mt-8">
-          <h2 className="font-display text-lg font-bold text-foreground mb-4">Sales Pipeline</h2>
-          <SalesPipeline mode="dealer" dealerId={dealer.id} />
-        </div>
-
-        {/* Portal Syndication */}
-        <div className="mt-8">
-          <PortalSyndication dealerId={dealer.id} />
-        </div>
-
-        {/* Analytics Section */}
-        <div className="mt-8">
-          <h2 className="font-display text-lg font-bold text-foreground mb-4">Analytics & Insights</h2>
-          <SellerAnalytics />
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">Dealer Management Tools</h2>
+          <Tabs defaultValue="stock-book">
+            <TabsList className="flex w-full flex-wrap justify-start gap-1 h-auto">
+              <TabsTrigger value="stock-book">Stock Book</TabsTrigger>
+              <TabsTrigger value="costs">Costs & Profit</TabsTrigger>
+              <TabsTrigger value="reservations">Reservations</TabsTrigger>
+              <TabsTrigger value="staff">Staff</TabsTrigger>
+              <TabsTrigger value="ad-shop">Ad Shop</TabsTrigger>
+              <TabsTrigger value="pipeline">Sales Pipeline</TabsTrigger>
+              <TabsTrigger value="syndication">Syndication</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            </TabsList>
+            <TabsContent value="stock-book" className="mt-4"><StockBookManager dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="costs" className="mt-4"><VehicleCostsManager dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="reservations" className="mt-4"><ReservationsManager dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="staff" className="mt-4"><StaffManager dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="ad-shop" className="mt-4">
+              <AdShopEditor dealerId={dealer.id} logoUrl={(dealer as any).logo_url} businessName={dealer.business_name} />
+            </TabsContent>
+            <TabsContent value="pipeline" className="mt-4"><SalesPipeline mode="dealer" dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="syndication" className="mt-4"><PortalSyndication dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="analytics" className="mt-4"><SellerAnalytics /></TabsContent>
+          </Tabs>
         </div>
 
         {/* Recent Listings */}
