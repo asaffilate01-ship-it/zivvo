@@ -113,6 +113,7 @@ const DealerLanding = () => {
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [shared, setShared] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [financeCar, setFinanceCar] = useState<{ id: string; price: number } | null>(null);
   const [newsletterSent, setNewsletterSent] = useState(false);
   const { items: recentlyViewed } = useRecentlyViewed();
 
