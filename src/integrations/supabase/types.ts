@@ -799,6 +799,7 @@ export type Database = {
           doors: number | null
           engine_size: string | null
           enquiries_count: number | null
+          external_ref: string | null
           features: string[] | null
           finance_check_clear: boolean | null
           fuel_type: string | null
@@ -821,6 +822,8 @@ export type Database = {
           registration: string | null
           search_vector: unknown
           seller_id: string
+          source: string
+          source_synced_at: string | null
           specs: Json | null
           status: Database["public"]["Enums"]["listing_status"] | null
           title: string
@@ -843,6 +846,7 @@ export type Database = {
           doors?: number | null
           engine_size?: string | null
           enquiries_count?: number | null
+          external_ref?: string | null
           features?: string[] | null
           finance_check_clear?: boolean | null
           fuel_type?: string | null
@@ -865,6 +869,8 @@ export type Database = {
           registration?: string | null
           search_vector?: unknown
           seller_id: string
+          source?: string
+          source_synced_at?: string | null
           specs?: Json | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title: string
@@ -887,6 +893,7 @@ export type Database = {
           doors?: number | null
           engine_size?: string | null
           enquiries_count?: number | null
+          external_ref?: string | null
           features?: string[] | null
           finance_check_clear?: boolean | null
           fuel_type?: string | null
@@ -909,6 +916,8 @@ export type Database = {
           registration?: string | null
           search_vector?: unknown
           seller_id?: string
+          source?: string
+          source_synced_at?: string | null
           specs?: Json | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title?: string
@@ -958,6 +967,96 @@ export type Database = {
           name?: string
           status?: string
           subject?: string
+        }
+        Relationships: []
+      }
+      dealer_ingest_keys: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          id: string
+          is_active: boolean
+          key_hash: string
+          key_prefix: string
+          label: string | null
+          last_used_at: string | null
+          revoked_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          id?: string
+          is_active?: boolean
+          key_hash: string
+          key_prefix: string
+          label?: string | null
+          last_used_at?: string | null
+          revoked_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          is_active?: boolean
+          key_hash?: string
+          key_prefix?: string
+          label?: string | null
+          last_used_at?: string | null
+          revoked_at?: string | null
+        }
+        Relationships: []
+      }
+      dealer_integrations: {
+        Row: {
+          api_key: string | null
+          api_secret: string | null
+          config: Json
+          created_at: string
+          dealer_id: string
+          id: string
+          is_enabled: boolean
+          last_sync_at: string | null
+          last_sync_error: string | null
+          last_sync_status: string | null
+          provider: string
+          sync_pull: boolean
+          sync_push: boolean
+          updated_at: string
+          vehicles_imported: number
+        }
+        Insert: {
+          api_key?: string | null
+          api_secret?: string | null
+          config?: Json
+          created_at?: string
+          dealer_id: string
+          id?: string
+          is_enabled?: boolean
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          provider: string
+          sync_pull?: boolean
+          sync_push?: boolean
+          updated_at?: string
+          vehicles_imported?: number
+        }
+        Update: {
+          api_key?: string | null
+          api_secret?: string | null
+          config?: Json
+          created_at?: string
+          dealer_id?: string
+          id?: string
+          is_enabled?: boolean
+          last_sync_at?: string | null
+          last_sync_error?: string | null
+          last_sync_status?: string | null
+          provider?: string
+          sync_pull?: boolean
+          sync_push?: boolean
+          updated_at?: string
+          vehicles_imported?: number
         }
         Relationships: []
       }
@@ -1352,6 +1451,51 @@ export type Database = {
           seller_id?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      dms_sync_logs: {
+        Row: {
+          created_at: string
+          dealer_id: string
+          details: Json | null
+          direction: string
+          error_message: string | null
+          id: string
+          items_created: number
+          items_failed: number
+          items_processed: number
+          items_updated: number
+          provider: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          dealer_id: string
+          details?: Json | null
+          direction: string
+          error_message?: string | null
+          id?: string
+          items_created?: number
+          items_failed?: number
+          items_processed?: number
+          items_updated?: number
+          provider: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          dealer_id?: string
+          details?: Json | null
+          direction?: string
+          error_message?: string | null
+          id?: string
+          items_created?: number
+          items_failed?: number
+          items_processed?: number
+          items_updated?: number
+          provider?: string
+          status?: string
         }
         Relationships: []
       }
