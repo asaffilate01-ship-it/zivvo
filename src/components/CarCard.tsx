@@ -156,10 +156,15 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
           <div className="relative aspect-[16/10] overflow-hidden">
             <img src={mainImage} alt={car.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
-            <div className="absolute left-3 top-3 flex gap-1.5">
+            <div className="absolute left-3 top-3 flex gap-1.5 flex-wrap">
               {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-xs font-semibold">🔥 Promoted</Badge>}
               {car.is_featured && <Badge className="gradient-primary border-0 text-xs font-semibold text-primary-foreground">Featured</Badge>}
               {car.verified && <Badge variant="secondary" className="bg-background/90 text-xs backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" />Verified</Badge>}
+              {car.source && car.source !== "manual" && (
+                <Badge variant="outline" className="bg-background/90 text-[10px] backdrop-blur-sm capitalize" title={`Synced from ${car.source}`}>
+                  ⇄ {car.source.replace("_", " ")}
+                </Badge>
+              )}
             </div>
             <Button variant="ghost" size="icon" className="absolute right-3 top-3 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background" onClick={handleLike}>
               <Heart className={`h-4 w-4 ${liked ? "fill-accent text-accent" : "text-foreground"}`} />
