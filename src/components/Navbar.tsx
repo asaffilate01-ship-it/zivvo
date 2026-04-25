@@ -44,6 +44,7 @@ const Navbar = () => {
 
   const navLinks = [
     { to: "/browse", label: "Browse" },
+    { to: "/browse?body=Van", label: "Vans" },
     { to: "/trade-stock", label: "Trade Stock" },
     { to: "/sell-my-car", label: "Sell" },
     { to: "/dealers", label: "Dealers" },
@@ -69,6 +70,7 @@ const Navbar = () => {
 
   const mobileLinks = [
     { to: "/browse", label: "Browse Cars", icon: Car },
+    { to: "/browse?body=Van", label: "Vans", icon: Car },
     { to: "/sell-my-car", label: "Sell Your Car", icon: Plus },
     { to: "/reviews", label: "Car Reviews", icon: BookOpen },
     { to: "/dealers", label: "For Dealers", icon: Building2 },
