@@ -45,6 +45,32 @@ serve(async (req) => {
 
     console.log(`✅ Notification created for seller ${enquiry.seller_id} - enquiry ${enquiryId}`);
 
+    // Forward enquiry to dealer's connected DMS (e.g. VirtualYard) — best effort, non-blocking
+    try {
+      const { data: dealer } = await supabase
+        .from("dealers")
+        .select("id")
+        .eq("owner_id", enquiry.seller_id)
+        .maybeSingle();
+      if (dealer?.id) {
+        const { data: integration } = await supabase
+          .from("dealer_integrations")
+          .select("provider, status")
+          .eq("dealer_id", dealer.id)
+          .eq("provider", "virtualyard")
+          .eq("status", "active")
+          .maybeSingle();
+        if (integration) {
+          await supabase.functions.invoke("virtualyard-push", {
+            body: { dealerId: dealer.id, type: "enquiry", enquiryId },
+          });
+          console.log(`📤 Forwarded enquiry ${enquiryId} → VirtualYard for dealer ${dealer.id}`);
+        }
+      }
+    } catch (pushErr) {
+      console.error("[NOTIFY-ENQUIRY] DMS push failed:", pushErr);
+    }
+
     return new Response(JSON.stringify({ success: true, listing: listingTitle }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
