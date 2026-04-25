@@ -455,6 +455,17 @@ const CarDetail = () => {
                   {car.dealer_id && (
                     <ReserveNowButton listingId={car.id} dealerId={car.dealer_id} listingTitle={car.title} />
                   )}
+                  <TestDriveDialog
+                    listingId={car.id}
+                    dealerId={car.dealer_id}
+                    vehicleLabel={car.title}
+                    trigger={<Button variant="outline" className="w-full">Book a test drive</Button>}
+                  />
+                  <TransportQuoteDialog
+                    listingId={car.id}
+                    dealerId={car.dealer_id}
+                    trigger={<Button variant="outline" className="w-full">Get delivery quote</Button>}
+                  />
                   <Button
                     variant="outline"
                     className="w-full"
