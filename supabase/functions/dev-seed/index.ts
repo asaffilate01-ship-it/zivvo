@@ -7,11 +7,11 @@ const corsHeaders = {
 };
 
 const TEST_USERS = [
-  { email: "buyer@autosouq.test", password: "Test1234!", full_name: "Test Buyer", roles: ["buyer"] },
-  { email: "seller@autosouq.test", password: "Test1234!", full_name: "Test Seller", roles: ["buyer", "seller"] },
-  { email: "dealer@autosouq.test", password: "Test1234!", full_name: "Test Dealer", roles: ["buyer", "seller", "dealer"] },
-  { email: "agent@autosouq.test", password: "Test1234!", full_name: "Test Agent", roles: ["buyer", "agent"] },
-  { email: "admin@autosouq.test", password: "Test1234!", full_name: "Test Admin", roles: ["buyer", "admin"] },
+  { email: "buyer@zivvo.test", password: "Test1234!", full_name: "Test Buyer", roles: ["buyer"] },
+  { email: "seller@zivvo.test", password: "Test1234!", full_name: "Test Seller", roles: ["buyer", "seller"] },
+  { email: "dealer@zivvo.test", password: "Test1234!", full_name: "Test Dealer", roles: ["buyer", "seller", "dealer"] },
+  { email: "agent@zivvo.test", password: "Test1234!", full_name: "Test Agent", roles: ["buyer", "agent"] },
+  { email: "admin@zivvo.test", password: "Test1234!", full_name: "Test Admin", roles: ["buyer", "admin"] },
 ];
 
 const SAMPLE_LISTINGS = [
@@ -82,8 +82,8 @@ serve(async (req) => {
       if (user.roles.includes("dealer") && created.user) {
         await admin.from("dealers").insert({
           user_id: created.user.id,
-          business_name: "AutoSouq Motors",
-          slug: "autosouq-motors",
+          business_name: "Zivvo Motors",
+          slug: "zivvo-motors",
           tier: "professional",
           subscription_status: "active",
           max_listings: 50,
@@ -99,8 +99,8 @@ serve(async (req) => {
     }
 
     // Seed listings
-    const sellerId = userIds["seller@autosouq.test"];
-    const dealerEmail = "dealer@autosouq.test";
+    const sellerId = userIds["seller@zivvo.test"];
+    const dealerEmail = "dealer@zivvo.test";
     const dealerId = userIds[dealerEmail];
 
     let listingsCreated = 0;

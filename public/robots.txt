@@ -27,4 +27,4 @@ Disallow: /admin
 Disallow: /dealer-dashboard
 Disallow: /agent-dashboard
 
-Sitemap: https://autosouq.app/sitemap.xml
+Sitemap: https://zivvo.co.uk/sitemap.xml

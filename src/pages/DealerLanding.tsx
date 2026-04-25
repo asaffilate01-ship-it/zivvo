@@ -174,7 +174,7 @@ const DealerLanding = () => {
 
   const handleShare = async () => {
     const url = window.location.href;
-    const title = `${dealer?.business_name || "Dealer"} on AutoSouq`;
+    const title = `${dealer?.business_name || "Dealer"} on Zivvo`;
     if (navigator.share) {
       try {
         await navigator.share({ title, url });
@@ -250,8 +250,8 @@ const DealerLanding = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${dealer.business_name} — AutoSouq Dealer`}
-        description={config.about_text || `Browse vehicles from ${dealer.business_name} on AutoSouq.`}
+        title={`${dealer.business_name} — Zivvo Dealer`}
+        description={config.about_text || `Browse vehicles from ${dealer.business_name} on Zivvo.`}
       />
       <Navbar />
 

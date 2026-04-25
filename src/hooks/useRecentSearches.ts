@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 
-const KEY = "autosouq_recent_searches";
+const KEY = "zivvo_recent_searches";
 const MAX = 6;
 
 export interface RecentSearch {

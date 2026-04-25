@@ -24,14 +24,14 @@ function getSystemTheme(): "light" | "dark" {
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === "undefined") return "system";
-    return (localStorage.getItem("autosouq-theme") as Theme) || "system";
+    return (localStorage.getItem("zivvo-theme") as Theme) || "system";
   });
 
   const resolved = theme === "system" ? getSystemTheme() : theme;
 
   const setTheme = (t: Theme) => {
     setThemeState(t);
-    localStorage.setItem("autosouq-theme", t);
+    localStorage.setItem("zivvo-theme", t);
   };
 
   useEffect(() => {

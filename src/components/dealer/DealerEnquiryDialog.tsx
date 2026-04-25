@@ -33,7 +33,7 @@ const DealerEnquiryDialog = ({ open, onOpenChange, dealerName, dealerEmail, acce
     }
     setLoading(true);
     // Open user's mail client as a reliable fallback (no public dealer contact endpoint exists)
-    const subject = encodeURIComponent(`Enquiry from ${name} via AutoSouq`);
+    const subject = encodeURIComponent(`Enquiry from ${name} via Zivvo`);
     const body = encodeURIComponent(
       `Name: ${name}\nEmail: ${email}\nPhone: ${phone || "—"}\n\n${message}`
     );

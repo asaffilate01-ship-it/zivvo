@@ -88,7 +88,7 @@ const Navbar = () => {
           <div className="gradient-primary flex h-8 w-8 items-center justify-center rounded-lg">
             <Car className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="font-display text-lg font-bold tracking-tight text-foreground">AutoSouq</span>
+          <span className="font-display text-lg font-bold tracking-tight text-foreground">Zivvo</span>
         </Link>
 
         {/* Desktop nav links */}
@@ -226,7 +226,7 @@ const Navbar = () => {
                   <div className="gradient-primary flex h-7 w-7 items-center justify-center rounded-lg">
                     <Car className="h-3.5 w-3.5 text-primary-foreground" />
                   </div>
-                  AutoSouq
+                  Zivvo
                 </SheetTitle>
               </SheetHeader>
 

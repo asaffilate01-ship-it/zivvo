@@ -7,7 +7,7 @@ export interface UserLocation {
   accuracy?: number;
 }
 
-const STORAGE_KEY = "autosouq:user-location";
+const STORAGE_KEY = "zivvo:user-location";
 const STORAGE_TTL_MS = 30 * 60 * 1000; // 30 min
 
 const readCache = (): UserLocation | null => {

@@ -44,7 +44,7 @@ const Footer = () => {
               <div className="gradient-primary flex h-9 w-9 items-center justify-center rounded-xl">
                 <Car className="h-4.5 w-4.5 text-primary-foreground" />
               </div>
-              <span className="font-display text-xl font-bold text-foreground">AutoSouq</span>
+              <span className="font-display text-xl font-bold text-foreground">Zivvo</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               The trusted marketplace for buying and selling vehicles. Verified listings, transparent history, and secure transactions.
@@ -79,7 +79,7 @@ const Footer = () => {
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
           <div className="flex items-center gap-4">
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} AutoSouq. All rights reserved.
+              © {new Date().getFullYear()} Zivvo. All rights reserved.
             </p>
           </div>
           

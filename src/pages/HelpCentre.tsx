@@ -43,13 +43,13 @@ const faqs = [
   },
   {
     q: "What is the agent programme?",
-    a: "Agents can onboard new dealers to AutoSouq and earn 30% recurring commission on their subscription payments. Contact us to apply for the agent programme.",
+    a: "Agents can onboard new dealers to Zivvo and earn 30% recurring commission on their subscription payments. Contact us to apply for the agent programme.",
   },
 ];
 
 const HelpCentre = () => (
   <div className="min-h-screen bg-background">
-    <SEOHead title="Help Centre — AutoSouq" description="Find answers to common questions about buying, selling, and dealer subscriptions on AutoSouq." />
+    <SEOHead title="Help Centre — Zivvo" description="Find answers to common questions about buying, selling, and dealer subscriptions on Zivvo." />
     <Navbar />
     <div className="container mx-auto max-w-3xl px-4 py-12">
       <div className="text-center">
