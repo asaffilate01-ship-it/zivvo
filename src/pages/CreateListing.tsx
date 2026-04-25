@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle, Sparkles } from "lucide-react";
 import ImageReorder from "@/components/ImageReorder";
+import VrmAutofill from "@/components/VrmAutofill";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -460,6 +461,28 @@ const CreateListing = () => {
             <CardTitle className="text-base">Identification & Location</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {country === "GB" && (
+              <VrmAutofill
+                value={form.registration}
+                onChange={(reg) => updateField("registration", reg)}
+                onAutofill={(d) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    registration: d.registration || prev.registration,
+                    make: d.make || prev.make,
+                    year: d.year_of_manufacture || prev.year,
+                    color: d.colour ? d.colour.charAt(0) + d.colour.slice(1).toLowerCase() : prev.color,
+                    fuel_type:
+                      d.fuel_type === "PETROL" ? "Petrol" :
+                      d.fuel_type === "DIESEL" ? "Diesel" :
+                      d.fuel_type === "ELECTRICITY" ? "Electric" :
+                      d.fuel_type === "HYBRID ELECTRIC" ? "Hybrid" :
+                      d.fuel_type ? d.fuel_type.charAt(0) + d.fuel_type.slice(1).toLowerCase() : prev.fuel_type,
+                    engine_size: d.engine_capacity || prev.engine_size,
+                  }));
+                }}
+              />
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>{config.terminology.registration}</Label>
