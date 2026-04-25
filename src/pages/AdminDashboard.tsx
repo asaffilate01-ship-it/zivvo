@@ -32,6 +32,7 @@ import { motion } from "framer-motion";
 import DashboardChart from "@/components/DashboardChart";
 import SalesPipeline from "@/components/SalesPipeline";
 import AdminInspectionPanel from "@/components/AdminInspectionPanel";
+import AdminDmsHealthPanel from "@/components/AdminDmsHealthPanel";
 
 
 
@@ -325,6 +326,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="contacts">Messages</TabsTrigger>
             <TabsTrigger value="bugs">Bugs</TabsTrigger>
             <TabsTrigger value="finance">Finance</TabsTrigger>
+            <TabsTrigger value="dms" className="gap-1"><Package className="h-3 w-3" /> DMS Health</TabsTrigger>
           </TabsList>
 
           {/* Dealers Tab */}
@@ -1046,6 +1048,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* DMS Health Tab */}
+          <TabsContent value="dms" className="mt-4">
+            <AdminDmsHealthPanel />
           </TabsContent>
         </Tabs>
 

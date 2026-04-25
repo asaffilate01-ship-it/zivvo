@@ -60,6 +60,7 @@ const ComplaintsPolicy = lazy(() => import("./pages/ComplaintsPolicy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Accessibility = lazy(() => import("./pages/Accessibility"));
 const ModernSlavery = lazy(() => import("./pages/ModernSlavery"));
+const DealerIntegrations = lazy(() => import("./pages/DealerIntegrations"));
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ const App = () => (
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/reset-password" element={<ResetPassword />} />
                       <Route path="/dealers" element={<DealerPricing />} />
+                      <Route path="/dealers/integrations" element={<DealerIntegrations />} />
                       <Route path="/dealer/:slug" element={<DealerLanding />} />
                       <Route path="/saved" element={<SavedCars />} />
                       <Route path="/privacy" element={<PrivacyPolicy />} />
