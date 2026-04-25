@@ -1329,6 +1329,15 @@ const DealerLanding = () => {
         </section>
       )}
 
+      {/* ─── Vehicle Finder ─── */}
+      {dealer?.id && (
+        <section className="border-t border-border bg-muted/20 py-12 md:py-16">
+          <div className="container mx-auto max-w-3xl px-4">
+            <VehicleFinderForm dealerId={dealer.id} dealerName={dealer.business_name} />
+          </div>
+        </section>
+      )}
+
       {/* ─── Part-Exchange / Trade-In CTA ─── */}
       <section className="border-t border-border py-12">
         <div className="container mx-auto px-4">
