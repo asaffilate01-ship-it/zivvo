@@ -99,7 +99,11 @@ const DealerLanding = () => {
   const [filterFuel, setFilterFuel] = useState("all");
   const [filterBody, setFilterBody] = useState("all");
   const [filterMake, setFilterMake] = useState("all");
+  const [filterModel, setFilterModel] = useState("all");
   const [budgetMax, setBudgetMax] = useState<number | null>(null);
+  const [budgetMode, setBudgetMode] = useState<"price" | "monthly">("price");
+  const [monthlyMax, setMonthlyMax] = useState<number | null>(null);
+  const [searchTab, setSearchTab] = useState<"buy" | "sell" | "finance" | "service">("buy");
   const [showAllCars, setShowAllCars] = useState(false);
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [shared, setShared] = useState(false);
