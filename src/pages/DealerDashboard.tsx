@@ -29,6 +29,7 @@ import StaffManager from "@/components/dealer/StaffManager";
 import ReservationsManager from "@/components/dealer/ReservationsManager";
 import BookingsManager from "@/components/dealer/BookingsManager";
 import AdShopEditor from "@/components/dealer/AdShopEditor";
+import DmsConnectionsManager from "@/components/dealer/DmsConnectionsManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -349,6 +350,7 @@ const DealerDashboard = () => {
               <TabsTrigger value="ad-shop">Ad Shop</TabsTrigger>
               <TabsTrigger value="pipeline">Sales Pipeline</TabsTrigger>
               <TabsTrigger value="syndication">Syndication</TabsTrigger>
+              <TabsTrigger value="integrations">Integrations</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
             <TabsContent value="stock-book" className="mt-4"><StockBookManager dealerId={dealer.id} /></TabsContent>
@@ -361,6 +363,7 @@ const DealerDashboard = () => {
             </TabsContent>
             <TabsContent value="pipeline" className="mt-4"><SalesPipeline mode="dealer" dealerId={dealer.id} /></TabsContent>
             <TabsContent value="syndication" className="mt-4"><PortalSyndication dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="integrations" className="mt-4"><DmsConnectionsManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="analytics" className="mt-4"><SellerAnalytics /></TabsContent>
           </Tabs>
         </div>
