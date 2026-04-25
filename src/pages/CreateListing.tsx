@@ -64,6 +64,7 @@ const CreateListing = () => {
     description: "",
     location: "",
     video_url: "",
+    vat_qualifying: false,
   });
 
   // Load existing listing for editing
@@ -272,6 +273,7 @@ const CreateListing = () => {
         logbook_url: logbookUrl,
         hpi_check_data: hpiCheckData,
         video_url: videoUrl,
+        vat_qualifying: !!form.vat_qualifying,
       };
 
       if (editId) {
