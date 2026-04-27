@@ -72,12 +72,14 @@ const HeroSearch = () => {
         : priceMax ? Number(priceMax) : undefined;
       if (effectiveMin) q = q.gte("price", effectiveMin);
       if (effectiveMax) q = q.lte("price", effectiveMax);
+      if (sellerType === "Dealer") q = q.not("dealer_id", "is", null);
+      else if (sellerType === "Private") q = q.is("dealer_id", null);
       const { count } = await q;
       setResultCount(count ?? 0);
       setCounting(false);
     }, 350);
     return () => clearTimeout(t);
-  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType]);
+  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType, sellerType]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
