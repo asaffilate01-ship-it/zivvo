@@ -56,6 +56,11 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
   const liked = isSaved(car.id);
   const mainImage = car.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80";
 
+  // Show price drop badge if the listing dropped within the last 14 days
+  const priceDroppedRecently = car.price_dropped_at
+    ? (Date.now() - new Date(car.price_dropped_at).getTime()) < 14 * 24 * 60 * 60 * 1000
+    : false;
+
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!user) {
