@@ -64,7 +64,7 @@ export const useAnalytics = () => {
 
     supabase.auth.getUser().then(({ data }) => {
       const user_id = data.user?.id ?? null;
-      void supabase.from("page_views").insert({
+      void (supabase.from("page_views") as any).insert({
         path: path.slice(0, 500),
         referrer: referrer?.slice(0, 500) ?? null,
         user_id,
@@ -88,7 +88,7 @@ export const trackEvent = async (
   try {
     const session_id = getSessionId();
     const { data } = await supabase.auth.getUser();
-    await supabase.from("analytics_events").insert({
+    await (supabase.from("analytics_events") as any).insert({
       event_name: event_name.slice(0, 100),
       user_id: data.user?.id ?? null,
       session_id,
