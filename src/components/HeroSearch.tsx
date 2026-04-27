@@ -14,7 +14,7 @@ import heroImage from "@/assets/hero-cars.jpg";
 
 const PRICE_STEPS = [500, 1000, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000, 50000, 75000, 100000];
 const MONTHLY_STEPS = [100, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1500];
-const DISTANCE_STEPS = [5, 10, 25, 50, 100, 200];
+const DISTANCE_STEPS = [1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300];
 
 // Carlingo-style approximation: ~£245/mo per £10k full-price → priceMax = monthlyMax / 0.0245
 const monthlyToPrice = (m: number) => Math.round(m / 0.0245);
