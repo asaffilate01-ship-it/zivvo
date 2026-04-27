@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video, Truck, Wallet } from "lucide-react";
+import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video, Truck, Wallet, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -42,6 +42,7 @@ interface CarCardProps {
     vat_qualifying?: boolean | null;
     source?: string | null;
     _distance_km?: number | null;
+    price_dropped_at?: string | null;
   };
   index?: number;
   layout?: "grid" | "list";
