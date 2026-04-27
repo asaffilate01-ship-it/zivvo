@@ -215,7 +215,7 @@ const Browse = () => {
       const ascending = sortBy === "price_asc" || sortBy === "mileage_asc";
       query = query.order("is_promoted", { ascending: false, nullsFirst: false }).order(orderCol, { ascending });
 
-      const distanceActive = !!(distance && distance !== "any" && originCoords);
+      const distanceActive = !!(distance && distance !== "any" && distance !== "nationwide" && originCoords);
       const radiusKm = distanceActive
         ? (config.distanceUnit === "miles" ? Number(distance) * 1.60934 : Number(distance))
         : null;
