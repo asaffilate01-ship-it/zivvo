@@ -523,6 +523,34 @@ const Browse = () => {
 
               {/* Location & Seller Section */}
               <FilterSection title="Location & Seller" sectionKey="location">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{config.terminology.postcode}</label>
+                  <Input
+                    placeholder={`e.g. ${country === "uk" ? "SW1A 1AA" : country === "us" ? "10001" : "12345"}`}
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value)}
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Distance</label>
+                  <Select value={distance || undefined} onValueChange={(v) => setDistance(v === "any" ? "" : v)}>
+                    <SelectTrigger className="h-9 text-sm" disabled={!postcode}>
+                      <SelectValue placeholder={postcode ? "Any distance" : "Enter postcode first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any distance</SelectItem>
+                      {[5, 10, 25, 50, 100, 200].map((d) => (
+                        <SelectItem key={d} value={String(d)}>Within {d} {config.distanceUnit}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {postcode && distance && distance !== "any" && (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {geocoding ? "Locating postcode…" : geocodeError ? <span className="text-destructive">{geocodeError}</span> : originCoords ? `📍 Centred on ${postcode.toUpperCase()}` : ""}
+                    </p>
+                  )}
+                </div>
                 <FilterSelect label="City / Area" value={selectedCity} onChange={setSelectedCity} placeholder="Any Location" options={cities} />
                 <FilterSelect label="Seller Type" value={sellerType} onChange={setSellerType} placeholder="Any Seller" options={sellerTypes} />
               </FilterSection>
