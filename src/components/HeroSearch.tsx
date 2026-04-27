@@ -33,6 +33,7 @@ const HeroSearch = () => {
   const [priceMin, setPriceMin] = useState<string>("");
   const [priceMax, setPriceMax] = useState<string>("");
   const [monthlyMax, setMonthlyMax] = useState<string>("");
+  const [sellerType, setSellerType] = useState<string>("");
 
   const [models, setModels] = useState<string[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
@@ -71,12 +72,14 @@ const HeroSearch = () => {
         : priceMax ? Number(priceMax) : undefined;
       if (effectiveMin) q = q.gte("price", effectiveMin);
       if (effectiveMax) q = q.lte("price", effectiveMax);
+      if (sellerType === "Dealer") q = q.not("dealer_id", "is", null);
+      else if (sellerType === "Private") q = q.is("dealer_id", null);
       const { count } = await q;
       setResultCount(count ?? 0);
       setCounting(false);
     }, 350);
     return () => clearTimeout(t);
-  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType]);
+  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType, sellerType]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +97,7 @@ const HeroSearch = () => {
     }
     if (postcode) params.set("postcode", postcode.trim());
     if (distance) params.set("distance", distance);
+    if (sellerType) params.set("seller", sellerType);
 
     const labelParts: string[] = [];
     if (make) labelParts.push(make);
@@ -228,6 +232,16 @@ const HeroSearch = () => {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Seller type */}
+                  <Select value={sellerType || undefined} onValueChange={(v) => setSellerType(v === "any" ? "" : v)}>
+                    <SelectTrigger className="h-11"><SelectValue placeholder="Any seller" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any seller</SelectItem>
+                      <SelectItem value="Private">Private seller</SelectItem>
+                      <SelectItem value="Dealer">Dealer</SelectItem>
+                    </SelectContent>
+                  </Select>
 
                   {/* Budget mode toggle */}
                   <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-1">
