@@ -33,6 +33,7 @@ import DashboardChart from "@/components/DashboardChart";
 import SalesPipeline from "@/components/SalesPipeline";
 import AdminInspectionPanel from "@/components/AdminInspectionPanel";
 import AdminDmsHealthPanel from "@/components/AdminDmsHealthPanel";
+import AdminAnalyticsPanel from "@/components/AdminAnalyticsPanel";
 
 
 
@@ -327,6 +328,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="bugs">Bugs</TabsTrigger>
             <TabsTrigger value="finance">Finance</TabsTrigger>
             <TabsTrigger value="dms" className="gap-1"><Package className="h-3 w-3" /> DMS Health</TabsTrigger>
+            <TabsTrigger value="analytics" className="gap-1"><BarChart3 className="h-3 w-3" /> Analytics</TabsTrigger>
           </TabsList>
 
           {/* Dealers Tab */}
