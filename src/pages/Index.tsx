@@ -15,6 +15,7 @@ import WhyBuyFromUs from "@/components/WhyBuyFromUs";
 import HowItWorks from "@/components/HowItWorks";
 import TrustBrandStrip from "@/components/TrustBrandStrip";
 import HomeServicesRow from "@/components/HomeServicesRow";
+import RealReviewsSection from "@/components/RealReviewsSection";
 import HistoryCheckPromo from "@/components/HistoryCheckPromo";
 import SEOLinkBlock from "@/components/SEOLinkBlock";
 import AIChatWidget from "@/components/AIChatWidget";
@@ -25,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
-  ArrowRight, Shield, Search, FileCheck, Car, Truck, Zap, Globe, Star, Quote,
+  ArrowRight, Shield, Search, FileCheck, Car, Truck, Zap, Globe, Star,
   CheckCircle, Users, TrendingUp, Mail, Calculator,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -34,10 +35,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
-import testimonialSarah from "@/assets/testimonial-sarah.jpg";
-import testimonialJames from "@/assets/testimonial-james.jpg";
-import testimonialEmma from "@/assets/testimonial-emma.jpg";
-import testimonialDavid from "@/assets/testimonial-david.jpg";
 import trustImage from "@/assets/trust-verify.jpg";
 import blogChecklist from "@/assets/blog-buying-checklist.jpg";
 import blogEvHybrid from "@/assets/blog-ev-hybrid.jpg";
@@ -52,13 +49,6 @@ const getCategories = (bodyTypes: string[]) => {
     { icon: Globe, label: "Hybrid", count: "—" },
   ];
 };
-
-const testimonials = [
-  { name: "Sarah K.", location: "London", rating: 5, avatar: testimonialSarah, text: "Sold my BMW in 3 days. The verified badge made buyers trust my listing instantly." },
-  { name: "James T.", location: "Manchester", rating: 5, avatar: testimonialJames, text: "The finance check feature saved me from buying a car with outstanding debt." },
-  { name: "Emma W.", location: "Birmingham", rating: 5, avatar: testimonialEmma, text: "As a dealer, Zivvo brings us qualified leads every day. Brilliant platform." },
-  { name: "David R.", location: "Edinburgh", rating: 5, avatar: testimonialDavid, text: "Found my dream Porsche through Zivvo. Transparent, verified and hassle-free." },
-];
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -292,48 +282,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="container mx-auto px-4 py-20">
-        <motion.div {...fadeUp} className="text-center">
-          <Badge variant="outline" className="mb-4 text-xs">Testimonials</Badge>
-          <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">What Our Users Say</h2>
-          <p className="mx-auto mt-2 max-w-md text-muted-foreground">Trusted by thousands of buyers, sellers, and dealers worldwide</p>
-        </motion.div>
+      {/* Founding members — honest pre-launch CTA in place of fake testimonials */}
+      <RealReviewsSection />
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              viewport={{ once: true }}
-              className="group rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-card"
-            >
-              <div className="flex items-center gap-1">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} className="h-3.5 w-3.5 fill-warning text-warning" />
-                ))}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
-              <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
-                <img
-                  src={t.avatar}
-                  alt={`${t.name} from ${t.location}`}
-                  loading="lazy"
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-card-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.location}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
 
       {/* Recently Viewed */}
       <RecentlyViewedCarousel />
@@ -425,7 +376,7 @@ const Index = () => {
               Ready to Find Your Next Car?
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-primary-foreground/60">
-              Join thousands of buyers and sellers. Individual listings are free — dealer subscriptions start from {formatPrice(config.dealerPlans[0].price, config)}/mo.
+              Be among the first sellers and dealers on Zivvo. Listing your car is free — dealer subscriptions start from {formatPrice(config.dealerPlans[0].price, config)}/mo.
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link to="/sell">

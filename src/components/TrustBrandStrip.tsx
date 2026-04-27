@@ -6,8 +6,8 @@ const badges = [
   { icon: Lock, label: "Buyer Protection", sub: "Escrow & deposits" },
   { icon: Award, label: "AA-Style Inspections", sub: "200-point report" },
   { icon: BadgeCheck, label: "HPI & MOT Clear", sub: "Full history reports" },
-  { icon: Sparkles, label: "7-Day Guarantee", sub: "Eligible vehicles" },
-  { icon: Star, label: "Rated 4.8 / 5", sub: "By UK buyers" },
+  { icon: Sparkles, label: "7-Day Guarantee", sub: "On eligible vehicles" },
+  { icon: Star, label: "Founding Members", sub: "Be one of the first" },
 ];
 
 const TrustBrandStrip = () => {
@@ -20,7 +20,7 @@ const TrustBrandStrip = () => {
           viewport={{ once: true }}
           className="text-center text-xs font-medium uppercase tracking-wider text-muted-foreground"
         >
-          Trusted by UK buyers, sellers & dealers
+          Built for UK buyers, sellers & dealers
         </motion.p>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
