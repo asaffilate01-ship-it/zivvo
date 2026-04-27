@@ -818,6 +818,7 @@ export type Database = {
           mileage: number | null
           model: string
           price: number
+          price_dropped_at: string | null
           promoted_until: string | null
           registration: string | null
           search_vector: unknown
@@ -866,6 +867,7 @@ export type Database = {
           mileage?: number | null
           model: string
           price: number
+          price_dropped_at?: string | null
           promoted_until?: string | null
           registration?: string | null
           search_vector?: unknown
@@ -914,6 +916,7 @@ export type Database = {
           mileage?: number | null
           model?: string
           price?: number
+          price_dropped_at?: string | null
           promoted_until?: string | null
           registration?: string | null
           search_vector?: unknown
@@ -2316,6 +2319,7 @@ export type Database = {
           created_at: string
           filters: Json
           id: string
+          last_notified_at: string
           name: string
           notify: boolean
           user_id: string
@@ -2324,6 +2328,7 @@ export type Database = {
           created_at?: string
           filters?: Json
           id?: string
+          last_notified_at?: string
           name: string
           notify?: boolean
           user_id: string
@@ -2332,6 +2337,7 @@ export type Database = {
           created_at?: string
           filters?: Json
           id?: string
+          last_notified_at?: string
           name?: string
           notify?: boolean
           user_id?: string
