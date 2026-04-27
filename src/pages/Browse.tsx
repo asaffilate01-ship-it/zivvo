@@ -213,14 +213,52 @@ const Browse = () => {
 
       const orderCol = sortBy === "price_asc" ? "price" : sortBy === "price_desc" ? "price" : sortBy === "mileage_asc" ? "mileage" : sortBy === "year_desc" ? "year" : "created_at";
       const ascending = sortBy === "price_asc" || sortBy === "mileage_asc";
-      query = query.order("is_promoted", { ascending: false, nullsFirst: false }).order(orderCol, { ascending }).range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      query = query.order("is_promoted", { ascending: false, nullsFirst: false }).order(orderCol, { ascending });
+
+      const distanceActive = !!(distance && distance !== "any" && originCoords);
+      const radiusKm = distanceActive
+        ? (config.distanceUnit === "miles" ? Number(distance) * 1.60934 : Number(distance))
+        : null;
+
+      if (distanceActive) {
+        // Pre-narrow on the server with a coarse bounding box (≈ ±radius)
+        const dLat = (radiusKm! / 111);
+        const dLng = (radiusKm! / (111 * Math.cos(originCoords!.lat * Math.PI / 180)));
+        query = query
+          .not("latitude", "is", null)
+          .not("longitude", "is", null)
+          .gte("latitude", originCoords!.lat - dLat)
+          .lte("latitude", originCoords!.lat + dLat)
+          .gte("longitude", originCoords!.lng - dLng)
+          .lte("longitude", originCoords!.lng + dLng)
+          .limit(500);
+      } else {
+        query = query.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      }
 
       const { data, count, error } = await query;
-      if (!error && data) { setListings(data); setTotalCount(count || 0); }
+      if (!error && data) {
+        if (distanceActive && radiusKm && originCoords) {
+          const enriched = (data as any[])
+            .map((r) => ({
+              ...r,
+              _distance_km: r.latitude != null && r.longitude != null
+                ? distanceKm(originCoords, { lat: Number(r.latitude), lng: Number(r.longitude) })
+                : null,
+            }))
+            .filter((r) => r._distance_km != null && r._distance_km <= radiusKm)
+            .sort((a, b) => (a._distance_km ?? 0) - (b._distance_km ?? 0));
+          setTotalCount(enriched.length);
+          setListings(enriched.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE));
+        } else {
+          setListings(data);
+          setTotalCount(count || 0);
+        }
+      }
       setLoading(false);
     };
     fetchListings();
-  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, country]);
+  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, country, distance, originCoords, config.distanceUnit]);
 
   const clearFilters = () => {
     setKeyword(""); setSelectedMake(""); setModel(""); setSelectedBody(""); setSelectedFuel("");
