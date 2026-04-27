@@ -97,6 +97,7 @@ const HeroSearch = () => {
     }
     if (postcode) params.set("postcode", postcode.trim());
     if (distance) params.set("distance", distance);
+    if (sellerType) params.set("seller", sellerType);
 
     const labelParts: string[] = [];
     if (make) labelParts.push(make);
