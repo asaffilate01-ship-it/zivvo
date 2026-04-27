@@ -41,6 +41,7 @@ interface CarCardProps {
     video_url?: string | null;
     vat_qualifying?: boolean | null;
     source?: string | null;
+    _distance_km?: number | null;
   };
   index?: number;
   layout?: "grid" | "list";
