@@ -2936,8 +2936,10 @@ export type Database = {
           inspection_score: number | null
           is_featured: boolean | null
           is_promoted: boolean | null
+          latitude: number | null
           legal_check_clear: boolean | null
           location: string | null
+          longitude: number | null
           make: string | null
           mileage: number | null
           model: string | null
@@ -2974,8 +2976,10 @@ export type Database = {
           inspection_score?: number | null
           is_featured?: boolean | null
           is_promoted?: boolean | null
+          latitude?: number | null
           legal_check_clear?: boolean | null
           location?: string | null
+          longitude?: number | null
           make?: string | null
           mileage?: number | null
           model?: string | null
@@ -3012,8 +3016,10 @@ export type Database = {
           inspection_score?: number | null
           is_featured?: boolean | null
           is_promoted?: boolean | null
+          latitude?: number | null
           legal_check_clear?: boolean | null
           location?: string | null
+          longitude?: number | null
           make?: string | null
           mileage?: number | null
           model?: string | null

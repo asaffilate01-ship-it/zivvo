@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import SaveSearchDialog from "@/components/SaveSearchDialog";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
+import { distanceKm } from "@/hooks/useUserLocation";
 
 const BrowseMapView = lazy(() => import("@/components/BrowseMapView"));
 
@@ -61,6 +62,11 @@ const Browse = () => {
   const [sellerType, setSellerType] = useState(searchParams.get("seller") || "");
   const [verifiedOnly, setVerifiedOnly] = useState(searchParams.get("verified") === "true");
   const [featuredOnly, setFeaturedOnly] = useState(searchParams.get("featured") === "true");
+  const [postcode, setPostcode] = useState(searchParams.get("postcode") || "");
+  const [distance, setDistance] = useState(searchParams.get("distance") || "");
+  const [originCoords, setOriginCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
 
   // Range filters
   const [priceRange, setPriceRange] = useState([
@@ -130,14 +136,48 @@ const Browse = () => {
     if (mileageMax < 200000) params.set("mileageMax", String(mileageMax));
     if (sortBy !== "newest") params.set("sort", sortBy);
     if (page > 0) params.set("page", String(page));
+    if (postcode.trim()) params.set("postcode", postcode.trim());
+    if (distance) params.set("distance", distance);
     setSearchParams(params, { replace: true });
-  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, setSearchParams]);
+  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, postcode, distance, setSearchParams]);
 
   useEffect(() => { updateURL(); }, [updateURL]);
 
   useEffect(() => {
     setPage(0);
-  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, country]);
+  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, country, postcode, distance]);
+
+  // Geocode the postcode (debounced) so we can do real-time distance filtering
+  useEffect(() => {
+    const code = postcode.trim();
+    if (!code || !distance) {
+      setOriginCoords(null);
+      setGeocodeError(null);
+      return;
+    }
+    const t = setTimeout(async () => {
+      setGeocoding(true);
+      setGeocodeError(null);
+      try {
+        const { data, error } = await supabase.functions.invoke("geocode", {
+          body: { address: code, country: country.toLowerCase() },
+        });
+        if (error) throw error;
+        if (data?.found && typeof data.lat === "number" && typeof data.lng === "number") {
+          setOriginCoords({ lat: data.lat, lng: data.lng });
+        } else {
+          setOriginCoords(null);
+          setGeocodeError("Could not locate that postcode");
+        }
+      } catch (e: any) {
+        setOriginCoords(null);
+        setGeocodeError(e?.message || "Geocoding failed");
+      } finally {
+        setGeocoding(false);
+      }
+    }, 500);
+    return () => clearTimeout(t);
+  }, [postcode, distance, country]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -173,20 +213,59 @@ const Browse = () => {
 
       const orderCol = sortBy === "price_asc" ? "price" : sortBy === "price_desc" ? "price" : sortBy === "mileage_asc" ? "mileage" : sortBy === "year_desc" ? "year" : "created_at";
       const ascending = sortBy === "price_asc" || sortBy === "mileage_asc";
-      query = query.order("is_promoted", { ascending: false, nullsFirst: false }).order(orderCol, { ascending }).range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      query = query.order("is_promoted", { ascending: false, nullsFirst: false }).order(orderCol, { ascending });
+
+      const distanceActive = !!(distance && distance !== "any" && originCoords);
+      const radiusKm = distanceActive
+        ? (config.distanceUnit === "miles" ? Number(distance) * 1.60934 : Number(distance))
+        : null;
+
+      if (distanceActive) {
+        // Pre-narrow on the server with a coarse bounding box (≈ ±radius)
+        const dLat = (radiusKm! / 111);
+        const dLng = (radiusKm! / (111 * Math.cos(originCoords!.lat * Math.PI / 180)));
+        query = query
+          .not("latitude", "is", null)
+          .not("longitude", "is", null)
+          .gte("latitude", originCoords!.lat - dLat)
+          .lte("latitude", originCoords!.lat + dLat)
+          .gte("longitude", originCoords!.lng - dLng)
+          .lte("longitude", originCoords!.lng + dLng)
+          .limit(500);
+      } else {
+        query = query.range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      }
 
       const { data, count, error } = await query;
-      if (!error && data) { setListings(data); setTotalCount(count || 0); }
+      if (!error && data) {
+        if (distanceActive && radiusKm && originCoords) {
+          const enriched = (data as any[])
+            .map((r) => ({
+              ...r,
+              _distance_km: r.latitude != null && r.longitude != null
+                ? distanceKm(originCoords, { lat: Number(r.latitude), lng: Number(r.longitude) })
+                : null,
+            }))
+            .filter((r) => r._distance_km != null && r._distance_km <= radiusKm)
+            .sort((a, b) => (a._distance_km ?? 0) - (b._distance_km ?? 0));
+          setTotalCount(enriched.length);
+          setListings(enriched.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE));
+        } else {
+          setListings(data);
+          setTotalCount(count || 0);
+        }
+      }
       setLoading(false);
     };
     fetchListings();
-  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, country]);
+  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, country, distance, originCoords, config.distanceUnit]);
 
   const clearFilters = () => {
     setKeyword(""); setSelectedMake(""); setModel(""); setSelectedBody(""); setSelectedFuel("");
     setSelectedTransmission(""); setSelectedColor(""); setSelectedDoors(""); setSelectedEngine("");
     setSelectedCity(""); setSellerType(""); setVerifiedOnly(false); setFeaturedOnly(false);
     setPriceRange([0, 200000]); setYearRange([2000, currentYear]); setMileageMax(200000);
+    setPostcode(""); setDistance(""); setOriginCoords(null);
   };
 
   const activeFiltersList: { label: string; clear: () => void }[] = [];
@@ -205,6 +284,7 @@ const Browse = () => {
   if (priceRange[0] > 0 || priceRange[1] < 200000) activeFiltersList.push({ label: `${formatPrice(priceRange[0], config)}-${formatPrice(priceRange[1], config)}`, clear: () => setPriceRange([0, 200000]) });
   if (yearRange[0] > 2000 || yearRange[1] < currentYear) activeFiltersList.push({ label: `${yearRange[0]}-${yearRange[1]}`, clear: () => setYearRange([2000, currentYear]) });
   if (mileageMax < 200000) activeFiltersList.push({ label: `≤${formatDistance(mileageMax, config)}`, clear: () => setMileageMax(200000) });
+  if (postcode && distance && distance !== "any") activeFiltersList.push({ label: `Within ${distance} ${config.distanceUnit} of ${postcode}`, clear: () => { setPostcode(""); setDistance(""); } });
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -443,6 +523,34 @@ const Browse = () => {
 
               {/* Location & Seller Section */}
               <FilterSection title="Location & Seller" sectionKey="location">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{config.terminology.postcode}</label>
+                  <Input
+                    placeholder={`e.g. ${country === "GB" ? "SW1A 1AA" : country === "US" ? "10001" : "12345"}`}
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value)}
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Distance</label>
+                  <Select value={distance || undefined} onValueChange={(v) => setDistance(v === "any" ? "" : v)}>
+                    <SelectTrigger className="h-9 text-sm" disabled={!postcode}>
+                      <SelectValue placeholder={postcode ? "Any distance" : "Enter postcode first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any distance</SelectItem>
+                      {[5, 10, 25, 50, 100, 200].map((d) => (
+                        <SelectItem key={d} value={String(d)}>Within {d} {config.distanceUnit}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {postcode && distance && distance !== "any" && (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {geocoding ? "Locating postcode…" : geocodeError ? <span className="text-destructive">{geocodeError}</span> : originCoords ? `📍 Centred on ${postcode.toUpperCase()}` : ""}
+                    </p>
+                  )}
+                </div>
                 <FilterSelect label="City / Area" value={selectedCity} onChange={setSelectedCity} placeholder="Any Location" options={cities} />
                 <FilterSelect label="Seller Type" value={sellerType} onChange={setSellerType} placeholder="Any Seller" options={sellerTypes} />
               </FilterSection>
