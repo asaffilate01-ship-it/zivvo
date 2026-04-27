@@ -15,6 +15,7 @@ import WhyBuyFromUs from "@/components/WhyBuyFromUs";
 import HowItWorks from "@/components/HowItWorks";
 import TrustBrandStrip from "@/components/TrustBrandStrip";
 import HomeServicesRow from "@/components/HomeServicesRow";
+import RealReviewsSection from "@/components/RealReviewsSection";
 import HistoryCheckPromo from "@/components/HistoryCheckPromo";
 import SEOLinkBlock from "@/components/SEOLinkBlock";
 import AIChatWidget from "@/components/AIChatWidget";
