@@ -233,6 +233,16 @@ const HeroSearch = () => {
                     </Select>
                   </div>
 
+                  {/* Seller type */}
+                  <Select value={sellerType || undefined} onValueChange={(v) => setSellerType(v === "any" ? "" : v)}>
+                    <SelectTrigger className="h-11"><SelectValue placeholder="Any seller" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any">Any seller</SelectItem>
+                      <SelectItem value="Private">Private seller</SelectItem>
+                      <SelectItem value="Dealer">Dealer</SelectItem>
+                    </SelectContent>
+                  </Select>
+
                   {/* Budget mode toggle */}
                   <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-1">
                     <button
