@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video, Truck, Wallet } from "lucide-react";
+import { Heart, MapPin, Fuel, Gauge, Calendar, Shield, BadgeCheck, Cog, Video, Truck, Wallet, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
@@ -42,6 +42,7 @@ interface CarCardProps {
     vat_qualifying?: boolean | null;
     source?: string | null;
     _distance_km?: number | null;
+    price_dropped_at?: string | null;
   };
   index?: number;
   layout?: "grid" | "list";
@@ -54,6 +55,11 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
   const { config } = useCountry();
   const liked = isSaved(car.id);
   const mainImage = car.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80";
+
+  // Show price drop badge if the listing dropped within the last 14 days
+  const priceDroppedRecently = car.price_dropped_at
+    ? (Date.now() - new Date(car.price_dropped_at).getTime()) < 14 * 24 * 60 * 60 * 1000
+    : false;
 
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -82,10 +88,11 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
           <div className="flex overflow-hidden rounded-xl border border-border bg-card shadow-card transition-all hover:shadow-elevated">
             <div className="relative h-auto w-48 shrink-0 sm:w-64">
               <img src={mainImage} alt={car.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-              <div className="absolute left-2 top-2 flex gap-1">
+              <div className="absolute left-2 top-2 flex gap-1 flex-wrap">
                 {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-[10px]">🔥 Promoted</Badge>}
                 {car.is_featured && <Badge className="gradient-primary border-0 text-[10px] text-primary-foreground">Featured</Badge>}
                 {car.verified && <Badge variant="secondary" className="bg-background/90 text-[10px] backdrop-blur-sm"><BadgeCheck className="mr-0.5 h-3 w-3 text-success" />Verified</Badge>}
+                {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-[10px]"><TrendingDown className="mr-0.5 h-3 w-3" />Price drop</Badge>}
               </div>
               <Button variant="ghost" size="icon" className="absolute right-2 top-2 h-7 w-7 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background" onClick={handleLike}>
                 <Heart className={`h-3.5 w-3.5 ${liked ? "fill-accent text-accent" : "text-foreground"}`} />
@@ -165,6 +172,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
               {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-xs font-semibold">🔥 Promoted</Badge>}
               {car.is_featured && <Badge className="gradient-primary border-0 text-xs font-semibold text-primary-foreground">Featured</Badge>}
               {car.verified && <Badge variant="secondary" className="bg-background/90 text-xs backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" />Verified</Badge>}
+              {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-xs font-semibold"><TrendingDown className="mr-1 h-3 w-3" />Price drop</Badge>}
               {car.source && car.source !== "manual" && (
                 <Badge variant="outline" className="bg-background/90 text-[10px] backdrop-blur-sm capitalize" title={`Synced from ${car.source}`}>
                   ⇄ {car.source.replace("_", " ")}
