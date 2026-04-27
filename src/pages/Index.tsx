@@ -292,48 +292,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="container mx-auto px-4 py-20">
-        <motion.div {...fadeUp} className="text-center">
-          <Badge variant="outline" className="mb-4 text-xs">Testimonials</Badge>
-          <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">What Our Users Say</h2>
-          <p className="mx-auto mt-2 max-w-md text-muted-foreground">Trusted by thousands of buyers, sellers, and dealers worldwide</p>
-        </motion.div>
+      {/* Founding members — honest pre-launch CTA in place of fake testimonials */}
+      <RealReviewsSection />
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              viewport={{ once: true }}
-              className="group rounded-2xl border border-border bg-card p-5 transition-all hover:shadow-card"
-            >
-              <div className="flex items-center gap-1">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} className="h-3.5 w-3.5 fill-warning text-warning" />
-                ))}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">"{t.text}"</p>
-              <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
-                <img
-                  src={t.avatar}
-                  alt={`${t.name} from ${t.location}`}
-                  loading="lazy"
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-card-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.location}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
 
       {/* Recently Viewed */}
       <RecentlyViewedCarousel />
