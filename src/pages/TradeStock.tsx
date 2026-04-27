@@ -450,6 +450,8 @@ const TradeStock = () => {
                             </div>
                           </div>
 
+                          <ArbitragePipelineStepper status={deal.status} />
+
                           {isAdmin && (
                             <div className="text-xs space-y-1 p-2 rounded-lg bg-muted/50">
                               <div className="flex justify-between"><span className="text-muted-foreground">Seller price</span><span>{fmt(deal.seller_price, deal.country)}</span></div>
