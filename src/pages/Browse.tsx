@@ -540,9 +540,10 @@ const Browse = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="any">Any distance</SelectItem>
-                      {[5, 10, 25, 50, 100, 200].map((d) => (
+                      {[1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300].map((d) => (
                         <SelectItem key={d} value={String(d)}>Within {d} {config.distanceUnit}</SelectItem>
                       ))}
+                      <SelectItem value="nationwide">Nationwide</SelectItem>
                     </SelectContent>
                   </Select>
                   {postcode && distance && distance !== "any" && (
