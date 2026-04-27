@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import SaveSearchDialog from "@/components/SaveSearchDialog";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
+import { distanceKm } from "@/hooks/useUserLocation";
 
 const BrowseMapView = lazy(() => import("@/components/BrowseMapView"));
 
