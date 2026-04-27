@@ -61,6 +61,11 @@ const Browse = () => {
   const [sellerType, setSellerType] = useState(searchParams.get("seller") || "");
   const [verifiedOnly, setVerifiedOnly] = useState(searchParams.get("verified") === "true");
   const [featuredOnly, setFeaturedOnly] = useState(searchParams.get("featured") === "true");
+  const [postcode, setPostcode] = useState(searchParams.get("postcode") || "");
+  const [distance, setDistance] = useState(searchParams.get("distance") || "");
+  const [originCoords, setOriginCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
 
   // Range filters
   const [priceRange, setPriceRange] = useState([
