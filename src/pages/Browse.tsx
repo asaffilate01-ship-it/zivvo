@@ -526,7 +526,7 @@ const Browse = () => {
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{config.terminology.postcode}</label>
                   <Input
-                    placeholder={`e.g. ${country === "uk" ? "SW1A 1AA" : country === "us" ? "10001" : "12345"}`}
+                    placeholder={`e.g. ${country === "GB" ? "SW1A 1AA" : country === "US" ? "10001" : "12345"}`}
                     value={postcode}
                     onChange={(e) => setPostcode(e.target.value)}
                     className="h-9 text-sm"
