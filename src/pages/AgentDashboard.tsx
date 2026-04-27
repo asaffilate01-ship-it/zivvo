@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,25 +16,33 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DollarSign,
+  PoundSterling,
   Building2,
-  TrendingUp,
   Clock,
   CheckCircle,
   AlertCircle,
   UserPlus,
   Download,
-  FileText,
+  TrendingUp,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import SalesPipeline from "@/components/SalesPipeline";
 
+// Tier MRR assumptions (GBP / month) — used to forecast pending commission
+const TIER_MRR: Record<string, number> = {
+  starter: 49,
+  professional: 149,
+  premium: 299,
+  enterprise: 599,
+};
+
+const COMMISSION_RATE = 0.30;
+
 const AgentDashboard = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const [dealers, setDealers] = useState<any[]>([]);
   const [commissions, setCommissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,8 +69,39 @@ const AgentDashboard = () => {
     .filter((c) => c.status === "pending")
     .reduce((acc, c) => acc + Number(c.amount), 0);
 
-  const activeDealer = dealers.filter((d) => d.subscription_status === "active").length;
+  const activeDealers = dealers.filter((d) => d.subscription_status === "active");
   const pendingOnboarding = dealers.filter((d) => !d.kyc_verified).length;
+
+  // Live MRR forecast: 30% of active dealer subscription value
+  const forecastMonthly = useMemo(
+    () => activeDealers.reduce((sum, d) => sum + (TIER_MRR[d.tier as string] || 0) * COMMISSION_RATE, 0),
+    [activeDealers]
+  );
+
+  // Per-dealer commission rollup (paid + pending grouped by dealer)
+  const commissionByDealer = useMemo(() => {
+    const map = new Map<string, { dealerId: string; paid: number; pending: number }>();
+    commissions.forEach((c) => {
+      const cur = map.get(c.dealer_id) || { dealerId: c.dealer_id, paid: 0, pending: 0 };
+      if (c.status === "paid") cur.paid += Number(c.amount);
+      else if (c.status === "pending") cur.pending += Number(c.amount);
+      map.set(c.dealer_id, cur);
+    });
+    const dealerNameById = new Map(dealers.map((d) => [d.id, d.business_name]));
+    return Array.from(map.values())
+      .map((row) => ({ ...row, businessName: dealerNameById.get(row.dealerId) || "Unknown dealer" }))
+      .sort((a, b) => (b.paid + b.pending) - (a.paid + a.pending));
+  }, [commissions, dealers]);
+
+  // Next payout: first day of next month
+  const nextPayoutDate = useMemo(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth() + 1, 1).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }, []);
 
   const exportCSV = (data: any[], filename: string) => {
     if (!data.length) return;
@@ -86,9 +126,14 @@ const AgentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Agent Dashboard — Track Commissions & Onboarding"
+        description="Track your dealer onboarding pipeline, monthly recurring commissions, payouts, and per-dealer earnings on Zivvo."
+        noindex
+      />
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">
               Agent Dashboard
@@ -106,9 +151,9 @@ const AgentDashboard = () => {
         {/* KPI Cards */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Total Earned", value: `£${totalEarned.toLocaleString()}`, icon: DollarSign, color: "text-primary" },
-            { label: "Pending Payout", value: `£${totalPending.toLocaleString()}`, icon: Clock, color: "text-accent-foreground" },
-            { label: "Active Dealers", value: activeDealer, icon: Building2, color: "text-primary" },
+            { label: "Total Earned", value: `£${totalEarned.toLocaleString()}`, icon: PoundSterling, color: "text-success" },
+            { label: "Pending Payout", value: `£${totalPending.toLocaleString()}`, icon: Clock, color: "text-primary" },
+            { label: "Forecast / month", value: `£${forecastMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: TrendingUp, color: "text-primary", hint: `${activeDealers.length} active dealer${activeDealers.length === 1 ? "" : "s"}` },
             { label: "Pending Onboarding", value: pendingOnboarding, icon: AlertCircle, color: "text-destructive" },
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
@@ -117,9 +162,10 @@ const AgentDashboard = () => {
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted">
                     <stat.icon className={`h-5 w-5 ${stat.color}`} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
                     <p className="font-display text-2xl font-bold text-card-foreground">{stat.value}</p>
+                    {stat.hint && <p className="text-[11px] text-muted-foreground">{stat.hint}</p>}
                   </div>
                 </CardContent>
               </Card>
@@ -127,15 +173,34 @@ const AgentDashboard = () => {
           ))}
         </div>
 
+        {/* Next payout banner */}
+        <Card className="mt-4 border-primary/20 bg-primary/5">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15">
+                <Calendar className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-card-foreground">Next payout: {nextPayoutDate}</p>
+                <p className="text-xs text-muted-foreground">
+                  £{totalPending.toLocaleString()} pending · paid monthly to your registered bank account
+                </p>
+              </div>
+            </div>
+            <Badge variant="outline" className="text-xs">{COMMISSION_RATE * 100}% recurring commission</Badge>
+          </CardContent>
+        </Card>
+
         {/* Sales Pipeline Analytics */}
         <div className="mt-8">
-          <h2 className="font-display text-lg font-bold text-foreground mb-4">Dealer Sales Pipeline</h2>
+          <h2 className="mb-4 font-display text-lg font-bold text-foreground">Dealer Sales Pipeline</h2>
           <SalesPipeline mode="agent" />
         </div>
 
         <Tabs defaultValue="pipeline" className="mt-8">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="pipeline">Onboarding</TabsTrigger>
+            <TabsTrigger value="dealers">By Dealer</TabsTrigger>
             <TabsTrigger value="commissions">Commissions</TabsTrigger>
             <TabsTrigger value="payouts">Payouts</TabsTrigger>
           </TabsList>
@@ -175,7 +240,7 @@ const AgentDashboard = () => {
                       {dealers.map((d) => (
                         <TableRow key={d.id}>
                           <TableCell className="font-medium">{d.business_name}</TableCell>
-                          <TableCell><Badge variant="secondary">{d.tier}</Badge></TableCell>
+                          <TableCell><Badge variant="secondary" className="capitalize">{d.tier}</Badge></TableCell>
                           <TableCell>
                             <Badge variant={d.subscription_status === "active" ? "default" : "destructive"}>
                               {d.subscription_status}
@@ -189,7 +254,47 @@ const AgentDashboard = () => {
                             )}
                           </TableCell>
                           <TableCell className="text-muted-foreground">
-                            {new Date(d.created_at).toLocaleDateString()}
+                            {new Date(d.created_at).toLocaleDateString("en-GB")}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="dealers" className="mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Earnings by Dealer</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {commissionByDealer.length === 0 ? (
+                  <p className="py-8 text-center text-muted-foreground">No commission history yet</p>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Business</TableHead>
+                        <TableHead className="text-right">Paid</TableHead>
+                        <TableHead className="text-right">Pending</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {commissionByDealer.map((row) => (
+                        <TableRow key={row.dealerId}>
+                          <TableCell className="font-medium">{row.businessName}</TableCell>
+                          <TableCell className="text-right font-display font-semibold text-success">
+                            £{row.paid.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </TableCell>
+                          <TableCell className="text-right text-muted-foreground">
+                            £{row.pending.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                          </TableCell>
+                          <TableCell className="text-right font-display font-bold text-primary">
+                            £{(row.paid + row.pending).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -217,7 +322,7 @@ const AgentDashboard = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Period</TableHead>
-                        <TableHead>Amount</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
                         <TableHead>Rate</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
@@ -226,10 +331,10 @@ const AgentDashboard = () => {
                       {commissions.map((c) => (
                         <TableRow key={c.id}>
                           <TableCell>
-                            {c.period_start ? `${c.period_start} - ${c.period_end}` : "N/A"}
+                            {c.period_start ? `${c.period_start} → ${c.period_end}` : "N/A"}
                           </TableCell>
-                          <TableCell className="font-display font-semibold text-primary">
-                            ${Number(c.amount).toFixed(2)}
+                          <TableCell className="text-right font-display font-semibold text-primary">
+                            £{Number(c.amount).toFixed(2)}
                           </TableCell>
                           <TableCell>{c.commission_rate}%</TableCell>
                           <TableCell>
@@ -255,17 +360,21 @@ const AgentDashboard = () => {
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Total Earned (All Time)</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-primary">£{totalEarned.toLocaleString()}</p>
+                    <p className="mt-1 font-display text-2xl font-bold text-success">£{totalEarned.toLocaleString()}</p>
                   </div>
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Pending</p>
                     <p className="mt-1 font-display text-2xl font-bold text-card-foreground">£{totalPending.toLocaleString()}</p>
                   </div>
                   <div className="rounded-lg border border-border p-4">
-                    <p className="text-sm text-muted-foreground">Commission Rate</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-card-foreground">30%</p>
+                    <p className="text-sm text-muted-foreground">Forecast / month</p>
+                    <p className="mt-1 font-display text-2xl font-bold text-primary">£{forecastMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                   </div>
                 </div>
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Payouts are processed on the 1st of each month for all commissions earned in the prior month.
+                  Forecast is based on currently active dealer subscriptions × {COMMISSION_RATE * 100}% commission rate.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

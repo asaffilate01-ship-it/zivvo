@@ -21,6 +21,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import SellerOffers from "@/components/SellerOffers";
+import ArbitragePipelineStepper from "@/components/ArbitragePipelineStepper";
 import {
   ArrowRightLeft, TrendingUp, Shield, Clock, CheckCircle2, XCircle,
   DollarSign, Truck, FileText, Search, Plus, Eye, Building2, CreditCard,
@@ -448,6 +449,8 @@ const TradeStock = () => {
                               {listing?.location && <span>• {listing.location}</span>}
                             </div>
                           </div>
+
+                          <ArbitragePipelineStepper status={deal.status} />
 
                           {isAdmin && (
                             <div className="text-xs space-y-1 p-2 rounded-lg bg-muted/50">
