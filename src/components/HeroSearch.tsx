@@ -33,6 +33,7 @@ const HeroSearch = () => {
   const [priceMin, setPriceMin] = useState<string>("");
   const [priceMax, setPriceMax] = useState<string>("");
   const [monthlyMax, setMonthlyMax] = useState<string>("");
+  const [sellerType, setSellerType] = useState<string>("");
 
   const [models, setModels] = useState<string[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
