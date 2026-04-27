@@ -265,6 +265,7 @@ const Browse = () => {
     setSelectedTransmission(""); setSelectedColor(""); setSelectedDoors(""); setSelectedEngine("");
     setSelectedCity(""); setSellerType(""); setVerifiedOnly(false); setFeaturedOnly(false);
     setPriceRange([0, 200000]); setYearRange([2000, currentYear]); setMileageMax(200000);
+    setPostcode(""); setDistance(""); setOriginCoords(null);
   };
 
   const activeFiltersList: { label: string; clear: () => void }[] = [];
