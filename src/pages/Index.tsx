@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import {
-  ArrowRight, Shield, Search, FileCheck, Car, Truck, Zap, Globe, Star, Quote,
+  ArrowRight, Shield, Search, FileCheck, Car, Truck, Zap, Globe, Star,
   CheckCircle, Users, TrendingUp, Mail, Calculator,
 } from "lucide-react";
 import { Link } from "react-router-dom";
