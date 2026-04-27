@@ -136,14 +136,48 @@ const Browse = () => {
     if (mileageMax < 200000) params.set("mileageMax", String(mileageMax));
     if (sortBy !== "newest") params.set("sort", sortBy);
     if (page > 0) params.set("page", String(page));
+    if (postcode.trim()) params.set("postcode", postcode.trim());
+    if (distance) params.set("distance", distance);
     setSearchParams(params, { replace: true });
-  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, setSearchParams]);
+  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, page, postcode, distance, setSearchParams]);
 
   useEffect(() => { updateURL(); }, [updateURL]);
 
   useEffect(() => {
     setPage(0);
-  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, country]);
+  }, [keyword, selectedMake, model, selectedBody, selectedFuel, selectedTransmission, selectedColor, selectedDoors, selectedEngine, selectedCity, sellerType, verifiedOnly, featuredOnly, priceRange, yearRange, mileageMax, sortBy, country, postcode, distance]);
+
+  // Geocode the postcode (debounced) so we can do real-time distance filtering
+  useEffect(() => {
+    const code = postcode.trim();
+    if (!code || !distance) {
+      setOriginCoords(null);
+      setGeocodeError(null);
+      return;
+    }
+    const t = setTimeout(async () => {
+      setGeocoding(true);
+      setGeocodeError(null);
+      try {
+        const { data, error } = await supabase.functions.invoke("geocode", {
+          body: { address: code, country: country.toLowerCase() },
+        });
+        if (error) throw error;
+        if (data?.found && typeof data.lat === "number" && typeof data.lng === "number") {
+          setOriginCoords({ lat: data.lat, lng: data.lng });
+        } else {
+          setOriginCoords(null);
+          setGeocodeError("Could not locate that postcode");
+        }
+      } catch (e: any) {
+        setOriginCoords(null);
+        setGeocodeError(e?.message || "Geocoding failed");
+      } finally {
+        setGeocoding(false);
+      }
+    }, 500);
+    return () => clearTimeout(t);
+  }, [postcode, distance, country]);
 
   useEffect(() => {
     const fetchListings = async () => {
