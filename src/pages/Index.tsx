@@ -376,7 +376,7 @@ const Index = () => {
               Ready to Find Your Next Car?
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-primary-foreground/60">
-              Join thousands of buyers and sellers. Individual listings are free — dealer subscriptions start from {formatPrice(config.dealerPlans[0].price, config)}/mo.
+              Be among the first sellers and dealers on Zivvo. Listing your car is free — dealer subscriptions start from {formatPrice(config.dealerPlans[0].price, config)}/mo.
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link to="/sell">
