@@ -35,10 +35,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
-import testimonialSarah from "@/assets/testimonial-sarah.jpg";
-import testimonialJames from "@/assets/testimonial-james.jpg";
-import testimonialEmma from "@/assets/testimonial-emma.jpg";
-import testimonialDavid from "@/assets/testimonial-david.jpg";
 import trustImage from "@/assets/trust-verify.jpg";
 import blogChecklist from "@/assets/blog-buying-checklist.jpg";
 import blogEvHybrid from "@/assets/blog-ev-hybrid.jpg";
@@ -53,13 +49,6 @@ const getCategories = (bodyTypes: string[]) => {
     { icon: Globe, label: "Hybrid", count: "—" },
   ];
 };
-
-const testimonials = [
-  { name: "Sarah K.", location: "London", rating: 5, avatar: testimonialSarah, text: "Sold my BMW in 3 days. The verified badge made buyers trust my listing instantly." },
-  { name: "James T.", location: "Manchester", rating: 5, avatar: testimonialJames, text: "The finance check feature saved me from buying a car with outstanding debt." },
-  { name: "Emma W.", location: "Birmingham", rating: 5, avatar: testimonialEmma, text: "As a dealer, Zivvo brings us qualified leads every day. Brilliant platform." },
-  { name: "David R.", location: "Edinburgh", rating: 5, avatar: testimonialDavid, text: "Found my dream Porsche through Zivvo. Transparent, verified and hassle-free." },
-];
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
