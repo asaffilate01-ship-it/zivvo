@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 const TrustReviewWidget = () => {
-  const [stats, setStats] = useState({ count: 0, avgRating: 0 });
+  const [stats, setStats] = useState<{ count: number; avgRating: number } | null>(null);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -13,17 +13,20 @@ const TrustReviewWidget = () => {
         .from("seller_reviews")
         .select("rating", { count: "exact" })
         .limit(1000);
-      if (data && count) {
+      if (data && count && count > 0) {
         const avg = data.reduce((a, r) => a + r.rating, 0) / data.length;
         setStats({ count, avgRating: Math.round(avg * 10) / 10 });
+      } else {
+        setStats({ count: 0, avgRating: 0 });
       }
     };
     fetchReviews();
   }, []);
 
-  const displayRating = stats.avgRating > 0 ? stats.avgRating : 4.9;
-  const displayCount = stats.count > 0 ? stats.count.toLocaleString() : "—";
-  const filledStars = Math.round(displayRating);
+  // Hide entirely until we have real reviews — no fake fallbacks pre-launch
+  if (!stats || stats.count === 0) return null;
+
+  const filledStars = Math.round(stats.avgRating);
 
   return (
     <section className="container mx-auto px-4 py-12">
@@ -43,25 +46,12 @@ const TrustReviewWidget = () => {
                 <Star key={i} className={`h-4 w-4 ${i < filledStars ? "fill-warning text-warning" : "text-muted-foreground"}`} />
               ))}
             </div>
-            <p className="mt-1 text-sm font-semibold text-card-foreground">Rated <span className="text-primary">Excellent</span></p>
-            <p className="text-xs text-muted-foreground">Based on {displayCount} verified reviews</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6 text-xs text-muted-foreground">
-          <div className="text-center">
-            <p className="font-display text-xl font-bold text-foreground">{displayRating}</p>
-            <p>Rating</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div className="text-center">
-            <p className="font-display text-xl font-bold text-foreground">98%</p>
-            <p>Recommend</p>
-          </div>
-          <div className="h-8 w-px bg-border" />
-          <div className="text-center">
-            <p className="font-display text-xl font-bold text-foreground">24h</p>
-            <p>Avg Response</p>
+            <p className="mt-1 text-sm font-semibold text-card-foreground">
+              Rated <span className="text-primary">{stats.avgRating} / 5</span>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Based on {stats.count.toLocaleString()} verified review{stats.count === 1 ? "" : "s"}
+            </p>
           </div>
         </div>
 
