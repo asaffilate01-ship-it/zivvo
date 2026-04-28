@@ -841,6 +841,8 @@ export type Database = {
           hpi_check_data: Json | null
           id: string
           images: string[] | null
+          inspection_completed_at: string | null
+          inspection_report_url: string | null
           inspection_score: number | null
           is_featured: boolean | null
           is_promoted: boolean | null
@@ -905,6 +907,8 @@ export type Database = {
           hpi_check_data?: Json | null
           id?: string
           images?: string[] | null
+          inspection_completed_at?: string | null
+          inspection_report_url?: string | null
           inspection_score?: number | null
           is_featured?: boolean | null
           is_promoted?: boolean | null
@@ -969,6 +973,8 @@ export type Database = {
           hpi_check_data?: Json | null
           id?: string
           images?: string[] | null
+          inspection_completed_at?: string | null
+          inspection_report_url?: string | null
           inspection_score?: number | null
           is_featured?: boolean | null
           is_promoted?: boolean | null
@@ -1640,6 +1646,109 @@ export type Database = {
           },
           {
             foreignKeyName: "enquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "dealer_vehicle_profit"
+            referencedColumns: ["listing_id"]
+          },
+        ]
+      }
+      inspection_bookings: {
+        Row: {
+          buyer_address: string | null
+          buyer_id: string
+          buyer_notes: string | null
+          buyer_phone: string | null
+          cancellation_reason: string | null
+          completed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          inspection_type: Database["public"]["Enums"]["inspection_type"]
+          inspector_id: string | null
+          inspector_notes: string | null
+          listing_id: string
+          price: number
+          report_summary: Json | null
+          report_url: string | null
+          scheduled_at: string | null
+          score: number | null
+          seller_id: string
+          status: Database["public"]["Enums"]["inspection_status"]
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          total_points: number
+          updated_at: string
+        }
+        Insert: {
+          buyer_address?: string | null
+          buyer_id: string
+          buyer_notes?: string | null
+          buyer_phone?: string | null
+          cancellation_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          inspection_type?: Database["public"]["Enums"]["inspection_type"]
+          inspector_id?: string | null
+          inspector_notes?: string | null
+          listing_id: string
+          price?: number
+          report_summary?: Json | null
+          report_url?: string | null
+          scheduled_at?: string | null
+          score?: number | null
+          seller_id: string
+          status?: Database["public"]["Enums"]["inspection_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_points?: number
+          updated_at?: string
+        }
+        Update: {
+          buyer_address?: string | null
+          buyer_id?: string
+          buyer_notes?: string | null
+          buyer_phone?: string | null
+          cancellation_reason?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          inspection_type?: Database["public"]["Enums"]["inspection_type"]
+          inspector_id?: string | null
+          inspector_notes?: string | null
+          listing_id?: string
+          price?: number
+          report_summary?: Json | null
+          report_url?: string | null
+          scheduled_at?: string | null
+          score?: number | null
+          seller_id?: string
+          status?: Database["public"]["Enums"]["inspection_status"]
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          total_points?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_bookings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_bookings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "car_listings_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_bookings_listing_id_fkey"
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "dealer_vehicle_profit"
@@ -3300,6 +3409,15 @@ export type Database = {
         | "released_to_seller"
         | "refunded"
         | "disputed"
+      inspection_status:
+        | "pending_payment"
+        | "paid"
+        | "scheduled"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+        | "refunded"
+      inspection_type: "standard_200" | "premium_300"
       listing_status: "draft" | "active" | "sold" | "expired" | "under_review"
       pipeline_stage:
         | "lead"
@@ -3498,6 +3616,16 @@ export const Constants = {
         "refunded",
         "disputed",
       ],
+      inspection_status: [
+        "pending_payment",
+        "paid",
+        "scheduled",
+        "in_progress",
+        "completed",
+        "cancelled",
+        "refunded",
+      ],
+      inspection_type: ["standard_200", "premium_300"],
       listing_status: ["draft", "active", "sold", "expired", "under_review"],
       pipeline_stage: [
         "lead",
