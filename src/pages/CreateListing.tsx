@@ -120,10 +120,21 @@ const CreateListing = () => {
           location: data.location || "",
           video_url: (data as any).video_url || "",
           vat_qualifying: !!(data as any).vat_qualifying,
+          sale_type: ((data as any).sale_type || "own") as "own" | "consignment" | "trade",
+          owner_name: (data as any).owner_name || "",
+          owner_address: (data as any).owner_address || "",
+          finance_outstanding: !!(data as any).finance_outstanding,
+          finance_lender: (data as any).finance_lender || "",
+          finance_settlement_amount: (data as any).finance_settlement_amount ? String((data as any).finance_settlement_amount) : "",
+          truth_declaration_accepted: !!(data as any).truth_declaration_accepted,
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
         setHpiCheckData((data as any).hpi_check_data || null);
+        setExistingPhotoIdUrl((data as any).photo_id_url || null);
+        setExistingConsignmentUrl((data as any).consignment_agreement_url || null);
+        setExistingTradeInvoiceUrl((data as any).trade_invoice_url || null);
+        setExistingFinanceLetterUrl((data as any).finance_settlement_letter_url || null);
       } else {
         toast({ title: "Listing not found", variant: "destructive" });
         navigate("/dashboard");
@@ -133,7 +144,7 @@ const CreateListing = () => {
     loadListing();
   }, [editId, user]);
 
-  const updateField = (field: string, value: string | number) => {
+  const updateField = (field: string, value: string | number | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
