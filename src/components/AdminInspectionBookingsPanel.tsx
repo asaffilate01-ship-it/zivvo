@@ -189,6 +189,22 @@ const AdminInspectionBookingsPanel = () => {
                 </div>
 
                 <div>
+                  <Label>Assign inspector</Label>
+                  <Select value={inspectorId} onValueChange={setInspectorId}>
+                    <SelectTrigger><SelectValue placeholder="Select inspector..." /></SelectTrigger>
+                    <SelectContent>
+                      {matchingInspectors(editing).length === 0 && <SelectItem value="none" disabled>No verified inspectors</SelectItem>}
+                      {matchingInspectors(editing).map((i) => (
+                        <SelectItem key={i.user_id} value={i.user_id}>
+                          {i.full_name} · {(i.coverage_postcodes || []).slice(0, 4).join(", ")} · {i.total_inspections || 0} done
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground mt-1">Filtered by postcode coverage matching buyer address.</p>
+                </div>
+
+                <div>
                   <Label>Status</Label>
                   <Select value={status} onValueChange={setStatus}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
