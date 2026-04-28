@@ -1171,6 +1171,7 @@ const AdminDashboard = () => {
           </DialogContent>
         </Dialog>
       </div>
+      <AdminVerificationDialog listing={verifyListing} open={!!verifyListing} onClose={() => setVerifyListing(null)} />
       <Footer />
     </div>
   );
