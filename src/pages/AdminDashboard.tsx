@@ -334,6 +334,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="dms" className="gap-1"><Package className="h-3 w-3" /> DMS Health</TabsTrigger>
             <TabsTrigger value="analytics" className="gap-1"><BarChart3 className="h-3 w-3" /> Analytics</TabsTrigger>
             <TabsTrigger value="inspections" className="gap-1"><Shield className="h-3 w-3" /> Inspections</TabsTrigger>
+            <TabsTrigger value="inspectors" className="gap-1"><Shield className="h-3 w-3" /> Inspectors</TabsTrigger>
           </TabsList>
 
           {/* Dealers Tab */}
