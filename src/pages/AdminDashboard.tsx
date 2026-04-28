@@ -48,6 +48,7 @@ const AdminDashboard = () => {
   const [listingReports, setListingReports] = useState<any[]>([]);
   const [contactMessages, setContactMessages] = useState<any[]>([]);
   const [bugReports, setBugReports] = useState<any[]>([]);
+  const [verifyListing, setVerifyListing] = useState<any>(null);
   const [auctions, setAuctions] = useState<any[]>([]);
   const [auctionEscrows, setAuctionEscrows] = useState<any[]>([]);
   const [auctionAuditLog, setAuctionAuditLog] = useState<any[]>([]);
@@ -537,6 +538,9 @@ const AdminDashboard = () => {
                                 <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => setVerifyListing(l)}>
+                                  <Eye className="mr-2 h-4 w-4" /> View verification
+                                </DropdownMenuItem>
                                 {l.status !== "active" && (
                                   <DropdownMenuItem
                                     onClick={() => {
