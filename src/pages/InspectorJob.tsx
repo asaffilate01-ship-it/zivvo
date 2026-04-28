@@ -52,7 +52,7 @@ const InspectorJob = () => {
 
     if (sc) {
       setScorecard(sc);
-      setData((sc.checklist as ChecklistData) || {});
+      setData((sc.checklist as unknown as ChecklistData) || {});
       setOverallNotes(sc.overall_notes || "");
       setRecommendation(sc.recommendation || "");
     }
@@ -81,7 +81,7 @@ const InspectorJob = () => {
     setSaving(true);
     const { score, total, grade } = calculateScore(data);
     await supabase.from("inspection_scorecards").update({
-      checklist: data, overall_notes: overallNotes, recommendation, score, total_points: total, grade,
+      checklist: data as any, overall_notes: overallNotes, recommendation, score, total_points: total, grade,
     }).eq("id", scorecard.id);
     setSaving(false);
     toast({ title: "Draft saved" });
@@ -100,7 +100,7 @@ const InspectorJob = () => {
     try {
       const { score, total, grade } = calculateScore(data);
       await supabase.from("inspection_scorecards").update({
-        checklist: data, overall_notes: overallNotes, recommendation, score, total_points: total, grade,
+        checklist: data as any, overall_notes: overallNotes, recommendation, score, total_points: total, grade,
         submitted_at: new Date().toISOString(),
       }).eq("id", scorecard.id);
 
@@ -173,7 +173,7 @@ const InspectorJob = () => {
                 <CardHeader><CardTitle className="text-base">{section.icon} {section.title}</CardTitle></CardHeader>
                 <CardContent className="space-y-3">
                   {section.items.map((item) => {
-                    const entry = data[item.id] || { result: undefined as any };
+                    const entry: { result?: CheckResult; notes?: string; photo_url?: string } = data[item.id] || {};
                     return (
                       <div key={item.id} className="border rounded-lg p-3">
                         <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
