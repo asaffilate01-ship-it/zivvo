@@ -1074,6 +1074,10 @@ const AdminDashboard = () => {
           <TabsContent value="inspections" className="mt-4">
             <AdminInspectionBookingsPanel />
           </TabsContent>
+
+          <TabsContent value="inspectors" className="mt-4">
+            <AdminInspectorsPanel />
+          </TabsContent>
         </Tabs>
 
         {/* Dealer Detail Dialog */}
