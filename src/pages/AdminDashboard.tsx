@@ -34,6 +34,7 @@ import SalesPipeline from "@/components/SalesPipeline";
 import AdminInspectionPanel from "@/components/AdminInspectionPanel";
 import AdminDmsHealthPanel from "@/components/AdminDmsHealthPanel";
 import AdminAnalyticsPanel from "@/components/AdminAnalyticsPanel";
+import AdminInspectionBookingsPanel from "@/components/AdminInspectionBookingsPanel";
 import AdminVerificationDialog from "@/components/AdminVerificationDialog";
 
 
@@ -331,6 +332,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="finance">Finance</TabsTrigger>
             <TabsTrigger value="dms" className="gap-1"><Package className="h-3 w-3" /> DMS Health</TabsTrigger>
             <TabsTrigger value="analytics" className="gap-1"><BarChart3 className="h-3 w-3" /> Analytics</TabsTrigger>
+            <TabsTrigger value="inspections" className="gap-1"><Shield className="h-3 w-3" /> Inspections</TabsTrigger>
           </TabsList>
 
           {/* Dealers Tab */}
@@ -1065,6 +1067,10 @@ const AdminDashboard = () => {
           {/* Analytics Tab */}
           <TabsContent value="analytics" className="mt-4">
             <AdminAnalyticsPanel />
+          </TabsContent>
+
+          <TabsContent value="inspections" className="mt-4">
+            <AdminInspectionBookingsPanel />
           </TabsContent>
         </Tabs>
 

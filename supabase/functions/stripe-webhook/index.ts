@@ -78,6 +78,60 @@ serve(async (req) => {
           break;
         }
 
+        // --- Inspection booking payment ---
+        if (metaType === "inspection_booking" && session.mode === "payment") {
+          const bookingId = session.metadata!.booking_id;
+          logStep("Inspection payment completed", { bookingId });
+
+          const { data: booking, error: bookErr } = await supabase
+            .from("inspection_bookings")
+            .update({
+              status: "paid",
+              stripe_payment_intent_id: (session.payment_intent as string) || null,
+            })
+            .eq("id", bookingId)
+            .select("buyer_id, seller_id, listing_id")
+            .single();
+
+          if (bookErr) {
+            logStep("ERROR updating inspection booking", { error: bookErr.message });
+            break;
+          }
+
+          // Notify buyer
+          await supabase.from("notifications").insert({
+            user_id: booking.buyer_id,
+            type: "inspection",
+            title: "Inspection booked ✅",
+            message: "Payment received. Our inspector will contact you within 24 hours to schedule.",
+            link: "/inbox",
+          });
+
+          // Notify seller
+          await supabase.from("notifications").insert({
+            user_id: booking.seller_id,
+            type: "inspection",
+            title: "Inspection requested 🔍",
+            message: "A buyer has booked an independent inspection on your listing. Inspector will be in touch.",
+            link: `/car/${booking.listing_id}`,
+          });
+
+          // Notify admins
+          const { data: admins } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
+          if (admins) {
+            for (const a of admins) {
+              await supabase.from("notifications").insert({
+                user_id: a.user_id,
+                type: "inspection",
+                title: "New inspection booking 🔧",
+                message: "Assign an inspector and schedule the visit.",
+                link: "/admin",
+              });
+            }
+          }
+          break;
+        }
+
         // --- Arbitrage dealer payment ---
         if (metaType === "arbitrage_dealer_payment") {
           const dealId = session.metadata!.deal_id;

@@ -10,6 +10,7 @@ import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import PriceIndicatorBadge from "@/components/PriceIndicatorBadge";
 import DealerPerformanceBadge from "@/components/DealerPerformanceBadge";
+import InspectionBadge from "@/components/InspectionBadge";
 
 // Rough monthly finance estimate: 10% deposit, 60 months, 9.9% APR
 const estimateMonthly = (price: number) => {
@@ -43,6 +44,7 @@ interface CarCardProps {
     source?: string | null;
     _distance_km?: number | null;
     price_dropped_at?: string | null;
+    inspection_score?: number | null;
   };
   index?: number;
   layout?: "grid" | "list";
@@ -92,6 +94,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                 {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-[10px]">🔥 Promoted</Badge>}
                 {car.is_featured && <Badge className="gradient-primary border-0 text-[10px] text-primary-foreground">Featured</Badge>}
                 {car.verified && <Badge variant="secondary" className="bg-background/90 text-[10px] backdrop-blur-sm"><BadgeCheck className="mr-0.5 h-3 w-3 text-success" />Verified</Badge>}
+                {car.inspection_score && <InspectionBadge score={car.inspection_score} />}
                 {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-[10px]"><TrendingDown className="mr-0.5 h-3 w-3" />Price drop</Badge>}
               </div>
               <Button variant="ghost" size="icon" className="absolute right-2 top-2 h-7 w-7 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background" onClick={handleLike}>
@@ -172,6 +175,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
               {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-xs font-semibold">🔥 Promoted</Badge>}
               {car.is_featured && <Badge className="gradient-primary border-0 text-xs font-semibold text-primary-foreground">Featured</Badge>}
               {car.verified && <Badge variant="secondary" className="bg-background/90 text-xs backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" />Verified</Badge>}
+              {car.inspection_score && <InspectionBadge score={car.inspection_score} />}
               {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-xs font-semibold"><TrendingDown className="mr-1 h-3 w-3" />Price drop</Badge>}
               {car.source && car.source !== "manual" && (
                 <Badge variant="outline" className="bg-background/90 text-[10px] backdrop-blur-sm capitalize" title={`Synced from ${car.source}`}>

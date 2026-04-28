@@ -10,6 +10,7 @@ import SellerReviews from "@/components/SellerReviews";
 import PaymentCalculator from "@/components/PaymentCalculator";
 import PartExchangeWidget from "@/components/PartExchangeWidget";
 import MakeOfferDialog from "@/components/MakeOfferDialog";
+import InspectionBookingDialog from "@/components/InspectionBookingDialog";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -452,6 +453,11 @@ const CarDetail = () => {
                   {showWhatsApp && <WhatsAppButton phone={dealer?.business_phone} listingTitle={car.title} />}
                   <EnquiryForm listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} />
                   <MakeOfferDialog listingId={car.id} sellerId={car.seller_id} listingTitle={car.title} askingPrice={Number(car.price)} />
+                  <InspectionBookingDialog listingId={car.id} trigger={
+                    <Button variant="outline" className="w-full gap-2">
+                      <Shield className="w-4 h-4" /> Book 200-pt Inspection · £249
+                    </Button>
+                  } />
                   {car.dealer_id && (
                     <ReserveNowButton listingId={car.id} dealerId={car.dealer_id} listingTitle={car.title} />
                   )}
