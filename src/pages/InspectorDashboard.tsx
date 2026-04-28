@@ -50,12 +50,13 @@ const InspectorDashboard = () => {
   const { user } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [payouts, setPayouts] = useState<{ pending: number; paid: number }>({ pending: 0, paid: 0 });
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const [{ data: profileData }, { data: jobsData }] = await Promise.all([
+    const [{ data: profileData }, { data: jobsData }, { data: payoutData }] = await Promise.all([
       supabase.from("inspector_profiles").select("*").eq("user_id", user.id).maybeSingle(),
       supabase
         .from("inspection_bookings")
@@ -63,9 +64,20 @@ const InspectorDashboard = () => {
         .eq("inspector_id", user.id)
         .in("status", ["paid", "scheduled", "in_progress", "completed"])
         .order("scheduled_at", { ascending: true, nullsFirst: false }),
+      supabase
+        .from("inspector_payouts")
+        .select("amount, status")
+        .eq("inspector_id", user.id),
     ]);
     setProfile((profileData as any) || null);
     setJobs((jobsData as any) || []);
+    const pending = (payoutData || [])
+      .filter((p: any) => p.status === "pending" || p.status === "approved")
+      .reduce((a: number, b: any) => a + Number(b.amount || 0), 0);
+    const paid = (payoutData || [])
+      .filter((p: any) => p.status === "paid")
+      .reduce((a: number, b: any) => a + Number(b.amount || 0), 0);
+    setPayouts({ pending, paid });
     setLoading(false);
   };
 
