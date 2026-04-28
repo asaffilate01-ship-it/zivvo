@@ -822,6 +822,7 @@ export type Database = {
         Row: {
           body_type: string | null
           color: string | null
+          consignment_agreement_url: string | null
           country: string
           created_at: string
           dealer_id: string | null
@@ -832,6 +833,10 @@ export type Database = {
           external_ref: string | null
           features: string[] | null
           finance_check_clear: boolean | null
+          finance_lender: string | null
+          finance_outstanding: boolean
+          finance_settlement_amount: number | null
+          finance_settlement_letter_url: string | null
           fuel_type: string | null
           hpi_check_data: Json | null
           id: string
@@ -847,10 +852,14 @@ export type Database = {
           make: string
           mileage: number | null
           model: string
+          owner_address: string | null
+          owner_name: string | null
+          photo_id_url: string | null
           price: number
           price_dropped_at: string | null
           promoted_until: string | null
           registration: string | null
+          sale_type: Database["public"]["Enums"]["sale_type"]
           search_vector: unknown
           seller_id: string
           source: string
@@ -858,10 +867,16 @@ export type Database = {
           specs: Json | null
           status: Database["public"]["Enums"]["listing_status"] | null
           title: string
+          trade_invoice_url: string | null
           transmission: string | null
+          truth_declaration_accepted: boolean
+          truth_declaration_at: string | null
+          truth_declaration_ip: string | null
           updated_at: string
           vat_qualifying: boolean
           vat_scheme: string
+          verification_notes: string | null
+          verification_rejected_reason: string | null
           verified: boolean | null
           video_url: string | null
           views_count: number | null
@@ -871,6 +886,7 @@ export type Database = {
         Insert: {
           body_type?: string | null
           color?: string | null
+          consignment_agreement_url?: string | null
           country?: string
           created_at?: string
           dealer_id?: string | null
@@ -881,6 +897,10 @@ export type Database = {
           external_ref?: string | null
           features?: string[] | null
           finance_check_clear?: boolean | null
+          finance_lender?: string | null
+          finance_outstanding?: boolean
+          finance_settlement_amount?: number | null
+          finance_settlement_letter_url?: string | null
           fuel_type?: string | null
           hpi_check_data?: Json | null
           id?: string
@@ -896,10 +916,14 @@ export type Database = {
           make: string
           mileage?: number | null
           model: string
+          owner_address?: string | null
+          owner_name?: string | null
+          photo_id_url?: string | null
           price: number
           price_dropped_at?: string | null
           promoted_until?: string | null
           registration?: string | null
+          sale_type?: Database["public"]["Enums"]["sale_type"]
           search_vector?: unknown
           seller_id: string
           source?: string
@@ -907,10 +931,16 @@ export type Database = {
           specs?: Json | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title: string
+          trade_invoice_url?: string | null
           transmission?: string | null
+          truth_declaration_accepted?: boolean
+          truth_declaration_at?: string | null
+          truth_declaration_ip?: string | null
           updated_at?: string
           vat_qualifying?: boolean
           vat_scheme?: string
+          verification_notes?: string | null
+          verification_rejected_reason?: string | null
           verified?: boolean | null
           video_url?: string | null
           views_count?: number | null
@@ -920,6 +950,7 @@ export type Database = {
         Update: {
           body_type?: string | null
           color?: string | null
+          consignment_agreement_url?: string | null
           country?: string
           created_at?: string
           dealer_id?: string | null
@@ -930,6 +961,10 @@ export type Database = {
           external_ref?: string | null
           features?: string[] | null
           finance_check_clear?: boolean | null
+          finance_lender?: string | null
+          finance_outstanding?: boolean
+          finance_settlement_amount?: number | null
+          finance_settlement_letter_url?: string | null
           fuel_type?: string | null
           hpi_check_data?: Json | null
           id?: string
@@ -945,10 +980,14 @@ export type Database = {
           make?: string
           mileage?: number | null
           model?: string
+          owner_address?: string | null
+          owner_name?: string | null
+          photo_id_url?: string | null
           price?: number
           price_dropped_at?: string | null
           promoted_until?: string | null
           registration?: string | null
+          sale_type?: Database["public"]["Enums"]["sale_type"]
           search_vector?: unknown
           seller_id?: string
           source?: string
@@ -956,10 +995,16 @@ export type Database = {
           specs?: Json | null
           status?: Database["public"]["Enums"]["listing_status"] | null
           title?: string
+          trade_invoice_url?: string | null
           transmission?: string | null
+          truth_declaration_accepted?: boolean
+          truth_declaration_at?: string | null
+          truth_declaration_ip?: string | null
           updated_at?: string
           vat_qualifying?: boolean
           vat_scheme?: string
+          verification_notes?: string | null
+          verification_rejected_reason?: string | null
           verified?: boolean | null
           video_url?: string | null
           views_count?: number | null
@@ -3271,6 +3316,7 @@ export type Database = {
         | "gumtree"
         | "cazoo"
         | "motors_co_uk"
+      sale_type: "own" | "consignment" | "trade"
       subscription_status:
         | "active"
         | "past_due"
@@ -3470,6 +3516,7 @@ export const Constants = {
         "cazoo",
         "motors_co_uk",
       ],
+      sale_type: ["own", "consignment", "trade"],
       subscription_status: [
         "active",
         "past_due",
