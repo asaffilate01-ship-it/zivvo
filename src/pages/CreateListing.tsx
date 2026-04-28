@@ -47,6 +47,20 @@ const CreateListing = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
+  // Ownership & finance verification
+  const [photoIdFile, setPhotoIdFile] = useState<File | null>(null);
+  const [existingPhotoIdUrl, setExistingPhotoIdUrl] = useState<string | null>(null);
+  const [consignmentFile, setConsignmentFile] = useState<File | null>(null);
+  const [existingConsignmentUrl, setExistingConsignmentUrl] = useState<string | null>(null);
+  const [tradeInvoiceFile, setTradeInvoiceFile] = useState<File | null>(null);
+  const [existingTradeInvoiceUrl, setExistingTradeInvoiceUrl] = useState<string | null>(null);
+  const [financeLetterFile, setFinanceLetterFile] = useState<File | null>(null);
+  const [existingFinanceLetterUrl, setExistingFinanceLetterUrl] = useState<string | null>(null);
+  const photoIdInputRef = useRef<HTMLInputElement>(null);
+  const consignmentInputRef = useRef<HTMLInputElement>(null);
+  const tradeInvoiceInputRef = useRef<HTMLInputElement>(null);
+  const financeLetterInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState({
     title: "",
     make: "",
@@ -66,6 +80,13 @@ const CreateListing = () => {
     location: "",
     video_url: "",
     vat_qualifying: false,
+    sale_type: "own" as "own" | "consignment" | "trade",
+    owner_name: "",
+    owner_address: "",
+    finance_outstanding: false,
+    finance_lender: "",
+    finance_settlement_amount: "",
+    truth_declaration_accepted: false,
   });
 
   // Load existing listing for editing
