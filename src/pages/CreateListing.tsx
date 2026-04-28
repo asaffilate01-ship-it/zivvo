@@ -10,7 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle, Sparkles } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle, Sparkles, FileText, IdCard, Banknote } from "lucide-react";
 import ImageReorder from "@/components/ImageReorder";
 import VrmAutofill from "@/components/VrmAutofill";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,6 +49,20 @@ const CreateListing = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
+  // Ownership & finance verification
+  const [photoIdFile, setPhotoIdFile] = useState<File | null>(null);
+  const [existingPhotoIdUrl, setExistingPhotoIdUrl] = useState<string | null>(null);
+  const [consignmentFile, setConsignmentFile] = useState<File | null>(null);
+  const [existingConsignmentUrl, setExistingConsignmentUrl] = useState<string | null>(null);
+  const [tradeInvoiceFile, setTradeInvoiceFile] = useState<File | null>(null);
+  const [existingTradeInvoiceUrl, setExistingTradeInvoiceUrl] = useState<string | null>(null);
+  const [financeLetterFile, setFinanceLetterFile] = useState<File | null>(null);
+  const [existingFinanceLetterUrl, setExistingFinanceLetterUrl] = useState<string | null>(null);
+  const photoIdInputRef = useRef<HTMLInputElement>(null);
+  const consignmentInputRef = useRef<HTMLInputElement>(null);
+  const tradeInvoiceInputRef = useRef<HTMLInputElement>(null);
+  const financeLetterInputRef = useRef<HTMLInputElement>(null);
+
   const [form, setForm] = useState({
     title: "",
     make: "",
@@ -66,6 +82,13 @@ const CreateListing = () => {
     location: "",
     video_url: "",
     vat_qualifying: false,
+    sale_type: "own" as "own" | "consignment" | "trade",
+    owner_name: "",
+    owner_address: "",
+    finance_outstanding: false,
+    finance_lender: "",
+    finance_settlement_amount: "",
+    truth_declaration_accepted: false,
   });
 
   // Load existing listing for editing
@@ -99,10 +122,21 @@ const CreateListing = () => {
           location: data.location || "",
           video_url: (data as any).video_url || "",
           vat_qualifying: !!(data as any).vat_qualifying,
+          sale_type: ((data as any).sale_type || "own") as "own" | "consignment" | "trade",
+          owner_name: (data as any).owner_name || "",
+          owner_address: (data as any).owner_address || "",
+          finance_outstanding: !!(data as any).finance_outstanding,
+          finance_lender: (data as any).finance_lender || "",
+          finance_settlement_amount: (data as any).finance_settlement_amount ? String((data as any).finance_settlement_amount) : "",
+          truth_declaration_accepted: !!(data as any).truth_declaration_accepted,
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
         setHpiCheckData((data as any).hpi_check_data || null);
+        setExistingPhotoIdUrl((data as any).photo_id_url || null);
+        setExistingConsignmentUrl((data as any).consignment_agreement_url || null);
+        setExistingTradeInvoiceUrl((data as any).trade_invoice_url || null);
+        setExistingFinanceLetterUrl((data as any).finance_settlement_letter_url || null);
       } else {
         toast({ title: "Listing not found", variant: "destructive" });
         navigate("/dashboard");
@@ -112,7 +146,7 @@ const CreateListing = () => {
     loadListing();
   }, [editId, user]);
 
-  const updateField = (field: string, value: string | number) => {
+  const updateField = (field: string, value: string | number | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -140,14 +174,32 @@ const CreateListing = () => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleLogbookSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const makeFileSelectHandler = (
+    setter: (f: File | null) => void,
+    label: string,
+    maxMb = 10
+  ) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Max 10MB for logbook upload.", variant: "destructive" });
+    if (file.size > maxMb * 1024 * 1024) {
+      toast({ title: "File too large", description: `Max ${maxMb}MB for ${label}.`, variant: "destructive" });
       return;
     }
-    setLogbookFile(file);
+    setter(file);
+  };
+
+  const handleLogbookSelect = makeFileSelectHandler(setLogbookFile, "logbook upload");
+  const handlePhotoIdSelect = makeFileSelectHandler(setPhotoIdFile, "photo ID");
+  const handleConsignmentSelect = makeFileSelectHandler(setConsignmentFile, "consignment agreement");
+  const handleTradeInvoiceSelect = makeFileSelectHandler(setTradeInvoiceFile, "trade invoice");
+  const handleFinanceLetterSelect = makeFileSelectHandler(setFinanceLetterFile, "settlement letter");
+
+  const uploadDocIfNew = async (file: File | null, prefix: string, existingPath: string | null): Promise<string | null> => {
+    if (!file) return existingPath;
+    const ext = file.name.split(".").pop();
+    const path = `${user!.id}/${prefix}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("listing-documents").upload(path, file);
+    return error ? existingPath : path;
   };
 
   const runHpiCheck = async () => {
@@ -181,10 +233,44 @@ const CreateListing = () => {
       return;
     }
 
-    // When publishing (not draft), require logbook
-    if (status === "active" && !logbookFile && !existingLogbookUrl) {
-      toast({ title: "Logbook Required", description: "Please upload a V5C logbook / ownership document before publishing.", variant: "destructive" });
-      return;
+    // When publishing (not draft), enforce verification requirements
+    if (status === "active") {
+      if (!logbookFile && !existingLogbookUrl) {
+        toast({ title: "Logbook Required", description: "Please upload a V5C logbook / ownership document before publishing.", variant: "destructive" });
+        return;
+      }
+      if (!photoIdFile && !existingPhotoIdUrl) {
+        toast({ title: "Photo ID Required", description: "Please upload a photo ID (passport or driving licence) matching the seller name.", variant: "destructive" });
+        return;
+      }
+      if (form.sale_type === "consignment") {
+        if (!form.owner_name.trim() || !form.owner_address.trim()) {
+          toast({ title: "Owner details required", description: "Please provide the registered owner's name and address for consignment sales.", variant: "destructive" });
+          return;
+        }
+        if (!consignmentFile && !existingConsignmentUrl) {
+          toast({ title: "Consignment Agreement Required", description: "Upload the signed agreement between you and the registered owner.", variant: "destructive" });
+          return;
+        }
+      }
+      if (form.sale_type === "trade" && !tradeInvoiceFile && !existingTradeInvoiceUrl) {
+        toast({ title: "Trade Invoice Required", description: "Upload the purchase invoice showing how the vehicle was acquired into stock.", variant: "destructive" });
+        return;
+      }
+      if (form.finance_outstanding) {
+        if (!form.finance_lender.trim()) {
+          toast({ title: "Lender required", description: "Please name the finance company holding the vehicle.", variant: "destructive" });
+          return;
+        }
+        if (!financeLetterFile && !existingFinanceLetterUrl) {
+          toast({ title: "Settlement Letter Required", description: "Upload a settlement letter from the finance company.", variant: "destructive" });
+          return;
+        }
+      }
+      if (!form.truth_declaration_accepted) {
+        toast({ title: "Declaration Required", description: "Please confirm the truth-of-information declaration before submitting.", variant: "destructive" });
+        return;
+      }
     }
 
     setLoading(true);
@@ -205,19 +291,18 @@ const CreateListing = () => {
         }
       }
 
-      // Upload logbook if new
-      let logbookUrl = existingLogbookUrl;
-      if (logbookFile) {
-        const ext = logbookFile.name.split(".").pop();
-        const logbookPath = `${user.id}/logbook-${Date.now()}.${ext}`;
-        const { error: logbookErr } = await supabase.storage
-          .from("listing-documents")
-          .upload(logbookPath, logbookFile);
-        if (!logbookErr) {
-          // For private bucket, store the path — admin will generate signed URL
-          logbookUrl = logbookPath;
-        }
-      }
+      // Upload verification documents to private bucket
+      const logbookUrl = await uploadDocIfNew(logbookFile, "logbook", existingLogbookUrl);
+      const photoIdUrl = await uploadDocIfNew(photoIdFile, "photo-id", existingPhotoIdUrl);
+      const consignmentUrl = form.sale_type === "consignment"
+        ? await uploadDocIfNew(consignmentFile, "consignment", existingConsignmentUrl)
+        : existingConsignmentUrl;
+      const tradeInvoiceUrl = form.sale_type === "trade"
+        ? await uploadDocIfNew(tradeInvoiceFile, "trade-invoice", existingTradeInvoiceUrl)
+        : existingTradeInvoiceUrl;
+      const financeLetterUrl = form.finance_outstanding
+        ? await uploadDocIfNew(financeLetterFile, "finance-letter", existingFinanceLetterUrl)
+        : existingFinanceLetterUrl;
 
       // Upload video file if provided
       let videoUrl = form.video_url || null;
@@ -276,6 +361,18 @@ const CreateListing = () => {
         hpi_check_data: hpiCheckData,
         video_url: videoUrl,
         vat_qualifying: !!form.vat_qualifying,
+        sale_type: form.sale_type,
+        owner_name: form.sale_type === "consignment" ? (form.owner_name || null) : null,
+        owner_address: form.sale_type === "consignment" ? (form.owner_address || null) : null,
+        consignment_agreement_url: consignmentUrl,
+        photo_id_url: photoIdUrl,
+        trade_invoice_url: tradeInvoiceUrl,
+        finance_outstanding: !!form.finance_outstanding,
+        finance_lender: form.finance_outstanding ? (form.finance_lender || null) : null,
+        finance_settlement_amount: form.finance_outstanding && form.finance_settlement_amount ? parseFloat(form.finance_settlement_amount) : null,
+        finance_settlement_letter_url: financeLetterUrl,
+        truth_declaration_accepted: !!form.truth_declaration_accepted,
+        truth_declaration_at: form.truth_declaration_accepted ? new Date().toISOString() : null,
       };
 
       if (editId) {
@@ -616,44 +713,228 @@ const CreateListing = () => {
               <Shield className="h-4 w-4 text-primary" /> Verification Documents
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-6">
+            {/* Sale Type */}
+            <div>
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <FileText className="h-4 w-4" /> How are you selling this vehicle? *
+              </Label>
+              <RadioGroup
+                value={form.sale_type}
+                onValueChange={(v) => updateField("sale_type", v)}
+                className="mt-2 grid gap-2 sm:grid-cols-3"
+              >
+                {[
+                  { value: "own", label: "My own vehicle", desc: "Registered in my name" },
+                  { value: "consignment", label: "On consignment", desc: "Selling on behalf of owner" },
+                  { value: "trade", label: "Trade stock", desc: "Dealer-acquired stock" },
+                ].map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex cursor-pointer items-start gap-2 rounded-md border p-3 text-sm transition-all ${
+                      form.sale_type === opt.value ? "border-primary bg-primary/5" : "border-border"
+                    }`}
+                  >
+                    <RadioGroupItem value={opt.value} className="mt-0.5" />
+                    <div>
+                      <p className="font-medium">{opt.label}</p>
+                      <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                    </div>
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+
             {/* Logbook Upload */}
             <div>
               <Label className="flex items-center gap-2 text-sm font-medium">
                 <FileCheck className="h-4 w-4" /> V5C Log Book / Ownership Document *
               </Label>
               <p className="mt-1 text-xs text-muted-foreground">
-                Upload your vehicle logbook (V5C) or ownership certificate. Required before your listing can go live.
+                {form.sale_type === "consignment"
+                  ? "Upload the registered owner's V5C logbook."
+                  : "Upload your V5C logbook or equivalent ownership certificate."}
               </p>
               <div className="mt-2 flex items-center gap-3">
-                {existingLogbookUrl ? (
+                {existingLogbookUrl || logbookFile ? (
                   <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
-                    <CheckCircle className="h-4 w-4" /> Logbook uploaded
-                  </div>
-                ) : logbookFile ? (
-                  <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
-                    <CheckCircle className="h-4 w-4" /> {logbookFile.name}
+                    <CheckCircle className="h-4 w-4" /> {logbookFile?.name || "Uploaded"}
                   </div>
                 ) : null}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => logbookInputRef.current?.click()}
-                >
+                <Button type="button" variant="outline" size="sm" onClick={() => logbookInputRef.current?.click()}>
                   <Upload className="mr-1 h-4 w-4" /> {existingLogbookUrl || logbookFile ? "Replace" : "Upload"}
                 </Button>
-                <input
-                  ref={logbookInputRef}
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png,.webp"
-                  className="hidden"
-                  onChange={handleLogbookSelect}
-                />
+                <input ref={logbookInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleLogbookSelect} />
               </div>
             </div>
 
-            {/* HPI Check */}
+            {/* Photo ID */}
+            <div>
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <IdCard className="h-4 w-4" /> Photo ID (Driving Licence or Passport) *
+              </Label>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Must match the seller (you). Used to confirm identity against the V5C / consignment agreement.
+              </p>
+              <div className="mt-2 flex items-center gap-3">
+                {existingPhotoIdUrl || photoIdFile ? (
+                  <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                    <CheckCircle className="h-4 w-4" /> {photoIdFile?.name || "Uploaded"}
+                  </div>
+                ) : null}
+                <Button type="button" variant="outline" size="sm" onClick={() => photoIdInputRef.current?.click()}>
+                  <Upload className="mr-1 h-4 w-4" /> {existingPhotoIdUrl || photoIdFile ? "Replace" : "Upload"}
+                </Button>
+                <input ref={photoIdInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handlePhotoIdSelect} />
+              </div>
+            </div>
+
+            {/* Consignment-specific */}
+            {form.sale_type === "consignment" && (
+              <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-4">
+                <p className="text-sm font-medium">Consignment Details</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label className="text-xs">Registered owner's full name *</Label>
+                    <Input
+                      value={form.owner_name}
+                      onChange={(e) => updateField("owner_name", e.target.value)}
+                      placeholder="As shown on V5C"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Owner's address *</Label>
+                    <Input
+                      value={form.owner_address}
+                      onChange={(e) => updateField("owner_address", e.target.value)}
+                      placeholder="As shown on V5C"
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2 text-xs">
+                    <FileText className="h-3.5 w-3.5" /> Signed Consignment Agreement *
+                  </Label>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Document signed by both you and the owner authorising you to sell on their behalf.
+                  </p>
+                  <div className="mt-2 flex items-center gap-3">
+                    {existingConsignmentUrl || consignmentFile ? (
+                      <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                        <CheckCircle className="h-4 w-4" /> {consignmentFile?.name || "Uploaded"}
+                      </div>
+                    ) : null}
+                    <Button type="button" variant="outline" size="sm" onClick={() => consignmentInputRef.current?.click()}>
+                      <Upload className="mr-1 h-4 w-4" /> {existingConsignmentUrl || consignmentFile ? "Replace" : "Upload"}
+                    </Button>
+                    <input ref={consignmentInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleConsignmentSelect} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Trade-specific */}
+            {form.sale_type === "trade" && (
+              <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-4">
+                <Label className="flex items-center gap-2 text-sm font-medium">
+                  <FileText className="h-4 w-4" /> Trade Purchase Invoice *
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Invoice or auction receipt showing how the vehicle entered your stock.
+                </p>
+                <div className="flex items-center gap-3">
+                  {existingTradeInvoiceUrl || tradeInvoiceFile ? (
+                    <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                      <CheckCircle className="h-4 w-4" /> {tradeInvoiceFile?.name || "Uploaded"}
+                    </div>
+                  ) : null}
+                  <Button type="button" variant="outline" size="sm" onClick={() => tradeInvoiceInputRef.current?.click()}>
+                    <Upload className="mr-1 h-4 w-4" /> {existingTradeInvoiceUrl || tradeInvoiceFile ? "Replace" : "Upload"}
+                  </Button>
+                  <input ref={tradeInvoiceInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleTradeInvoiceSelect} />
+                </div>
+              </div>
+            )}
+
+            {/* Finance Disclosure */}
+            <div className="space-y-3 rounded-md border border-amber-500/30 bg-amber-500/5 p-4">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <Banknote className="h-4 w-4 text-amber-500" /> Outstanding Finance Declaration *
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                It is illegal to sell a vehicle with outstanding finance without the lender's consent.
+              </p>
+              <RadioGroup
+                value={form.finance_outstanding ? "yes" : "no"}
+                onValueChange={(v) => updateField("finance_outstanding", v === "yes")}
+                className="grid gap-2 sm:grid-cols-2"
+              >
+                {[
+                  { value: "no", label: "No outstanding finance" },
+                  { value: "yes", label: "Yes — finance is outstanding" },
+                ].map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex cursor-pointer items-center gap-2 rounded-md border p-3 text-sm transition-all ${
+                      (form.finance_outstanding ? "yes" : "no") === opt.value ? "border-primary bg-primary/5" : "border-border"
+                    }`}
+                  >
+                    <RadioGroupItem value={opt.value} />
+                    {opt.label}
+                  </label>
+                ))}
+              </RadioGroup>
+
+              {form.finance_outstanding && (
+                <div className="space-y-3 border-t border-amber-500/20 pt-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <Label className="text-xs">Finance company / lender *</Label>
+                      <Input
+                        value={form.finance_lender}
+                        onChange={(e) => updateField("finance_lender", e.target.value)}
+                        placeholder="e.g. Black Horse, Santander Consumer"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Settlement amount ({config.currency.symbol})</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={form.finance_settlement_amount}
+                        onChange={(e) => updateField("finance_settlement_amount", e.target.value)}
+                        placeholder="0.00"
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="flex items-center gap-2 text-xs">
+                      <FileText className="h-3.5 w-3.5" /> Settlement Letter from Lender *
+                    </Label>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Letter confirming settlement figure and that finance will be cleared on sale.
+                    </p>
+                    <div className="mt-2 flex items-center gap-3">
+                      {existingFinanceLetterUrl || financeLetterFile ? (
+                        <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                          <CheckCircle className="h-4 w-4" /> {financeLetterFile?.name || "Uploaded"}
+                        </div>
+                      ) : null}
+                      <Button type="button" variant="outline" size="sm" onClick={() => financeLetterInputRef.current?.click()}>
+                        <Upload className="mr-1 h-4 w-4" /> {existingFinanceLetterUrl || financeLetterFile ? "Replace" : "Upload"}
+                      </Button>
+                      <input ref={financeLetterInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleFinanceLetterSelect} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+
             <div>
               <Label className="flex items-center gap-2 text-sm font-medium">
                 <Shield className="h-4 w-4" /> HPI / Vehicle History Check
@@ -691,8 +972,25 @@ const CreateListing = () => {
               )}
             </div>
 
+            {/* Truth Declaration */}
+            <label className="flex cursor-pointer items-start gap-3 rounded-md border border-primary/30 bg-primary/5 p-4">
+              <Checkbox
+                checked={form.truth_declaration_accepted}
+                onCheckedChange={(v) => updateField("truth_declaration_accepted", !!v)}
+                className="mt-0.5"
+              />
+              <div className="text-xs text-muted-foreground">
+                <p className="font-medium text-foreground">I declare that the information provided is true and accurate.</p>
+                <p className="mt-1">
+                  I confirm I am legally entitled to sell this vehicle, that the documents uploaded are genuine, and that any
+                  outstanding finance has been disclosed. I understand that providing false information may result in my listing
+                  being removed, my account suspended, and may constitute a criminal offence.
+                </p>
+              </div>
+            </label>
+
             <div className="rounded-md border border-border bg-muted/50 p-3 text-xs text-muted-foreground">
-              <strong>Note:</strong> All listings are submitted for admin review. Your listing will go live once the logbook and vehicle history have been verified by our team.
+              <strong>Note:</strong> All listings are submitted for admin review. Your listing will go live once your documents and vehicle history have been verified by our team. Documents are stored privately and only visible to Zivvo admins.
             </div>
           </CardContent>
         </Card>
