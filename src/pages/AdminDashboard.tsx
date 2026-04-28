@@ -35,7 +35,6 @@ import AdminInspectionPanel from "@/components/AdminInspectionPanel";
 import AdminDmsHealthPanel from "@/components/AdminDmsHealthPanel";
 import AdminAnalyticsPanel from "@/components/AdminAnalyticsPanel";
 import AdminVerificationDialog from "@/components/AdminVerificationDialog";
-import { Eye } from "lucide-react";
 
 
 
