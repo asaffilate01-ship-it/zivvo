@@ -10,7 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle, Sparkles } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle, Sparkles, FileText, IdCard, Banknote } from "lucide-react";
 import ImageReorder from "@/components/ImageReorder";
 import VrmAutofill from "@/components/VrmAutofill";
 import { useAuth } from "@/contexts/AuthContext";
