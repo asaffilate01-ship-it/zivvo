@@ -35,6 +35,7 @@ import AdminInspectionPanel from "@/components/AdminInspectionPanel";
 import AdminDmsHealthPanel from "@/components/AdminDmsHealthPanel";
 import AdminAnalyticsPanel from "@/components/AdminAnalyticsPanel";
 import AdminInspectionBookingsPanel from "@/components/AdminInspectionBookingsPanel";
+import AdminInspectorsPanel from "@/components/AdminInspectorsPanel";
 import AdminVerificationDialog from "@/components/AdminVerificationDialog";
 
 
