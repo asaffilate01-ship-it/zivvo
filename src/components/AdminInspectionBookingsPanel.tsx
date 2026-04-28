@@ -50,14 +50,17 @@ const AdminInspectionBookingsPanel = () => {
   const [status, setStatus] = useState("");
   const [reportFile, setReportFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [inspectors, setInspectors] = useState<any[]>([]);
+  const [inspectorId, setInspectorId] = useState<string>("");
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("inspection_bookings")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setBookings((data as any) || []);
+    const [{ data: bks }, { data: ins }] = await Promise.all([
+      supabase.from("inspection_bookings").select("*").order("created_at", { ascending: false }),
+      supabase.from("inspector_profiles").select("user_id, full_name, coverage_postcodes, max_travel_miles, is_verified, is_active, total_inspections").eq("is_active", true).eq("is_verified", true),
+    ]);
+    setBookings((bks as any) || []);
+    setInspectors((ins as any) || []);
     setLoading(false);
   };
 
