@@ -371,6 +371,7 @@ const CreateListing = () => {
         finance_settlement_letter_url: financeLetterUrl,
         truth_declaration_accepted: !!form.truth_declaration_accepted,
         truth_declaration_at: form.truth_declaration_accepted ? new Date().toISOString() : null,
+      };
 
       if (editId) {
         const { error } = await supabase.from("car_listings")
