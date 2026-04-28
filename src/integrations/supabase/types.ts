@@ -1811,6 +1811,137 @@ export type Database = {
           },
         ]
       }
+      inspection_scorecards: {
+        Row: {
+          booking_id: string
+          checklist: Json
+          created_at: string
+          grade: string | null
+          id: string
+          inspector_id: string
+          overall_notes: string | null
+          pdf_url: string | null
+          recommendation: string | null
+          score: number | null
+          started_at: string
+          submitted_at: string | null
+          total_points: number | null
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          checklist?: Json
+          created_at?: string
+          grade?: string | null
+          id?: string
+          inspector_id: string
+          overall_notes?: string | null
+          pdf_url?: string | null
+          recommendation?: string | null
+          score?: number | null
+          started_at?: string
+          submitted_at?: string | null
+          total_points?: number | null
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          checklist?: Json
+          created_at?: string
+          grade?: string | null
+          id?: string
+          inspector_id?: string
+          overall_notes?: string | null
+          pdf_url?: string | null
+          recommendation?: string | null
+          score?: number | null
+          started_at?: string
+          submitted_at?: string | null
+          total_points?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_scorecards_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "inspection_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspector_profiles: {
+        Row: {
+          avg_score_given: number | null
+          base_address: string | null
+          base_latitude: number | null
+          base_longitude: number | null
+          bio: string | null
+          coverage_postcodes: string[] | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          max_travel_miles: number | null
+          phone: string | null
+          profile_photo_url: string | null
+          qualifications: string | null
+          rating: number | null
+          total_inspections: number | null
+          updated_at: string
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          avg_score_given?: number | null
+          base_address?: string | null
+          base_latitude?: number | null
+          base_longitude?: number | null
+          bio?: string | null
+          coverage_postcodes?: string[] | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          max_travel_miles?: number | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          qualifications?: string | null
+          rating?: number | null
+          total_inspections?: number | null
+          updated_at?: string
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          avg_score_given?: number | null
+          base_address?: string | null
+          base_latitude?: number | null
+          base_longitude?: number | null
+          bio?: string | null
+          coverage_postcodes?: string[] | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          max_travel_miles?: number | null
+          phone?: string | null
+          profile_photo_url?: string | null
+          qualifications?: string | null
+          rating?: number | null
+          total_inspections?: number | null
+          updated_at?: string
+          user_id?: string
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       listing_fingerprints: {
         Row: {
           color: string | null
@@ -3371,7 +3502,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "buyer" | "seller" | "dealer" | "agent" | "admin"
+      app_role: "buyer" | "seller" | "dealer" | "agent" | "admin" | "inspector"
       arbitrage_status:
         | "sourced"
         | "offer_sent"
@@ -3574,7 +3705,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["buyer", "seller", "dealer", "agent", "admin"],
+      app_role: ["buyer", "seller", "dealer", "agent", "admin", "inspector"],
       arbitrage_status: [
         "sourced",
         "offer_sent",

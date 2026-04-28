@@ -50,14 +50,17 @@ const AdminInspectionBookingsPanel = () => {
   const [status, setStatus] = useState("");
   const [reportFile, setReportFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [inspectors, setInspectors] = useState<any[]>([]);
+  const [inspectorId, setInspectorId] = useState<string>("");
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("inspection_bookings")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setBookings((data as any) || []);
+    const [{ data: bks }, { data: ins }] = await Promise.all([
+      supabase.from("inspection_bookings").select("*").order("created_at", { ascending: false }),
+      supabase.from("inspector_profiles").select("user_id, full_name, coverage_postcodes, max_travel_miles, is_verified, is_active, total_inspections").eq("is_active", true).eq("is_verified", true),
+    ]);
+    setBookings((bks as any) || []);
+    setInspectors((ins as any) || []);
     setLoading(false);
   };
 
@@ -70,6 +73,17 @@ const AdminInspectionBookingsPanel = () => {
     setScheduledAt(b.scheduled_at ? b.scheduled_at.slice(0, 16) : "");
     setStatus(b.status);
     setReportFile(null);
+    setInspectorId((b as any).inspector_id || "");
+  };
+
+  // Filter inspectors that cover this booking's postcode area
+  const matchingInspectors = (b: Booking | null) => {
+    if (!b?.buyer_address) return inspectors;
+    const upper = b.buyer_address.toUpperCase();
+    const matches = inspectors.filter((i) =>
+      (i.coverage_postcodes || []).some((pc: string) => upper.includes(pc.toUpperCase()))
+    );
+    return matches.length > 0 ? matches : inspectors;
   };
 
   const save = async () => {
@@ -90,6 +104,7 @@ const AdminInspectionBookingsPanel = () => {
         scheduled_at: scheduledAt ? new Date(scheduledAt).toISOString() : null,
         score: score ? parseInt(score) : null,
         report_url: reportUrl,
+        inspector_id: inspectorId || null,
       };
       if (status === "completed") updates.completed_at = new Date().toISOString();
 
@@ -171,6 +186,22 @@ const AdminInspectionBookingsPanel = () => {
                   <div><strong>Phone:</strong> {editing.buyer_phone}</div>
                   <div><strong>Address:</strong> {editing.buyer_address}</div>
                   {editing.buyer_notes && <div><strong>Notes:</strong> {editing.buyer_notes}</div>}
+                </div>
+
+                <div>
+                  <Label>Assign inspector</Label>
+                  <Select value={inspectorId} onValueChange={setInspectorId}>
+                    <SelectTrigger><SelectValue placeholder="Select inspector..." /></SelectTrigger>
+                    <SelectContent>
+                      {matchingInspectors(editing).length === 0 && <SelectItem value="none" disabled>No verified inspectors</SelectItem>}
+                      {matchingInspectors(editing).map((i) => (
+                        <SelectItem key={i.user_id} value={i.user_id}>
+                          {i.full_name} · {(i.coverage_postcodes || []).slice(0, 4).join(", ")} · {i.total_inspections || 0} done
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground mt-1">Filtered by postcode coverage matching buyer address.</p>
                 </div>
 
                 <div>

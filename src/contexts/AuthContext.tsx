@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode, useCallback 
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type AppRole = "buyer" | "seller" | "dealer" | "agent" | "admin";
+type AppRole = "buyer" | "seller" | "dealer" | "agent" | "admin" | "inspector";
 
 interface SubscriptionInfo {
   subscribed: boolean;
