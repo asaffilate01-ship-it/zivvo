@@ -972,8 +972,25 @@ const CreateListing = () => {
               )}
             </div>
 
+            {/* Truth Declaration */}
+            <label className="flex cursor-pointer items-start gap-3 rounded-md border border-primary/30 bg-primary/5 p-4">
+              <Checkbox
+                checked={form.truth_declaration_accepted}
+                onCheckedChange={(v) => updateField("truth_declaration_accepted", !!v)}
+                className="mt-0.5"
+              />
+              <div className="text-xs text-muted-foreground">
+                <p className="font-medium text-foreground">I declare that the information provided is true and accurate.</p>
+                <p className="mt-1">
+                  I confirm I am legally entitled to sell this vehicle, that the documents uploaded are genuine, and that any
+                  outstanding finance has been disclosed. I understand that providing false information may result in my listing
+                  being removed, my account suspended, and may constitute a criminal offence.
+                </p>
+              </div>
+            </label>
+
             <div className="rounded-md border border-border bg-muted/50 p-3 text-xs text-muted-foreground">
-              <strong>Note:</strong> All listings are submitted for admin review. Your listing will go live once the logbook and vehicle history have been verified by our team.
+              <strong>Note:</strong> All listings are submitted for admin review. Your listing will go live once your documents and vehicle history have been verified by our team. Documents are stored privately and only visible to Zivvo admins.
             </div>
           </CardContent>
         </Card>
