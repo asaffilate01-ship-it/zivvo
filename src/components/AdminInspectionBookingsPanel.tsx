@@ -73,6 +73,17 @@ const AdminInspectionBookingsPanel = () => {
     setScheduledAt(b.scheduled_at ? b.scheduled_at.slice(0, 16) : "");
     setStatus(b.status);
     setReportFile(null);
+    setInspectorId((b as any).inspector_id || "");
+  };
+
+  // Filter inspectors that cover this booking's postcode area
+  const matchingInspectors = (b: Booking | null) => {
+    if (!b?.buyer_address) return inspectors;
+    const upper = b.buyer_address.toUpperCase();
+    const matches = inspectors.filter((i) =>
+      (i.coverage_postcodes || []).some((pc: string) => upper.includes(pc.toUpperCase()))
+    );
+    return matches.length > 0 ? matches : inspectors;
   };
 
   const save = async () => {
@@ -93,6 +104,7 @@ const AdminInspectionBookingsPanel = () => {
         scheduled_at: scheduledAt ? new Date(scheduledAt).toISOString() : null,
         score: score ? parseInt(score) : null,
         report_url: reportUrl,
+        inspector_id: inspectorId || null,
       };
       if (status === "completed") updates.completed_at = new Date().toISOString();
 
