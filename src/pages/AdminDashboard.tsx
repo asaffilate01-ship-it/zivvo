@@ -36,6 +36,7 @@ import AdminDmsHealthPanel from "@/components/AdminDmsHealthPanel";
 import AdminAnalyticsPanel from "@/components/AdminAnalyticsPanel";
 import AdminInspectionBookingsPanel from "@/components/AdminInspectionBookingsPanel";
 import AdminInspectorsPanel from "@/components/AdminInspectorsPanel";
+import AdminInspectorPayoutsPanel from "@/components/AdminInspectorPayoutsPanel";
 import AdminVerificationDialog from "@/components/AdminVerificationDialog";
 
 
@@ -335,6 +336,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="analytics" className="gap-1"><BarChart3 className="h-3 w-3" /> Analytics</TabsTrigger>
             <TabsTrigger value="inspections" className="gap-1"><Shield className="h-3 w-3" /> Inspections</TabsTrigger>
             <TabsTrigger value="inspectors" className="gap-1"><Shield className="h-3 w-3" /> Inspectors</TabsTrigger>
+            <TabsTrigger value="payouts" className="gap-1"><DollarSign className="h-3 w-3" /> Payouts</TabsTrigger>
           </TabsList>
 
           {/* Dealers Tab */}
@@ -1077,6 +1079,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="inspectors" className="mt-4">
             <AdminInspectorsPanel />
+          </TabsContent>
+
+          <TabsContent value="payouts" className="mt-4">
+            <AdminInspectorPayoutsPanel />
           </TabsContent>
         </Tabs>
 
