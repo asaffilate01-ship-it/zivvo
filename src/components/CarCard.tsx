@@ -10,6 +10,7 @@ import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import PriceIndicatorBadge from "@/components/PriceIndicatorBadge";
 import DealerPerformanceBadge from "@/components/DealerPerformanceBadge";
+import InspectionBadge from "@/components/InspectionBadge";
 
 // Rough monthly finance estimate: 10% deposit, 60 months, 9.9% APR
 const estimateMonthly = (price: number) => {
