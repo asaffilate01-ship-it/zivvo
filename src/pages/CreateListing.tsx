@@ -172,14 +172,32 @@ const CreateListing = () => {
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleLogbookSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const makeFileSelectHandler = (
+    setter: (f: File | null) => void,
+    label: string,
+    maxMb = 10
+  ) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Max 10MB for logbook upload.", variant: "destructive" });
+    if (file.size > maxMb * 1024 * 1024) {
+      toast({ title: "File too large", description: `Max ${maxMb}MB for ${label}.`, variant: "destructive" });
       return;
     }
-    setLogbookFile(file);
+    setter(file);
+  };
+
+  const handleLogbookSelect = makeFileSelectHandler(setLogbookFile, "logbook upload");
+  const handlePhotoIdSelect = makeFileSelectHandler(setPhotoIdFile, "photo ID");
+  const handleConsignmentSelect = makeFileSelectHandler(setConsignmentFile, "consignment agreement");
+  const handleTradeInvoiceSelect = makeFileSelectHandler(setTradeInvoiceFile, "trade invoice");
+  const handleFinanceLetterSelect = makeFileSelectHandler(setFinanceLetterFile, "settlement letter");
+
+  const uploadDocIfNew = async (file: File | null, prefix: string, existingPath: string | null): Promise<string | null> => {
+    if (!file) return existingPath;
+    const ext = file.name.split(".").pop();
+    const path = `${user!.id}/${prefix}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("listing-documents").upload(path, file);
+    return error ? existingPath : path;
   };
 
   const runHpiCheck = async () => {
@@ -213,10 +231,44 @@ const CreateListing = () => {
       return;
     }
 
-    // When publishing (not draft), require logbook
-    if (status === "active" && !logbookFile && !existingLogbookUrl) {
-      toast({ title: "Logbook Required", description: "Please upload a V5C logbook / ownership document before publishing.", variant: "destructive" });
-      return;
+    // When publishing (not draft), enforce verification requirements
+    if (status === "active") {
+      if (!logbookFile && !existingLogbookUrl) {
+        toast({ title: "Logbook Required", description: "Please upload a V5C logbook / ownership document before publishing.", variant: "destructive" });
+        return;
+      }
+      if (!photoIdFile && !existingPhotoIdUrl) {
+        toast({ title: "Photo ID Required", description: "Please upload a photo ID (passport or driving licence) matching the seller name.", variant: "destructive" });
+        return;
+      }
+      if (form.sale_type === "consignment") {
+        if (!form.owner_name.trim() || !form.owner_address.trim()) {
+          toast({ title: "Owner details required", description: "Please provide the registered owner's name and address for consignment sales.", variant: "destructive" });
+          return;
+        }
+        if (!consignmentFile && !existingConsignmentUrl) {
+          toast({ title: "Consignment Agreement Required", description: "Upload the signed agreement between you and the registered owner.", variant: "destructive" });
+          return;
+        }
+      }
+      if (form.sale_type === "trade" && !tradeInvoiceFile && !existingTradeInvoiceUrl) {
+        toast({ title: "Trade Invoice Required", description: "Upload the purchase invoice showing how the vehicle was acquired into stock.", variant: "destructive" });
+        return;
+      }
+      if (form.finance_outstanding) {
+        if (!form.finance_lender.trim()) {
+          toast({ title: "Lender required", description: "Please name the finance company holding the vehicle.", variant: "destructive" });
+          return;
+        }
+        if (!financeLetterFile && !existingFinanceLetterUrl) {
+          toast({ title: "Settlement Letter Required", description: "Upload a settlement letter from the finance company.", variant: "destructive" });
+          return;
+        }
+      }
+      if (!form.truth_declaration_accepted) {
+        toast({ title: "Declaration Required", description: "Please confirm the truth-of-information declaration before submitting.", variant: "destructive" });
+        return;
+      }
     }
 
     setLoading(true);
