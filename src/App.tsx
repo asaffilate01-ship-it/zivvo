@@ -62,6 +62,9 @@ const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Accessibility = lazy(() => import("./pages/Accessibility"));
 const ModernSlavery = lazy(() => import("./pages/ModernSlavery"));
 const DealerIntegrations = lazy(() => import("./pages/DealerIntegrations"));
+const InspectorDashboard = lazy(() => import("./pages/InspectorDashboard"));
+const InspectorOnboard = lazy(() => import("./pages/InspectorOnboard"));
+const InspectorJob = lazy(() => import("./pages/InspectorJob"));
 
 const queryClient = new QueryClient();
 
@@ -215,6 +218,9 @@ const App = () => (
                           </ProtectedRoute>
                         }
                       />
+                      <Route path="/inspector" element={<ProtectedRoute><InspectorDashboard /></ProtectedRoute>} />
+                      <Route path="/inspector/onboard" element={<ProtectedRoute><InspectorOnboard /></ProtectedRoute>} />
+                      <Route path="/inspector/job/:id" element={<ProtectedRoute><InspectorJob /></ProtectedRoute>} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
