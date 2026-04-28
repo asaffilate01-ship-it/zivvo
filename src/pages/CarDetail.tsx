@@ -10,6 +10,7 @@ import SellerReviews from "@/components/SellerReviews";
 import PaymentCalculator from "@/components/PaymentCalculator";
 import PartExchangeWidget from "@/components/PartExchangeWidget";
 import MakeOfferDialog from "@/components/MakeOfferDialog";
+import InspectionBookingDialog from "@/components/InspectionBookingDialog";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
