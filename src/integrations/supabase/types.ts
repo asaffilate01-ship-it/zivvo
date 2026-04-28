@@ -1870,6 +1870,48 @@ export type Database = {
           },
         ]
       }
+      inspector_payouts: {
+        Row: {
+          amount: number
+          booking_id: string
+          created_at: string
+          currency: string
+          id: string
+          inspector_id: string
+          notes: string | null
+          paid_at: string | null
+          payment_reference: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          booking_id: string
+          created_at?: string
+          currency?: string
+          id?: string
+          inspector_id: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          inspector_id?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inspector_profiles: {
         Row: {
           avg_score_given: number | null
