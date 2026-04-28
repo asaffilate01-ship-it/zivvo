@@ -289,19 +289,18 @@ const CreateListing = () => {
         }
       }
 
-      // Upload logbook if new
-      let logbookUrl = existingLogbookUrl;
-      if (logbookFile) {
-        const ext = logbookFile.name.split(".").pop();
-        const logbookPath = `${user.id}/logbook-${Date.now()}.${ext}`;
-        const { error: logbookErr } = await supabase.storage
-          .from("listing-documents")
-          .upload(logbookPath, logbookFile);
-        if (!logbookErr) {
-          // For private bucket, store the path — admin will generate signed URL
-          logbookUrl = logbookPath;
-        }
-      }
+      // Upload verification documents to private bucket
+      const logbookUrl = await uploadDocIfNew(logbookFile, "logbook", existingLogbookUrl);
+      const photoIdUrl = await uploadDocIfNew(photoIdFile, "photo-id", existingPhotoIdUrl);
+      const consignmentUrl = form.sale_type === "consignment"
+        ? await uploadDocIfNew(consignmentFile, "consignment", existingConsignmentUrl)
+        : existingConsignmentUrl;
+      const tradeInvoiceUrl = form.sale_type === "trade"
+        ? await uploadDocIfNew(tradeInvoiceFile, "trade-invoice", existingTradeInvoiceUrl)
+        : existingTradeInvoiceUrl;
+      const financeLetterUrl = form.finance_outstanding
+        ? await uploadDocIfNew(financeLetterFile, "finance-letter", existingFinanceLetterUrl)
+        : existingFinanceLetterUrl;
 
       // Upload video file if provided
       let videoUrl = form.video_url || null;
@@ -360,7 +359,18 @@ const CreateListing = () => {
         hpi_check_data: hpiCheckData,
         video_url: videoUrl,
         vat_qualifying: !!form.vat_qualifying,
-      };
+        sale_type: form.sale_type,
+        owner_name: form.sale_type === "consignment" ? (form.owner_name || null) : null,
+        owner_address: form.sale_type === "consignment" ? (form.owner_address || null) : null,
+        consignment_agreement_url: consignmentUrl,
+        photo_id_url: photoIdUrl,
+        trade_invoice_url: tradeInvoiceUrl,
+        finance_outstanding: !!form.finance_outstanding,
+        finance_lender: form.finance_outstanding ? (form.finance_lender || null) : null,
+        finance_settlement_amount: form.finance_outstanding && form.finance_settlement_amount ? parseFloat(form.finance_settlement_amount) : null,
+        finance_settlement_letter_url: financeLetterUrl,
+        truth_declaration_accepted: !!form.truth_declaration_accepted,
+        truth_declaration_at: form.truth_declaration_accepted ? new Date().toISOString() : null,
 
       if (editId) {
         const { error } = await supabase.from("car_listings")
