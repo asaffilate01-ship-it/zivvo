@@ -779,48 +779,31 @@ const slides: { title: string; node: ReactNode }[] = [
     ),
   },
 
-  /* 21 — TECH STACK */
+  /* 21 — SECURITY & INFRASTRUCTURE */
   {
-    title: "Tech Stack",
+    title: "Secure & Scalable",
     node: (
       <SlideShell>
-        <SectionTag>Engineered to Scale</SectionTag>
-        <h2 className="text-7xl font-black mt-6 leading-[0.95]">Modern. Serverless. Bank-grade.</h2>
-        <div className="grid grid-cols-2 gap-12 mt-12">
-          <div>
-            <h3 className="text-2xl font-bold text-[hsl(295_85%_70%)] mb-4">Frontend</h3>
-            <div className="space-y-3">
-              {[
-                ["React 18 + Vite + TypeScript", "Type-safe, lightning fast"],
-                ["Tailwind + shadcn/ui", "Custom design system"],
-                ["framer-motion", "60fps animations"],
-                ["React.lazy + code splitting", "Sub-2s page loads"],
-                ["Capacitor", "Native iOS/Android shells"],
-              ].map(([t, d]) => (
-                <div key={t} className="p-4 rounded-xl bg-white/[0.04] border border-white/10">
-                  <div className="font-bold">{t}</div>
-                  <div className="text-white/60 text-sm">{d}</div>
-                </div>
-              ))}
+        <SectionTag>Enterprise-grade Infrastructure</SectionTag>
+        <h2 className="text-7xl font-black mt-6 leading-[0.95]">Secure. Scalable. Always on.</h2>
+        <p className="text-2xl text-white/70 mt-6 max-w-4xl">
+          Built on world-class cloud infrastructure with bank-grade security, so your data — and your customers' — is always protected.
+        </p>
+        <div className="grid grid-cols-3 gap-6 mt-12">
+          {[
+            ["☁️", "Cloud-Native", "Hosted on AWS-backed global infrastructure with 99.99% uptime and auto-scaling on demand."],
+            ["🔒", "Bank-Grade Security", "End-to-end encryption, secure authentication, and continuous security monitoring."],
+            ["🛡️", "GDPR & Compliance Ready", "Full GDPR compliance, audited data handling, and regional data residency."],
+            ["⚡", "Built to Scale", "Handles millions of listings, bids and users without breaking a sweat."],
+            ["🌍", "Global CDN", "Lightning-fast load times in every region we serve."],
+            ["🔁", "Automatic Backups", "Continuous backups and disaster recovery — your data is never at risk."],
+          ].map(([icon, title, desc]) => (
+            <div key={title} className="p-6 rounded-2xl bg-white/[0.04] border border-white/10">
+              <div className="text-4xl mb-3">{icon}</div>
+              <div className="text-xl font-bold mb-2">{title}</div>
+              <div className="text-white/60 text-base leading-relaxed">{desc}</div>
             </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-[hsl(295_85%_70%)] mb-4">Backend & Infra</h3>
-            <div className="space-y-3">
-              {[
-                ["Supabase (Postgres + Auth + Storage)", "RLS-secured, multi-tenant"],
-                ["17 Deno edge functions", "Stripe, AI, vehicle APIs, geocoding"],
-                ["Postgres realtime", "Live chat, bids, notifications"],
-                ["pg_cron", "Auto-close auctions, expire boosts"],
-                ["Stripe + Twilio + Google Maps", "Best-in-class integrations"],
-              ].map(([t, d]) => (
-                <div key={t} className="p-4 rounded-xl bg-white/[0.04] border border-white/10">
-                  <div className="font-bold">{t}</div>
-                  <div className="text-white/60 text-sm">{d}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </SlideShell>
     ),
