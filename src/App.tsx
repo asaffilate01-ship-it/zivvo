@@ -65,6 +65,7 @@ const DealerIntegrations = lazy(() => import("./pages/DealerIntegrations"));
 const InspectorDashboard = lazy(() => import("./pages/InspectorDashboard"));
 const InspectorOnboard = lazy(() => import("./pages/InspectorOnboard"));
 const InspectorJob = lazy(() => import("./pages/InspectorJob"));
+const Pitch = lazy(() => import("./pages/Pitch"));
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ const App = () => (
                   <Suspense fallback={<PageSkeleton />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
+                      <Route path="/pitch" element={<Pitch />} />
                       <Route path="/browse" element={<Browse />} />
                       <Route path="/car/:id" element={<CarDetail />} />
                       <Route path="/login" element={<Login />} />
