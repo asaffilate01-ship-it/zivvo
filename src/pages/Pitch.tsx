@@ -856,18 +856,18 @@ const slides: { title: string; node: ReactNode }[] = [
     title: "Roadmap",
     node: (
       <SlideShell>
-        <SectionTag>12-Month Roadmap</SectionTag>
+        <SectionTag>Roadmap</SectionTag>
         <h2 className="text-7xl font-black mt-6 leading-[0.95]">From UK launch → 4-region scale.</h2>
         <div className="grid grid-cols-4 gap-6 mt-14">
           {[
-            { q: "Q1", t: "UK Launch", items: ["10K dealer outreach", "Public marketing push", "Dealer pricing rollout", "Inspector network in 5 cities"], color: "from-[hsl(265_75%_58%)] to-[hsl(295_75%_60%)]" },
-            { q: "Q2", t: "USA Soft-launch", items: ["NHTSA + Carfax integration", "USD pricing live", "First 100 US dealers", "Spanish localisation"], color: "from-[hsl(280_75%_60%)] to-[hsl(310_75%_65%)]" },
-            { q: "Q3", t: "Pakistan", items: ["Urdu + RTL support", "Excise verification", "Karachi · Lahore · Islamabad", "Mobile-first rollout"], color: "from-[hsl(295_75%_60%)] to-[hsl(325_75%_65%)]" },
-            { q: "Q4", t: "UAE + Series A", items: ["Arabic + RTL", "RTA integration", "Dubai HQ launch", "Series A raise"], color: "from-[hsl(310_75%_60%)] to-[hsl(340_75%_65%)]" },
+            { phase: "Phase 1", t: "UK Launch", items: ["Dealer outreach at scale", "Public marketing push", "Dealer pricing rollout", "Inspector network across key cities"], color: "from-[hsl(265_75%_58%)] to-[hsl(295_75%_60%)]" },
+            { phase: "Phase 2", t: "USA Expansion", items: ["NHTSA + Carfax integration", "USD pricing live", "Onboard first US dealers", "Spanish localisation"], color: "from-[hsl(280_75%_60%)] to-[hsl(310_75%_65%)]" },
+            { phase: "Phase 3", t: "Pakistan", items: ["Urdu + RTL support", "Excise verification", "Karachi · Lahore · Islamabad", "Mobile-first rollout"], color: "from-[hsl(295_75%_60%)] to-[hsl(325_75%_65%)]" },
+            { phase: "Phase 4", t: "UAE + Series A", items: ["Arabic + RTL", "RTA integration", "Dubai HQ launch", "Series A raise"], color: "from-[hsl(310_75%_60%)] to-[hsl(340_75%_65%)]" },
           ].map(p => (
-            <div key={p.q} className="rounded-3xl overflow-hidden">
+            <div key={p.phase} className="rounded-3xl overflow-hidden">
               <div className={`bg-gradient-to-br ${p.color} p-6`}>
-                <div className="text-white/80 font-semibold">{p.q} 2026</div>
+                <div className="text-white/80 font-semibold">{p.phase}</div>
                 <div className="text-3xl font-black mt-2">{p.t}</div>
               </div>
               <div className="bg-white/[0.04] border border-white/10 p-5 space-y-3">
