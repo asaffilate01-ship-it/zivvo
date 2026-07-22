@@ -38,6 +38,7 @@ import AdminInspectionBookingsPanel from "@/components/AdminInspectionBookingsPa
 import AdminInspectorsPanel from "@/components/AdminInspectorsPanel";
 import AdminInspectorPayoutsPanel from "@/components/AdminInspectorPayoutsPanel";
 import AdminVerificationDialog from "@/components/AdminVerificationDialog";
+import AdManager from "@/components/admin/AdManager";
 
 
 
