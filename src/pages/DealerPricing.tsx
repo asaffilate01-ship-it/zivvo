@@ -258,15 +258,15 @@ const DealerPricing = () => {
       <section className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-            Alles, was du brauchst, um mehr Autos zu verkaufen
+            {t("pricing.pillarsTitle")}
           </h2>
         </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: BarChart3, title: "Live-Analytik", desc: "Aufrufe, Leads und Conversion in Echtzeit." },
-            { icon: ShieldCheck, title: "Verifiziertes Abzeichen", desc: "Vertrauen der Käufer durch KYC-Verifizierung." },
-            { icon: Globe2, title: "Multi-Portal-Reichweite", desc: "Inserate automatisch zu mobile.de, AutoScout24 & mehr." },
-            { icon: Headphones, title: "Deutscher Support", desc: "Priorisierte Hilfe von unserem Team in Deutschland." },
+            { icon: BarChart3, title: t("pricing.pillars.analyticsTitle"), desc: t("pricing.pillars.analyticsDesc") },
+            { icon: ShieldCheck, title: t("pricing.pillars.verifiedTitle"), desc: t("pricing.pillars.verifiedDesc") },
+            { icon: Globe2, title: t("pricing.pillars.reachTitle"), desc: t("pricing.pillars.reachDesc") },
+            { icon: Headphones, title: t("pricing.pillars.supportTitle"), desc: t("pricing.pillars.supportDesc") },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="group rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
