@@ -211,7 +211,19 @@ const DealerPricing = () => {
 
                 <div className="my-6 h-px bg-border" />
                 <ul className="space-y-3">
-                  {dealerPlan.features.map((f) => (
+                  {[
+                    t("pricing.dealer.vehicles"),
+                    t("pricing.dealer.photos"),
+                    t("pricing.dealer.videos"),
+                    t("pricing.dealer.trial"),
+                    t("pricing.dealer.analytics"),
+                    t("pricing.dealer.landingPage"),
+                    t("pricing.dealer.featured"),
+                    t("pricing.dealer.support"),
+                    t("pricing.dealer.syndication"),
+                    t("pricing.dealer.financeIntegration"),
+                    t("pricing.dealer.verifiedBadge"),
+                  ].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-card-foreground">
                       <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/15">
                         <Check className="h-3 w-3 text-primary" />
