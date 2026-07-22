@@ -56,7 +56,7 @@ const DealerPricing = () => {
 
   const handleCheckout = async () => {
     if (!businessName.trim()) {
-      toast({ title: "Firmenname erforderlich", variant: "destructive" });
+      toast({ title: t("pricing.dialog.businessNameRequired"), variant: "destructive" });
       return;
     }
     setLoading(selectedPriceId);
@@ -73,7 +73,7 @@ const DealerPricing = () => {
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
-      toast({ title: "Fehler bei der Zahlung", description: err.message, variant: "destructive" });
+      toast({ title: t("pricing.toast.errorTitle"), description: err.message, variant: "destructive" });
     } finally {
       setLoading(null);
     }
