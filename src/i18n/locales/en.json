@@ -206,5 +206,54 @@
     "de": "Deutsch",
     "en": "English",
     "switch": "Change language"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "forgot": "Forgot password?",
+      "submit": "Sign In",
+      "submitting": "Signing in…",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up",
+      "failed": "Login failed",
+      "welcome": "Welcome back!"
+    },
+    "signup": {
+      "title": "Create account",
+      "subtitle": "Start buying or selling vehicles today",
+      "fullName": "Full name",
+      "namePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Min 6 characters",
+      "agree": "I agree to the",
+      "terms": "Terms of Service",
+      "and": "and",
+      "privacy": "Privacy Policy",
+      "acceptRequired": "Please accept the terms and privacy policy",
+      "submit": "Create Account",
+      "submitting": "Creating account…",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "failed": "Signup failed",
+      "checkEmail": "Check your email",
+      "checkEmailDesc": "We sent you a confirmation link to verify your account."
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "Enter your email and we'll send you a reset link.",
+      "sentTitle": "Check your email",
+      "sentSubtitle": "We sent a password reset link to your email.",
+      "email": "Email",
+      "submit": "Send Reset Link",
+      "submitting": "Sending…",
+      "back": "Back to login"
+    }
   }
 }
