@@ -63,7 +63,7 @@ const HeroSearch = () => {
   useEffect(() => {
     const t = setTimeout(async () => {
       setCounting(true);
-      let q = supabase.from("car_listings").select("id", { count: "exact", head: true }).eq("status", "active");
+      let q = supabase.from("car_listings").select("id", { count: "exact", head: true }).eq("status", "active").eq("country", country);
       if (make) q = q.eq("make", make);
       if (model) q = q.eq("model", model);
       if (vehicleType === "vans") q = q.in("body_type", ["Van", "Pickup"]);
