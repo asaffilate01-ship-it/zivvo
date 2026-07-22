@@ -22,7 +22,7 @@ const monthlyToPrice = (m: number) => Math.round(m / 0.0245);
 
 const HeroSearch = () => {
   const navigate = useNavigate();
-  const { config } = useCountry();
+  const { config, country } = useCountry();
   const { t } = useTranslation();
   const { add: addRecentSearch } = useRecentSearches();
 
