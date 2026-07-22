@@ -3,15 +3,8 @@ import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
 
-const GDPR = () => {
-  const { t } = useTranslation("gdpr");
-  const s2List = t("s2List", { returnObjects: true }) as string[];
-  const s3List = t("s3List", { returnObjects: true }) as string[];
-  const s5List = t("s5List", { returnObjects: true }) as string[];
-
-  const renderBold = (line: string) => (
-    <span dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
-  );
+const Impressum = () => {
+  const { t } = useTranslation("impressum");
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,43 +23,34 @@ const GDPR = () => {
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s1Title")}</h2>
-            <p className="mt-2">{t("s1Body")}</p>
+            <p className="mt-2">{t("companyName")}</p>
+            <p>{t("legalForm")}</p>
+            <p>{t("street")}</p>
+            <p>{t("cityLine")}</p>
+            <p>{t("country")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s2Title")}</h2>
-            <ul className="mt-2 list-disc space-y-1 pl-5">
-              {s2List.map((item, i) => <li key={i}>{renderBold(item)}</li>)}
-            </ul>
+            <p className="mt-2">{t("geschaeftsfuehrer")} {t("geschaeftsfuehrerValue")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s3Title")}</h2>
-            <ul className="mt-2 list-disc space-y-1 pl-5">
-              {s3List.map((item, i) => <li key={i}>{renderBold(item)}</li>)}
-            </ul>
+            <p className="mt-2">{t("phoneLabel")} {t("phoneValue")}</p>
+            <p>{t("emailLabel")} {t("emailValue")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s4Title")}</h2>
-            <p className="mt-2">
-              {t("s4Body").split("privacy@zivvo.de").map((part, i, arr) => (
-                <span key={i}>
-                  {part}
-                  {i < arr.length - 1 && (
-                    <a href="mailto:privacy@zivvo.de" className="text-primary underline">privacy@zivvo.de</a>
-                  )}
-                </span>
-              ))}
-            </p>
+            <p className="mt-2">{t("registerCourt")} {t("registerCourtValue")}</p>
+            <p>{t("registerNumber")} {t("registerNumberValue")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s5Title")}</h2>
-            <p className="mt-2">{t("s5Intro")}</p>
-            <ul className="mt-2 list-disc space-y-1 pl-5">
-              {s5List.map((item, i) => <li key={i}>{item}</li>)}
-            </ul>
+            <p className="mt-2">{t("vatBody")}</p>
+            <p>{t("vatValue")}</p>
           </section>
 
           <section>
@@ -81,7 +65,13 @@ const GDPR = () => {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s8Title")}</h2>
-            <p className="mt-2">{t("s8Body")}</p>
+            <p className="mt-2">
+              {t("s8Body")}{" "}
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                {t("s8LinkText")}
+              </a>
+            </p>
+            <p className="mt-2">{t("s8Body2")}</p>
           </section>
 
           <section>
@@ -91,10 +81,17 @@ const GDPR = () => {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s10Title")}</h2>
-            <p className="mt-2">
-              {t("s10Body")}{" "}
-              <a href="mailto:dpo@zivvo.de" className="text-primary underline">dpo@zivvo.de</a>.
-            </p>
+            <p className="mt-2">{t("s10Body")}</p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s11Title")}</h2>
+            <p className="mt-2">{t("s11Body")}</p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s12Title")}</h2>
+            <p className="mt-2">{t("s12Body")}</p>
           </section>
         </div>
       </div>
@@ -103,4 +100,4 @@ const GDPR = () => {
   );
 };
 
-export default GDPR;
+export default Impressum;

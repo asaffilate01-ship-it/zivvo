@@ -60,7 +60,8 @@ const GDPR = lazy(() => import("./pages/GDPR"));
 const ComplaintsPolicy = lazy(() => import("./pages/ComplaintsPolicy"));
 const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
 const Accessibility = lazy(() => import("./pages/Accessibility"));
-const ModernSlavery = lazy(() => import("./pages/ModernSlavery"));
+const Impressum = lazy(() => import("./pages/Impressum"));
+const Widerruf = lazy(() => import("./pages/Widerruf"));
 const DealerIntegrations = lazy(() => import("./pages/DealerIntegrations"));
 const InspectorDashboard = lazy(() => import("./pages/InspectorDashboard"));
 const InspectorOnboard = lazy(() => import("./pages/InspectorOnboard"));
@@ -104,7 +105,8 @@ const App = () => (
                       <Route path="/complaints" element={<ComplaintsPolicy />} />
                       <Route path="/cookies" element={<CookiePolicy />} />
                       <Route path="/accessibility" element={<Accessibility />} />
-                      <Route path="/modern-slavery" element={<ModernSlavery />} />
+                      <Route path="/impressum" element={<Impressum />} />
+                      <Route path="/widerruf" element={<Widerruf />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/help" element={<HelpCentre />} />
                       <Route path="/compare" element={<CompareCars />} />
