@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const Signup = () => {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +25,7 @@ const Signup = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreed) {
-      toast({ title: "Please accept the terms and privacy policy", variant: "destructive" });
+      toast({ title: t("auth.signup.acceptRequired"), variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -38,11 +40,11 @@ const Signup = () => {
     setLoading(false);
 
     if (error) {
-      toast({ title: "Signup failed", description: error.message, variant: "destructive" });
+      toast({ title: t("auth.signup.failed"), description: error.message, variant: "destructive" });
     } else {
       toast({
-        title: "Check your email",
-        description: "We sent you a confirmation link to verify your account.",
+        title: t("auth.signup.checkEmail"),
+        description: t("auth.signup.checkEmailDesc"),
       });
       navigate("/login");
     }
@@ -58,23 +60,23 @@ const Signup = () => {
               <div className="gradient-primary mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
                 <Car className="h-7 w-7 text-primary-foreground" />
               </div>
-              <h1 className="mt-4 font-display text-3xl font-bold text-foreground">Create account</h1>
-              <p className="mt-2 text-muted-foreground">Start buying or selling cars today</p>
+              <h1 className="mt-4 font-display text-3xl font-bold text-foreground">{t("auth.signup.title")}</h1>
+              <p className="mt-2 text-muted-foreground">{t("auth.signup.subtitle")}</p>
             </div>
 
             <form onSubmit={handleSignup} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
-                <Input id="fullName" type="text" placeholder="John Doe" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                <Label htmlFor="fullName">{t("auth.signup.fullName")}</Label>
+                <Input id="fullName" type="text" placeholder={t("auth.signup.namePlaceholder")} value={fullName} onChange={(e) => setFullName(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Label htmlFor="email">{t("auth.signup.email")}</Label>
+                <Input id="email" type="email" placeholder={t("auth.signup.emailPlaceholder")} value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.signup.password")}</Label>
                 <div className="relative">
-                  <Input id="password" type={showPassword ? "text" : "password"} placeholder="Min 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required />
+                  <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("auth.signup.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required />
                   <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -84,23 +86,23 @@ const Signup = () => {
               <div className="flex items-start gap-2">
                 <Checkbox id="terms" checked={agreed} onCheckedChange={(v) => setAgreed(v === true)} className="mt-0.5" />
                 <label htmlFor="terms" className="text-sm text-muted-foreground">
-                  I agree to the{" "}
-                  <Link to="/terms" className="text-primary underline">Terms of Service</Link>{" "}
-                  and{" "}
-                  <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>
+                  {t("auth.signup.agree")}{" "}
+                  <Link to="/terms" className="text-primary underline">{t("auth.signup.terms")}</Link>{" "}
+                  {t("auth.signup.and")}{" "}
+                  <Link to="/privacy" className="text-primary underline">{t("auth.signup.privacy")}</Link>
                 </label>
               </div>
 
               <Button type="submit" className="gradient-primary w-full border-0" disabled={loading || !agreed}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loading ? "Creating account..." : "Create Account"}
+                {loading ? t("auth.signup.submitting") : t("auth.signup.submit")}
                 {!loading && <ArrowRight className="ml-1 h-4 w-4" />}
               </Button>
             </form>
 
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
+              {t("auth.signup.haveAccount")}{" "}
+              <Link to="/login" className="font-medium text-primary hover:underline">{t("auth.signup.loginLink")}</Link>
             </p>
           </div>
         </div>
