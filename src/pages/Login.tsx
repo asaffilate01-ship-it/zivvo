@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ const DEV_ACCOUNTS = [
 ];
 
 const Login = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,9 +36,9 @@ const Login = () => {
     setLoading(false);
 
     if (error) {
-      toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      toast({ title: t("auth.login.failed"), description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Welcome back!" });
+      toast({ title: t("auth.login.welcome") });
       navigate("/");
     }
   };
@@ -80,17 +82,17 @@ const Login = () => {
               <div className="gradient-primary mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
                 <Car className="h-7 w-7 text-primary-foreground" />
               </div>
-              <h1 className="mt-4 font-display text-3xl font-bold text-foreground">Welcome back</h1>
-              <p className="mt-2 text-muted-foreground">Sign in to your account</p>
+              <h1 className="mt-4 font-display text-3xl font-bold text-foreground">{t("auth.login.title")}</h1>
+              <p className="mt-2 text-muted-foreground">{t("auth.login.subtitle")}</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.login.email")}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t("auth.login.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -98,16 +100,16 @@ const Login = () => {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t("auth.login.password")}</Label>
                   <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot password?
+                    {t("auth.login.forgot")}
                   </Link>
                 </div>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder={t("auth.login.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -124,20 +126,19 @@ const Login = () => {
 
               <Button type="submit" className="gradient-primary w-full border-0" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                {loading ? "Signing in..." : "Sign In"}
+                {loading ? t("auth.login.submitting") : t("auth.login.submit")}
                 {!loading && <ArrowRight className="ml-1 h-4 w-4" />}
               </Button>
             </form>
 
             <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              {t("auth.login.noAccount")}{" "}
               <Link to="/signup" className="font-medium text-primary hover:underline">
-                Sign up
+                {t("auth.login.signupLink")}
               </Link>
             </p>
           </div>
 
-          {/* Dev Login Panel — only in development */}
           {import.meta.env.DEV && (
             <div className="mt-4 border-t border-border pt-4">
               <button
