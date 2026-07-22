@@ -4,23 +4,52 @@ import { Badge } from "@/components/ui/badge";
 
 /**
  * Sponsored ad slot — sized to match a CarCard in the results grid.
- * Renders Google AdSense (or Media.net) if a slot ID env var is configured;
- * otherwise falls back to a neutral house-ad placeholder so layout is stable.
  *
- * Configure via Vite env:
- *   VITE_ADSENSE_CLIENT   e.g. "ca-pub-XXXXXXXXXXXXXXXX"
- *   VITE_ADSENSE_SLOT     e.g. "1234567890"
+ * Priority (highest wins):
+ *   1. Manual ad passed via props (imageUrl+href, or raw html)
+ *   2. Manual ad stored in localStorage under `zivvo_manual_ad`
+ *      { imageUrl?: string; href?: string; alt?: string; html?: string }
+ *   3. Google AdSense / Media.net via Vite env
+ *        VITE_ADSENSE_CLIENT  e.g. "ca-pub-XXXXXXXXXXXXXXXX"
+ *        VITE_ADSENSE_SLOT    e.g. "1234567890"
+ *   4. Neutral house-ad placeholder
  */
-const SponsoredAdCard = () => {
+export interface ManualAd {
+  imageUrl?: string;
+  href?: string;
+  alt?: string;
+  html?: string;
+}
+
+interface SponsoredAdCardProps {
+  manualAd?: ManualAd;
+}
+
+const readManualAdFromStorage = (): ManualAd | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem("zivvo_manual_ad");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ManualAd;
+    if (parsed && (parsed.imageUrl || parsed.html)) return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+};
+
+const SponsoredAdCard = ({ manualAd }: SponsoredAdCardProps) => {
   const { t } = useTranslation();
   const insRef = useRef<HTMLModElement | null>(null);
   const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined;
   const slot = import.meta.env.VITE_ADSENSE_SLOT as string | undefined;
-  const enabled = Boolean(client && slot);
+
+  const ad = manualAd ?? readManualAdFromStorage();
+  const hasManual = Boolean(ad && (ad.imageUrl || ad.html));
+  const enabled = !hasManual && Boolean(client && slot);
 
   useEffect(() => {
     if (!enabled) return;
-    // Inject AdSense loader once
     const id = "adsbygoogle-js";
     if (!document.getElementById(id)) {
       const s = document.createElement("script");
@@ -46,7 +75,37 @@ const SponsoredAdCard = () => {
       >
         {t("browse.sponsored", "Sponsored")}
       </Badge>
-      {enabled ? (
+
+      {hasManual && ad ? (
+        ad.html ? (
+          <div
+            className="min-h-[320px] w-full"
+            // Manual HTML snippet from admin — treated as trusted operator input.
+            dangerouslySetInnerHTML={{ __html: ad.html }}
+          />
+        ) : ad.href ? (
+          <a
+            href={ad.href}
+            target="_blank"
+            rel="noopener sponsored"
+            className="block h-full min-h-[320px]"
+          >
+            <img
+              src={ad.imageUrl}
+              alt={ad.alt ?? "Advertisement"}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </a>
+        ) : (
+          <img
+            src={ad.imageUrl}
+            alt={ad.alt ?? "Advertisement"}
+            className="h-full min-h-[320px] w-full object-cover"
+            loading="lazy"
+          />
+        )
+      ) : enabled ? (
         <ins
           ref={insRef as any}
           className="adsbygoogle block"
