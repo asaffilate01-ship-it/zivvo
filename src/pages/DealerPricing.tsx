@@ -310,17 +310,17 @@ const DealerPricing = () => {
           <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.15),transparent_60%)]" />
           <Sparkles className="mx-auto h-8 w-8 text-primary" />
           <h2 className="mt-4 font-display text-3xl font-bold text-foreground md:text-4xl">
-            Bereit, dein Autohaus wachsen zu lassen?
+            {t("pricing.finalCta.title")}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Starte jetzt mit 2 Monaten kostenlos — keine Vertragslaufzeit, jederzeit kündbar.
+            {t("pricing.finalCta.subtitle")}
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button size="lg" className="gradient-primary border-0 shadow-lg shadow-primary/20" onClick={() => handleSubscribe(dealerPlan.priceId)}>
               {t("pricing.dealer.cta")} <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate("/contact")}>
-              Vertrieb kontaktieren
+              {t("pricing.contactSales")}
             </Button>
           </div>
         </div>
