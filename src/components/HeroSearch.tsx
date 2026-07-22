@@ -81,7 +81,7 @@ const HeroSearch = () => {
       setCounting(false);
     }, 350);
     return () => clearTimeout(t);
-  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType, sellerType]);
+  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType, sellerType, country]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
