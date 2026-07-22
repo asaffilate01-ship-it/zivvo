@@ -48,11 +48,11 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { to: "/browse", label: "Browse" },
-    { to: "/browse?body=Van", label: "Vans" },
-    { to: "/trade-stock", label: "Trade Stock" },
-    { to: "/sell-my-car", label: "Sell" },
-    { to: "/dealers", label: "Dealers" },
+    { to: "/browse", label: t("nav.browse") },
+    { to: "/browse?body=Van", label: t("nav.vans") },
+    { to: "/trade-stock", label: t("nav.tradeStock") },
+    { to: "/sell-my-car", label: t("nav.sell") },
+    { to: "/dealers", label: t("nav.dealers") },
   ];
 
   const getDashboardLink = () => {
