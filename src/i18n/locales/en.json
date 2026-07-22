@@ -283,14 +283,43 @@
    "vans": "Vans for sale"
   }
  },
- "home": {
-  "featured": {
-   "title": "Featured Vehicles",
-   "badge": "Hot",
-   "subtitle": "Hand-picked premium listings",
-   "seeAll": "See all",
-   "empty": "No featured vehicles yet. Check back soon!"
+  "home": {
+  "services": {
+    "eyebrow": "Services",
+    "title": "All you need, in one place",
+    "finance": {
+      "title": "Cut the cost of car finance",
+      "b1": "Zero deposit available",
+      "b2": "Soft-search — no impact on credit",
+      "b3": "Decision in minutes",
+      "cta": "Get a quote",
+      "ribbon": "Rates from 3.9% APR"
+    },
+    "sell": {
+      "title": "Sell your car",
+      "b1": "List in under 2 minutes",
+      "b2": "Reach 25K+ active buyers",
+      "b3": "Free valuation in seconds",
+      "cta": "Get a free valuation",
+      "ribbon": "Average sale: 7 days"
+    },
+    "hpi": {
+      "title": "Vehicle history check",
+      "b1": "Outstanding finance",
+      "b2": "Stolen / written-off",
+      "b3": "Mileage anomalies",
+      "cta": "Run a history check",
+      "ribbon": "9 of 10 listings checked"
+    }
   },
+  "featured": {
+    "title": "Featured Vehicles",
+    "badge": "Hot",
+    "subtitle": "Hand-picked premium listings",
+    "seeAll": "See all",
+    "empty": "No featured vehicles yet. Check back soon!"
+   },
+
   "trust": {
    "badge": "Why Zivvo",
    "titleA": "Buy with",
