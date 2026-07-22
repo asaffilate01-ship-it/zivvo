@@ -255,5 +255,144 @@
       "submitting": "Wird gesendet…",
       "back": "Zurück zur Anmeldung"
     }
+  },
+  "home": {
+    "featured": {
+      "title": "Empfohlene Fahrzeuge",
+      "badge": "Top",
+      "subtitle": "Handverlesene Premium-Inserate",
+      "seeAll": "Alle anzeigen",
+      "empty": "Noch keine empfohlenen Fahrzeuge. Schau bald wieder vorbei!"
+    },
+    "trust": {
+      "badge": "Warum Zivvo",
+      "titleA": "Kaufe mit",
+      "titleB": "vollem Vertrauen",
+      "subtitle": "Wir tun alles dafür, dass jede Transaktion sicher, transparent und stressfrei abläuft.",
+      "verifiedTitle": "Geprüfte Inserate",
+      "verifiedDesc": "Jeder Händler ist verifiziert. Das Prüfsiegel bedeutet: legal einwandfrei und ohne offene Finanzierung.",
+      "financeTitle": "Finanz- & Rechtsprüfung",
+      "financeDesc": "Sofortprüfung auf offene Finanzierung, Diebstahl oder Totalschaden.",
+      "historyTitle": "Vollständige Historie",
+      "historyDesc": "TÜV-Historie, Kilometerprüfung und Vorbesitzer — alles auf einen Klick.",
+      "verifiedClean": "Geprüft & sauber",
+      "verifiedCleanSub": "Keine Finanzierung · Kein Diebstahl"
+    },
+    "stats": {
+      "users": "Aktive Nutzer",
+      "listings": "Inserate",
+      "soldValue": "Verkaufswert gesamt",
+      "rating": "Durchschnittsbewertung"
+    },
+    "latest": {
+      "title": "Neueste Inserate",
+      "subtitle": "Gerade eingestellt von Verkäufern in deiner Nähe",
+      "empty": "Noch keine Inserate. Sei der Erste!"
+    },
+    "blog": {
+      "badge": "Ratgeber",
+      "title": "Aus dem Ratgeber",
+      "post1Title": "Gebrauchtwagen-Checkliste 2026",
+      "post1Cat": "Kaufratgeber",
+      "post2Title": "Elektro vs. Hybrid: Was passt zu dir?",
+      "post2Cat": "E-Auto-Ratgeber",
+      "post3Title": "10 Tipps für den schnellen Verkauf",
+      "post3Cat": "Verkaufstipps"
+    },
+    "cta": {
+      "title": "Bereit für dein nächstes Auto?",
+      "subtitle": "Sei einer der ersten Verkäufer und Händler bei Zivvo. Inserate sind kostenlos — Händler-Abos ab {{price}}/Monat.",
+      "postAd": "Kostenlos inserieren",
+      "dealerPlans": "Händler-Tarife",
+      "newsletterPlaceholder": "E-Mail für wöchentliche Angebote",
+      "subscribe": "Abonnieren",
+      "noSpam": "Kein Spam. Jederzeit abbestellbar."
+    },
+    "howItWorks": {
+      "badge": "So funktioniert es",
+      "title": "Von der Suche bis zur Auffahrt in 4 Schritten",
+      "subtitle": "Reibungsloser Kaufprozess — mit Prüfung, Treuhand und 7-Tage-Garantie.",
+      "step": "Schritt {{n}}",
+      "s1Title": "Suchen & Merken",
+      "s1Desc": "Filtere nach Marke, Budget, Kraftstoff und Entfernung. Suchen speichern und Sofort-Alarm erhalten.",
+      "s2Title": "Sicher reservieren",
+      "s2Desc": "Jeder Händler ist KYC-geprüft. Käuferschutz und vorautorisierte Anzahlung sichern dein Geld.",
+      "s3Title": "Prüfen & Testen",
+      "s3Desc": "200-Punkte-Fahrzeugcheck, komplette Historie, TÜV und Finanzierungsstatus — alles an einem Ort.",
+      "s4Title": "Losfahren",
+      "s4Desc": "Abholung vor Ort oder deutschlandweite Lieferung. 7 Tage Geld-zurück-Garantie bei berechtigten Fahrzeugen."
+    },
+    "whyBuy": {
+      "titleA": "Warum bei",
+      "titleB": "kaufen?",
+      "subtitle": "Wir bauen den vertrauenswürdigsten Automarktplatz der Welt.",
+      "verifiedTitle": "Geprüfte Verkäufer",
+      "verifiedDesc": "Jeder Händler durchläuft eine KYC-Prüfung. Privatverkäufer werden identitätsgeprüft.",
+      "checksTitle": "Finanz- & Diebstahlprüfung",
+      "checksDesc": "Alle Fahrzeuge werden auf offene Finanzierung, Diebstahl und Totalschaden geprüft.",
+      "paymentsTitle": "Sichere Zahlungen",
+      "paymentsDesc": "Stripe-basierte Zahlungen mit Käuferschutz bei jedem Kauf.",
+      "supportTitle": "Persönlicher Support",
+      "supportDesc": "Unser Team ist 7 Tage die Woche für dich erreichbar.",
+      "historyTitle": "Vollständige Historie",
+      "historyDesc": "TÜV-Historie, Kilometerprüfung und Vorbesitzer sofort einsehbar.",
+      "privacyTitle": "Datenschutz",
+      "privacyDesc": "Deine Daten sind verschlüsselt und werden nicht an Dritte weitergegeben."
+    },
+    "trustStrip": {
+      "headline": "Für Käufer, Verkäufer und Händler in Deutschland gemacht",
+      "kycLabel": "KYC-geprüfte Händler",
+      "kycSub": "Jeder Verkäufer geprüft",
+      "protectionLabel": "Käuferschutz",
+      "protectionSub": "Treuhand & Anzahlungen",
+      "inspectionLabel": "200-Punkte-Check",
+      "inspectionSub": "Ausführlicher Prüfbericht",
+      "historyLabel": "Historie geprüft",
+      "historySub": "Komplette Historienberichte",
+      "guaranteeLabel": "7-Tage-Garantie",
+      "guaranteeSub": "Bei berechtigten Fahrzeugen",
+      "foundingLabel": "Gründungsmitglieder",
+      "foundingSub": "Sei von Anfang an dabei"
+    },
+    "bodyType": {
+      "badge": "Karosserie",
+      "title": "Nach Karosserietyp suchen",
+      "subtitle": "Finde den passenden Fahrzeugtyp für deinen Alltag",
+      "vehicles": "{{count}} Fahrzeuge"
+    },
+    "carOfWeek": {
+      "editorsPick": "Redaktionstipp",
+      "badge": "Auto der Woche",
+      "defaultDesc": "Ein herausragender {{year}} {{make}} {{model}} in Top-Zustand.",
+      "year": "Baujahr",
+      "mileage": "Laufleistung",
+      "views": "Aufrufe",
+      "na": "k. A.",
+      "viewDetails": "Details ansehen"
+    },
+    "recentlySold": {
+      "live": "Live",
+      "title": "Kürzlich verkauft auf Zivvo",
+      "sold": "Verkauft",
+      "justNow": "Gerade eben",
+      "hoursAgo": "vor {{h}} Std.",
+      "daysAgo": "vor {{d}} Tagen"
+    }
+  },
+  "carCard": {
+    "signInToSave": "Zum Speichern anmelden",
+    "signInToSaveDesc": "Erstelle ein Konto, um deine Favoriten zu speichern.",
+    "promoted": "🔥 Beworben",
+    "featured": "Empfohlen",
+    "verified": "Geprüft",
+    "priceDrop": "Preis gesenkt",
+    "video": "Video",
+    "from": "Ab",
+    "perMonth": "/Monat",
+    "homeDelivery": "Lieferung möglich",
+    "dealer": "Händler",
+    "private": "Privat",
+    "syncedFrom": "Synchronisiert von {{source}}",
+    "vat": "zzgl. MwSt."
   }
 }

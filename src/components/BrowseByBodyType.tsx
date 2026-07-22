@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useCountry } from "@/contexts/CountryContext";
+import { useTranslation } from "react-i18next";
 import bodySaloon from "@/assets/body-saloon.jpg";
 import bodySuv from "@/assets/body-suv.jpg";
 import bodyCoupe from "@/assets/body-coupe.jpg";
@@ -49,6 +50,7 @@ interface Props {
 
 const BrowseByBodyType = ({ counts = {} }: Props) => {
   const { config } = useCountry();
+  const { t } = useTranslation();
   const bodyTypes = config.bodyTypes.slice(0, 8);
 
   return (
@@ -61,13 +63,13 @@ const BrowseByBodyType = ({ counts = {} }: Props) => {
         className="flex items-end justify-between"
       >
         <div>
-          <Badge variant="outline" className="mb-3 text-xs">Browse</Badge>
-          <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">Shop by Body Type</h2>
-          <p className="mt-1 text-muted-foreground">Find the perfect style for your lifestyle</p>
+          <Badge variant="outline" className="mb-3 text-xs">{t("home.bodyType.badge")}</Badge>
+          <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("home.bodyType.title")}</h2>
+          <p className="mt-1 text-muted-foreground">{t("home.bodyType.subtitle")}</p>
         </div>
         <Link to="/browse">
           <Button variant="ghost" size="sm" className="text-primary">
-            View All <ArrowRight className="ml-1 h-4 w-4" />
+            {t("common.viewAll")} <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
         </Link>
       </motion.div>
@@ -95,7 +97,7 @@ const BrowseByBodyType = ({ counts = {} }: Props) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
                 <div className="absolute bottom-3 left-3 right-3">
                   <h3 className="font-display text-lg font-bold text-primary-foreground">{label}</h3>
-                  <p className="text-xs text-primary-foreground/70">{counts[label] || 0} vehicles</p>
+                  <p className="text-xs text-primary-foreground/70">{t("home.bodyType.vehicles", { count: counts[label] || 0 })}</p>
                 </div>
               </div>
             </Link>

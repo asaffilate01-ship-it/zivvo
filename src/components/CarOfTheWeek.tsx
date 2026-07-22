@@ -7,9 +7,11 @@ import { Award, ArrowRight, Eye, Calendar, Gauge } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
+import { useTranslation } from "react-i18next";
 
 const CarOfTheWeek = () => {
   const { country, config } = useCountry();
+  const { t } = useTranslation();
   const [car, setCar] = useState<any>(null);
 
   useEffect(() => {
@@ -50,36 +52,36 @@ const CarOfTheWeek = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent lg:bg-gradient-to-r" />
               <Badge className="absolute left-4 top-4 bg-warning text-warning-foreground border-0 gap-1">
-                <Award className="h-3 w-3" /> Editor's Pick
+                <Award className="h-3 w-3" /> {t("home.carOfWeek.editorsPick")}
               </Badge>
             </div>
 
             {/* Details */}
             <div className="flex flex-col justify-center p-6 lg:p-10">
-              <Badge variant="outline" className="mb-3 w-fit text-xs">Car of the Week</Badge>
+              <Badge variant="outline" className="mb-3 w-fit text-xs">{t("home.carOfWeek.badge")}</Badge>
               <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
                 {car.title}
               </h2>
               <p className="mt-2 line-clamp-3 text-muted-foreground">
-                {car.description || `A stunning ${car.year} ${car.make} ${car.model} in excellent condition.`}
+                {car.description || t("home.carOfWeek.defaultDesc", { year: car.year, make: car.make, model: car.model })}
               </p>
 
               <div className="mt-6 grid grid-cols-3 gap-3">
                 <div className="rounded-xl bg-muted/50 p-3 text-center">
                   <Calendar className="mx-auto h-4 w-4 text-muted-foreground" />
-                  <p className="mt-1 text-xs text-muted-foreground">Year</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("home.carOfWeek.year")}</p>
                   <p className="font-display text-sm font-bold text-foreground">{car.year}</p>
                 </div>
                 <div className="rounded-xl bg-muted/50 p-3 text-center">
                   <Gauge className="mx-auto h-4 w-4 text-muted-foreground" />
-                  <p className="mt-1 text-xs text-muted-foreground">Mileage</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("home.carOfWeek.mileage")}</p>
                   <p className="font-display text-sm font-bold text-foreground">
-                    {car.mileage ? formatDistance(car.mileage, config) : "N/A"}
+                    {car.mileage ? formatDistance(car.mileage, config) : t("home.carOfWeek.na")}
                   </p>
                 </div>
                 <div className="rounded-xl bg-muted/50 p-3 text-center">
                   <Eye className="mx-auto h-4 w-4 text-muted-foreground" />
-                  <p className="mt-1 text-xs text-muted-foreground">Views</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t("home.carOfWeek.views")}</p>
                   <p className="font-display text-sm font-bold text-foreground">{car.views_count || 0}</p>
                 </div>
               </div>
@@ -90,7 +92,7 @@ const CarOfTheWeek = () => {
                 </p>
                 <Link to={`/car/${car.id}`}>
                   <Button className="gradient-primary border-0 gap-1.5">
-                    View Details <ArrowRight className="h-4 w-4" />
+                    {t("home.carOfWeek.viewDetails")} <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
               </div>

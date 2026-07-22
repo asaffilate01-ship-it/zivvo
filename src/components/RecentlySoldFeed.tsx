@@ -5,6 +5,7 @@ import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 interface SoldCar {
   id: string;
@@ -16,6 +17,7 @@ interface SoldCar {
 
 const RecentlySoldFeed = () => {
   const { config, country } = useCountry();
+  const { t } = useTranslation();
   const [soldCars, setSoldCars] = useState<SoldCar[]>([]);
 
   useEffect(() => {
@@ -32,16 +34,15 @@ const RecentlySoldFeed = () => {
     fetch();
   }, [country]);
 
-  // If no real sold cars, show nothing
   if (soldCars.length === 0) return null;
 
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
     const hours = Math.floor(diff / 3600000);
-    if (hours < 1) return "Just now";
-    if (hours < 24) return `${hours}h ago`;
+    if (hours < 1) return t("home.recentlySold.justNow");
+    if (hours < 24) return t("home.recentlySold.hoursAgo", { h: hours });
     const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    return t("home.recentlySold.daysAgo", { d: days });
   };
 
   return (
@@ -53,8 +54,8 @@ const RecentlySoldFeed = () => {
           viewport={{ once: true }}
           className="flex items-center gap-3 mb-6"
         >
-          <Badge className="bg-success/10 text-success border-success/20">Live</Badge>
-          <h2 className="font-display text-lg font-bold text-foreground">Recently Sold on Zivvo</h2>
+          <Badge className="bg-success/10 text-success border-success/20">{t("home.recentlySold.live")}</Badge>
+          <h2 className="font-display text-lg font-bold text-foreground">{t("home.recentlySold.title")}</h2>
         </motion.div>
 
         <div className="relative overflow-hidden">
@@ -80,7 +81,7 @@ const RecentlySoldFeed = () => {
                     <p className="text-sm font-bold text-primary">{formatPrice(car.price, config)}</p>
                     <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                       <CheckCircle className="h-3 w-3 text-success" />
-                      Sold
+                      {t("home.recentlySold.sold")}
                       <Clock className="ml-1 h-3 w-3" />
                       {timeAgo(car.updated_at)}
                     </div>

@@ -35,6 +35,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import trustImage from "@/assets/trust-verify.jpg";
 import blogChecklist from "@/assets/blog-buying-checklist.jpg";
 import blogEvHybrid from "@/assets/blog-ev-hybrid.jpg";
@@ -60,6 +61,7 @@ const fadeUp = {
 const Index = () => {
   const { country, config } = useCountry();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [featured, setFeatured] = useState<any[]>([]);
   const [latest, setLatest] = useState<any[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
@@ -166,13 +168,13 @@ const Index = () => {
           <motion.div {...fadeUp} className="flex items-end justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">Featured Vehicles</h2>
-                <Badge className="gradient-primary border-0 text-primary-foreground">Hot</Badge>
+                <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("home.featured.title")}</h2>
+                <Badge className="gradient-primary border-0 text-primary-foreground">{t("home.featured.badge")}</Badge>
               </div>
-              <p className="mt-1 text-muted-foreground">Hand-picked premium listings</p>
+              <p className="mt-1 text-muted-foreground">{t("home.featured.subtitle")}</p>
             </div>
             <Link to="/browse?featured=true">
-              <Button variant="ghost" size="sm" className="text-primary">See All <ArrowRight className="ml-1 h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" className="text-primary">{t("home.featured.seeAll")} <ArrowRight className="ml-1 h-4 w-4" /></Button>
             </Link>
           </motion.div>
 
@@ -186,7 +188,7 @@ const Index = () => {
             ) : (
               <div className="flex flex-col items-center rounded-2xl border border-dashed border-border py-16">
                 <Car className="h-10 w-10 text-muted-foreground" />
-                <p className="mt-3 text-muted-foreground">No featured vehicles yet. Check back soon!</p>
+                <p className="mt-3 text-muted-foreground">{t("home.featured.empty")}</p>
               </div>
             )}
           </div>
@@ -198,18 +200,18 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <motion.div {...fadeUp}>
-              <Badge variant="outline" className="mb-4 text-xs">Why Zivvo</Badge>
+              <Badge variant="outline" className="mb-4 text-xs">{t("home.trust.badge")}</Badge>
               <h2 className="font-display text-2xl font-bold text-foreground md:text-4xl">
-                Buy with
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> Complete Confidence</span>
+                {t("home.trust.titleA")}
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> {t("home.trust.titleB")}</span>
               </h2>
-              <p className="mt-3 max-w-lg text-muted-foreground">We go the extra mile to ensure every transaction is safe, transparent, and hassle-free.</p>
+              <p className="mt-3 max-w-lg text-muted-foreground">{t("home.trust.subtitle")}</p>
 
               <div className="mt-10 space-y-6">
                 {[
-                  { icon: Shield, variant: "primary" as const, title: "Verified Listings", desc: "Every dealer is vetted. Verified badges mean the vehicle has passed our checks for legality and outstanding finance." },
-                  { icon: Search, variant: "info" as const, title: "Finance & Legal Check", desc: "Instantly check if a vehicle has outstanding finance, is reported stolen, or has been written off." },
-                  { icon: FileCheck, variant: "success" as const, title: "Full History Reports", desc: "Access complete MOT history, mileage verification, and previous owner details with a single click." },
+                  { icon: Shield, variant: "primary" as const, title: t("home.trust.verifiedTitle"), desc: t("home.trust.verifiedDesc") },
+                  { icon: Search, variant: "info" as const, title: t("home.trust.financeTitle"), desc: t("home.trust.financeDesc") },
+                  { icon: FileCheck, variant: "success" as const, title: t("home.trust.historyTitle"), desc: t("home.trust.historyDesc") },
                 ].map((item, i) => (
                   <motion.div
                     key={item.title}
@@ -241,8 +243,8 @@ const Index = () => {
               <div className="absolute -bottom-4 -left-4 flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 shadow-elevated">
                 <CheckCircle className="h-5 w-5 text-success" />
                 <div>
-                  <p className="text-xs font-semibold text-card-foreground">Verified Clean</p>
-                  <p className="text-[10px] text-muted-foreground">No finance · No theft</p>
+                  <p className="text-xs font-semibold text-card-foreground">{t("home.trust.verifiedClean")}</p>
+                  <p className="text-[10px] text-muted-foreground">{t("home.trust.verifiedCleanSub")}</p>
                 </div>
               </div>
             </motion.div>
@@ -258,10 +260,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {[
-              { icon: Users, variant: "primary" as const, value: platformStats.users > 0 ? platformStats.users.toLocaleString() : "—", label: "Active Users" },
-              { icon: Car, variant: "info" as const, value: platformStats.listings > 0 ? platformStats.listings.toLocaleString() : "—", label: "Vehicles Listed" },
-              { icon: TrendingUp, variant: "success" as const, value: platformStats.soldValue > 0 ? formatPrice(platformStats.soldValue, config) : "—", label: "Total Value Sold" },
-              { icon: Star, variant: "warning" as const, value: platformStats.avgRating > 0 ? `${platformStats.avgRating}/5` : "—", label: "Average Rating" },
+              { icon: Users, variant: "primary" as const, value: platformStats.users > 0 ? platformStats.users.toLocaleString() : "—", label: t("home.stats.users") },
+              { icon: Car, variant: "info" as const, value: platformStats.listings > 0 ? platformStats.listings.toLocaleString() : "—", label: t("home.stats.listings") },
+              { icon: TrendingUp, variant: "success" as const, value: platformStats.soldValue > 0 ? formatPrice(platformStats.soldValue, config) : "—", label: t("home.stats.soldValue") },
+              { icon: Star, variant: "warning" as const, value: platformStats.avgRating > 0 ? `${platformStats.avgRating}/5` : "—", label: t("home.stats.rating") },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -306,11 +308,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="flex items-end justify-between">
             <div>
-              <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">Latest Listings</h2>
-              <p className="mt-1 text-muted-foreground">Just posted by sellers near you</p>
+              <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("home.latest.title")}</h2>
+              <p className="mt-1 text-muted-foreground">{t("home.latest.subtitle")}</p>
             </div>
             <Link to="/browse">
-              <Button variant="ghost" size="sm" className="text-primary">View All <ArrowRight className="ml-1 h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" className="text-primary">{t("common.viewAll")} <ArrowRight className="ml-1 h-4 w-4" /></Button>
             </Link>
           </motion.div>
 
@@ -324,7 +326,7 @@ const Index = () => {
             ) : (
               <div className="flex flex-col items-center rounded-2xl border border-dashed border-border py-16">
                 <Car className="h-10 w-10 text-muted-foreground" />
-                <p className="mt-3 text-muted-foreground">No listings yet. Be the first to post!</p>
+                <p className="mt-3 text-muted-foreground">{t("home.latest.empty")}</p>
               </div>
             )}
           </div>
@@ -339,18 +341,18 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp} className="flex items-end justify-between">
             <div>
-              <Badge variant="outline" className="mb-3 text-xs">Blog</Badge>
-              <h2 className="font-display text-2xl font-bold text-foreground">From the Blog</h2>
+              <Badge variant="outline" className="mb-3 text-xs">{t("home.blog.badge")}</Badge>
+              <h2 className="font-display text-2xl font-bold text-foreground">{t("home.blog.title")}</h2>
             </div>
             <Link to="/blog">
-              <Button variant="ghost" size="sm" className="text-primary">View All <ArrowRight className="ml-1 h-4 w-4" /></Button>
+              <Button variant="ghost" size="sm" className="text-primary">{t("common.viewAll")} <ArrowRight className="ml-1 h-4 w-4" /></Button>
             </Link>
           </motion.div>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {[
-              { title: "Used Car Buying Checklist 2026", cat: "Buying Guide", img: blogChecklist },
-              { title: "Electric vs Hybrid: Which Is Right?", cat: "EV Guide", img: blogEvHybrid },
-              { title: "10 Tips to Sell Your Car Fast", cat: "Selling Tips", img: blogSellTips },
+              { title: t("home.blog.post1Title"), cat: t("home.blog.post1Cat"), img: blogChecklist },
+              { title: t("home.blog.post2Title"), cat: t("home.blog.post2Cat"), img: blogEvHybrid },
+              { title: t("home.blog.post3Title"), cat: t("home.blog.post3Cat"), img: blogSellTips },
             ].map((post, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }}>
                 <Link to="/blog" className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:shadow-elevated block">
@@ -373,20 +375,20 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-display text-3xl font-bold text-primary-foreground md:text-4xl">
-              Ready to Find Your Next Car?
+              {t("home.cta.title")}
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-primary-foreground/60">
-              Be among the first sellers and dealers on Zivvo. Listing your car is free — dealer subscriptions start from {formatPrice(config.dealerPlans[0].price, config)}/mo.
+              {t("home.cta.subtitle", { price: formatPrice(config.dealerPlans[0].price, config) })}
             </p>
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link to="/sell">
                 <Button size="lg" className="gradient-primary border-0 px-8 font-semibold">
-                  Post Your Ad — Free
+                  {t("home.cta.postAd")}
                 </Button>
               </Link>
               <Link to="/dealers">
                 <Button size="lg" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
-                  Dealer Plans
+                  {t("home.cta.dealerPlans")}
                 </Button>
               </Link>
             </div>
@@ -395,7 +397,7 @@ const Index = () => {
             <form onSubmit={handleNewsletter} className="mx-auto mt-10 flex max-w-md gap-2">
               <Input
                 type="email"
-                placeholder="Enter your email for weekly deals"
+                placeholder={t("home.cta.newsletterPlaceholder")}
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
                 className="h-11 border-primary-foreground/10 bg-primary-foreground/5 text-primary-foreground placeholder:text-primary-foreground/40"
@@ -403,10 +405,10 @@ const Index = () => {
               />
               <Button type="submit" size="lg" variant="secondary" className="h-11 shrink-0" disabled={subscribing}>
                 <Mail className="mr-1 h-4 w-4" />
-                {subscribing ? "..." : "Subscribe"}
+                {subscribing ? "..." : t("home.cta.subscribe")}
               </Button>
             </form>
-            <p className="mt-2 text-xs text-primary-foreground/40">No spam. Unsubscribe anytime.</p>
+            <p className="mt-2 text-xs text-primary-foreground/40">{t("home.cta.noSpam")}</p>
           </div>
         </div>
       </section>
