@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import heroAuctions from "@/assets/hero-auctions.jpg";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -25,7 +26,7 @@ const fmtCurrency = (amount: number, country: string) => {
 
 const getTimeLeft = (endsAt: string) => {
   const diff = new Date(endsAt).getTime() - Date.now();
-  if (diff <= 0) return "Ended";
+  if (diff <= 0) return "Ended";  // internal, rendered via caller translation not needed for badge text
   const d = Math.floor(diff / 86400000);
   const h = Math.floor((diff % 86400000) / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
@@ -35,6 +36,7 @@ const getTimeLeft = (endsAt: string) => {
 };
 
 const Auctions = () => {
+  const { t } = useTranslation();
   const { country } = useCountry();
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("ending_soon");
@@ -72,7 +74,7 @@ const Auctions = () => {
 
   return (
     <>
-      <SEOHead title="Trusted Car Auctions | Verified & Inspected Vehicles" description="Bid on professionally inspected, HPI-checked vehicles with full condition reports. Every seller verified, every car guaranteed." />
+      <SEOHead title={t("auctions.seo.title")} description={t("auctions.seo.description")} />
       <Navbar />
       <main className="min-h-screen bg-background">
         {/* Hero */}
@@ -84,21 +86,21 @@ const Auctions = () => {
               <div className="flex items-center gap-2 mb-4">
                 <Gavel className="w-6 h-6 text-primary" />
                 <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 font-semibold">
-                  Trusted Auctions
+                  {t("auctions.hero.badge")}
                 </Badge>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display tracking-tight mb-4">
-                Every Car Inspected.<br />Every Seller Verified.
+                {t("auctions.hero.title1")}<br />{t("auctions.hero.title2")}
               </h1>
               <p className="text-lg md:text-xl text-primary-foreground/70 mb-8 max-w-2xl">
-                Bid with confidence. Professional inspections, HPI checks, and payment protection on every auction. Only 3% buyer premium — the lowest in the industry.
+                {t("auctions.hero.subtitle")}
               </p>
               <div className="flex flex-wrap gap-6 text-sm text-primary-foreground/60">
                 {[
-                  { icon: Shield, label: "HPI & Ownership Checked" },
-                  { icon: Star, label: "1-5 Condition Rating" },
-                  { icon: CheckCircle2, label: "Payment Protected" },
-                  { icon: Users, label: "Verified Buyers & Sellers" },
+                  { icon: Shield, label: t("auctions.hero.trust1") },
+                  { icon: Star, label: t("auctions.hero.trust2") },
+                  { icon: CheckCircle2, label: t("auctions.hero.trust3") },
+                  { icon: Users, label: t("auctions.hero.trust4") },
                 ].map(({ icon: Icon, label }) => (
                   <div key={label} className="flex items-center gap-2">
                     <Icon className="w-4 h-4 text-primary" />
@@ -108,10 +110,10 @@ const Auctions = () => {
               </div>
               <div className="flex gap-3 mt-6">
                 <Button asChild size="lg" className="gap-2">
-                  <Link to="/auctions/apply"><Gavel className="w-4 h-4" /> Sell at Auction</Link>
+                  <Link to="/auctions/apply"><Gavel className="w-4 h-4" /> {t("auctions.hero.sell")}</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="gap-2 border-white/40 bg-white/10 text-white hover:bg-white/20 [&]:text-white">
-                  <Link to="/auctions">Browse Auctions</Link>
+                  <Link to="/auctions">{t("auctions.hero.browse")}</Link>
                 </Button>
               </div>
             </motion.div>
@@ -125,17 +127,17 @@ const Auctions = () => {
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input placeholder="Search auctions..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+                  <Input placeholder={t("auctions.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
                 </div>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-full md:w-48">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ending_soon">Ending Soon</SelectItem>
-                    <SelectItem value="price_low">Price: Low → High</SelectItem>
-                    <SelectItem value="price_high">Price: High → Low</SelectItem>
-                    <SelectItem value="most_bids">Most Bids</SelectItem>
+                    <SelectItem value="ending_soon">{t("auctions.sort.endingSoon")}</SelectItem>
+                    <SelectItem value="price_low">{t("auctions.sort.priceLow")}</SelectItem>
+                    <SelectItem value="price_high">{t("auctions.sort.priceHigh")}</SelectItem>
+                    <SelectItem value="most_bids">{t("auctions.sort.mostBids")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -147,10 +149,10 @@ const Auctions = () => {
         <div className="container mx-auto px-4 py-8">
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList className="mb-6">
-              <TabsTrigger value="live" className="gap-2"><Gavel className="w-4 h-4" /> Live</TabsTrigger>
-              <TabsTrigger value="ending" className="gap-2"><Timer className="w-4 h-4" /> Ending Soon</TabsTrigger>
-              <TabsTrigger value="upcoming" className="gap-2"><Clock className="w-4 h-4" /> Upcoming</TabsTrigger>
-              <TabsTrigger value="sold" className="gap-2"><TrendingUp className="w-4 h-4" /> Recently Sold</TabsTrigger>
+              <TabsTrigger value="live" className="gap-2"><Gavel className="w-4 h-4" /> {t("auctions.tabs.live")}</TabsTrigger>
+              <TabsTrigger value="ending" className="gap-2"><Timer className="w-4 h-4" /> {t("auctions.tabs.ending")}</TabsTrigger>
+              <TabsTrigger value="upcoming" className="gap-2"><Clock className="w-4 h-4" /> {t("auctions.tabs.upcoming")}</TabsTrigger>
+              <TabsTrigger value="sold" className="gap-2"><TrendingUp className="w-4 h-4" /> {t("auctions.tabs.sold")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value={tab}>
@@ -169,8 +171,8 @@ const Auctions = () => {
               ) : sorted.length === 0 ? (
                 <div className="text-center py-16">
                   <Gavel className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-1">No auctions found</h3>
-                  <p className="text-muted-foreground">Check back soon — new vehicles are added daily.</p>
+                  <h3 className="text-lg font-semibold mb-1">{t("auctions.empty.title")}</h3>
+                  <p className="text-muted-foreground">{t("auctions.empty.desc")}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -208,11 +210,11 @@ const Auctions = () => {
                               </div>
                               <div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
                                 <div className="bg-background/90 backdrop-blur-sm rounded-lg px-3 py-1.5">
-                                  <p className="text-xs text-muted-foreground">{auction.bid_count || 0} bids</p>
+                                  <p className="text-xs text-muted-foreground">{t("auctions.card.bids", { count: auction.bid_count || 0 })}</p>
                                   <p className="font-bold text-foreground">{fmtCurrency(currentPrice, country)}</p>
                                 </div>
                                 <div className={`rounded-lg px-3 py-1.5 backdrop-blur-sm ${isEnding ? "bg-red-500/90 text-white" : "bg-background/90"}`}>
-                                  <p className="text-xs opacity-70">Time left</p>
+                                  <p className="text-xs opacity-70">{t("auctions.card.timeLeft")}</p>
                                   <p className={`font-bold ${isEnding ? "" : "text-foreground"}`}>{timeLeft}</p>
                                 </div>
                               </div>
@@ -222,13 +224,13 @@ const Auctions = () => {
                                 {listing?.year} {listing?.make} {listing?.model}
                               </h3>
                               <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                                {listing?.mileage && <span>{listing.mileage.toLocaleString()} mi</span>}
+                                {listing?.mileage && <span>{listing.mileage.toLocaleString()} {t("auctions.card.mi")}</span>}
                                 {listing?.fuel_type && <span>• {listing.fuel_type}</span>}
                                 {listing?.transmission && <span>• {listing.transmission}</span>}
                               </div>
                               <div className="flex items-center gap-2 mt-3">
-                                {auction.seller_verified && <Badge variant="outline" className="text-[10px] py-0"><CheckCircle2 className="w-3 h-3 mr-1" />Verified Seller</Badge>}
-                                {auction.ownership_verified && <Badge variant="outline" className="text-[10px] py-0"><Shield className="w-3 h-3 mr-1" />V5C Confirmed</Badge>}
+                                {auction.seller_verified && <Badge variant="outline" className="text-[10px] py-0"><CheckCircle2 className="w-3 h-3 mr-1" />{t("auctions.card.verifiedSeller")}</Badge>}
+                                {auction.ownership_verified && <Badge variant="outline" className="text-[10px] py-0"><Shield className="w-3 h-3 mr-1" />{t("auctions.card.v5cConfirmed")}</Badge>}
                               </div>
                             </CardContent>
                           </Card>
@@ -248,13 +250,13 @@ const Auctions = () => {
         {/* Trust Strip */}
         <section className="border-t border-border bg-muted/30 py-12">
           <div className="container mx-auto px-4">
-            <h2 className="text-center text-xl font-bold mb-8">How Our Trusted Auction Works</h2>
+            <h2 className="text-center text-xl font-bold mb-8">{t("auctions.howItWorks.title")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {[
-                { step: "01", title: "Professional Inspection", desc: "Every car inspected by approved specialists with a 1-5 condition rating and full report." },
-                { step: "02", title: "HPI & History Check", desc: "Finance, stolen, write-off, mileage anomaly and ownership verification included." },
-                { step: "03", title: "Secure Bidding", desc: "Buyers pre-verified with card pre-auth or finance approval. Anti-sniping protection." },
-                { step: "04", title: "Payment Protection & E-Sign", desc: "Funds held securely. Released only after V5C, keys handover and signed contract." },
+                { step: "01", title: t("auctions.howItWorks.step1Title"), desc: t("auctions.howItWorks.step1Desc") },
+                { step: "02", title: t("auctions.howItWorks.step2Title"), desc: t("auctions.howItWorks.step2Desc") },
+                { step: "03", title: t("auctions.howItWorks.step3Title"), desc: t("auctions.howItWorks.step3Desc") },
+                { step: "04", title: t("auctions.howItWorks.step4Title"), desc: t("auctions.howItWorks.step4Desc") },
               ].map(({ step, title, desc }) => (
                 <div key={step} className="text-center">
                   <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center mx-auto mb-3 text-sm">{step}</div>

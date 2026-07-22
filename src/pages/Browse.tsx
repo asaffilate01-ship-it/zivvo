@@ -24,6 +24,7 @@ import SaveSearchDialog from "@/components/SaveSearchDialog";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import { distanceKm } from "@/hooks/useUserLocation";
+import { useTranslation } from "react-i18next";
 
 const BrowseMapView = lazy(() => import("@/components/BrowseMapView"));
 
@@ -35,6 +36,7 @@ const engineSizes = ["1.0L", "1.2L", "1.4L", "1.5L", "1.6L", "1.8L", "2.0L", "2.
 const sellerTypes = ["Any", "Private", "Dealer"];
 
 const Browse = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { country, config } = useCountry();
 
@@ -270,21 +272,21 @@ const Browse = () => {
 
   const activeFiltersList: { label: string; clear: () => void }[] = [];
   if (selectedMake) activeFiltersList.push({ label: selectedMake, clear: () => setSelectedMake("") });
-  if (model) activeFiltersList.push({ label: `Model: ${model}`, clear: () => setModel("") });
+  if (model) activeFiltersList.push({ label: t("browse.modelLabel", { model }), clear: () => setModel("") });
   if (selectedBody) activeFiltersList.push({ label: selectedBody, clear: () => setSelectedBody("") });
   if (selectedFuel) activeFiltersList.push({ label: selectedFuel, clear: () => setSelectedFuel("") });
   if (selectedTransmission) activeFiltersList.push({ label: selectedTransmission, clear: () => setSelectedTransmission("") });
   if (selectedColor) activeFiltersList.push({ label: selectedColor, clear: () => setSelectedColor("") });
-  if (selectedDoors) activeFiltersList.push({ label: `${selectedDoors} doors`, clear: () => setSelectedDoors("") });
+  if (selectedDoors) activeFiltersList.push({ label: t("browse.doorsLabel", { count: selectedDoors }), clear: () => setSelectedDoors("") });
   if (selectedEngine) activeFiltersList.push({ label: selectedEngine, clear: () => setSelectedEngine("") });
   if (selectedCity) activeFiltersList.push({ label: selectedCity, clear: () => setSelectedCity("") });
   if (sellerType) activeFiltersList.push({ label: sellerType, clear: () => setSellerType("") });
-  if (verifiedOnly) activeFiltersList.push({ label: "Verified", clear: () => setVerifiedOnly(false) });
-  if (featuredOnly) activeFiltersList.push({ label: "Featured", clear: () => setFeaturedOnly(false) });
+  if (verifiedOnly) activeFiltersList.push({ label: t("browse.verifiedLabel"), clear: () => setVerifiedOnly(false) });
+  if (featuredOnly) activeFiltersList.push({ label: t("browse.featuredLabel"), clear: () => setFeaturedOnly(false) });
   if (priceRange[0] > 0 || priceRange[1] < 200000) activeFiltersList.push({ label: `${formatPrice(priceRange[0], config)}-${formatPrice(priceRange[1], config)}`, clear: () => setPriceRange([0, 200000]) });
   if (yearRange[0] > 2000 || yearRange[1] < currentYear) activeFiltersList.push({ label: `${yearRange[0]}-${yearRange[1]}`, clear: () => setYearRange([2000, currentYear]) });
   if (mileageMax < 200000) activeFiltersList.push({ label: `≤${formatDistance(mileageMax, config)}`, clear: () => setMileageMax(200000) });
-  if (postcode && distance && distance !== "any") activeFiltersList.push({ label: `Within ${distance} ${config.distanceUnit} of ${postcode}`, clear: () => { setPostcode(""); setDistance(""); } });
+  if (postcode && distance && distance !== "any") activeFiltersList.push({ label: t("browse.withinOf", { distance, unit: config.distanceUnit, postcode }), clear: () => { setPostcode(""); setDistance(""); } });
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
@@ -315,7 +317,7 @@ const Browse = () => {
 
   // Price quick-select presets
   const pricePresets = [
-    { label: "Under " + config.currency.symbol + "5k", min: 0, max: 5000 },
+    { label: t("browse.under", { price: config.currency.symbol + "5k" }), min: 0, max: 5000 },
     { label: config.currency.symbol + "5k–15k", min: 5000, max: 15000 },
     { label: config.currency.symbol + "15k–30k", min: 15000, max: 30000 },
     { label: config.currency.symbol + "30k–50k", min: 30000, max: 50000 },
@@ -325,8 +327,8 @@ const Browse = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Browse Cars for Sale"
-        description={`Browse ${totalCount > 0 ? totalCount.toLocaleString() : ""} verified vehicles. Filter by make, model, price, year, and more.`}
+        title={t("browse.title")}
+        description={t("browse.seoDescription", { count: totalCount > 0 ? totalCount.toLocaleString() : "" })}
       />
       <Navbar />
 
@@ -334,12 +336,12 @@ const Browse = () => {
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Browse Cars</h1>
-            <p className="text-sm text-muted-foreground">{totalCount.toLocaleString()} vehicles found</p>
+            <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("browse.heading")}</h1>
+            <p className="text-sm text-muted-foreground">{t("browse.vehiclesFound", { count: totalCount.toLocaleString() })}</p>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/compare">
-              <Button variant="outline" size="sm"><GitCompare className="mr-1 h-4 w-4" /> Compare</Button>
+              <Button variant="outline" size="sm"><GitCompare className="mr-1 h-4 w-4" /> {t("browse.compare")}</Button>
             </Link>
 
             {/* View toggle */}
@@ -360,11 +362,11 @@ const Browse = () => {
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-44 h-9 text-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="newest">Newest First</SelectItem>
-                <SelectItem value="price_asc">Price: Low–High</SelectItem>
-                <SelectItem value="price_desc">Price: High–Low</SelectItem>
-                <SelectItem value="mileage_asc">Mileage: Low–High</SelectItem>
-                <SelectItem value="year_desc">Year: Newest</SelectItem>
+                <SelectItem value="newest">{t("browse.sort.newest")}</SelectItem>
+                <SelectItem value="price_asc">{t("browse.sort.priceAsc")}</SelectItem>
+                <SelectItem value="price_desc">{t("browse.sort.priceDesc")}</SelectItem>
+                <SelectItem value="mileage_asc">{t("browse.sort.mileageAsc")}</SelectItem>
+                <SelectItem value="year_desc">{t("browse.sort.yearDesc")}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -381,7 +383,7 @@ const Browse = () => {
 
             <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="lg:hidden">
               <SlidersHorizontal className="mr-1 h-4 w-4" />
-              Filters {activeFiltersList.length > 0 && `(${activeFiltersList.length})`}
+              {t("browse.filtersBtn")} {activeFiltersList.length > 0 && `(${activeFiltersList.length})`}
             </Button>
           </div>
         </div>
@@ -395,7 +397,7 @@ const Browse = () => {
                 <button onClick={f.clear} className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"><X className="h-3 w-3" /></button>
               </Badge>
             ))}
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">Clear all</Button>
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">{t("browse.clearAll")}</Button>
           </div>
         )}
 
@@ -405,9 +407,9 @@ const Browse = () => {
             {showFilters && <div className="fixed inset-0 z-40 bg-foreground/50 lg:hidden" onClick={() => setShowFilters(false)} />}
             <div className={`${showFilters ? "fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl lg:static lg:max-h-none lg:rounded-none" : ""} sticky top-20 space-y-1 rounded-xl border border-border bg-card p-4`}>
               <div className="flex items-center justify-between pb-2">
-                <h3 className="font-display text-sm font-semibold text-card-foreground">Filters</h3>
+                <h3 className="font-display text-sm font-semibold text-card-foreground">{t("browse.filters")}</h3>
                 <div className="flex items-center gap-2">
-                  {activeFiltersList.length > 0 && <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">Clear all</Button>}
+                  {activeFiltersList.length > 0 && <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-primary">{t("browse.clearAll")}</Button>}
                   <Button variant="ghost" size="icon" className="h-7 w-7 lg:hidden" onClick={() => setShowFilters(false)}><X className="h-4 w-4" /></Button>
                 </div>
               </div>
@@ -416,28 +418,28 @@ const Browse = () => {
               <div className="pb-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input placeholder="Search make, model, keyword..." value={keyword} onChange={(e) => setKeyword(e.target.value)} className="h-9 pl-10 text-sm" />
+                  <Input placeholder={t("browse.searchPlaceholder")} value={keyword} onChange={(e) => setKeyword(e.target.value)} className="h-9 pl-10 text-sm" />
                 </div>
               </div>
 
               <div className="h-px bg-border" />
 
               {/* Vehicle Section */}
-              <FilterSection title="Vehicle" sectionKey="vehicle">
-                <FilterSelect label="Make" value={selectedMake} onChange={(v) => { setSelectedMake(v); setModel(""); }} placeholder="Any Make" options={makes} />
+              <FilterSection title={t("browse.sections.vehicle")} sectionKey="vehicle">
+                <FilterSelect label={t("browse.make")} value={selectedMake} onChange={(v) => { setSelectedMake(v); setModel(""); }} placeholder={t("browse.anyMake")} options={makes} />
                 {availableModels.length > 0 ? (
                   <FilterSelect
-                    label="Model"
+                    label={t("browse.model")}
                     value={model}
                     onChange={setModel}
-                    placeholder={modelsLoading ? "Loading models..." : "Any Model"}
+                    placeholder={modelsLoading ? t("browse.loadingModels") : t("browse.anyModel")}
                     options={availableModels}
                   />
                 ) : (
                   <div>
-                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Model</label>
+                    <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("browse.model")}</label>
                     <Input
-                      placeholder={selectedMake ? (modelsLoading ? "Loading..." : `Search ${selectedMake} models...`) : "Select a make first"}
+                      placeholder={selectedMake ? (modelsLoading ? t("browse.loadingModels") : t("browse.searchModels", { make: selectedMake })) : t("browse.selectMakeFirst")}
                       value={model}
                       onChange={(e) => setModel(e.target.value)}
                       className="h-9 text-sm"
@@ -445,9 +447,9 @@ const Browse = () => {
                     />
                   </div>
                 )}
-                <FilterSelect label="Body Type" value={selectedBody} onChange={setSelectedBody} placeholder="Any Type" options={bodyTypes} />
+                <FilterSelect label={t("browse.bodyType")} value={selectedBody} onChange={setSelectedBody} placeholder={t("browse.anyType")} options={bodyTypes} />
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Year: {yearRange[0]} — {yearRange[1]}</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("browse.yearRange", { from: yearRange[0], to: yearRange[1] })}</label>
                   <Slider min={2000} max={currentYear} step={1} value={yearRange} onValueChange={setYearRange} className="mt-2" />
                   <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
                     <span>2000</span><span>{currentYear}</span>
@@ -458,7 +460,7 @@ const Browse = () => {
               <div className="h-px bg-border" />
 
               {/* Price Section */}
-              <FilterSection title="Price" sectionKey="price">
+              <FilterSection title={t("browse.sections.price")} sectionKey="price">
                 <div className="flex flex-wrap gap-1.5">
                   {pricePresets.map((preset) => (
                     <Button
@@ -480,7 +482,7 @@ const Browse = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-[10px] text-muted-foreground mb-1">Min Price</label>
+                    <label className="block text-[10px] text-muted-foreground mb-1">{t("browse.minPrice")}</label>
                     <Input
                       type="number"
                       value={priceRange[0] || ""}
@@ -490,13 +492,13 @@ const Browse = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] text-muted-foreground mb-1">Max Price</label>
+                    <label className="block text-[10px] text-muted-foreground mb-1">{t("browse.maxPrice")}</label>
                     <Input
                       type="number"
                       value={priceRange[1] === 200000 ? "" : priceRange[1]}
                       onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 200000])}
                       className="h-8 text-xs"
-                      placeholder="No max"
+                      placeholder={t("browse.noMax")}
                     />
                   </div>
                 </div>
@@ -505,15 +507,15 @@ const Browse = () => {
               <div className="h-px bg-border" />
 
               {/* Details Section */}
-              <FilterSection title="Specifications" sectionKey="details">
-                <FilterSelect label="Fuel Type" value={selectedFuel} onChange={setSelectedFuel} placeholder="Any Fuel" options={fuelTypes} />
-                <FilterSelect label="Transmission" value={selectedTransmission} onChange={setSelectedTransmission} placeholder="Any" options={transmissions} />
-                <FilterSelect label="Color" value={selectedColor} onChange={setSelectedColor} placeholder="Any Color" options={colors} />
-                <FilterSelect label="Doors" value={selectedDoors} onChange={setSelectedDoors} placeholder="Any" options={doorOptions} />
-                <FilterSelect label="Engine Size" value={selectedEngine} onChange={setSelectedEngine} placeholder="Any" options={engineSizes} />
+              <FilterSection title={t("browse.sections.specifications")} sectionKey="details">
+                <FilterSelect label={t("browse.fuelType")} value={selectedFuel} onChange={setSelectedFuel} placeholder={t("browse.anyFuel")} options={fuelTypes} />
+                <FilterSelect label={t("browse.transmission")} value={selectedTransmission} onChange={setSelectedTransmission} placeholder={t("browse.any")} options={transmissions} />
+                <FilterSelect label={t("browse.color")} value={selectedColor} onChange={setSelectedColor} placeholder={t("browse.anyColor")} options={colors} />
+                <FilterSelect label={t("browse.doors")} value={selectedDoors} onChange={setSelectedDoors} placeholder={t("browse.any")} options={doorOptions} />
+                <FilterSelect label={t("browse.engineSize")} value={selectedEngine} onChange={setSelectedEngine} placeholder={t("browse.any")} options={engineSizes} />
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-                    Max {config.terminology.mileage}: {mileageMax >= 200000 ? "Any" : formatDistance(mileageMax, config)}
+                    {t("browse.maxMileage", { unit: config.terminology.mileage, value: mileageMax >= 200000 ? t("browse.anyValue") : formatDistance(mileageMax, config) })}
                   </label>
                   <Slider min={0} max={200000} step={5000} value={[mileageMax]} onValueChange={(v) => setMileageMax(v[0])} className="mt-2" />
                 </div>
@@ -522,7 +524,7 @@ const Browse = () => {
               <div className="h-px bg-border" />
 
               {/* Location & Seller Section */}
-              <FilterSection title="Location & Seller" sectionKey="location">
+              <FilterSection title={t("browse.sections.locationSeller")} sectionKey="location">
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{config.terminology.postcode}</label>
                   <Input
@@ -533,51 +535,51 @@ const Browse = () => {
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Distance</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">{t("browse.distance")}</label>
                   <Select value={distance || undefined} onValueChange={(v) => setDistance(v === "any" ? "" : v)}>
                     <SelectTrigger className="h-9 text-sm" disabled={!postcode}>
-                      <SelectValue placeholder={postcode ? "Any distance" : "Enter postcode first"} />
+                      <SelectValue placeholder={postcode ? t("browse.anyDistance") : t("browse.enterPostcodeFirst")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any distance</SelectItem>
+                      <SelectItem value="any">{t("browse.anyDistance")}</SelectItem>
                       {[1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300].map((d) => (
-                        <SelectItem key={d} value={String(d)}>Within {d} {config.distanceUnit}</SelectItem>
+                        <SelectItem key={d} value={String(d)}>{t("browse.within", { distance: d, unit: config.distanceUnit })}</SelectItem>
                       ))}
-                      <SelectItem value="nationwide">Nationwide</SelectItem>
+                      <SelectItem value="nationwide">{t("browse.nationwide")}</SelectItem>
                     </SelectContent>
                   </Select>
                   {postcode && distance && distance !== "any" && (
                     <p className="mt-1 text-[11px] text-muted-foreground">
-                      {geocoding ? "Locating postcode…" : geocodeError ? <span className="text-destructive">{geocodeError}</span> : originCoords ? `📍 Centred on ${postcode.toUpperCase()}` : ""}
+                      {geocoding ? t("browse.locatingPostcode") : geocodeError ? <span className="text-destructive">{geocodeError}</span> : originCoords ? t("browse.centredOn", { postcode: postcode.toUpperCase() }) : ""}
                     </p>
                   )}
                 </div>
-                <FilterSelect label="City / Area" value={selectedCity} onChange={setSelectedCity} placeholder="Any Location" options={cities} />
-                <FilterSelect label="Seller Type" value={sellerType} onChange={setSellerType} placeholder="Any Seller" options={sellerTypes} />
+                <FilterSelect label={t("browse.cityArea")} value={selectedCity} onChange={setSelectedCity} placeholder={t("browse.anyLocation")} options={cities} />
+                <FilterSelect label={t("browse.sellerType")} value={sellerType} onChange={setSellerType} placeholder={t("browse.anySeller")} options={sellerTypes} />
               </FilterSection>
 
               <div className="h-px bg-border" />
 
               {/* Quick Options */}
-              <FilterSection title="Quick Filters" sectionKey="options">
+              <FilterSection title={t("browse.sections.quickFilters")} sectionKey="options">
                 <div className="flex items-center justify-between rounded-lg border border-border p-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="h-4 w-4 text-success" />
-                    <span className="text-sm text-foreground">Verified Only</span>
+                    <span className="text-sm text-foreground">{t("browse.verifiedOnly")}</span>
                   </div>
                   <Switch checked={verifiedOnly} onCheckedChange={setVerifiedOnly} />
                 </div>
                 <div className="flex items-center justify-between rounded-lg border border-border p-3">
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-warning" />
-                    <span className="text-sm text-foreground">Featured Only</span>
+                    <span className="text-sm text-foreground">{t("browse.featuredOnly")}</span>
                   </div>
                   <Switch checked={featuredOnly} onCheckedChange={setFeaturedOnly} />
                 </div>
               </FilterSection>
 
               <Button className="w-full gradient-primary border-0 lg:hidden mt-3" onClick={() => setShowFilters(false)}>
-                Show {totalCount.toLocaleString()} Results
+                {t("browse.showResults", { count: totalCount.toLocaleString() })}
               </Button>
             </div>
           </div>
@@ -589,9 +591,9 @@ const Browse = () => {
             ) : listings.length === 0 ? (
               <EmptyState
                 icon={Search}
-                title="No vehicles found"
-                description="Try adjusting your filters or search criteria"
-                actionLabel="Clear Filters"
+                title={t("browse.noVehiclesFound")}
+                description={t("browse.adjustFilters")}
+                actionLabel={t("browse.clearFilters")}
                 onAction={clearFilters}
               />
             ) : (
@@ -600,7 +602,7 @@ const Browse = () => {
                   <Suspense fallback={<div className="h-[500px] w-full animate-pulse rounded-xl bg-muted" />}>
                     <BrowseMapView listings={listings} country={country} />
                     <p className="mt-2 text-xs text-muted-foreground text-center">
-                      {listings.filter(l => l.location).length} of {listings.length} listings shown on map (based on location data)
+                      {t("browse.mapShownCount", { shown: listings.filter(l => l.location).length, total: listings.length })}
                     </p>
                   </Suspense>
                 ) : (
@@ -618,7 +620,7 @@ const Browse = () => {
                 {totalPages > 1 && (
                   <div className="mt-8 flex items-center justify-center gap-2">
                     <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                      <ChevronLeft className="h-4 w-4" /> Previous
+                      <ChevronLeft className="h-4 w-4" /> {t("browse.previous")}
                     </Button>
                     <div className="flex items-center gap-1">
                       {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -637,7 +639,7 @@ const Browse = () => {
                       })}
                     </div>
                     <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>
-                      Next <ChevronRight className="h-4 w-4" />
+                      {t("browse.next")} <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
                 )}

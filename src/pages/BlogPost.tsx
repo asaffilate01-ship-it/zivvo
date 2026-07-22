@@ -8,104 +8,23 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar, Clock, User, BookOpen, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const blogPosts: Record<string, {
-  title: string; excerpt: string; category: string; image: string;
-  author: string; date: string; readTime: string; content: string[];
-}> = {
-  "buying-used-car-checklist": {
-    title: "The Ultimate Used Car Buying Checklist for 2026",
-    excerpt: "Don't get caught out. Our comprehensive checklist covers everything from bodywork inspection to finance checks before you hand over your money.",
-    category: "Buying Guide",
-    image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1200&q=80",
-    author: "Zivvo Team", date: "2026-03-10", readTime: "8 min read",
-    content: [
-      "Buying a used car can be one of the smartest financial decisions you make — but only if you do it right. Every year, thousands of buyers end up with vehicles that have hidden problems, outstanding finance, or a questionable history.",
-      "Our comprehensive checklist breaks down every step of the used car buying process, from your initial online search to the final handshake. We've compiled this from data across thousands of successful and unsuccessful transactions on Zivvo.",
-      "## Before You View\n\n1. **Set your budget** — include insurance, tax, and running costs\n2. **Research the model** — check common faults on owner forums\n3. **Run an HPI check** — verify no outstanding finance, theft, or write-offs\n4. **Check the MOT history** — look for advisory patterns online",
-      "## At the Viewing\n\n1. **Walk around the exterior** — check panel gaps, paint mismatches, rust\n2. **Open all doors, boot, and bonnet** — listen for creaks\n3. **Check tyre condition** — uneven wear suggests alignment issues\n4. **Start the engine cold** — listen for knocks or rattles\n5. **Test all electrics** — windows, mirrors, lights, infotainment",
-      "## The Test Drive\n\nDrive for at least 15 minutes on varied roads. Check brakes, steering response, gearbox smoothness, and listen for any unusual noises. Pay attention to how the car feels at motorway speeds.",
-      "## After the Deal\n\nEnsure you receive the V5C logbook, service history, both keys, and a receipt. Transfer the V5C to your name within 14 days and arrange insurance before driving away.",
-    ],
-  },
-  "electric-vs-hybrid-2026": {
-    title: "Electric vs Hybrid: Which Is Right for You in 2026?",
-    excerpt: "We break down the real-world costs, range, and practicality of going electric versus hybrid.",
-    category: "EV Guide",
-    image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80",
-    author: "Zivvo Team", date: "2026-03-05", readTime: "6 min read",
-    content: [
-      "The electric vehicle landscape has transformed dramatically. With charging infrastructure now covering most major routes and battery costs falling year on year, the question is no longer 'if' but 'when' to go electric.",
-      "## Full Electric (BEV)\n\nPure electric vehicles offer the lowest running costs, zero tailpipe emissions, and an increasingly impressive range. Most modern EVs now offer 250-400 miles per charge, making range anxiety largely a thing of the past.",
-      "## Hybrid (HEV & PHEV)\n\nHybrids offer a stepping stone — you get electric efficiency around town with petrol backup for longer journeys. Plug-in hybrids (PHEVs) typically offer 30-60 miles of electric-only range, perfect for daily commutes.",
-      "## Cost Comparison\n\nWhile EVs have a higher upfront cost, they're significantly cheaper to run. Electricity costs roughly 7p per mile compared to 15-20p for petrol. Tax benefits, lower servicing costs, and congestion charge exemptions add up quickly.",
-      "## Our Verdict\n\nIf you have home charging and drive under 300 miles per day, go full electric. If you frequently drive long distances without reliable charging stops, a PHEV offers the best of both worlds.",
-    ],
-  },
-  "how-to-sell-car-fast": {
-    title: "How to Sell Your Car Fast: 10 Expert Tips",
-    excerpt: "Data-backed advice from thousands of successful sales on Zivvo.",
-    category: "Selling Tips",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80",
-    author: "Zivvo Team", date: "2026-02-28", readTime: "5 min read",
-    content: [
-      "Selling your car doesn't have to be a drawn-out process. Based on data from thousands of successful sales on Zivvo, here are the strategies that consistently lead to faster sales at better prices.",
-      "## 1. Price It Right\n\nOverpricing is the #1 reason cars sit unsold. Research similar models on Zivvo and price competitively. Listings priced within 5% of market value sell 3x faster.",
-      "## 2. Take Great Photos\n\nListings with 10+ high-quality photos get 4x more enquiries. Shoot in daylight, clean the car first, and include interior, exterior, engine bay, and any imperfections.",
-      "## 3. Write a Detailed Description\n\nBe honest and thorough. Include service history highlights, recent work done, and genuine reasons for selling. Transparency builds trust.",
-      "## 4. Get an HPI Check\n\nA clear HPI check reassures buyers and can justify a higher price. Zivvo offers integrated HPI checks directly from your listing dashboard.",
-      "## 5. Respond Quickly\n\nSellers who respond to enquiries within 1 hour are 5x more likely to close the sale. Enable notifications and keep your phone handy.",
-    ],
-  },
-  "finance-check-guide": {
-    title: "Why You Should Always Run a Finance Check Before Buying",
-    excerpt: "Here's how to protect yourself from outstanding finance.",
-    category: "Safety",
-    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80",
-    author: "Zivvo Team", date: "2026-02-20", readTime: "4 min read",
-    content: [
-      "Every year, thousands of cars are sold with outstanding finance — meaning the buyer could lose the car and their money. A finance check is one of the most important steps you can take.",
-      "## What Is Outstanding Finance?\n\nWhen a car is bought on finance (HP, PCP, or personal loan secured against the vehicle), the finance company retains legal ownership until the debt is fully paid. If you buy a car with outstanding finance, the finance company can legally repossess it.",
-      "## How to Check\n\nZivvo's integrated HPI check includes a comprehensive finance check. Simply enter the registration number and we'll search against all major UK finance databases.",
-      "## What If Finance Is Found?\n\nDon't panic — but don't proceed with the purchase either. The seller needs to settle the outstanding amount before the sale can go through legitimately.",
-    ],
-  },
-  "best-family-suvs-2026": {
-    title: "Top 10 Best Family SUVs in 2026",
-    excerpt: "Safety ratings, boot space, and running costs ranked.",
-    category: "Reviews",
-    image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1200&q=80",
-    author: "Zivvo Team", date: "2026-02-15", readTime: "7 min read",
-    content: [
-      "Choosing the right family SUV means balancing safety, space, running costs, and budget. We've ranked the top 10 based on real owner feedback and expert analysis.",
-      "## 1. Toyota RAV4 Hybrid\n\nReliability king. The RAV4 Hybrid delivers exceptional fuel economy (50+ mpg), a spacious boot, and Toyota's legendary build quality. Five-star NCAP rating.",
-      "## 2. Hyundai Tucson\n\nStunning design inside and out. The Tucson offers a premium feel at a mid-range price, with hybrid and plug-in hybrid options.",
-      "## 3. Skoda Kodiaq\n\nThe practical choice. Seven seats as standard on most trims, massive boot space, and sensible running costs make the Kodiaq a family favourite.",
-      "## 4. Kia Sportage\n\nIndustry-leading 7-year warranty, sharp styling, and an excellent infotainment system. The plug-in hybrid version offers great tax benefits.",
-      "## 5. Volvo XC60\n\nSafety pioneer. If protecting your family is the top priority, Volvo's XC60 leads the pack with the most advanced safety tech available.",
-    ],
-  },
-  "dealer-subscription-benefits": {
-    title: "Why Dealers Are Switching to Zivvo: A Case Study",
-    excerpt: "How verified dealers reach more buyers and close faster.",
-    category: "For Dealers",
-    image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=1200&q=80",
-    author: "Zivvo Team", date: "2026-02-10", readTime: "5 min read",
-    content: [
-      "Independent dealers across the UK are discovering that Zivvo's platform offers a more cost-effective way to reach serious buyers compared to traditional classified sites.",
-      "## The Challenge\n\nSmall and medium dealers often struggle with high advertising costs, limited visibility, and difficulty building trust with online buyers.",
-      "## The Zivvo Solution\n\nOur dealer plans start from just £49/month and include verified dealer badges, custom landing pages, integrated analytics, and direct buyer messaging.",
-      "## Results\n\n- **47% more enquiries** within the first month\n- **3x faster response times** with our integrated messaging\n- **Verified dealer badge** increased click-through rates by 62%\n- **Custom landing pages** gave dealers a professional online presence",
-      "## Getting Started\n\nJoin hundreds of dealers already growing their business on Zivvo. Choose from Starter, Professional, or Enterprise plans to match your dealership size.",
-    ],
-  },
+const postMeta: Record<string, { image: string; author: string; date: string; readTime: string }> = {
+  "buying-used-car-checklist": { image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1200&q=80", author: "Zivvo Team", date: "2026-03-10", readTime: "8 min read" },
+  "electric-vs-hybrid-2026": { image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1200&q=80", author: "Zivvo Team", date: "2026-03-05", readTime: "6 min read" },
+  "how-to-sell-car-fast": { image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80", author: "Zivvo Team", date: "2026-02-28", readTime: "5 min read" },
+  "finance-check-guide": { image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80", author: "Zivvo Team", date: "2026-02-20", readTime: "4 min read" },
+  "best-family-suvs-2026": { image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1200&q=80", author: "Zivvo Team", date: "2026-02-15", readTime: "7 min read" },
+  "dealer-subscription-benefits": { image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=1200&q=80", author: "Zivvo Team", date: "2026-02-10", readTime: "5 min read" },
 };
 
-const allPostIds = Object.keys(blogPosts);
+const allPostIds = Object.keys(postMeta);
 
 const BlogPost = () => {
+  const { t } = useTranslation("blogPost");
   const { id } = useParams<{ id: string }>();
-  const post = id ? blogPosts[id] : null;
+  const meta = id ? postMeta[id] : null;
   const [readProgress, setReadProgress] = useState(0);
 
   useEffect(() => {
@@ -118,19 +37,25 @@ const BlogPost = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (!post) {
+  if (!meta || !id) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto flex flex-col items-center justify-center px-4 py-24 text-center">
-          <h1 className="font-display text-2xl font-bold text-foreground">Article Not Found</h1>
-          <p className="mt-2 text-muted-foreground">This blog post doesn't exist or has been removed.</p>
-          <Link to="/blog"><Button className="mt-6" variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> Back to Blog</Button></Link>
+          <h1 className="font-display text-2xl font-bold text-foreground">{t("notFoundTitle")}</h1>
+          <p className="mt-2 text-muted-foreground">{t("notFoundDesc")}</p>
+          <Link to="/blog"><Button className="mt-6" variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> {t("backToBlog")}</Button></Link>
         </div>
         <Footer />
       </div>
     );
   }
+
+  const title = t(`posts.${id}.title`);
+  const excerpt = t(`posts.${id}.excerpt`);
+  const category = t(`posts.${id}.category`);
+  const content = t(`posts.${id}.content`, { returnObjects: true }) as string[];
+  const post = { ...meta, title, excerpt, category, content };
 
   // Extract headings for table of contents
   const headings = post.content
@@ -142,8 +67,8 @@ const BlogPost = () => {
   const relatedPosts = allPostIds
     .filter(pid => pid !== id)
     .sort((a, b) => {
-      const aMatch = blogPosts[a].category === post.category ? 0 : 1;
-      const bMatch = blogPosts[b].category === post.category ? 0 : 1;
+      const aMatch = t(`posts.${a}.category`) === post.category ? 0 : 1;
+      const bMatch = t(`posts.${b}.category`) === post.category ? 0 : 1;
       return aMatch - bMatch;
     })
     .slice(0, 3);
@@ -192,7 +117,7 @@ const BlogPost = () => {
 
       <article className="container mx-auto max-w-4xl px-4 py-8">
         <Link to="/blog" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-6 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Back to Blog
+          <ArrowLeft className="h-4 w-4" /> {t("backToBlog")}
         </Link>
 
         <Badge variant="secondary" className="mb-3">{post.category}</Badge>
@@ -202,7 +127,7 @@ const BlogPost = () => {
         <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1"><User className="h-4 w-4" /> {post.author}</span>
-            <span className="flex items-center gap-1"><Calendar className="h-4 w-4" /> {new Date(post.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</span>
+            <span className="flex items-center gap-1"><Calendar className="h-4 w-4" /> {new Date(post.date).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}</span>
             <span className="flex items-center gap-1"><Clock className="h-4 w-4" /> {post.readTime}</span>
           </div>
           <ShareSheet title={post.title} text={post.excerpt} />
@@ -245,7 +170,7 @@ const BlogPost = () => {
             <aside className="hidden lg:block">
               <div className="sticky top-20 rounded-xl border border-border bg-card p-5 shadow-card">
                 <h3 className="flex items-center gap-2 font-display text-sm font-semibold text-card-foreground mb-3">
-                  <BookOpen className="h-4 w-4" /> Contents
+                  <BookOpen className="h-4 w-4" /> {t("contents")}
                 </h3>
                 <nav className="space-y-2">
                   {headings.map((h) => (
@@ -261,7 +186,7 @@ const BlogPost = () => {
 
                 {/* Social share in sidebar */}
                 <div className="mt-6 pt-4 border-t border-border">
-                  <p className="text-xs text-muted-foreground mb-2">Share this article</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t("shareArticle")}</p>
                   <ShareSheet title={post.title} text={post.excerpt} />
                 </div>
               </div>
@@ -276,22 +201,24 @@ const BlogPost = () => {
           </div>
           <div>
             <p className="font-display font-semibold text-card-foreground">{post.author}</p>
-            <p className="text-sm text-muted-foreground">Helping buyers and sellers make smarter car decisions across the UK.</p>
+            <p className="text-sm text-muted-foreground">{t("authorBio")}</p>
           </div>
         </div>
 
         {/* Bottom share bar */}
         <div className="mt-8 flex items-center justify-between rounded-xl border border-border bg-secondary/30 p-4">
-          <p className="text-sm font-medium text-foreground">Found this useful? Share it</p>
+          <p className="text-sm font-medium text-foreground">{t("foundUseful")}</p>
           <ShareSheet title={post.title} text={post.excerpt} />
         </div>
 
         {/* Related posts */}
         <section className="mt-14">
-          <h2 className="font-display text-xl font-bold text-foreground mb-6">You Might Also Like</h2>
+          <h2 className="font-display text-xl font-bold text-foreground mb-6">{t("youMightAlsoLike")}</h2>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {relatedPosts.map((pid) => {
-              const rp = blogPosts[pid];
+              const rpMeta = postMeta[pid];
+              const rpTitle = t(`posts.${pid}.title`);
+              const rpCategory = t(`posts.${pid}.category`);
               return (
                 <Link key={pid} to={`/blog/${pid}`}>
                   <motion.div
@@ -300,12 +227,12 @@ const BlogPost = () => {
                     viewport={{ once: true }}
                     className="group overflow-hidden rounded-xl border border-border bg-card shadow-card transition-all hover:shadow-elevated h-full"
                   >
-                    <img src={rp.image} alt={rp.title} className="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
+                    <img src={rpMeta.image} alt={rpTitle} className="h-36 w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
                     <div className="p-4">
-                      <Badge variant="outline" className="text-xs">{rp.category}</Badge>
-                      <h3 className="mt-2 font-display text-sm font-semibold text-card-foreground line-clamp-2">{rp.title}</h3>
+                      <Badge variant="outline" className="text-xs">{rpCategory}</Badge>
+                      <h3 className="mt-2 font-display text-sm font-semibold text-card-foreground line-clamp-2">{rpTitle}</h3>
                       <span className="mt-2 inline-flex items-center text-xs text-primary gap-0.5">
-                        Read more <ChevronRight className="h-3 w-3" />
+                        {t("readMore")} <ChevronRight className="h-3 w-3" />
                       </span>
                     </div>
                   </motion.div>
@@ -316,7 +243,7 @@ const BlogPost = () => {
         </section>
 
         <div className="mt-12 border-t border-border pt-8">
-          <Link to="/blog"><Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> More Articles</Button></Link>
+          <Link to="/blog"><Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" /> {t("moreArticles")}</Button></Link>
         </div>
       </article>
 

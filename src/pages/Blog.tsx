@@ -9,74 +9,29 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
-const blogPosts = [
-  {
-    id: "buying-used-car-checklist",
-    title: "The Ultimate Used Car Buying Checklist for 2026",
-    excerpt: "Don't get caught out. Our comprehensive checklist covers everything from bodywork inspection to finance checks before you hand over your money.",
-    category: "Buying Guide",
-    image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80",
-    author: "Zivvo Team",
-    date: "2026-03-10",
-    readTime: "8 min read",
-  },
-  {
-    id: "electric-vs-hybrid-2026",
-    title: "Electric vs Hybrid: Which Is Right for You in 2026?",
-    excerpt: "With EV infrastructure growing rapidly, we break down the real-world costs, range, and practicality of going electric versus hybrid.",
-    category: "EV Guide",
-    image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80",
-    author: "Zivvo Team",
-    date: "2026-03-05",
-    readTime: "6 min read",
-  },
-  {
-    id: "how-to-sell-car-fast",
-    title: "How to Sell Your Car Fast: 10 Expert Tips",
-    excerpt: "From pricing strategy to photo tips, learn what makes listings sell faster. Data-backed advice from thousands of successful sales on Zivvo.",
-    category: "Selling Tips",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80",
-    author: "Zivvo Team",
-    date: "2026-02-28",
-    readTime: "5 min read",
-  },
-  {
-    id: "finance-check-guide",
-    title: "Why You Should Always Run a Finance Check Before Buying",
-    excerpt: "Thousands of cars are sold each year with outstanding finance. Here's how to protect yourself and what to do if a check comes back positive.",
-    category: "Safety",
-    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
-    author: "Zivvo Team",
-    date: "2026-02-20",
-    readTime: "4 min read",
-  },
-  {
-    id: "best-family-suvs-2026",
-    title: "Top 10 Best Family SUVs in 2026",
-    excerpt: "Safety ratings, boot space, and running costs — we rank the best SUVs for families based on real owner data and expert reviews.",
-    category: "Reviews",
-    image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80",
-    author: "Zivvo Team",
-    date: "2026-02-15",
-    readTime: "7 min read",
-  },
-  {
-    id: "dealer-subscription-benefits",
-    title: "Why Dealers Are Switching to Zivvo: A Case Study",
-    excerpt: "See how verified dealers on Zivvo are reaching more buyers, closing faster, and building trust with our platform tools.",
-    category: "For Dealers",
-    image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&q=80",
-    author: "Zivvo Team",
-    date: "2026-02-10",
-    readTime: "5 min read",
-  },
+const postMeta = [
+  { id: "buying-used-car-checklist", image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80", author: "Zivvo Team", date: "2026-03-10", readTime: "8 min read" },
+  { id: "electric-vs-hybrid-2026", image: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80", author: "Zivvo Team", date: "2026-03-05", readTime: "6 min read" },
+  { id: "how-to-sell-car-fast", image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80", author: "Zivvo Team", date: "2026-02-28", readTime: "5 min read" },
+  { id: "finance-check-guide", image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80", author: "Zivvo Team", date: "2026-02-20", readTime: "4 min read" },
+  { id: "best-family-suvs-2026", image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80", author: "Zivvo Team", date: "2026-02-15", readTime: "7 min read" },
+  { id: "dealer-subscription-benefits", image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&q=80", author: "Zivvo Team", date: "2026-02-10", readTime: "5 min read" },
 ];
 
 const Blog = () => {
+  const { t } = useTranslation("blog");
   const { toast } = useToast();
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [subscribing, setSubscribing] = useState(false);
+
+  const blogPosts = postMeta.map((meta) => ({
+    ...meta,
+    title: t(`posts.${meta.id}.title`),
+    excerpt: t(`posts.${meta.id}.excerpt`),
+    category: t(`posts.${meta.id}.category`),
+  }));
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,11 +40,11 @@ const Blog = () => {
     const { error } = await supabase.from("newsletter_subscribers" as any).insert({ email: newsletterEmail.trim() });
     setSubscribing(false);
     if (error?.code === "23505") {
-      toast({ title: "Already subscribed!", description: "You're already on our mailing list." });
+      toast({ title: t("toastAlreadySubscribedTitle"), description: t("toastAlreadySubscribedDesc") });
     } else if (error) {
-      toast({ title: "Failed to subscribe", variant: "destructive" });
+      toast({ title: t("toastFailTitle"), variant: "destructive" });
     } else {
-      toast({ title: "Subscribed!", description: "You'll receive our latest articles by email." });
+      toast({ title: t("toastSuccessTitle"), description: t("toastSuccessDesc") });
     }
     setNewsletterEmail("");
   };
@@ -97,8 +52,8 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Zivvo Blog — Car Buying Tips, Reviews & Guides"
-        description="Expert advice on buying, selling, and maintaining your car. Guides, reviews, and industry insights from the Zivvo team."
+        title={t("metaTitle")}
+        description={t("metaDescription")}
         keywords="car buying guide, used car tips, sell car fast, EV guide, car reviews, Zivvo blog"
         jsonLd={{
           "@context": "https://schema.org",
@@ -118,12 +73,12 @@ const Blog = () => {
       {/* Hero */}
       <section className="gradient-dark py-16">
         <div className="container mx-auto px-4 text-center">
-          <Badge className="gradient-primary border-0 text-primary-foreground mb-4">Blog & Guides</Badge>
+          <Badge className="gradient-primary border-0 text-primary-foreground mb-4">{t("badge")}</Badge>
           <h1 className="font-display text-3xl font-bold text-primary-foreground md:text-5xl">
-            Expert Advice for Smarter Car Decisions
+            {t("heroTitle")}
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-primary-foreground/70">
-            Tips, guides, and reviews to help you buy, sell, and maintain your vehicle with confidence.
+            {t("heroSubtitle")}
           </p>
         </div>
       </section>
@@ -149,12 +104,12 @@ const Blog = () => {
               </h2>
               <p className="mt-3 text-muted-foreground leading-relaxed">{blogPosts[0].excerpt}</p>
               <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {new Date(blogPosts[0].date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+                <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {new Date(blogPosts[0].date).toLocaleDateString("de-DE", { day: "numeric", month: "short", year: "numeric" })}</span>
                 <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {blogPosts[0].readTime}</span>
               </div>
               <Link to={`/blog/${blogPosts[0].id}`}>
                 <Button className="mt-6 gradient-primary border-0 w-fit">
-                  Read Article <ArrowRight className="ml-1 h-4 w-4" />
+                  {t("readArticle")} <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -164,7 +119,7 @@ const Blog = () => {
 
       {/* Grid */}
       <section className="container mx-auto px-4 py-14">
-        <h2 className="font-display text-2xl font-bold text-foreground">Latest Articles</h2>
+        <h2 className="font-display text-2xl font-bold text-foreground">{t("latestArticles")}</h2>
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {blogPosts.slice(1).map((post, i) => (
             <Link key={post.id} to={`/blog/${post.id}`}>
@@ -203,19 +158,19 @@ const Blog = () => {
       {/* Newsletter CTA */}
       <section className="border-t border-border bg-secondary/30 py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-display text-2xl font-bold text-foreground">Stay in the Know</h2>
-          <p className="mt-2 text-muted-foreground">Get the latest car buying tips and market insights delivered to your inbox.</p>
+          <h2 className="font-display text-2xl font-bold text-foreground">{t("stayInTheKnow")}</h2>
+          <p className="mt-2 text-muted-foreground">{t("newsletterSubtitle")}</p>
           <form onSubmit={handleSubscribe} className="mx-auto mt-6 flex max-w-md gap-2">
             <input
               type="email"
               value={newsletterEmail}
               onChange={(e) => setNewsletterEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder={t("emailPlaceholder")}
               required
               className="flex-1 rounded-lg border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <Button type="submit" className="gradient-primary border-0" disabled={subscribing}>
-              {subscribing ? "..." : "Subscribe"}
+              {subscribing ? t("subscribing") : t("subscribe")}
             </Button>
           </form>
         </div>

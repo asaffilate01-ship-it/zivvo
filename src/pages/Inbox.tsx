@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ChatWindow from "@/components/ChatWindow";
+import { useTranslation } from "react-i18next";
 
 interface Conversation {
   conversationId: string;
@@ -23,6 +24,7 @@ interface Conversation {
 }
 
 const Inbox = () => {
+  const { t } = useTranslation("inbox");
   const { user } = useAuth();
   const { toast } = useToast();
   const [received, setReceived] = useState<any[]>([]);
@@ -132,7 +134,7 @@ const Inbox = () => {
       .channel("enquiries-inbox")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "enquiries", filter: `seller_id=eq.${user.id}` }, (payload) => {
         setReceived((prev) => [payload.new as any, ...prev]);
-        toast({ title: "New enquiry received!" });
+        toast({ title: t("toast.newEnquiry") });
       })
       .subscribe();
 
@@ -142,7 +144,7 @@ const Inbox = () => {
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
         const msg = payload.new as any;
         if (msg.sender_id !== user.id && msg.recipient_id === user.id) {
-          toast({ title: "New message received!" });
+          toast({ title: t("toast.newMessage") });
           // Update conversations
           setConversations((prev) => {
             const existing = prev.find((c) => c.conversationId === msg.conversation_id);
@@ -176,11 +178,11 @@ const Inbox = () => {
     }).eq("id", enquiryId);
 
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("toast.error"), description: error.message, variant: "destructive" });
     } else {
       setReceived((prev) => prev.map((e) => e.id === enquiryId ? { ...e, reply: text, status: "replied", replied_at: new Date().toISOString() } : e));
       setReplyText((prev) => ({ ...prev, [enquiryId]: "" }));
-      toast({ title: "Reply sent" });
+      toast({ title: t("toast.replySent") });
     }
     setReplyingId(null);
   };
@@ -246,24 +248,24 @@ const Inbox = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto max-w-3xl px-4 py-8">
-        <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Inbox</h1>
-        <p className="text-muted-foreground">Manage your enquiries and messages</p>
+        <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
 
         <Tabs value={tab} onValueChange={setTab} className="mt-6">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="received">
-              Enquiries {unreadCount > 0 && <Badge className="ml-2 gradient-primary border-0 text-xs text-primary-foreground">{unreadCount}</Badge>}
+              {t("tabs.enquiries")} {unreadCount > 0 && <Badge className="ml-2 gradient-primary border-0 text-xs text-primary-foreground">{unreadCount}</Badge>}
             </TabsTrigger>
             <TabsTrigger value="messages">
-              Messages {totalUnreadMessages > 0 && <Badge className="ml-2 gradient-primary border-0 text-xs text-primary-foreground">{totalUnreadMessages}</Badge>}
+              {t("tabs.messages")} {totalUnreadMessages > 0 && <Badge className="ml-2 gradient-primary border-0 text-xs text-primary-foreground">{totalUnreadMessages}</Badge>}
             </TabsTrigger>
-            <TabsTrigger value="sent">Sent</TabsTrigger>
+            <TabsTrigger value="sent">{t("tabs.sent")}</TabsTrigger>
           </TabsList>
 
           {/* Received Enquiries */}
           <TabsContent value="received" className="mt-4 space-y-4">
             {received.length === 0 ? (
-              <Card><CardContent className="flex flex-col items-center py-12"><MessageSquare className="h-12 w-12 text-muted-foreground" /><p className="mt-3 text-muted-foreground">No enquiries received yet</p></CardContent></Card>
+              <Card><CardContent className="flex flex-col items-center py-12"><MessageSquare className="h-12 w-12 text-muted-foreground" /><p className="mt-3 text-muted-foreground">{t("noEnquiriesReceived")}</p></CardContent></Card>
             ) : received.map((e) => (
               <Card key={e.id} className={e.status === "unread" ? "border-primary/30" : ""}>
                 <CardContent className="p-5">
@@ -273,13 +275,13 @@ const Inbox = () => {
                         {e.car_listings?.title || `${e.car_listings?.year} ${e.car_listings?.make} ${e.car_listings?.model}`}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        From: {e.sender_name || "Anonymous"} {e.sender_email && `· ${e.sender_email}`}
+                        {t("from")}: {e.sender_name || t("anonymous")} {e.sender_email && `· ${e.sender_email}`}
                       </p>
                       <p className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={e.status === "unread" ? "default" : e.status === "replied" ? "secondary" : "outline"}>{e.status}</Badge>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startChat(e)} title="Open chat">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startChat(e)} title={t("openChat")}>
                         <MessageCircle className="h-4 w-4" />
                       </Button>
                     </div>
@@ -288,19 +290,19 @@ const Inbox = () => {
 
                   {e.reply && (
                     <div className="mt-3 rounded-lg border border-success/20 bg-success/5 p-3">
-                      <p className="text-xs font-medium text-success">Your Reply</p>
+                      <p className="text-xs font-medium text-success">{t("yourReply")}</p>
                       <p className="mt-1 text-sm text-foreground">{e.reply}</p>
                     </div>
                   )}
 
                   {!e.reply && (
                     <div className="mt-3 flex gap-2">
-                      {e.status === "unread" && <Button size="sm" variant="ghost" onClick={() => markRead(e.id)}>Mark Read</Button>}
+                      {e.status === "unread" && <Button size="sm" variant="ghost" onClick={() => markRead(e.id)}>{t("markRead")}</Button>}
                       <div className="flex flex-1 gap-2">
                         <Textarea
                           value={replyText[e.id] || ""}
                           onChange={(ev) => setReplyText((p) => ({ ...p, [e.id]: ev.target.value }))}
-                          placeholder="Type your reply..."
+                          placeholder={t("replyPlaceholder")}
                           rows={2}
                           className="flex-1"
                         />
@@ -321,8 +323,8 @@ const Inbox = () => {
               <Card>
                 <CardContent className="flex flex-col items-center py-12">
                   <MessageCircle className="h-12 w-12 text-muted-foreground" />
-                  <p className="mt-3 text-muted-foreground">No conversations yet</p>
-                  <p className="text-xs text-muted-foreground mt-1">Start a chat from an enquiry or listing page</p>
+                  <p className="mt-3 text-muted-foreground">{t("noConversations")}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t("noConversationsDesc")}</p>
                 </CardContent>
               </Card>
             ) : conversations.map((conv) => (
@@ -355,7 +357,7 @@ const Inbox = () => {
           {/* Sent Enquiries */}
           <TabsContent value="sent" className="mt-4 space-y-4">
             {sent.length === 0 ? (
-              <Card><CardContent className="flex flex-col items-center py-12"><Mail className="h-12 w-12 text-muted-foreground" /><p className="mt-3 text-muted-foreground">No enquiries sent yet</p></CardContent></Card>
+              <Card><CardContent className="flex flex-col items-center py-12"><Mail className="h-12 w-12 text-muted-foreground" /><p className="mt-3 text-muted-foreground">{t("noEnquiriesSent")}</p></CardContent></Card>
             ) : sent.map((e) => (
               <Card key={e.id}>
                 <CardContent className="p-5">
@@ -364,14 +366,14 @@ const Inbox = () => {
                       <p className="font-display font-semibold text-card-foreground">{e.car_listings?.title || "Listing"}</p>
                       <p className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startChat(e)} title="Open chat">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startChat(e)} title={t("openChat")}>
                       <MessageCircle className="h-4 w-4" />
                     </Button>
                   </div>
                   <p className="mt-3 rounded-lg bg-muted p-3 text-sm text-foreground">{e.message}</p>
                   {e.reply && (
                     <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
-                      <p className="text-xs font-medium text-primary">Seller's Reply</p>
+                      <p className="text-xs font-medium text-primary">{t("sellersReply")}</p>
                       <p className="mt-1 text-sm text-foreground">{e.reply}</p>
                     </div>
                   )}

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Star, ArrowRight, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const reviews = [
   {
@@ -92,22 +93,24 @@ const RatingBadge = ({ rating }: { rating: number }) => {
   );
 };
 
-const CarReviews = () => (
+const CarReviews = () => {
+  const { t } = useTranslation();
+  return (
   <div className="min-h-screen bg-background">
     <SEOHead
-      title="Expert Car Reviews — Ratings & Buying Guides"
-      description="Read expert car reviews with ratings, pros & cons. Find the best car for your needs with our comprehensive reviews."
+      title={t("carReviews.seo.title")}
+      description={t("carReviews.seo.description")}
     />
     <Navbar />
 
     <div className="container mx-auto px-4 py-12">
       <div className="text-center mb-10">
-        <Badge variant="outline" className="mb-3 text-xs">Expert Reviews</Badge>
+        <Badge variant="outline" className="mb-3 text-xs">{t("carReviews.badge")}</Badge>
         <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-          Car Reviews &
-          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> Ratings</span>
+          {t("carReviews.title1")}
+          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> {t("carReviews.title2")}</span>
         </h1>
-        <p className="mt-2 text-muted-foreground">Honest, in-depth reviews to help you make the right choice</p>
+        <p className="mt-2 text-muted-foreground">{t("carReviews.subtitle")}</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -140,7 +143,7 @@ const CarReviews = () => (
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <div>
                     <div className="flex items-center gap-1 text-[10px] font-semibold text-success mb-1">
-                      <ThumbsUp className="h-3 w-3" /> Pros
+                      <ThumbsUp className="h-3 w-3" /> {t("carReviews.pros")}
                     </div>
                     {review.pros.slice(0, 2).map((p) => (
                       <p key={p} className="text-[11px] text-muted-foreground truncate">• {p}</p>
@@ -148,7 +151,7 @@ const CarReviews = () => (
                   </div>
                   <div>
                     <div className="flex items-center gap-1 text-[10px] font-semibold text-destructive mb-1">
-                      <ThumbsDown className="h-3 w-3" /> Cons
+                      <ThumbsDown className="h-3 w-3" /> {t("carReviews.cons")}
                     </div>
                     {review.cons.slice(0, 2).map((c) => (
                       <p key={c} className="text-[11px] text-muted-foreground truncate">• {c}</p>
@@ -164,7 +167,7 @@ const CarReviews = () => (
                   </div>
                   <Link to={`/browse?make=${review.make}`}>
                     <Button variant="ghost" size="sm" className="text-primary text-xs h-7">
-                      Browse {review.make} <ArrowRight className="ml-1 h-3 w-3" />
+                      {t("carReviews.browse", { make: review.make })} <ArrowRight className="ml-1 h-3 w-3" />
                     </Button>
                   </Link>
                 </div>
@@ -177,6 +180,7 @@ const CarReviews = () => (
 
     <Footer />
   </div>
-);
+  );
+};
 
 export default CarReviews;
