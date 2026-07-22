@@ -1,41 +1,42 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useCountry } from "@/contexts/CountryContext";
+import { formatPrice } from "@/lib/countryConfig";
 
 type CountMap = Record<string, number>;
 
-const TABS = [
-  { id: "makes", label: "All makes" },
-  { id: "body", label: "Popular body styles" },
-  { id: "popular", label: "Popular searches" },
-  { id: "local", label: "Local searches" },
-] as const;
-
-type TabId = (typeof TABS)[number]["id"];
-
-const POPULAR_SEARCHES = [
-  { label: "Cars under £5,000", href: "/browse?priceMax=5000" },
-  { label: "Cars under £10,000", href: "/browse?priceMax=10000" },
-  { label: "Electric cars", href: "/browse?fuel=Electric" },
-  { label: "Hybrid cars", href: "/browse?fuel=Hybrid" },
-  { label: "Automatic cars", href: "/browse?transmission=Automatic" },
-  { label: "Manual cars", href: "/browse?transmission=Manual" },
-  { label: "Low mileage cars", href: "/browse?mileageMax=30000" },
-  { label: "Convertibles", href: "/browse?body=Convertible" },
-  { label: "Family SUVs", href: "/browse?body=SUV" },
-  { label: "First-time driver cars", href: "/browse?priceMax=4000&engine=1.0L" },
-  { label: "Diesel cars", href: "/browse?fuel=Diesel" },
-  { label: "Vans for sale", href: "/browse?body=Van" },
-];
-
 const SEOLinkBlock = () => {
   const { country, config } = useCountry();
-  const [tab, setTab] = useState<TabId>("makes");
+  const { t } = useTranslation();
+  const [tab, setTab] = useState<"makes" | "body" | "popular" | "local">("makes");
   const [makeCounts, setMakeCounts] = useState<CountMap>({});
   const [bodyCounts, setBodyCounts] = useState<CountMap>({});
   const [cityCounts, setCityCounts] = useState<CountMap>({});
+
+  const TABS = [
+    { id: "makes" as const, label: t("seoLinks.tabs.makes") },
+    { id: "body" as const, label: t("seoLinks.tabs.body") },
+    { id: "popular" as const, label: t("seoLinks.tabs.popular") },
+    { id: "local" as const, label: t("seoLinks.tabs.local") },
+  ];
+
+  const POPULAR_SEARCHES = [
+    { label: t("seoLinks.popular.under", { price: formatPrice(5000, config) }), href: "/browse?priceMax=5000" },
+    { label: t("seoLinks.popular.under", { price: formatPrice(10000, config) }), href: "/browse?priceMax=10000" },
+    { label: t("seoLinks.popular.electric"), href: "/browse?fuel=Electric" },
+    { label: t("seoLinks.popular.hybrid"), href: "/browse?fuel=Hybrid" },
+    { label: t("seoLinks.popular.automatic"), href: "/browse?transmission=Automatic" },
+    { label: t("seoLinks.popular.manual"), href: "/browse?transmission=Manual" },
+    { label: t("seoLinks.popular.lowMileage"), href: "/browse?mileageMax=30000" },
+    { label: t("seoLinks.popular.convertibles"), href: "/browse?body=Convertible" },
+    { label: t("seoLinks.popular.familySuvs"), href: "/browse?body=SUV" },
+    { label: t("seoLinks.popular.firstTime"), href: "/browse?priceMax=4000&engine=1.0L" },
+    { label: t("seoLinks.popular.diesel"), href: "/browse?fuel=Diesel" },
+    { label: t("seoLinks.popular.vans"), href: "/browse?body=Van" },
+  ];
 
   useEffect(() => {
     const load = async () => {
@@ -65,23 +66,24 @@ const SEOLinkBlock = () => {
   }, [country]);
 
   const renderItems = () => {
+    const prefix = t("seoLinks.usedPrefix");
     if (tab === "makes") {
       return config.makes.map((make) => ({
-        label: `Used ${make}`,
+        label: `${prefix} ${make}`,
         count: makeCounts[make] ?? 0,
         href: `/browse?make=${encodeURIComponent(make)}`,
       }));
     }
     if (tab === "body") {
       return config.bodyTypes.map((body) => ({
-        label: `Used ${body}`,
+        label: `${prefix} ${body}`,
         count: bodyCounts[body] ?? 0,
         href: `/browse?body=${encodeURIComponent(body)}`,
       }));
     }
     if (tab === "local") {
       return config.popularCities.map((city) => ({
-        label: `Used cars in ${city}`,
+        label: t("seoLinks.usedCarsIn", { city }),
         count: cityCounts[city] ?? 0,
         href: `/browse?location=${encodeURIComponent(city)}`,
       }));
@@ -95,20 +97,20 @@ const SEOLinkBlock = () => {
     <section className="bg-background py-14">
       <div className="container mx-auto px-4">
         <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 text-center">
-          <p className="text-xs font-medium uppercase tracking-wider text-primary">Browse the marketplace</p>
-          <h2 className="mt-1 font-display text-2xl font-bold text-foreground md:text-3xl">Find used cars by make, body or city</h2>
+          <p className="text-xs font-medium uppercase tracking-wider text-primary">{t("seoLinks.eyebrow")}</p>
+          <h2 className="mt-1 font-display text-2xl font-bold text-foreground md:text-3xl">{t("seoLinks.title")}</h2>
         </motion.div>
 
         <div className="mx-auto mb-6 inline-flex w-full max-w-3xl flex-wrap justify-center gap-1.5 rounded-full border border-border bg-muted/40 p-1.5">
-          {TABS.map((t) => (
+          {TABS.map((tb) => (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tb.id}
+              onClick={() => setTab(tb.id)}
               className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-                tab === t.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                tab === tb.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {t.label}
+              {tb.label}
             </button>
           ))}
         </div>

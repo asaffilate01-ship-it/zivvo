@@ -258,6 +258,31 @@
    "back": "Zurück zur Anmeldung"
   }
  },
+ "seoLinks": {
+  "eyebrow": "Marktplatz durchsuchen",
+  "title": "Gebrauchtwagen nach Marke, Karosserie oder Stadt finden",
+  "tabs": {
+   "makes": "Alle Marken",
+   "body": "Beliebte Karosserieformen",
+   "popular": "Beliebte Suchen",
+   "local": "Regionale Suchen"
+  },
+  "usedPrefix": "Gebrauchte",
+  "usedCarsIn": "Gebrauchtwagen in {{city}}",
+  "popular": {
+   "under": "Autos unter {{price}}",
+   "electric": "Elektroautos",
+   "hybrid": "Hybridautos",
+   "automatic": "Automatikautos",
+   "manual": "Schaltgetriebe",
+   "lowMileage": "Autos mit geringer Laufleistung",
+   "convertibles": "Cabriolets",
+   "familySuvs": "Familien-SUVs",
+   "firstTime": "Autos für Fahranfänger",
+   "diesel": "Dieselautos",
+   "vans": "Transporter"
+  }
+ },
  "home": {
   "featured": {
    "title": "Empfohlene Fahrzeuge",
