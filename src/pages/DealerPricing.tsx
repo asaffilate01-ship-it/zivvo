@@ -329,22 +329,22 @@ const DealerPricing = () => {
       <Dialog open={showBusinessDialog} onOpenChange={setShowBusinessDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-display">Autohaus einrichten</DialogTitle>
-            <DialogDescription>Gib deinen Firmennamen ein, um zu starten. Du kannst das später ändern.</DialogDescription>
+            <DialogTitle className="font-display">{t("pricing.dialog.title")}</DialogTitle>
+            <DialogDescription>{t("pricing.dialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="business-name">Firmenname</Label>
+              <Label htmlFor="business-name">{t("pricing.dialog.businessName")}</Label>
               <Input
                 id="business-name"
-                placeholder="z.B. Premium Autohaus Berlin GmbH"
+                placeholder={t("pricing.dialog.businessNamePlaceholder")}
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCheckout()}
               />
             </div>
             <Button className="gradient-primary w-full border-0" onClick={handleCheckout}>
-              Weiter zur Zahlung <ChevronRight className="ml-1 h-4 w-4" />
+              {t("pricing.dialog.continue")} <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
         </DialogContent>
