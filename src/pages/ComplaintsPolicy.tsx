@@ -24,11 +24,14 @@ const ComplaintsPolicy = () => {
           {t("lastUpdated")}{" "}
           {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
+        <p className="mt-4 rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
+          {t("disclaimer")}
+        </p>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           <Card><CardContent className="p-4"><Clock className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("acknowledgedWithin")}</p><p className="font-display font-semibold">{t("acknowledgedValue")}</p></CardContent></Card>
           <Card><CardContent className="p-4"><FileText className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("resolutionTarget")}</p><p className="font-display font-semibold">{t("resolutionValue")}</p></CardContent></Card>
-          <Card><CardContent className="p-4"><Mail className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("emailUs")}</p><p className="font-display text-sm font-semibold">complaints@zivvo.co.uk</p></CardContent></Card>
+          <Card><CardContent className="p-4"><Mail className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("emailUs")}</p><p className="font-display text-sm font-semibold">{t("emailUs2")}</p></CardContent></Card>
         </div>
 
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
@@ -41,7 +44,7 @@ const ComplaintsPolicy = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s2Title")}</h2>
             <p className="mt-2">{t("s2Intro")}</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li><strong>{t("s2Email")}</strong> <a href="mailto:complaints@zivvo.co.uk" className="text-primary underline">complaints@zivvo.co.uk</a></li>
+              <li><strong>{t("s2Email")}</strong> <a href={`mailto:${t("emailUs2")}`} className="text-primary underline">{t("emailUs2")}</a></li>
               <li><strong>{t("s2Phone")}</strong> {t("s2PhoneValue")}</li>
               <li><strong>{t("s2Post")}</strong> {t("s2PostValue")}</li>
               <li><strong>{t("s2Online")}</strong> {t("s2OnlineValue")} <a href="/contact" className="text-primary underline">{t("s2ContactPage")}</a> {t("s2page")}</li>
@@ -61,35 +64,21 @@ const ComplaintsPolicy = () => {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s4Title")}</h2>
-            <p className="mt-2">{t("s4Intro")}</p>
-            <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li>
-                <strong>{t("s4Ombudsman")}</strong> — {t("s4OmbudsmanDesc")}{" "}
-                <a href="https://www.themotorombudsman.org" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                  themotorombudsman.org
-                </a>
-              </li>
-              <li>
-                <strong>{t("s4Citizens")}</strong> — {t("s4CitizensDesc")}{" "}
-                <a href="https://www.citizensadvice.org.uk" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                  citizensadvice.org.uk
-                </a>{" "}
-                · 0808 223 1133.
-              </li>
-              <li>
-                <strong>{t("s4Trading")}</strong> — {t("s4TradingDesc")}
-              </li>
-              <li>
-                <strong>{t("s4Ico")}</strong> — {t("s4IcoDesc")}{" "}
-                <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer" className="text-primary underline">ico.org.uk</a>
-              </li>
-              <li>
-                <strong>{t("s4Odr")}</strong>{" "}
-                <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                  ec.europa.eu/consumers/odr
-                </a>
-              </li>
-            </ul>
+            <p className="mt-2">
+              {t("s4Intro")}{" "}
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                ec.europa.eu/consumers/odr
+              </a>
+            </p>
+
+            <div className="mt-4">
+              <h3 className="font-display text-sm font-semibold text-foreground">{t("s4TeilnahmeTitle")}</h3>
+              <p className="mt-1">{t("s4TeilnahmeBody")}</p>
+            </div>
+
+            <div className="mt-4">
+              <p><strong>{t("s4Universal")}</strong> {t("s4UniversalDesc")}</p>
+            </div>
           </section>
 
           <section>

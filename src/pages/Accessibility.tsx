@@ -17,11 +17,19 @@ const Accessibility = () => {
           {t("lastUpdated")}{" "}
           {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
+        <p className="mt-4 rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
+          {t("disclaimer")}
+        </p>
 
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("commitmentTitle")}</h2>
             <p className="mt-2" dangerouslySetInnerHTML={{ __html: t("commitmentBody", { wcag: `<strong>${t("wcagStandard")}</strong>` }) }} />
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("bfsgTitle")}</h2>
+            <p className="mt-2">{t("bfsgBody")}</p>
           </section>
 
           <section>
@@ -41,11 +49,11 @@ const Accessibility = () => {
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("reportingTitle")}</h2>
             <p className="mt-2">
-              {t("reportingBody", { email: "accessibility@zivvo.co.uk" }).split("accessibility@zivvo.co.uk").map((part, i, arr) => (
+              {t("reportingBody", { email: "accessibility@zivvo.de" }).split("accessibility@zivvo.de").map((part, i, arr) => (
                 <span key={i}>
                   {part}
                   {i < arr.length - 1 && (
-                    <a href="mailto:accessibility@zivvo.co.uk" className="text-primary underline">accessibility@zivvo.co.uk</a>
+                    <a href="mailto:accessibility@zivvo.de" className="text-primary underline">accessibility@zivvo.de</a>
                   )}
                 </span>
               ))}
@@ -54,12 +62,7 @@ const Accessibility = () => {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("enforcementTitle")}</h2>
-            <p className="mt-2">
-              {t("enforcementBody")}{" "}
-              <a href="https://www.equalityadvisoryservice.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                equalityadvisoryservice.com
-              </a>
-            </p>
+            <p className="mt-2">{t("enforcementBody")}</p>
           </section>
         </div>
       </div>

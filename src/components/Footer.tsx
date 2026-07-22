@@ -44,7 +44,8 @@ const Footer = () => {
         { label: t("footer.links.terms"), to: "/terms" },
         { label: t("footer.links.cookiePolicy"), to: "/cookies" },
         { label: t("footer.links.gdpr"), to: "/gdpr" },
-        { label: t("footer.links.impressum"), to: "/modern-slavery" },
+        { label: t("footer.links.impressum"), to: "/impressum" },
+        { label: t("footer.links.widerruf"), to: "/widerruf" },
       ],
     },
   ];
