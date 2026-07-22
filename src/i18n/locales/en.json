@@ -2471,5 +2471,73 @@
   "submitting": "Updating...",
   "success": "Password updated!",
   "error": "Error"
+ },
+ "notFoundPage": {
+  "seoTitle": "Page Not Found",
+  "seoDesc": "The page you're looking for doesn't exist.",
+  "title": "Page Not Found",
+  "desc": "The page you're looking for doesn't exist or has been moved.",
+  "backHome": "Back to Home",
+  "browseCars": "Browse Cars"
+ },
+ "enquiryForm": {
+  "sendMessage": "Send Message",
+  "sendEnquiry": "Send Enquiry",
+  "about": "About: {{title}}",
+  "signInToSend": "Sign in to send enquiries",
+  "error": "Error",
+  "sentTitle": "Message Sent!",
+  "sentDesc": "The seller will be notified of your enquiry.",
+  "close": "Close",
+  "yourName": "Your Name",
+  "email": "Email",
+  "phone": "Phone",
+  "message": "Message *",
+  "messagePlaceholder": "Hi, I'm interested in this vehicle..."
+ },
+ "inspectionDialog": {
+  "bookInspection": "Book Inspection",
+  "title": "Independent Vehicle Inspection",
+  "description": "A qualified mechanic visits the seller and produces a full report. Pay only if the car checks out.",
+  "yourPhone": "Your phone *",
+  "yourAddress": "Your address *",
+  "notes": "Notes (optional)",
+  "notesPlaceholder": "Anything specific you want checked?",
+  "howItWorksLabel": "How it works:",
+  "howItWorksDesc": "Pay £{{price}} now. We'll contact the seller, schedule the visit, and email you the full report within 48–72 hours. Refund if seller refuses access.",
+  "payAndBook": "Pay £{{price}} & Book",
+  "missingTitle": "Missing details",
+  "missingDesc": "Phone and address are required.",
+  "bookingFailed": "Booking failed",
+  "standardName": "Standard 200-point",
+  "standardB1": "200 visual & mechanical checks",
+  "standardB2": "Diagnostic OBD scan",
+  "standardB3": "Photo report (PDF)",
+  "standardB4": "Result within 48 hours",
+  "premiumName": "Premium 300-point + Road Test",
+  "premiumB1": "Everything in Standard",
+  "premiumB2": "30-minute road test",
+  "premiumB3": "Paint depth measurements",
+  "premiumB4": "Underbody inspection on ramp"
+ },
+ "chatWindow": {
+  "re": "Re: {{title}}",
+  "noMessages": "No messages yet. Start the conversation!",
+  "placeholder": "Type a message..."
+ },
+ "aiChat": {
+  "welcome": "Hi! I'm Zivvo AI 🚗 I can help you find the perfect car, answer questions about our platform, or guide you through selling your vehicle. What can I help with?",
+  "errorReply": "Sorry, I couldn't process that right now. Please try again!",
+  "connectionError": "I'm having trouble connecting right now. You can browse our cars at /browse or contact us at /contact for help!",
+  "name": "Zivvo AI",
+  "tagline": "Your car-finding assistant",
+  "placeholder": "Ask me anything about cars...",
+  "suggestion1": "Find me an SUV under £15,000",
+  "suggestion2": "Best electric cars available?",
+  "suggestion3": "How do I sell my car?",
+  "suggestion4": "What checks do you do on cars?"
+ },
+ "auctionApply": {
+  "submitSuccess": "Application submitted! Our team will inspect your vehicle and get back to you."
  }
 }

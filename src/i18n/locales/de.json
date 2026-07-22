@@ -2471,5 +2471,73 @@
   "submitting": "Wird aktualisiert…",
   "success": "Passwort aktualisiert!",
   "error": "Fehler"
+ },
+ "notFoundPage": {
+  "seoTitle": "Seite nicht gefunden",
+  "seoDesc": "Die gesuchte Seite existiert nicht.",
+  "title": "Seite nicht gefunden",
+  "desc": "Die gesuchte Seite existiert nicht mehr oder wurde verschoben.",
+  "backHome": "Zurück zur Startseite",
+  "browseCars": "Fahrzeuge durchsuchen"
+ },
+ "enquiryForm": {
+  "sendMessage": "Nachricht senden",
+  "sendEnquiry": "Anfrage senden",
+  "about": "Betreff: {{title}}",
+  "signInToSend": "Melde dich an, um Anfragen zu senden",
+  "error": "Fehler",
+  "sentTitle": "Nachricht gesendet!",
+  "sentDesc": "Der Verkäufer wird über deine Anfrage informiert.",
+  "close": "Schließen",
+  "yourName": "Dein Name",
+  "email": "E-Mail",
+  "phone": "Telefon",
+  "message": "Nachricht *",
+  "messagePlaceholder": "Hallo, ich interessiere mich für dieses Fahrzeug..."
+ },
+ "inspectionDialog": {
+  "bookInspection": "Inspektion buchen",
+  "title": "Unabhängige Fahrzeuginspektion",
+  "description": "Ein qualifizierter Mechaniker besucht den Verkäufer und erstellt einen vollständigen Bericht. Zahle nur, wenn das Fahrzeug den Check besteht.",
+  "yourPhone": "Deine Telefonnummer *",
+  "yourAddress": "Deine Adresse *",
+  "notes": "Notizen (optional)",
+  "notesPlaceholder": "Möchtest du etwas Bestimmtes prüfen lassen?",
+  "howItWorksLabel": "So funktioniert's:",
+  "howItWorksDesc": "Zahle jetzt £{{price}}. Wir kontaktieren den Verkäufer, vereinbaren den Termin und senden dir den vollständigen Bericht innerhalb von 48–72 Stunden. Rückerstattung, falls der Verkäufer den Zugang verweigert.",
+  "payAndBook": "£{{price}} zahlen & buchen",
+  "missingTitle": "Angaben fehlen",
+  "missingDesc": "Telefonnummer und Adresse sind erforderlich.",
+  "bookingFailed": "Buchung fehlgeschlagen",
+  "standardName": "Standard 200-Punkte-Check",
+  "standardB1": "200 optische & mechanische Prüfungen",
+  "standardB2": "OBD-Diagnosescan",
+  "standardB3": "Fotobericht (PDF)",
+  "standardB4": "Ergebnis innerhalb von 48 Stunden",
+  "premiumName": "Premium 300-Punkte + Probefahrt",
+  "premiumB1": "Alles aus Standard",
+  "premiumB2": "30-minütige Probefahrt",
+  "premiumB3": "Lackschichtmessung",
+  "premiumB4": "Unterbodencheck auf der Hebebühne"
+ },
+ "chatWindow": {
+  "re": "Betreff: {{title}}",
+  "noMessages": "Noch keine Nachrichten. Starte die Unterhaltung!",
+  "placeholder": "Nachricht eingeben..."
+ },
+ "aiChat": {
+  "welcome": "Hallo! Ich bin Zivvo AI 🚗 Ich helfe dir, das perfekte Auto zu finden, beantworte Fragen zu unserer Plattform oder unterstütze dich beim Verkauf deines Fahrzeugs. Womit kann ich helfen?",
+  "errorReply": "Entschuldigung, das konnte ich gerade nicht verarbeiten. Bitte versuche es erneut!",
+  "connectionError": "Ich habe gerade Verbindungsprobleme. Du kannst unsere Fahrzeuge unter /browse durchsuchen oder uns unter /contact kontaktieren!",
+  "name": "Zivvo AI",
+  "tagline": "Dein Auto-Finder-Assistent",
+  "placeholder": "Frag mich alles über Autos...",
+  "suggestion1": "Finde mir einen SUV unter 15.000 £",
+  "suggestion2": "Welche Elektroautos sind verfügbar?",
+  "suggestion3": "Wie verkaufe ich mein Auto?",
+  "suggestion4": "Welche Checks führt ihr bei Autos durch?"
+ },
+ "auctionApply": {
+  "submitSuccess": "Bewerbung eingereicht! Unser Team wird dein Fahrzeug inspizieren und sich bei dir melden."
  }
 }
