@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Send, Loader2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 
 interface Message {
   id: string;
@@ -25,6 +26,7 @@ interface ChatWindowProps {
 }
 
 const ChatWindow = ({ conversationId, recipientId, recipientName, listingTitle, onBack }: ChatWindowProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
@@ -123,7 +125,7 @@ const ChatWindow = ({ conversationId, recipientId, recipientName, listingTitle, 
         <div className="min-w-0">
           <p className="truncate font-display font-semibold text-foreground">{recipientName}</p>
           {listingTitle && (
-            <p className="truncate text-xs text-muted-foreground">Re: {listingTitle}</p>
+            <p className="truncate text-xs text-muted-foreground">{t("chatWindow.re", { title: listingTitle })}</p>
           )}
         </div>
       </div>
@@ -136,7 +138,7 @@ const ChatWindow = ({ conversationId, recipientId, recipientName, listingTitle, 
           </div>
         ) : messages.length === 0 ? (
           <p className="text-center text-sm text-muted-foreground py-8">
-            No messages yet. Start the conversation!
+            {t("chatWindow.noMessages")}
           </p>
         ) : (
           <div className="space-y-3">
@@ -171,7 +173,7 @@ const ChatWindow = ({ conversationId, recipientId, recipientName, listingTitle, 
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
+            placeholder={t("chatWindow.placeholder")}
             className="flex-1"
           />
           <Button

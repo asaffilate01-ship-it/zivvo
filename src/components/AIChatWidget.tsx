@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 interface Message {
   id: string;
@@ -12,20 +13,21 @@ interface Message {
   content: string;
 }
 
-const SUGGESTIONS = [
-  "Find me an SUV under £15,000",
-  "Best electric cars available?",
-  "How do I sell my car?",
-  "What checks do you do on cars?",
+const SUGGESTION_KEYS = [
+  "aiChat.suggestion1",
+  "aiChat.suggestion2",
+  "aiChat.suggestion3",
+  "aiChat.suggestion4",
 ];
 
 const AIChatWidget = () => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
-      content: "Hi! I'm Zivvo AI 🚗 I can help you find the perfect car, answer questions about our platform, or guide you through selling your vehicle. What can I help with?",
+      content: t("aiChat.welcome"),
     },
   ]);
   const [input, setInput] = useState("");
@@ -55,7 +57,7 @@ const AIChatWidget = () => {
         body: { message: text.trim(), history: messages.slice(-6) },
       });
 
-      const reply = data?.reply || "Sorry, I couldn't process that right now. Please try again!";
+      const reply = data?.reply || t("aiChat.errorReply");
       setMessages((prev) => [
         ...prev,
         { id: (Date.now() + 1).toString(), role: "assistant", content: reply },
@@ -66,7 +68,7 @@ const AIChatWidget = () => {
         {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: "I'm having trouble connecting right now. You can browse our cars at /browse or contact us at /contact for help!",
+          content: t("aiChat.connectionError"),
         },
       ]);
     }
@@ -120,8 +122,8 @@ const AIChatWidget = () => {
                   <Sparkles className="h-4 w-4 text-primary-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-primary-foreground">Zivvo AI</p>
-                  <p className="text-[10px] text-primary-foreground/60">Your car-finding assistant</p>
+                  <p className="text-sm font-semibold text-primary-foreground">{t("aiChat.name")}</p>
+                  <p className="text-[10px] text-primary-foreground/60">{t("aiChat.tagline")}</p>
                 </div>
               </div>
               <Button
@@ -179,13 +181,13 @@ const AIChatWidget = () => {
               {/* Suggestions */}
               {messages.length <= 1 && (
                 <div className="mt-4 space-y-1.5">
-                  {SUGGESTIONS.map((s) => (
+                  {SUGGESTION_KEYS.map((key) => (
                     <button
-                      key={s}
-                      onClick={() => sendMessage(s)}
+                      key={key}
+                      onClick={() => sendMessage(t(key))}
                       className="block w-full rounded-lg border border-border bg-background px-3 py-2 text-left text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     >
-                      {s}
+                      {t(key)}
                     </button>
                   ))}
                 </div>
@@ -199,7 +201,7 @@ const AIChatWidget = () => {
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask me anything about cars..."
+                  placeholder={t("aiChat.placeholder")}
                   className="h-9 text-sm"
                   disabled={loading}
                 />
