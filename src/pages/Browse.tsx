@@ -613,12 +613,10 @@ const Browse = () => {
                       : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
                   }>
                     {listings.map((car, i) => (
-                      <>
-                        <CarCard key={car.id} car={car} index={i} layout={viewMode} />
-                        {i === 3 && viewMode === "grid" && (
-                          <SponsoredAdCard key="ad-slot-1" />
-                        )}
-                      </>
+                      <Fragment key={car.id}>
+                        <CarCard car={car} index={i} layout={viewMode} />
+                        {i === 3 && viewMode === "grid" && <SponsoredAdCard />}
+                      </Fragment>
                     ))}
                   </div>
                 )}
