@@ -8,7 +8,8 @@ import {
   LayoutDashboard, ShieldCheck, Users, Building2, HelpCircle, Phone, BookOpen, Percent,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
-import zivvoLogo from "@/assets/zivvo-logo.png";
+import zivvoLogoEn from "@/assets/zivvo-logo.png";
+import zivvoLogoDe from "@/assets/zivvo-logo-de.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,7 +23,8 @@ import {
 } from "@/components/ui/sheet";
 
 const Navbar = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const zivvoLogo = i18n.language?.startsWith("de") ? zivvoLogoDe : zivvoLogoEn;
   const location = useLocation();
   const { user, signOut, hasRole } = useAuth();
   const { theme, setTheme, resolved } = useTheme();
