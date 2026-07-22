@@ -138,7 +138,7 @@ const DealerPricing = () => {
                   <span className="text-sm text-muted-foreground">/ {t("common.free").toLowerCase()}</span>
                 </div>
                 <p className="mt-1 text-xs text-success">
-                  + {formatPrice(privatePlan.price, config)} {privatePlan.label}
+                  + {formatPrice(privatePlan.price, config)} {t("pricing.private.perExtra")}
                 </p>
 
                 <p className="mt-4 text-sm text-muted-foreground">{t("pricing.private.subtitle")}</p>
