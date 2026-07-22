@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
@@ -31,6 +32,7 @@ interface Props {
 const TIMES = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
 const TestDriveDialog = ({ listingId, dealerId, vehicleLabel, trigger }: Props) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -41,7 +43,7 @@ const TestDriveDialog = ({ listingId, dealerId, vehicleLabel, trigger }: Props) 
   const submit = async () => {
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
-      toast({ title: "Check your details", description: "Please enter a valid name and email.", variant: "destructive" });
+      toast({ title: t("dealer.testDrive.checkDetailsTitle"), description: t("dealer.testDrive.checkDetailsDescription"), variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -60,10 +62,10 @@ const TestDriveDialog = ({ listingId, dealerId, vehicleLabel, trigger }: Props) 
     });
     setLoading(false);
     if (error) {
-      toast({ title: "Could not book", description: error.message, variant: "destructive" });
+      toast({ title: t("dealer.testDrive.couldNotBook"), description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Test drive requested", description: "The dealer will be in touch to confirm." });
+    toast({ title: t("dealer.testDrive.requestedTitle"), description: t("dealer.testDrive.requestedDescription") });
     setOpen(false);
     setForm({ name: "", email: "", phone: "", message: "" });
     setDate(undefined); setTime("");
@@ -72,36 +74,36 @@ const TestDriveDialog = ({ listingId, dealerId, vehicleLabel, trigger }: Props) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="outline"><Car className="w-4 h-4 mr-2" /> Test Drive</Button>}
+        {trigger ?? <Button variant="outline"><Car className="w-4 h-4 mr-2" /> {t("dealer.testDrive.trigger")}</Button>}
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Book a test drive</DialogTitle>
-          <DialogDescription>{vehicleLabel ?? "Choose a date and time that suits you."}</DialogDescription>
+          <DialogTitle>{t("dealer.testDrive.title")}</DialogTitle>
+          <DialogDescription>{vehicleLabel ?? t("dealer.testDrive.description")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs">Name</Label>
+              <Label className="text-xs">{t("dealer.testDrive.name")}</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             </div>
             <div>
-              <Label className="text-xs">Phone</Label>
+              <Label className="text-xs">{t("dealer.testDrive.phone")}</Label>
               <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </div>
           </div>
           <div>
-            <Label className="text-xs">Email</Label>
+            <Label className="text-xs">{t("dealer.testDrive.email")}</Label>
             <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs">Preferred date</Label>
+              <Label className="text-xs">{t("dealer.testDrive.preferredDate")}</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("w-full justify-start font-normal", !date && "text-muted-foreground")}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : "Pick a date"}
+                    {date ? format(date, "PPP") : t("dealer.testDrive.pickDate")}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -112,22 +114,22 @@ const TestDriveDialog = ({ listingId, dealerId, vehicleLabel, trigger }: Props) 
               </Popover>
             </div>
             <div>
-              <Label className="text-xs">Preferred time</Label>
+              <Label className="text-xs">{t("dealer.testDrive.preferredTime")}</Label>
               <Select value={time} onValueChange={setTime}>
-                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("dealer.testDrive.select")} /></SelectTrigger>
                 <SelectContent>
-                  {TIMES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  {TIMES.map((tm) => <SelectItem key={tm} value={tm}>{tm}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div>
-            <Label className="text-xs">Notes (optional)</Label>
+            <Label className="text-xs">{t("dealer.testDrive.notes")}</Label>
             <Textarea rows={3} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
           </div>
           <Button onClick={submit} disabled={loading} className="w-full">
             {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Car className="w-4 h-4 mr-2" />}
-            Request test drive
+            {t("dealer.testDrive.requestTestDrive")}
           </Button>
         </div>
       </DialogContent>

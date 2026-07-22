@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -23,17 +24,18 @@ interface Staff {
   invite_token: string | null;
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  manager: "Manager",
-  sales: "Sales",
-  admin_assistant: "Admin Assistant",
-};
-
 const StaffManager = ({ dealerId }: Props) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [staff, setStaff] = useState<Staff[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ email: "", full_name: "", role: "sales" as Staff["role"] });
+
+  const ROLE_LABELS: Record<string, string> = {
+    manager: t("dealer.staffManager.roleManager"),
+    sales: t("dealer.staffManager.roleSales"),
+    admin_assistant: t("dealer.staffManager.roleAdminAssistant"),
+  };
 
   const load = async () => {
     const { data } = await supabase
@@ -47,7 +49,7 @@ const StaffManager = ({ dealerId }: Props) => {
   useEffect(() => { load(); }, [dealerId]);
 
   const invite = async () => {
-    if (!form.email) { toast({ title: "Email required", variant: "destructive" }); return; }
+    if (!form.email) { toast({ title: t("dealer.staffManager.emailRequired"), variant: "destructive" }); return; }
     const token = crypto.randomUUID().replace(/-/g, "");
     const { error } = await supabase.from("dealer_staff" as any).insert({
       dealer_id: dealerId,
@@ -57,10 +59,10 @@ const StaffManager = ({ dealerId }: Props) => {
       invite_token: token,
     });
     if (error) {
-      toast({ title: "Error", description: error.message.includes("unique") ? "This email is already invited" : error.message, variant: "destructive" });
+      toast({ title: t("common.error"), description: error.message.includes("unique") ? t("dealer.staffManager.alreadyInvited") : error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Invitation sent", description: "Share the invite link with your team member." });
+    toast({ title: t("dealer.staffManager.invitationSentTitle"), description: t("dealer.staffManager.invitationSentDescription") });
     setOpen(false);
     setForm({ email: "", full_name: "", role: "sales" });
     load();
@@ -68,8 +70,8 @@ const StaffManager = ({ dealerId }: Props) => {
 
   const remove = async (id: string) => {
     const { error } = await supabase.from("dealer_staff" as any).delete().eq("id", id);
-    if (error) { toast({ title: "Error", variant: "destructive" }); return; }
-    toast({ title: "Staff removed" });
+    if (error) { toast({ title: t("common.error"), variant: "destructive" }); return; }
+    toast({ title: t("dealer.staffManager.staffRemoved") });
     load();
   };
 
@@ -81,47 +83,47 @@ const StaffManager = ({ dealerId }: Props) => {
   const copyInvite = (token: string) => {
     const link = `${window.location.origin}/signup?invite=${token}`;
     navigator.clipboard.writeText(link);
-    toast({ title: "Invite link copied", description: link });
+    toast({ title: t("dealer.staffManager.linkCopied"), description: link });
   };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div>
-          <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> Staff & Team</CardTitle>
-          <p className="mt-1 text-xs text-muted-foreground">Invite sales staff, managers and admin assistants under your dealership.</p>
+          <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5" /> {t("dealer.staffManager.title")}</CardTitle>
+          <p className="mt-1 text-xs text-muted-foreground">{t("dealer.staffManager.subtitle")}</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gradient-primary border-0"><UserPlus className="mr-1 h-4 w-4" /> Invite Staff</Button>
+            <Button size="sm" className="gradient-primary border-0"><UserPlus className="mr-1 h-4 w-4" /> {t("dealer.staffManager.inviteStaff")}</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Invite a Team Member</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{t("dealer.staffManager.inviteTitle")}</DialogTitle></DialogHeader>
             <div className="grid gap-3 py-2">
-              <div><Label>Full Name</Label><Input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} placeholder="Jane Doe" /></div>
-              <div><Label>Email *</Label><Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="jane@example.com" /></div>
+              <div><Label>{t("dealer.staffManager.fullName")}</Label><Input value={form.full_name} onChange={e => setForm({ ...form, full_name: e.target.value })} placeholder="Jane Doe" /></div>
+              <div><Label>{t("dealer.staffManager.email")}</Label><Input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="jane@example.com" /></div>
               <div>
-                <Label>Role</Label>
+                <Label>{t("dealer.staffManager.role")}</Label>
                 <Select value={form.role} onValueChange={v => setForm({ ...form, role: v as any })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="manager">Manager — full access</SelectItem>
-                    <SelectItem value="sales">Sales — manage stock & enquiries</SelectItem>
-                    <SelectItem value="admin_assistant">Admin Assistant — paperwork only</SelectItem>
+                    <SelectItem value="manager">{t("dealer.staffManager.roleManagerFull")}</SelectItem>
+                    <SelectItem value="sales">{t("dealer.staffManager.roleSalesFull")}</SelectItem>
+                    <SelectItem value="admin_assistant">{t("dealer.staffManager.roleAdminAssistantFull")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={invite} className="gradient-primary border-0">Send Invite</Button>
+              <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
+              <Button onClick={invite} className="gradient-primary border-0">{t("dealer.staffManager.sendInvite")}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </CardHeader>
       <CardContent>
         {staff.length === 0 ? (
-          <div className="flex flex-col items-center py-8 text-center"><Users className="h-10 w-10 text-muted-foreground" /><p className="mt-2 text-sm text-muted-foreground">No team members yet. Invite your first.</p></div>
+          <div className="flex flex-col items-center py-8 text-center"><Users className="h-10 w-10 text-muted-foreground" /><p className="mt-2 text-sm text-muted-foreground">{t("dealer.staffManager.empty")}</p></div>
         ) : (
           <div className="space-y-2">
             {staff.map(s => (
@@ -136,15 +138,15 @@ const StaffManager = ({ dealerId }: Props) => {
                 <div className="flex items-center gap-2">
                   <Badge variant="outline">{ROLE_LABELS[s.role]}</Badge>
                   {s.accepted_at ? (
-                    <Badge className="bg-success text-success-foreground">Active</Badge>
+                    <Badge className="bg-success text-success-foreground">{t("dealer.staffManager.active")}</Badge>
                   ) : (
-                    <Badge variant="secondary">Pending</Badge>
+                    <Badge variant="secondary">{t("dealer.staffManager.pending")}</Badge>
                   )}
                   {!s.accepted_at && s.invite_token && (
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => copyInvite(s.invite_token!)} title="Copy invite link"><Copy className="h-4 w-4" /></Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => copyInvite(s.invite_token!)} title={t("dealer.staffManager.copyInviteLink")}><Copy className="h-4 w-4" /></Button>
                   )}
-                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => toggleActive(s)} title={s.is_active ? "Disable" : "Enable"}>
-                    <Badge variant={s.is_active ? "default" : "outline"} className="px-1 text-[10px]">{s.is_active ? "ON" : "OFF"}</Badge>
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => toggleActive(s)} title={s.is_active ? t("dealer.staffManager.disable") : t("dealer.staffManager.enable")}>
+                    <Badge variant={s.is_active ? "default" : "outline"} className="px-1 text-[10px]">{s.is_active ? t("dealer.staffManager.on") : t("dealer.staffManager.off")}</Badge>
                   </Button>
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => remove(s.id)}><Trash2 className="h-4 w-4" /></Button>
                 </div>

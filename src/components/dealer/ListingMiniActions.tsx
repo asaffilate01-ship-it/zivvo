@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Calculator, Car, Truck } from "lucide-react";
 import TestDriveDialog from "./TestDriveDialog";
@@ -10,11 +11,12 @@ interface Props {
 }
 
 const ListingMiniActions = ({ listingId, dealerId, onFinance }: Props) => {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-3 gap-1.5 mt-2">
       <Button size="sm" variant="outline" className="h-8 px-2 text-xs"
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); onFinance?.(); }}>
-        <Calculator className="w-3 h-3 mr-1" /> Finance
+        <Calculator className="w-3 h-3 mr-1" /> {t("dealer.miniActions.finance")}
       </Button>
       <TestDriveDialog
         listingId={listingId}
@@ -22,7 +24,7 @@ const ListingMiniActions = ({ listingId, dealerId, onFinance }: Props) => {
         trigger={
           <Button size="sm" variant="outline" className="h-8 px-2 text-xs"
             onClick={(e) => e.stopPropagation()}>
-            <Car className="w-3 h-3 mr-1" /> Test
+            <Car className="w-3 h-3 mr-1" /> {t("dealer.miniActions.test")}
           </Button>
         }
       />
@@ -32,7 +34,7 @@ const ListingMiniActions = ({ listingId, dealerId, onFinance }: Props) => {
         trigger={
           <Button size="sm" variant="outline" className="h-8 px-2 text-xs"
             onClick={(e) => e.stopPropagation()}>
-            <Truck className="w-3 h-3 mr-1" /> Deliver
+            <Truck className="w-3 h-3 mr-1" /> {t("dealer.miniActions.deliver")}
           </Button>
         }
       />
