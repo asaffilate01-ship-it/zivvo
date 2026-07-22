@@ -23,7 +23,8 @@ import {
 } from "@/components/ui/sheet";
 
 const Navbar = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const zivvoLogo = i18n.language?.startsWith("de") ? zivvoLogoDe : zivvoLogoEn;
   const location = useLocation();
   const { user, signOut, hasRole } = useAuth();
   const { theme, setTheme, resolved } = useTheme();
