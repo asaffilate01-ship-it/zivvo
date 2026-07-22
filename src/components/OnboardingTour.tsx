@@ -2,33 +2,19 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { X, ArrowRight, Search, Heart, Shield, Calculator } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const steps = [
-  {
-    icon: Search,
-    title: "Find Your Perfect Car",
-    description: "Search thousands of verified listings by make, model, price, and location.",
-  },
-  {
-    icon: Shield,
-    title: "Trust & Verification",
-    description: "Every listed vehicle comes with HPI checks, finance clearance, and inspection reports.",
-  },
-  {
-    icon: Heart,
-    title: "Save & Compare",
-    description: "Save your favourite cars and compare them side by side to make the best decision.",
-  },
-  {
-    icon: Calculator,
-    title: "Finance Tools",
-    description: "Calculate monthly payments and get instant finance quotes right from the listing.",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const OnboardingTour = () => {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(false);
+
+  const steps = [
+    { icon: Search, title: t("onboarding.step1Title"), description: t("onboarding.step1Desc") },
+    { icon: Shield, title: t("onboarding.step2Title"), description: t("onboarding.step2Desc") },
+    { icon: Heart, title: t("onboarding.step3Title"), description: t("onboarding.step3Desc") },
+    { icon: Calculator, title: t("onboarding.step4Title"), description: t("onboarding.step4Desc") },
+  ];
 
   useEffect(() => {
     if (!localStorage.getItem("onboarding-complete")) {
@@ -82,7 +68,6 @@ const OnboardingTour = () => {
             <p className="mt-2 text-sm text-muted-foreground">{current.description}</p>
           </div>
 
-          {/* Step indicator */}
           <div className="mt-5 flex justify-center gap-1.5">
             {steps.map((_, i) => (
               <div
@@ -94,10 +79,10 @@ const OnboardingTour = () => {
 
           <div className="mt-5 flex gap-2">
             <Button variant="outline" size="sm" className="flex-1" onClick={handleComplete}>
-              Skip
+              {t("onboarding.skip")}
             </Button>
             <Button size="sm" className="gradient-primary flex-1 border-0 gap-1" onClick={handleNext}>
-              {step >= steps.length - 1 ? "Get Started" : "Next"}
+              {step >= steps.length - 1 ? t("onboarding.start") : t("onboarding.next")}
               {step < steps.length - 1 && <ArrowRight className="h-3.5 w-3.5" />}
             </Button>
           </div>

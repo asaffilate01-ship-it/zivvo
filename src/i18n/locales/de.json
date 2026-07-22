@@ -2402,5 +2402,43 @@
    "Datum:",
    "(*) Unzutreffendes streichen."
   ]
+ },
+ "cookie": {
+  "title": "Wir respektieren Ihre Privatsphäre",
+  "body": "Wir verwenden notwendige Cookies, damit Zivvo funktioniert. Zusätzlich möchten wir Analyse-Cookies einsetzen, um unseren Service zu verbessern.",
+  "privacy": "Datenschutzerklärung",
+  "acceptAll": "Alle akzeptieren",
+  "essential": "Nur notwendige"
+ },
+ "onboarding": {
+  "skip": "Überspringen",
+  "next": "Weiter",
+  "start": "Los geht's",
+  "step1Title": "Finden Sie Ihr Traumauto",
+  "step1Desc": "Durchsuchen Sie tausende geprüfte Inserate nach Marke, Modell, Preis und Standort.",
+  "step2Title": "Vertrauen & Prüfung",
+  "step2Desc": "Jedes Fahrzeug kommt mit HPI-Check, Finanzierungsprüfung und Inspektionsbericht.",
+  "step3Title": "Speichern & Vergleichen",
+  "step3Desc": "Speichern Sie Ihre Favoriten und vergleichen Sie sie nebeneinander, um die beste Entscheidung zu treffen.",
+  "step4Title": "Finanzierungstools",
+  "step4Desc": "Berechnen Sie monatliche Raten und erhalten Sie Sofort-Angebote direkt vom Inserat aus."
+ },
+ "pwa": {
+  "title": "Zivvo installieren",
+  "subtitle": "Schneller Zugriff direkt vom Startbildschirm",
+  "install": "App installieren",
+  "later": "Später"
+ },
+ "reset": {
+  "invalid": "Ungültiger Link",
+  "invalidDesc": "Dieser Zurücksetzen-Link ist ungültig oder abgelaufen.",
+  "title": "Neues Passwort festlegen",
+  "subtitle": "Geben Sie unten Ihr neues Passwort ein",
+  "label": "Neues Passwort",
+  "placeholder": "Mind. 6 Zeichen",
+  "submit": "Passwort aktualisieren",
+  "submitting": "Wird aktualisiert…",
+  "success": "Passwort aktualisiert!",
+  "error": "Fehler"
  }
 }

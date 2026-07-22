@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -19,7 +21,7 @@ const ResetPassword = () => {
   useEffect(() => {
     const hash = window.location.hash;
     if (!hash.includes("type=recovery")) {
-      toast({ title: "Invalid link", description: "This reset link is invalid or expired.", variant: "destructive" });
+      toast({ title: t("reset.invalid"), description: t("reset.invalidDesc"), variant: "destructive" });
     }
   }, []);
 
@@ -30,9 +32,9 @@ const ResetPassword = () => {
     setLoading(false);
 
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("reset.error"), description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Password updated!" });
+      toast({ title: t("reset.success") });
       navigate("/login");
     }
   };
@@ -46,18 +48,18 @@ const ResetPassword = () => {
             <div className="gradient-primary mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
               <Car className="h-7 w-7 text-primary-foreground" />
             </div>
-            <h1 className="mt-4 font-display text-3xl font-bold text-foreground">Set new password</h1>
-            <p className="mt-2 text-muted-foreground">Enter your new password below</p>
+            <h1 className="mt-4 font-display text-3xl font-bold text-foreground">{t("reset.title")}</h1>
+            <p className="mt-2 text-muted-foreground">{t("reset.subtitle")}</p>
           </div>
 
           <form onSubmit={handleUpdate} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
+              <Label htmlFor="password">{t("reset.label")}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Min 6 characters"
+                  placeholder={t("reset.placeholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   minLength={6}
@@ -73,7 +75,7 @@ const ResetPassword = () => {
               </div>
             </div>
             <Button type="submit" className="gradient-primary w-full border-0" disabled={loading}>
-              {loading ? "Updating..." : "Update Password"}
+              {loading ? t("reset.submitting") : t("reset.submit")}
             </Button>
           </form>
         </div>

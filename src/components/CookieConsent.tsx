@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Shield, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const CONSENT_KEY = "zivvo_cookie_consent";
 
 const CookieConsent = () => {
+  const { t } = useTranslation();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -41,17 +43,17 @@ const CookieConsent = () => {
               <Shield className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-card-foreground">We value your privacy</p>
+              <p className="text-sm font-medium text-card-foreground">{t("cookie.title")}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                We use essential cookies to make Zivvo work. We'd also like to use analytics cookies to improve our service.{" "}
-                <Link to="/privacy" className="text-primary underline">Privacy Policy</Link>
+                {t("cookie.body")}{" "}
+                <Link to="/privacy" className="text-primary underline">{t("cookie.privacy")}</Link>
               </p>
               <div className="mt-3 flex gap-2">
                 <Button size="sm" onClick={accept} className="gradient-primary border-0 text-xs">
-                  Accept All
+                  {t("cookie.acceptAll")}
                 </Button>
                 <Button size="sm" variant="outline" onClick={decline} className="text-xs">
-                  Essential Only
+                  {t("cookie.essential")}
                 </Button>
               </div>
             </div>

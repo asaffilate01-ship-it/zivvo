@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -9,6 +10,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const PWAInstallPrompt = () => {
+  const { t } = useTranslation();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -52,8 +54,8 @@ const PWAInstallPrompt = () => {
             <Download className="h-5 w-5 text-primary-foreground" />
           </div>
           <div className="flex-1">
-            <p className="font-display font-semibold text-card-foreground">Install Zivvo</p>
-            <p className="mt-0.5 text-sm text-muted-foreground">Get quick access from your home screen</p>
+            <p className="font-display font-semibold text-card-foreground">{t("pwa.title")}</p>
+            <p className="mt-0.5 text-sm text-muted-foreground">{t("pwa.subtitle")}</p>
           </div>
           <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={handleDismiss}>
             <X className="h-4 w-4" />
@@ -61,10 +63,10 @@ const PWAInstallPrompt = () => {
         </div>
         <div className="mt-3 flex gap-2">
           <Button size="sm" className="gradient-primary flex-1 border-0" onClick={handleInstall}>
-            Install App
+            {t("pwa.install")}
           </Button>
           <Button size="sm" variant="outline" onClick={handleDismiss}>
-            Not Now
+            {t("pwa.later")}
           </Button>
         </div>
       </motion.div>
