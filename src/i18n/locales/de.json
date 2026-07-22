@@ -284,6 +284,34 @@
   }
  },
  "home": {
+  "services": {
+    "eyebrow": "Services",
+    "title": "Alles, was du brauchst – an einem Ort",
+    "finance": {
+      "title": "Autofinanzierung günstiger",
+      "b1": "Ohne Anzahlung möglich",
+      "b2": "Soft-Check – ohne SCHUFA-Einfluss",
+      "b3": "Entscheidung in Minuten",
+      "cta": "Angebot erhalten",
+      "ribbon": "Zinsen ab 3,9 % eff."
+    },
+    "sell": {
+      "title": "Auto verkaufen",
+      "b1": "In unter 2 Minuten inserieren",
+      "b2": "25.000+ aktive Käufer erreichen",
+      "b3": "Kostenlose Bewertung in Sekunden",
+      "cta": "Kostenlose Bewertung",
+      "ribbon": "Ø Verkauf: 7 Tage"
+    },
+    "hpi": {
+      "title": "Fahrzeughistorie prüfen",
+      "b1": "Offene Finanzierung",
+      "b2": "Gestohlen / Totalschaden",
+      "b3": "Auffälligkeiten beim Kilometerstand",
+      "cta": "Historie prüfen",
+      "ribbon": "9 von 10 Inseraten geprüft"
+    }
+  },
   "featured": {
    "title": "Empfohlene Fahrzeuge",
    "badge": "Top",
@@ -291,6 +319,7 @@
    "seeAll": "Alle anzeigen",
    "empty": "Noch keine empfohlenen Fahrzeuge. Schau bald wieder vorbei!"
   },
+
   "trust": {
    "badge": "Warum Zivvo",
    "titleA": "Kaufe mit",
