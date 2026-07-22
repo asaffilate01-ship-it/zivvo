@@ -154,7 +154,7 @@ const CarDetail = () => {
   const specs = (car.specs as Record<string, any>) || {};
   const sellerName = dealer?.business_name || "Private Seller";
   const sellerLocation = car.location || dealer?.city || "";
-  const showWhatsApp = (country === "AE" || country === "PK");
+  const showWhatsApp = true;
 
   // Resolve coordinates from listing first, then dealer
   const carLat = (car as any).latitude ?? (dealer as any)?.latitude ?? null;
