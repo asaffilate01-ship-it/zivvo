@@ -21,8 +21,10 @@ interface Review {
  * shows a transparent "founding members" CTA — no fake testimonials.
  */
 const RealReviewsSection = () => {
+  const { t, i18n } = useTranslation();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetch = async () => {
