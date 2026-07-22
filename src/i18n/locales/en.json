@@ -2402,5 +2402,44 @@
    "Date:",
    "(*) Delete as appropriate."
   ]
+ },
+ "cookie": {
+  "title": "We value your privacy",
+  "body": "We use essential cookies to make Zivvo work. We'd also like to use analytics cookies to improve our service.",
+  "privacy": "Privacy Policy",
+  "acceptAll": "Accept All",
+  "essential": "Essential Only"
+ },
+ "onboarding": {
+  "skip": "Skip",
+  "next": "Next",
+  "start": "Get Started",
+  "step1Title": "Find Your Perfect Car",
+  "step1Desc": "Search thousands of verified listings by make, model, price, and location.",
+  "step2Title": "Trust & Verification",
+  "step2Desc": "Every listed vehicle comes with HPI checks, finance clearance, and inspection reports.",
+  "step3Title": "Save & Compare",
+  "step3Desc": "Save your favourite cars and compare them side by side to make the best decision.",
+  "step4Title": "Finance Tools",
+  "step4Desc": "Calculate monthly payments and get instant finance quotes right from the listing."
+ },
+ "pwa": {
+  "title": "Install Zivvo",
+  "subtitle": "Get quick access from your home screen",
+  "install": "Install App",
+  "later": "Not Now"
+ },
+ "reset": {
+  "invalid": "Invalid link",
+  "invalidDesc": "This reset link is invalid or expired.",
+  "title": "Set new password",
+  "subtitle": "Enter your new password below",
+  "label": "New Password",
+  "placeholder": "Min 6 characters",
+  "submit": "Update Password",
+  "submitting": "Updating...",
+  "success": "Password updated!",
+  "error": "Error"
  }
+}
 }
