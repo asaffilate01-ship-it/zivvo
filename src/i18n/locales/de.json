@@ -1658,5 +1658,552 @@
     "toast": {
       "submitted": "Auktion zur Inspektionsprüfung eingereicht!"
     }
+  },
+  "auctionDetail": {
+    "breadcrumb": "Auktionen",
+    "notFound": "Auktion nicht gefunden",
+    "seo": {
+      "title": "{{year}} {{make}} {{model}} — Auktion",
+      "description": "Bieten Sie auf diesen geprüften {{make}} {{model}}. Zustand bewertet mit {{rating}}/5. HPI-geprüft."
+    },
+    "toasts": {
+      "paymentSuccess": "Zahlung erfolgreich! Ihr Kauf wird bearbeitet.",
+      "watchAdded": "Zur Beobachtungsliste hinzugefügt",
+      "watchRemoved": "Von der Beobachtungsliste entfernt",
+      "bidPlaced": "Gebot erfolgreich abgegeben!",
+      "contractSigned": "Vertrag erfolgreich unterzeichnet!",
+      "contractSignFailed": "Vertrag konnte nicht unterzeichnet werden",
+      "handoverConfirmed": "Übergabeschritt bestätigt!",
+      "handoverFailed": "Bestätigung fehlgeschlagen",
+      "paymentComplete": "Zahlung abgeschlossen! Die Kaution deckte den vollen Betrag.",
+      "deliveryRequestSubmitted": "Lieferanfrage übermittelt! Unser Team wird sich bei Ihnen melden."
+    },
+    "errors": {
+      "loginRequired": "Anmeldung erforderlich",
+      "minimumBid": "Mindestgebot beträgt {{amount}}",
+      "cannotBidOwnAuction": "Sie können nicht auf Ihre eigene Auktion bieten",
+      "depositRequired": "Sie müssen eine Kaution vorautorisieren, bevor Sie bieten können",
+      "maxAutoBidTooLow": "Das maximale Automatikgebot muss höher als Ihr Gebot sein"
+    },
+    "gallery": {
+      "live": "LIVE",
+      "condition": "Zustand {{rating}}/5",
+      "photos": "{{current}}/{{total}} Fotos"
+    },
+    "tabs": {
+      "condition": "Zustandsbericht",
+      "history": "Historie & Prüfungen",
+      "assets": "Was ist enthalten",
+      "bids": "Gebotshistorie ({{count}})"
+    },
+    "conditionTab": {
+      "inspectionRating": "Inspektionsbewertung",
+      "assessedBy": "Bewertet von zugelassenem Sachverständigen",
+      "paintCondition": "Lackzustand",
+      "interiorCondition": "Innenraumzustand",
+      "mechanicalNotes": "Technische Hinweise",
+      "tyresCondition": "Reifenzustand",
+      "notAssessed": "Nicht bewertet"
+    },
+    "historyTab": {
+      "hpiCheck": "HPI-Prüfung",
+      "hpiClear": "Unbedenklich — keine Probleme gefunden",
+      "ownershipVerified": "Eigentum verifiziert",
+      "ownershipOk": "Fahrzeugbrief mit DVLA bestätigt",
+      "sellerVerified": "Verkäufer verifiziert",
+      "sellerVerifiedOk": "Identität & Adresse geprüft",
+      "accidentHistory": "Unfallhistorie",
+      "noAccidents": "Keine Unfälle verzeichnet",
+      "pending": "Ausstehend"
+    },
+    "assetsTab": {
+      "keys": "Schlüssel",
+      "keysCount": "{{count}} Schlüssel{{spare}}",
+      "plusSpare": " + Ersatzschlüssel",
+      "notSpecified": "Nicht angegeben",
+      "serviceHistory": "Wartungshistorie",
+      "warranty": "Garantie",
+      "noWarranty": "Keine Garantie",
+      "additionalAssets": "Zusätzliches Zubehör",
+      "noneListed": "Nichts angegeben",
+      "deliveryAvailable": "Lieferung verfügbar",
+      "deliveryVia": "Über unsere Logistikpartner{{estimate}}",
+      "deliveryEstimate": " — geschätzt {{amount}}"
+    },
+    "bidsTab": {
+      "noBids": "Noch keine Gebote. Geben Sie das erste ab!",
+      "you": "Sie",
+      "bidderMasked": "Bieter ***{{last4}}",
+      "auto": "Automatisch",
+      "finance": "Finanzierung"
+    },
+    "sidebar": {
+      "currentBid": "Aktuelles Gebot",
+      "startingPrice": "Startpreis",
+      "bidsWatchers": "{{bids}} Gebote • {{watchers}} Beobachter",
+      "reserveNotMet": "Mindestpreis noch nicht erreicht",
+      "timeRemaining": "Verbleibende Zeit",
+      "auctionStatus": "Auktion {{status}}",
+      "auctionEnded": "Auktion beendet",
+      "unwatch": "Nicht mehr beobachten",
+      "watchAuction": "Auktion beobachten",
+      "verificationRequired": "Verifizierung erforderlich",
+      "chooseOption": "Wählen Sie eine Option, um mit dem Bieten zu beginnen:",
+      "cardDeposit": "Kartenkaution",
+      "financeOption": "Finanzierung",
+      "financePreapproved": "Finanzierung vorab genehmigt",
+      "depositPreauthorized": "Kaution vorautorisiert",
+      "readyToBid": " — bereit zum Bieten",
+      "yourBidMin": "Ihr Gebot (mind.: {{amount}})",
+      "autoBid": "Automatikgebot (Proxy)",
+      "maxAutoBidCeiling": "Maximale Automatikgebotsgrenze",
+      "autoBidHint": "Das System bietet in Ihrem Namen die Mindesterhöhungen bis zu diesem Betrag",
+      "placeBid": "Gebot abgeben",
+      "buyerPremiumNote": "3 % Käuferaufgeld fällig • Anti-Sniping: Gebote in den letzten 2 Minuten verlängern die Auktion",
+      "registerToBid": "Registrieren & verifizieren, um zu bieten",
+      "createAccount": "Konto erstellen",
+      "yourAuction": "Dies ist Ihre Auktion",
+      "reserve": "Mindestpreis: {{amount}} {{status}}",
+      "reserveMet": "✅ Erreicht",
+      "reserveNotMetShort": "⏳ Nicht erreicht"
+    },
+    "feeBreakdown": {
+      "title": "Gebührenaufstellung",
+      "hammerPrice": "Zuschlagspreis",
+      "buyerPremium": "Käuferaufgeld (3 %)",
+      "totalForBuyer": "Gesamtbetrag für Käufer"
+    },
+    "trustBadges": {
+      "paymentProtected": "Zahlung geschützt",
+      "paymentProtectedDesc": "Gelder werden bis zum Abschluss der Übergabe treuhänderisch verwaltet",
+      "depositPreauth": "Kaution vorautorisiert",
+      "depositPreauthDesc": "500 £ vorgemerkt, erst bei Gewinn belastet",
+      "eSignContract": "E-Signatur-Vertrag",
+      "eSignContractDesc": "Rechtsverbindlicher digitaler Vertrag",
+      "auditTrail": "Vollständiges Prüfprotokoll",
+      "auditTrailDesc": "Jede Aktion wird protokolliert und mit Zeitstempel versehen"
+    },
+    "winnerPayment": {
+      "title": "Zahlung erforderlich",
+      "totalDue": "Fälliger Gesamtbetrag",
+      "depositHeld": "Hinterlegte Kaution",
+      "remainingBalance": "Restbetrag",
+      "paymentDeadline": "Zahlungsfrist",
+      "processing": "Wird verarbeitet...",
+      "payRemainingBalance": "Restbetrag bezahlen"
+    },
+    "contract": {
+      "title": "Kaufvertrag",
+      "buyerSigned": "Käufer unterzeichnet",
+      "sellerSigned": "Verkäufer unterzeichnet",
+      "pending": "⏳ Ausstehend",
+      "reviewAndSign": "Vertrag prüfen & unterzeichnen",
+      "dialogTitle": "Kaufvertrag",
+      "dialogDesc": "Prüfen Sie den Vertrag sorgfältig, bevor Sie unterschreiben. Ihre IP-Adresse und der Zeitstempel werden erfasst.",
+      "agreeNote": "Mit der Unterschrift stimmen Sie den obigen Bedingungen zu.",
+      "signing": "Wird unterzeichnet...",
+      "signButton": "Ich stimme zu — Vertrag unterzeichnen"
+    },
+    "handover": {
+      "title": "Übergabe-Checkliste",
+      "fundsNote": "Gelder werden erst an den Verkäufer freigegeben, wenn alle Schritte bestätigt sind",
+      "v5cReceived": "Fahrzeugbrief erhalten",
+      "confirmed": "✓ Bestätigt",
+      "confirmSent": "Versand bestätigen",
+      "pending": "Ausstehend",
+      "keysHandedOver": "Schlüssel übergeben",
+      "confirmHanded": "Übergabe bestätigen",
+      "contractSigned": "Vertrag unterzeichnet",
+      "bothSigned": "✓ Beide unterzeichnet",
+      "protectionStatus": "Schutzstatus",
+      "requestDelivery": "Lieferung anfragen"
+    },
+    "bidDialog": {
+      "title": "Gebot bestätigen",
+      "description": "Dies ist ein verbindliches Gebot. Stellen Sie sicher, dass Sie zum Kauf bereit sind.",
+      "yourBid": "Ihr Gebot",
+      "buyerPremium": "Käuferaufgeld (3 %)",
+      "totalIfWin": "Gesamtbetrag bei Gewinn",
+      "autoBidCeiling": "Automatikgebotsgrenze",
+      "autoBidHint": "Das System bietet in Ihrem Namen die Mindesterhöhungen bis zu diesem Betrag",
+      "cancel": "Abbrechen",
+      "placing": "Wird abgegeben...",
+      "confirmBid": "Gebot bestätigen"
+    },
+    "deliveryDialog": {
+      "title": "Lieferung anfragen",
+      "description": "Unsere Logistikpartner organisieren die Lieferung an Ihre Adresse.",
+      "collectionFrom": "Abholung von",
+      "tbc": "Wird noch festgelegt",
+      "estimatedCost": "Geschätzte Kosten",
+      "note": "Die Lieferkosten trägt zusätzlich der Käufer. Ein genaues Angebot erhalten Sie nach Bestätigung Ihrer Lieferadresse.",
+      "cancel": "Abbrechen",
+      "submitRequest": "Anfrage senden"
+    }
+  },
+  "tradeStock": {
+    "seo": {
+      "title": "Handelsbestand — Fahrzeug-Großhandelsarbitrage",
+      "description": "Zugang zu vorab geprüften Großhandelsfahrzeugen zu attraktiven Handelspreisen. Von der Plattform beschafft, inspiziert und bereit für Ihren Hof."
+    },
+    "hero": {
+      "badge": "Handelsbestand",
+      "title1": "Fahrzeug-Großhandel",
+      "title2": "Arbitrage",
+      "subtitle": "Wir beschaffen geprüfte Fahrzeuge von Verkäufern, inspizieren sie und bieten sie unserem Händlernetzwerk mit einem geringen Aufschlag an. Sie erhalten verkaufsfertigen Bestand — wir kümmern uns um Verkäufer, Papierkram und Logistik."
+    },
+    "search": {
+      "placeholder": "Handelsbestand durchsuchen..."
+    },
+    "createDeal": {
+      "button": "Deal erstellen",
+      "dialogTitle": "Arbitrage-Deal erstellen",
+      "dialogDesc": "Beschaffen Sie ein Fahrzeug von einem Verkäufer und legen Sie Ihren Aufschlag für den Weiterverkauf an Händler fest.",
+      "selectListing": "Anzeige auswählen",
+      "chooseCar": "Fahrzeug wählen...",
+      "buyFromSellerAt": "Vom Verkäufer kaufen für",
+      "sellerPricePlaceholder": "z. B. 8000",
+      "markupPct": "Aufschlag %",
+      "adminNotes": "Admin-Notizen",
+      "adminNotesPlaceholder": "Warum dieses Fahrzeug? Marktbeobachtungen...",
+      "sellerPriceLabel": "Verkäuferpreis",
+      "platformMarkup": "Plattform-Aufschlag ({{pct}} %)",
+      "dealerPays": "Händler zahlt",
+      "creating": "Wird erstellt...",
+      "create": "Deal erstellen"
+    },
+    "status": {
+      "sourced": "Beschafft",
+      "offer_sent": "Angebot gesendet",
+      "seller_accepted": "Verkäufer akzeptiert",
+      "seller_rejected": "Abgelehnt",
+      "acquired": "Erworben",
+      "listed_to_dealers": "Händlern gelistet",
+      "dealer_accepted": "Händler akzeptiert",
+      "seller_paid": "Verkäufer bezahlt",
+      "completed": "Abgeschlossen",
+      "cancelled": "Storniert"
+    },
+    "tabs": {
+      "available": "Verfügbarer Bestand",
+      "myOffers": "Meine Angebote",
+      "myDeals": "Meine Deals",
+      "all": "Alle Deals",
+      "audit": "Prüfprotokoll"
+    },
+    "audit": {
+      "empty": "Noch keine Protokolleinträge"
+    },
+    "empty": {
+      "title": "Kein Handelsbestand verfügbar",
+      "subtitle": "Schauen Sie bald wieder vorbei — täglich werden neue Fahrzeuge beschafft."
+    },
+    "dealCard": {
+      "tradePrice": "Handelspreis",
+      "mi": "mi",
+      "sellerPrice": "Verkäuferpreis",
+      "markup": "Aufschlag ({{pct}} %)",
+      "dealerPrice": "Händlerpreis",
+      "accepting": "Wird akzeptiert...",
+      "acceptAndPurchase": "Akzeptieren & kaufen",
+      "openingPayment": "Zahlung wird geöffnet...",
+      "pay": "{{amount}} bezahlen",
+      "sendToSeller": "An Verkäufer senden",
+      "listToDealers": "Händlern anbieten",
+      "paySeller": "Verkäufer bezahlen",
+      "completeDeal": "Deal abschließen",
+      "ref": "Ref.: {{ref}}",
+      "cancel": "Stornieren"
+    },
+    "payoutDialog": {
+      "title": "Verkäufer als bezahlt markieren",
+      "description": "Erfassen Sie die Zahlungsreferenz für {{vehicle}}. Der Verkäufer erhält {{amount}}.",
+      "defaultVehicle": "dieses Fahrzeug",
+      "paymentRefLabel": "Zahlungsreferenz / Überweisungsreferenz",
+      "paymentRefPlaceholder": "z. B. BACS-2026-03-18-001",
+      "sellerPrice": "Verkäuferpreis",
+      "platformRevenue": "Plattformerlös",
+      "cancel": "Abbrechen",
+      "processing": "Wird verarbeitet...",
+      "confirm": "Zahlung bestätigen"
+    },
+    "howItWorks": {
+      "badge": "So funktioniert's",
+      "title": "Arbitrage in 5 Schritten",
+      "step1Title": "Wir beschaffen",
+      "step1Desc": "Die Plattform identifiziert unterbewertete oder stark nachgefragte Fahrzeuge",
+      "step2Title": "Wir kaufen",
+      "step2Desc": "Wir unterbreiten dem Verkäufer ein faires Angebot und erwerben das Fahrzeug",
+      "step3Title": "Wir prüfen",
+      "step3Desc": "Vollständige Inspektion, HPI-Prüfung und Zustandsbericht",
+      "step4Title": "Wir bieten an",
+      "step4Desc": "Angebot an unser Händlernetzwerk mit geringem Aufschlag",
+      "step5Title": "Wir liefern",
+      "step5Desc": "Logistik organisiert, Verkäufer bezahlt, Deal abgeschlossen",
+      "step": "SCHRITT {{n}}"
+    },
+    "toasts": {
+      "dealCreated": "Arbitrage-Deal erstellt!",
+      "dealUpdated": "Deal aktualisiert!",
+      "dealAccepted": "Deal akzeptiert! Weiter zur Zahlung.",
+      "sellerPaid": "Verkäufer als bezahlt markiert!"
+    },
+    "errors": {
+      "selectListingAndPrice": "Anzeige auswählen und Preis festlegen",
+      "listingNotFound": "Anzeige nicht gefunden",
+      "mustBeDealer": "Sie müssen ein registrierter Händler sein",
+      "paymentSessionFailed": "Zahlungssitzung konnte nicht erstellt werden"
+    }
+  },
+  "dealerLanding": {
+    "notFound": {
+      "title": "Händler nicht gefunden",
+      "subtitle": "Diese Händlerseite ist möglicherweise nicht mehr verfügbar.",
+      "browseAll": "Alle Fahrzeuge durchsuchen"
+    },
+    "seo": {
+      "title": "{{name}} — Zivvo Händler",
+      "description": "Durchsuchen Sie Fahrzeuge von {{name}} auf Zivvo."
+    },
+    "share": {
+      "title": "{{name}} auf Zivvo",
+      "copiedTitle": "Link kopiert",
+      "copiedDesc": "Teilen Sie ihn mit Ihren Freunden.",
+      "failedTitle": "Kopieren fehlgeschlagen",
+      "failedDesc": "Bitte kopieren Sie den Link aus der Adressleiste.",
+      "copied": "Kopiert",
+      "share": "Teilen"
+    },
+    "newsletter": {
+      "invalidTitle": "Ungültige E-Mail",
+      "invalidDesc": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "errorTitle": "Anmeldung fehlgeschlagen",
+      "successTitle": "Sie sind angemeldet!",
+      "successDesc": "Wir informieren Sie, sobald neuer Bestand eintrifft.",
+      "heading": "Bestandsbenachrichtigungen & Sonderangebote",
+      "subtitle": "Erfahren Sie als Erster, wenn neue Fahrzeuge bei {{name}} eintreffen. Kein Spam, jederzeit abbestellbar.",
+      "placeholder": "sie@beispiel.de",
+      "subscribed": "Angemeldet",
+      "subscribe": "Anmelden",
+      "privacyNote": "Mit der Anmeldung stimmen Sie unserer Datenschutzerklärung zu. Wir geben Ihre Daten niemals weiter."
+    },
+    "hero": {
+      "viewInventory": "Bestand ansehen",
+      "browseInventory": "Bestand durchsuchen",
+      "callUs": "Anrufen",
+      "callNow": "Jetzt anrufen",
+      "verifiedDealer": "Verifizierter Händler",
+      "tierDealer": "{{tier}}-Händler",
+      "website": "Website"
+    },
+    "quickActions": {
+      "buy": "Kaufen",
+      "sell": "Verkaufen",
+      "finance": "Finanzierung",
+      "service": "Service",
+      "buyHeading": "Sie könnten nur wenige Klicks von Ihrem nächsten Auto entfernt sein…",
+      "carsAvailable": "{{count}} Fahrzeuge verfügbar",
+      "anyMake": "Jede Marke",
+      "pickMakeFirst": "Zuerst Marke wählen",
+      "anyModel": "Jedes Modell",
+      "anyFuel": "Jeder Kraftstoff",
+      "anyFuelType": "Jede Kraftstoffart",
+      "fullPrice": "Gesamtpreis",
+      "monthlyBudget": "Monatliches Budget",
+      "anyMinPrice": "Kein Mindestpreis",
+      "anyMaxPrice": "Kein Höchstpreis",
+      "upTo": "Bis zu {{price}}",
+      "anyMinMonthly": "Kein Minimum /Monat",
+      "anyMaxMonthly": "Kein Maximum /Monat",
+      "upToMonthly": "Bis zu {{price}} /Monat",
+      "search": "Suchen ({{count}})",
+      "financeDisclaimer": "Repräsentativer effektiver Jahreszins {{apr}} %. Wir sind Kreditvermittler, kein Kreditgeber.",
+      "financeDisclaimerDefault": " Finanzierung vorbehaltlich Bonitätsprüfung. Monatliche Beträge sind unverbindlich.",
+      "sellHeading": "Kostenlose Bewertung Ihres Autos oder Transporters",
+      "sellSubtitle": "Erhalten Sie ein sofortiges, unverbindliches Angebot von {{name}}. Inzahlungnahme möglich.",
+      "regPlaceholder": "Kennzeichen eingeben (z. B. B-AB 1234)",
+      "valueMyCar": "Mein Auto bewerten",
+      "financeHeading": "Flexible Finanzierung ab {{apr}} % effektivem Jahreszins",
+      "financeSubtitle": "PCP-, Ratenkredit- und Privatkreditoptionen. Schnelle Entscheidungen, keine Auswirkung auf Ihre Bonität bei einer Anfrage.",
+      "seeFinanceExamples": "Finanzierungsbeispiele ansehen",
+      "applyNow": "Jetzt beantragen",
+      "financeTerms": "Finanzierung vorbehaltlich Bonitätsprüfung. AGB gelten. Wir sind Kreditvermittler, kein Kreditgeber.",
+      "serviceHeading": "Wartung & Kundendienst",
+      "serviceSubtitle": "Vollservice, HU/TÜV, Reparaturen und Garantiearbeiten — alles durch unser eigenes, vertrauenswürdiges Team.",
+      "bookService": "Service buchen",
+      "callWorkshop": "Werkstatt anrufen"
+    },
+    "stats": {
+      "vehiclesInStock": "Fahrzeuge auf Lager",
+      "customerRating": "Kundenbewertung",
+      "openingHours": "Öffnungszeiten",
+      "defaultHours": "Mo–Sa 9–18 Uhr",
+      "startingPrice": "Startpreis",
+      "fromPrice": "Ab {{price}}",
+      "verifiedDealer": "Verifizierter Händler",
+      "hundredPercent": "100 %"
+    },
+    "brands": {
+      "badge": "Marken im Bestand",
+      "title": "Nach Hersteller einkaufen",
+      "subtitle": "Tippen Sie auf eine Marke, um unseren Bestand sofort zu filtern",
+      "all": "Alle ({{count}})"
+    },
+    "glance": {
+      "badge": "Auf einen Blick",
+      "title": "Unseren Bestand durchsuchen",
+      "subtitle": "Schnellfilter, um Ihr perfektes Auto zu finden",
+      "viewAll": "Alle {{body}} ansehen →",
+      "priceRange": "Preisspanne",
+      "newestYear": "Neuestes Baujahr",
+      "avgMileage": "Ø Kilometerstand"
+    },
+    "usps": {
+      "badge": "Warum wir",
+      "title": "Warum bei {{name}} kaufen?"
+    },
+    "about": {
+      "badge": "Über uns",
+      "title": "Über {{name}}",
+      "followUs": "Folgen Sie uns:"
+    },
+    "contactCard": {
+      "title": "Kontaktinformationen",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "location": "Standort",
+      "website": "Website",
+      "visitWebsite": "Website besuchen",
+      "enquireNow": "Jetzt anfragen",
+      "findUs": "So finden Sie uns",
+      "getDirections": "Route anzeigen →"
+    },
+    "featuredBanner": {
+      "badge": "Empfohlen",
+      "title": "Ausgewählte Fahrzeuge",
+      "viewAll": "Alle ansehen"
+    },
+    "howBuying": {
+      "badge": "Einfacher Ablauf",
+      "title": "So funktioniert der Kauf bei uns",
+      "subtitle": "Von der Suche bis zur Abholung — ein einfacher, transparenter Ablauf in 4 Schritten.",
+      "step1Title": "Durchsuchen",
+      "step1Desc": "Entdecken Sie unseren geprüften Bestand mit detaillierten Angaben und vollständigen Fotogalerien.",
+      "step2Title": "Anfragen",
+      "step2Desc": "Stellen Sie Fragen, fordern Sie eine Videobesichtigung an oder vereinbaren Sie eine Probefahrt.",
+      "step3Title": "Reservieren",
+      "step3Desc": "Sichern Sie sich Ihr Fahrzeug mit einer kleinen, erstattungsfähigen Anzahlung. Wir übernehmen den Papierkram.",
+      "step4Title": "Abholen",
+      "step4Desc": "Persönlich abholen oder bundesweit liefern lassen — vollständig aufbereitet und geprüft."
+    },
+    "trustBadges": {
+      "hpiChecked": "Alle Fahrzeuge HPI-geprüft",
+      "verifiedDealer": "Verifizierter Händler",
+      "partExchange": "Inzahlungnahme möglich",
+      "financeAvailable": "Finanzierung verfügbar"
+    },
+    "accreditations": {
+      "title": "Vertrauenswürdige Zertifizierungen & Partner",
+      "fca": "FCA-zugelassen",
+      "rac": "RAC-geprüft",
+      "aa": "AA-inspiziert",
+      "hpi": "HPI-geprüft",
+      "trustpilot": "Trustpilot 5★",
+      "autoTrader": "Auto Trader Partner"
+    },
+    "inventory": {
+      "title": "Unser Fahrzeugbestand",
+      "vehiclesAvailable": "{{count}} Fahrzeug{{plural}} verfügbar",
+      "matches": "{{count}} Treffer{{plural}}",
+      "budget": "Budget:",
+      "under": "Bis zu {{price}}",
+      "clear": "Zurücksetzen",
+      "searchPlaceholder": "Marke, Modell suchen...",
+      "allFuels": "Alle Kraftstoffarten",
+      "allTypes": "Alle Fahrzeugtypen",
+      "newestFirst": "Neueste zuerst",
+      "priceLowHigh": "Preis: aufsteigend",
+      "priceHighLow": "Preis: absteigend",
+      "yearNewest": "Baujahr: neueste",
+      "mileageLowest": "Kilometerstand: niedrigste",
+      "noMatching": "Keine passenden Fahrzeuge",
+      "noneYet": "Noch keine Fahrzeuge gelistet",
+      "tryAdjusting": "Passen Sie Ihre Suche an",
+      "checkBackSoon": "Schauen Sie bald wieder für neuen Bestand vorbei",
+      "showAll": "Alle {{count}} Fahrzeuge anzeigen"
+    },
+    "recentlyViewed": {
+      "badge": "Kürzlich angesehen",
+      "title": "Machen Sie da weiter, wo Sie aufgehört haben"
+    },
+    "partExchange": {
+      "badge": "Inzahlungnahme",
+      "title": "Geben Sie Ihr aktuelles Auto in Zahlung",
+      "subtitle": "Erhalten Sie eine sofortige Bewertung und nutzen Sie diese als Anzahlung für jedes Fahrzeug in unserem Showroom. Kostenlose, unverbindliche Angebote — meist innerhalb weniger Minuten.",
+      "getValuation": "Meine Bewertung erhalten",
+      "talkToUs": "Sprechen Sie mit uns"
+    },
+    "financeBar": {
+      "representative": "Repräsentativer effektiver Jahreszins {{apr}} %.",
+      "disclaimer": "Wir sind Kreditvermittler, kein Kreditgeber. Finanzierung vorbehaltlich Bonitätsprüfung. Es gelten die AGB."
+    },
+    "financeCta": {
+      "defaultTitle": "Brauchen Sie eine Finanzierung? Wir helfen Ihnen",
+      "subtitle": "Flexible Finanzierungsoptionen für alle Fahrzeuge. Holen Sie sich ein schnelles Angebot ohne Auswirkung auf Ihre Bonität.",
+      "getQuote": "Finanzierungsangebot erhalten"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Häufig gestellte Fragen",
+      "subtitle": "Alles, was Sie über den Kauf bei {{name}} wissen müssen. Nicht gefunden, was Sie suchen? Kontaktieren Sie uns — wir helfen gerne.",
+      "askQuestion": "Stellen Sie uns eine Frage",
+      "defaults": {
+        "q1": "Bieten Sie eine Finanzierung an?",
+        "a1": "Ja — wir arbeiten mit einem Netzwerk vertrauenswürdiger Kreditgeber zusammen und bieten wettbewerbsfähige PCP-, Ratenkredit- und Privatkreditpakete für jedes Fahrzeug. Repräsentativer effektiver Jahreszins {{apr}}. Wir sind Kreditvermittler, kein Kreditgeber.",
+        "q2": "Nehmen Sie mein Auto in Zahlung?",
+        "a2": "Selbstverständlich. Wir akzeptieren Inzahlungnahmen für jedes Fahrzeug in unserem Showroom. Holen Sie sich eine sofortige Online-Bewertung oder bringen Sie Ihr Auto vorbei — unser Team macht Ihnen innerhalb von Minuten ein faires, unverbindliches Angebot.",
+        "q3": "Sind Ihre Fahrzeuge HPI-geprüft?",
+        "a3": "Jedes von uns verkaufte Fahrzeug ist vollständig HPI-geprüft, verfügt über eine verifizierte Kilometerstandshistorie und wird einer umfassenden Mehrpunktinspektion unterzogen. Den vollständigen Bericht finden Sie in jeder Anzeige.",
+        "q4": "Können Sie mir das Auto liefern?",
+        "a4": "Ja — wir bieten bundesweite Lieferung an. Die Lieferkosten richten sich nach Entfernung und Fahrzeug, und Ihr Auto kommt vollständig aufbereitet, gereinigt und fahrbereit an.",
+        "q5": "Welche Garantie bieten Sie?",
+        "a5": "Alle unsere Fahrzeuge werden standardmäßig mit einer umfassenden Garantie von mindestens 3 Monaten geliefert; erweiterte Garantieoptionen sind beim Kauf verfügbar.",
+        "q6": "Kann ich ein Auto online reservieren?",
+        "a6": "Ja — sichern Sie sich jedes Fahrzeug aus unserem Bestand mit einer kleinen, erstattungsfähigen Anzahlung. Ihr Auto wird für Sie reserviert, während wir Besichtigung, Finanzierung oder Lieferung organisieren."
+      }
+    },
+    "testimonials": {
+      "badge": "Bewertungen",
+      "title": "Was unsere Kunden sagen"
+    },
+    "openingHours": {
+      "title": "Öffnungszeiten",
+      "openNow": "Jetzt geöffnet",
+      "closed": "Geschlossen",
+      "visitUs": "Besuchen Sie uns in {{location}}. Spontane Besuche sind während der Öffnungszeiten willkommen.",
+      "days": {
+        "monday": "Montag",
+        "tuesday": "Dienstag",
+        "wednesday": "Mittwoch",
+        "thursday": "Donnerstag",
+        "friday": "Freitag",
+        "saturday": "Samstag",
+        "sunday": "Sonntag"
+      },
+      "byAppointment": "Nach Vereinbarung"
+    },
+    "ctaFooter": {
+      "title": "Bereit für Ihr nächstes Auto?",
+      "subtitle": "Kontaktieren Sie uns noch heute oder durchsuchen Sie unser vollständiges Angebot an Qualitätsfahrzeugen",
+      "whatsapp": "WhatsApp",
+      "emailUs": "E-Mail senden",
+      "established": "Gegründet",
+      "companyNo": "Handelsregisternr.",
+      "vatNo": "USt-IdNr.",
+      "fcaReference": "FCA-Referenz"
+    },
+    "financeDialog": {
+      "title": "Finanzierungsrechner"
+    }
   }
 }

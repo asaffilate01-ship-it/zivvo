@@ -1658,5 +1658,552 @@
     "toast": {
       "submitted": "Auction submitted for inspection review!"
     }
+  },
+  "auctionDetail": {
+    "breadcrumb": "Auctions",
+    "notFound": "Auction not found",
+    "seo": {
+      "title": "{{year}} {{make}} {{model}} — Auction",
+      "description": "Bid on this inspected {{make}} {{model}}. Condition rated {{rating}}/5. HPI checked."
+    },
+    "toasts": {
+      "paymentSuccess": "Payment successful! Your purchase is being processed.",
+      "watchAdded": "Added to watchlist",
+      "watchRemoved": "Removed from watchlist",
+      "bidPlaced": "Bid placed successfully!",
+      "contractSigned": "Contract signed successfully!",
+      "contractSignFailed": "Failed to sign contract",
+      "handoverConfirmed": "Handover step confirmed!",
+      "handoverFailed": "Failed to confirm",
+      "paymentComplete": "Payment complete! Deposit covered the full amount.",
+      "deliveryRequestSubmitted": "Delivery request submitted! Our team will contact you."
+    },
+    "errors": {
+      "loginRequired": "Login required",
+      "minimumBid": "Minimum bid is {{amount}}",
+      "cannotBidOwnAuction": "You cannot bid on your own auction",
+      "depositRequired": "You need to pre-authorize a deposit before bidding",
+      "maxAutoBidTooLow": "Max auto-bid must be higher than your bid"
+    },
+    "gallery": {
+      "live": "LIVE",
+      "condition": "{{rating}}/5 Condition",
+      "photos": "{{current}}/{{total}} photos"
+    },
+    "tabs": {
+      "condition": "Condition Report",
+      "history": "History & Checks",
+      "assets": "What's Included",
+      "bids": "Bid History ({{count}})"
+    },
+    "conditionTab": {
+      "inspectionRating": "Inspection Rating",
+      "assessedBy": "Assessed by approved specialist",
+      "paintCondition": "Paint Condition",
+      "interiorCondition": "Interior Condition",
+      "mechanicalNotes": "Mechanical Notes",
+      "tyresCondition": "Tyres Condition",
+      "notAssessed": "Not assessed"
+    },
+    "historyTab": {
+      "hpiCheck": "HPI Check",
+      "hpiClear": "Clear — No issues found",
+      "ownershipVerified": "Ownership Verified",
+      "ownershipOk": "V5C confirmed with DVLA",
+      "sellerVerified": "Seller Verified",
+      "sellerVerifiedOk": "Identity & address verified",
+      "accidentHistory": "Accident History",
+      "noAccidents": "No accidents recorded",
+      "pending": "Pending"
+    },
+    "assetsTab": {
+      "keys": "Keys",
+      "keysCount": "{{count}} key(s){{spare}}",
+      "plusSpare": " + spare",
+      "notSpecified": "Not specified",
+      "serviceHistory": "Service History",
+      "warranty": "Warranty",
+      "noWarranty": "No warranty",
+      "additionalAssets": "Additional Assets",
+      "noneListed": "None listed",
+      "deliveryAvailable": "Delivery Available",
+      "deliveryVia": "Via our logistics partners{{estimate}}",
+      "deliveryEstimate": " — estimated {{amount}}"
+    },
+    "bidsTab": {
+      "noBids": "No bids yet. Be the first!",
+      "you": "You",
+      "bidderMasked": "Bidder ***{{last4}}",
+      "auto": "Auto",
+      "finance": "Finance"
+    },
+    "sidebar": {
+      "currentBid": "Current Bid",
+      "startingPrice": "Starting Price",
+      "bidsWatchers": "{{bids}} bids • {{watchers}} watchers",
+      "reserveNotMet": "Reserve not yet met",
+      "timeRemaining": "Time Remaining",
+      "auctionStatus": "Auction {{status}}",
+      "auctionEnded": "Auction Ended",
+      "unwatch": "Unwatch",
+      "watchAuction": "Watch Auction",
+      "verificationRequired": "Verification Required",
+      "chooseOption": "Choose one option to start bidding:",
+      "cardDeposit": "Card Deposit",
+      "financeOption": "Finance",
+      "financePreapproved": "Finance pre-approved",
+      "depositPreauthorized": "Deposit pre-authorized",
+      "readyToBid": " — Ready to bid",
+      "yourBidMin": "Your bid (min: {{amount}})",
+      "autoBid": "Auto-bid (proxy)",
+      "maxAutoBidCeiling": "Maximum auto-bid ceiling",
+      "autoBidHint": "System bids minimum increments on your behalf up to this amount",
+      "placeBid": "Place Bid",
+      "buyerPremiumNote": "3% buyer premium applies • Anti-sniping: bids in last 2 min extend auction",
+      "registerToBid": "Register & verify to bid",
+      "createAccount": "Create Account",
+      "yourAuction": "This is your auction",
+      "reserve": "Reserve: {{amount}} {{status}}",
+      "reserveMet": "✅ Met",
+      "reserveNotMetShort": "⏳ Not met"
+    },
+    "feeBreakdown": {
+      "title": "Fee Breakdown",
+      "hammerPrice": "Hammer Price",
+      "buyerPremium": "Buyer Premium (3%)",
+      "totalForBuyer": "Total for Buyer"
+    },
+    "trustBadges": {
+      "paymentProtected": "Payment Protected",
+      "paymentProtectedDesc": "Funds held until handover complete",
+      "depositPreauth": "Deposit Pre-auth",
+      "depositPreauthDesc": "£500 held, not charged until you win",
+      "eSignContract": "E-Sign Contract",
+      "eSignContractDesc": "Legally binding digital contract",
+      "auditTrail": "Full Audit Trail",
+      "auditTrailDesc": "Every action logged & timestamped"
+    },
+    "winnerPayment": {
+      "title": "Payment Required",
+      "totalDue": "Total Due",
+      "depositHeld": "Deposit Held",
+      "remainingBalance": "Remaining Balance",
+      "paymentDeadline": "Payment Deadline",
+      "processing": "Processing...",
+      "payRemainingBalance": "Pay Remaining Balance"
+    },
+    "contract": {
+      "title": "Sale Contract",
+      "buyerSigned": "Buyer signed",
+      "sellerSigned": "Seller signed",
+      "pending": "⏳ Pending",
+      "reviewAndSign": "Review & Sign Contract",
+      "dialogTitle": "Sale Contract",
+      "dialogDesc": "Review the contract carefully before signing. Your IP address and timestamp will be recorded.",
+      "agreeNote": "By signing, you agree to the terms above.",
+      "signing": "Signing...",
+      "signButton": "I Agree — Sign Contract"
+    },
+    "handover": {
+      "title": "Handover Checklist",
+      "fundsNote": "Funds released to seller once all steps confirmed",
+      "v5cReceived": "V5C / Logbook Received",
+      "confirmed": "✓ Confirmed",
+      "confirmSent": "Confirm Sent",
+      "pending": "Pending",
+      "keysHandedOver": "Keys Handed Over",
+      "confirmHanded": "Confirm Handed",
+      "contractSigned": "Contract Signed",
+      "bothSigned": "✓ Both Signed",
+      "protectionStatus": "Protection Status",
+      "requestDelivery": "Request Delivery"
+    },
+    "bidDialog": {
+      "title": "Confirm Your Bid",
+      "description": "This is a binding bid. Make sure you're ready to purchase.",
+      "yourBid": "Your Bid",
+      "buyerPremium": "Buyer Premium (3%)",
+      "totalIfWin": "Total if you win",
+      "autoBidCeiling": "Auto-bid ceiling",
+      "autoBidHint": "System will bid minimum increments on your behalf up to this amount",
+      "cancel": "Cancel",
+      "placing": "Placing...",
+      "confirmBid": "Confirm Bid"
+    },
+    "deliveryDialog": {
+      "title": "Request Delivery",
+      "description": "Our logistics partners will arrange delivery to your address.",
+      "collectionFrom": "Collection from",
+      "tbc": "TBC",
+      "estimatedCost": "Estimated cost",
+      "note": "Delivery cost is additional and paid by the buyer. Exact quote will be provided after confirming your delivery address.",
+      "cancel": "Cancel",
+      "submitRequest": "Submit Request"
+    }
+  },
+  "tradeStock": {
+    "seo": {
+      "title": "Trade Stock — Wholesale Vehicle Arbitrage",
+      "description": "Access pre-verified wholesale vehicles at competitive trade prices. Platform-sourced, inspected, and ready for your forecourt."
+    },
+    "hero": {
+      "badge": "Trade Stock",
+      "title1": "Wholesale Vehicle",
+      "title2": "Arbitrage",
+      "subtitle": "We source verified vehicles from sellers, inspect them, and offer them to our dealer network at a small markup. You get trade-ready stock — we handle the seller, paperwork, and logistics."
+    },
+    "search": {
+      "placeholder": "Search trade stock..."
+    },
+    "createDeal": {
+      "button": "Create Deal",
+      "dialogTitle": "Create Arbitrage Deal",
+      "dialogDesc": "Source a car from a seller and set your markup for dealer resale.",
+      "selectListing": "Select Listing",
+      "chooseCar": "Choose a car...",
+      "buyFromSellerAt": "Buy from Seller at",
+      "sellerPricePlaceholder": "e.g. 8000",
+      "markupPct": "Markup %",
+      "adminNotes": "Admin Notes",
+      "adminNotesPlaceholder": "Why this car? Market observations...",
+      "sellerPriceLabel": "Seller Price",
+      "platformMarkup": "Platform Markup ({{pct}}%)",
+      "dealerPays": "Dealer Pays",
+      "creating": "Creating...",
+      "create": "Create Deal"
+    },
+    "status": {
+      "sourced": "Sourced",
+      "offer_sent": "Offer Sent",
+      "seller_accepted": "Seller Accepted",
+      "seller_rejected": "Rejected",
+      "acquired": "Acquired",
+      "listed_to_dealers": "Listed to Dealers",
+      "dealer_accepted": "Dealer Accepted",
+      "seller_paid": "Seller Paid",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "tabs": {
+      "available": "Available Stock",
+      "myOffers": "My Offers",
+      "myDeals": "My Deals",
+      "all": "All Deals",
+      "audit": "Audit Log"
+    },
+    "audit": {
+      "empty": "No audit entries yet"
+    },
+    "empty": {
+      "title": "No trade stock available",
+      "subtitle": "Check back soon — new vehicles are sourced daily."
+    },
+    "dealCard": {
+      "tradePrice": "Trade Price",
+      "mi": "mi",
+      "sellerPrice": "Seller price",
+      "markup": "Markup ({{pct}}%)",
+      "dealerPrice": "Dealer price",
+      "accepting": "Accepting...",
+      "acceptAndPurchase": "Accept & Purchase",
+      "openingPayment": "Opening Payment...",
+      "pay": "Pay {{amount}}",
+      "sendToSeller": "Send to Seller",
+      "listToDealers": "List to Dealers",
+      "paySeller": "Pay Seller",
+      "completeDeal": "Complete Deal",
+      "ref": "Ref: {{ref}}",
+      "cancel": "Cancel"
+    },
+    "payoutDialog": {
+      "title": "Mark Seller as Paid",
+      "description": "Record the payment reference for {{vehicle}}. Seller receives {{amount}}.",
+      "defaultVehicle": "this vehicle",
+      "paymentRefLabel": "Payment Reference / Bank Transfer Ref",
+      "paymentRefPlaceholder": "e.g. BACS-2026-03-18-001",
+      "sellerPrice": "Seller Price",
+      "platformRevenue": "Platform Revenue",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "confirm": "Confirm Payment Sent"
+    },
+    "howItWorks": {
+      "badge": "How It Works",
+      "title": "Arbitrage in 5 Steps",
+      "step1Title": "We Source",
+      "step1Desc": "Platform identifies undervalued or high-demand vehicles",
+      "step2Title": "We Buy",
+      "step2Desc": "We make the seller a fair offer and acquire the car",
+      "step3Title": "We Verify",
+      "step3Desc": "Full inspection, HPI check, and condition report",
+      "step4Title": "We Offer",
+      "step4Desc": "Listed to our dealer network at a small markup",
+      "step5Title": "We Deliver",
+      "step5Desc": "Logistics arranged, seller paid, deal completed",
+      "step": "STEP {{n}}"
+    },
+    "toasts": {
+      "dealCreated": "Arbitrage deal created!",
+      "dealUpdated": "Deal updated!",
+      "dealAccepted": "Deal accepted! Proceed to payment.",
+      "sellerPaid": "Seller marked as paid!"
+    },
+    "errors": {
+      "selectListingAndPrice": "Select a listing and set price",
+      "listingNotFound": "Listing not found",
+      "mustBeDealer": "You must be a registered dealer",
+      "paymentSessionFailed": "Failed to create payment session"
+    }
+  },
+  "dealerLanding": {
+    "notFound": {
+      "title": "Dealer Not Found",
+      "subtitle": "This dealer page may no longer be available.",
+      "browseAll": "Browse All Cars"
+    },
+    "seo": {
+      "title": "{{name}} — Zivvo Dealer",
+      "description": "Browse vehicles from {{name}} on Zivvo."
+    },
+    "share": {
+      "title": "{{name}} on Zivvo",
+      "copiedTitle": "Link copied",
+      "copiedDesc": "Share it with your friends.",
+      "failedTitle": "Copy failed",
+      "failedDesc": "Please copy from the address bar.",
+      "copied": "Copied",
+      "share": "Share"
+    },
+    "newsletter": {
+      "invalidTitle": "Invalid email",
+      "invalidDesc": "Please enter a valid email address.",
+      "errorTitle": "Couldn't subscribe",
+      "successTitle": "You're subscribed!",
+      "successDesc": "We'll let you know when new stock arrives.",
+      "heading": "Stock alerts & special offers",
+      "subtitle": "Be first to know when new vehicles arrive at {{name}}. No spam, unsubscribe anytime.",
+      "placeholder": "you@example.com",
+      "subscribed": "Subscribed",
+      "subscribe": "Subscribe",
+      "privacyNote": "By subscribing you agree to our privacy policy. We never share your data."
+    },
+    "hero": {
+      "viewInventory": "View Inventory",
+      "browseInventory": "Browse Inventory",
+      "callUs": "Call Us",
+      "callNow": "Call Now",
+      "verifiedDealer": "Verified Dealer",
+      "tierDealer": "{{tier}} Dealer",
+      "website": "Website"
+    },
+    "quickActions": {
+      "buy": "Buy",
+      "sell": "Sell",
+      "finance": "Finance",
+      "service": "Service",
+      "buyHeading": "You could be moments away from finding your next car…",
+      "carsAvailable": "{{count}} cars available",
+      "anyMake": "Any Make",
+      "pickMakeFirst": "Pick a make first",
+      "anyModel": "Any Model",
+      "anyFuel": "Any Fuel",
+      "anyFuelType": "Any Fuel Type",
+      "fullPrice": "Full Price",
+      "monthlyBudget": "Monthly Budget",
+      "anyMinPrice": "Any Min Price",
+      "anyMaxPrice": "Any Max Price",
+      "upTo": "Up to {{price}}",
+      "anyMinMonthly": "Any Min /mo",
+      "anyMaxMonthly": "Any Max /mo",
+      "upToMonthly": "Up to {{price}} /mo",
+      "search": "Search ({{count}})",
+      "financeDisclaimer": "Representative {{apr}}% APR. We are a credit broker, not a lender.",
+      "financeDisclaimerDefault": " Finance subject to status. Indicative monthly figures only.",
+      "sellHeading": "Free valuation of your car or van",
+      "sellSubtitle": "Get an instant, no-obligation quote from {{name}}. Part-exchange welcome.",
+      "regPlaceholder": "Enter your reg (e.g. AB12 CDE)",
+      "valueMyCar": "Value My Car",
+      "financeHeading": "Flexible finance from {{apr}}% APR",
+      "financeSubtitle": "PCP, HP and personal loan options. Quick decisions, no impact on your credit score for a quote.",
+      "seeFinanceExamples": "See finance examples",
+      "applyNow": "Apply Now",
+      "financeTerms": "Finance subject to status. T&Cs apply. We are a credit broker, not a lender.",
+      "serviceHeading": "Servicing & aftercare",
+      "serviceSubtitle": "Full service, MOT, repairs and warranty work — all carried out by our trusted in-house team.",
+      "bookService": "Book a Service",
+      "callWorkshop": "Call Workshop"
+    },
+    "stats": {
+      "vehiclesInStock": "Vehicles in Stock",
+      "customerRating": "Customer Rating",
+      "openingHours": "Opening Hours",
+      "defaultHours": "Mon–Sat 9–6",
+      "startingPrice": "Starting Price",
+      "fromPrice": "From {{price}}",
+      "verifiedDealer": "Verified Dealer",
+      "hundredPercent": "100%"
+    },
+    "brands": {
+      "badge": "Brands We Stock",
+      "title": "Shop by manufacturer",
+      "subtitle": "Tap a brand to filter our inventory instantly",
+      "all": "All ({{count}})"
+    },
+    "glance": {
+      "badge": "At a Glance",
+      "title": "Browse our stock",
+      "subtitle": "Quick filters to find your perfect car",
+      "viewAll": "View all {{body}} →",
+      "priceRange": "Price range",
+      "newestYear": "Newest model year",
+      "avgMileage": "Avg. mileage"
+    },
+    "usps": {
+      "badge": "Why Choose Us",
+      "title": "Why Buy From {{name}}?"
+    },
+    "about": {
+      "badge": "About",
+      "title": "About {{name}}",
+      "followUs": "Follow us:"
+    },
+    "contactCard": {
+      "title": "Contact Information",
+      "phone": "Phone",
+      "email": "Email",
+      "location": "Location",
+      "website": "Website",
+      "visitWebsite": "Visit Website",
+      "enquireNow": "Enquire Now",
+      "findUs": "Find us",
+      "getDirections": "Get directions →"
+    },
+    "featuredBanner": {
+      "badge": "Featured",
+      "title": "Spotlight Vehicles",
+      "viewAll": "View All"
+    },
+    "howBuying": {
+      "badge": "Simple Process",
+      "title": "How buying from us works",
+      "subtitle": "From browsing to driving away — a simple, transparent journey in 4 steps.",
+      "step1Title": "Browse",
+      "step1Desc": "Explore our verified inventory, with detailed specs and full photo galleries.",
+      "step2Title": "Enquire",
+      "step2Desc": "Ask questions, request a video walkaround or book a test drive.",
+      "step3Title": "Reserve",
+      "step3Desc": "Secure your car with a small refundable deposit. We handle the paperwork.",
+      "step4Title": "Drive away",
+      "step4Desc": "Collect in person or have it delivered to your door, fully prepared and inspected."
+    },
+    "trustBadges": {
+      "hpiChecked": "All cars HPI checked",
+      "verifiedDealer": "Verified dealer",
+      "partExchange": "Part-exchange welcome",
+      "financeAvailable": "Finance available"
+    },
+    "accreditations": {
+      "title": "Trusted accreditations & partners",
+      "fca": "FCA Authorised",
+      "rac": "RAC Approved",
+      "aa": "AA Inspected",
+      "hpi": "HPI Checked",
+      "trustpilot": "Trustpilot 5★",
+      "autoTrader": "Auto Trader Partner"
+    },
+    "inventory": {
+      "title": "Our Inventory",
+      "vehiclesAvailable": "{{count}} vehicle{{plural}} available",
+      "matches": "{{count}} match{{plural}}",
+      "budget": "Budget:",
+      "under": "Under {{price}}",
+      "clear": "Clear",
+      "searchPlaceholder": "Search make, model...",
+      "allFuels": "All Fuels",
+      "allTypes": "All Types",
+      "newestFirst": "Newest First",
+      "priceLowHigh": "Price: Low–High",
+      "priceHighLow": "Price: High–Low",
+      "yearNewest": "Year: Newest",
+      "mileageLowest": "Mileage: Lowest",
+      "noMatching": "No matching vehicles",
+      "noneYet": "No vehicles listed yet",
+      "tryAdjusting": "Try adjusting your search",
+      "checkBackSoon": "Check back soon for new inventory",
+      "showAll": "Show All {{count}} Vehicles"
+    },
+    "recentlyViewed": {
+      "badge": "Recently Viewed",
+      "title": "Pick up where you left off"
+    },
+    "partExchange": {
+      "badge": "Part-Exchange",
+      "title": "Trade in your current car",
+      "subtitle": "Get an instant valuation and use it as part-payment toward any vehicle in our showroom. Free, no-obligation offers — usually within minutes.",
+      "getValuation": "Get my valuation",
+      "talkToUs": "Talk to us"
+    },
+    "financeBar": {
+      "representative": "Representative {{apr}}% APR.",
+      "disclaimer": "We are a credit broker, not a lender. Finance is subject to status. Terms and conditions apply."
+    },
+    "financeCta": {
+      "defaultTitle": "Need Finance? We Can Help",
+      "subtitle": "Flexible finance options available on all vehicles. Get a quick quote with no impact on your credit score.",
+      "getQuote": "Get a Finance Quote"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Frequently asked questions",
+      "subtitle": "Everything you need to know about buying from {{name}}. Can't find what you're looking for? Get in touch — we're happy to help.",
+      "askQuestion": "Ask us a question",
+      "defaults": {
+        "q1": "Do you offer finance?",
+        "a1": "Yes — we work with a panel of trusted lenders to offer competitive PCP, HP and personal loan packages on every vehicle. Representative {{apr}} APR. We are a credit broker, not a lender.",
+        "q2": "Will you take my car in part-exchange?",
+        "a2": "Absolutely. We accept part-exchanges on any vehicle in our showroom. Get an instant online valuation or bring your car in — our team will give you a fair, no-obligation offer in minutes.",
+        "q3": "Are your cars HPI checked?",
+        "a3": "Every vehicle we sell is fully HPI checked, has a verified mileage history and comes with a comprehensive multi-point inspection. You can review the full report on each listing.",
+        "q4": "Can you deliver the car to me?",
+        "a4": "Yes — we offer nationwide UK delivery. Delivery costs are calculated based on distance and vehicle, and your car arrives fully prepared, valeted and ready to drive.",
+        "q5": "What warranty do you provide?",
+        "a5": "All our vehicles come with a minimum 3-month comprehensive warranty as standard, with extended warranty options available at point of sale.",
+        "q6": "Can I reserve a car online?",
+        "a6": "Yes — secure any vehicle in our stock with a small refundable deposit. Your car will be held for you while we arrange viewing, finance or delivery."
+      }
+    },
+    "testimonials": {
+      "badge": "Reviews",
+      "title": "What Our Customers Say"
+    },
+    "openingHours": {
+      "title": "Opening hours",
+      "openNow": "Open now",
+      "closed": "Closed",
+      "visitUs": "Visit us at {{location}}. Walk-ins welcome during opening hours.",
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "byAppointment": "By appointment"
+    },
+    "ctaFooter": {
+      "title": "Ready to find your next car?",
+      "subtitle": "Contact us today or browse our full range of quality vehicles",
+      "whatsapp": "WhatsApp",
+      "emailUs": "Email Us",
+      "established": "Established",
+      "companyNo": "Company No.",
+      "vatNo": "VAT No.",
+      "fcaReference": "FCA Reference"
+    },
+    "financeDialog": {
+      "title": "Finance estimator"
+    }
   }
 }
