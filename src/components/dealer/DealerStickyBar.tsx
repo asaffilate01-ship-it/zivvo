@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Phone, MessageCircle, Mail } from "lucide-react";
 
@@ -11,6 +12,7 @@ interface DealerStickyBarProps {
 }
 
 const DealerStickyBar = ({ phone, email, whatsapp, accent, onEnquireClick }: DealerStickyBarProps) => {
+  const { t } = useTranslation();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const DealerStickyBar = ({ phone, email, whatsapp, accent, onEnquireClick }: Dea
         {phone && (
           <a href={`tel:${phone}`} className="flex-1">
             <Button size="sm" variant="outline" className="w-full">
-              <Phone className="mr-1 h-3.5 w-3.5" /> Call
+              <Phone className="mr-1 h-3.5 w-3.5" /> {t("dealer.stickyBar.call")}
             </Button>
           </a>
         )}
@@ -40,7 +42,7 @@ const DealerStickyBar = ({ phone, email, whatsapp, accent, onEnquireClick }: Dea
             className="flex-1"
           >
             <Button size="sm" className="w-full bg-[#25D366] text-white hover:bg-[#20BD5A]">
-              <MessageCircle className="mr-1 h-3.5 w-3.5" /> WhatsApp
+              <MessageCircle className="mr-1 h-3.5 w-3.5" /> {t("dealer.stickyBar.whatsapp")}
             </Button>
           </a>
         )}
@@ -50,7 +52,7 @@ const DealerStickyBar = ({ phone, email, whatsapp, accent, onEnquireClick }: Dea
           className="flex-1 border-0 text-white"
           style={{ backgroundColor: accent }}
         >
-          <Mail className="mr-1 h-3.5 w-3.5" /> Enquire
+          <Mail className="mr-1 h-3.5 w-3.5" /> {t("dealer.stickyBar.enquire")}
         </Button>
       </div>
     </div>

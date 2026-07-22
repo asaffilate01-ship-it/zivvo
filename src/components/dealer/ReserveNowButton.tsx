@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ interface Props {
 }
 
 const ReserveNowButton = ({ listingId, dealerId, listingTitle, accent, defaultAmount = 200 }: Props) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,7 +27,7 @@ const ReserveNowButton = ({ listingId, dealerId, listingTitle, accent, defaultAm
 
   const submit = async () => {
     if (!form.buyer_name || !form.buyer_email || !form.amount) {
-      toast({ title: "Missing info", description: "Name, email and amount required", variant: "destructive" });
+      toast({ title: t("dealer.reserveNow.missingInfoTitle"), description: t("dealer.reserveNow.missingInfoDescription"), variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -37,10 +39,10 @@ const ReserveNowButton = ({ listingId, dealerId, listingTitle, accent, defaultAm
       if (data?.url) {
         window.location.href = data.url;
       } else {
-        throw new Error(data?.error || "Could not start payment");
+        throw new Error(data?.error || t("dealer.reserveNow.couldNotStartPayment"));
       }
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("common.error"), description: err.message, variant: "destructive" });
       setLoading(false);
     }
   };
@@ -53,27 +55,27 @@ const ReserveNowButton = ({ listingId, dealerId, listingTitle, accent, defaultAm
           className="border-0 text-white"
           style={accent ? { backgroundColor: accent } : undefined}
         >
-          <CreditCard className="mr-2 h-5 w-5" /> Reserve Now
+          <CreditCard className="mr-2 h-5 w-5" /> {t("dealer.reserveNow.reserveNow")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reserve {listingTitle}</DialogTitle>
+          <DialogTitle>{t("dealer.reserveNow.reserveTitle", { title: listingTitle })}</DialogTitle>
           <DialogDescription className="flex items-start gap-2 pt-2">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            <span>Pay a refundable deposit to reserve this vehicle for 7 days. Fully refundable if you change your mind.</span>
+            <span>{t("dealer.reserveNow.description")}</span>
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-3 py-2">
-          <div><Label>Full Name *</Label><Input value={form.buyer_name} onChange={e => setForm({ ...form, buyer_name: e.target.value })} /></div>
-          <div><Label>Email *</Label><Input type="email" value={form.buyer_email} onChange={e => setForm({ ...form, buyer_email: e.target.value })} /></div>
-          <div><Label>Phone</Label><Input value={form.buyer_phone} onChange={e => setForm({ ...form, buyer_phone: e.target.value })} /></div>
-          <div><Label>Deposit Amount (£)</Label><Input type="number" min={50} max={5000} value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} /></div>
+          <div><Label>{t("dealer.reserveNow.fullName")}</Label><Input value={form.buyer_name} onChange={e => setForm({ ...form, buyer_name: e.target.value })} /></div>
+          <div><Label>{t("dealer.reserveNow.email")}</Label><Input type="email" value={form.buyer_email} onChange={e => setForm({ ...form, buyer_email: e.target.value })} /></div>
+          <div><Label>{t("dealer.reserveNow.phone")}</Label><Input value={form.buyer_phone} onChange={e => setForm({ ...form, buyer_phone: e.target.value })} /></div>
+          <div><Label>{t("dealer.reserveNow.depositAmount")}</Label><Input type="number" min={50} max={5000} value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} /></div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
           <Button onClick={submit} disabled={loading} className="border-0 text-white" style={accent ? { backgroundColor: accent } : undefined}>
-            {loading ? "Redirecting…" : `Pay £${form.amount} & Reserve`}
+            {loading ? t("dealer.reserveNow.redirecting") : t("dealer.reserveNow.payAndReserve", { amount: form.amount })}
           </Button>
         </DialogFooter>
       </DialogContent>

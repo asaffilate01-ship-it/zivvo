@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ interface Props {
 }
 
 const TransportQuoteDialog = ({ listingId, dealerId, trigger }: Props) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,7 @@ const TransportQuoteDialog = ({ listingId, dealerId, trigger }: Props) => {
   const submit = async () => {
     const parsed = schema.safeParse(form);
     if (!parsed.success) {
-      toast({ title: "Check your details", description: "Please enter name, email and postcode.", variant: "destructive" });
+      toast({ title: t("dealer.transportQuote.checkDetailsTitle"), description: t("dealer.transportQuote.checkDetailsDescription"), variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -46,8 +48,8 @@ const TransportQuoteDialog = ({ listingId, dealerId, trigger }: Props) => {
       status: "pending",
     });
     setLoading(false);
-    if (error) { toast({ title: "Failed", description: error.message, variant: "destructive" }); return; }
-    toast({ title: "Quote requested", description: "The dealer will get back to you with delivery options." });
+    if (error) { toast({ title: t("dealer.transportQuote.failedTitle"), description: error.message, variant: "destructive" }); return; }
+    toast({ title: t("dealer.transportQuote.requestedTitle"), description: t("dealer.transportQuote.requestedDescription") });
     setOpen(false);
     setForm({ name: "", email: "", phone: "", delivery_postcode: "", notes: "" });
   };
@@ -55,29 +57,29 @@ const TransportQuoteDialog = ({ listingId, dealerId, trigger }: Props) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger ?? <Button variant="outline"><Truck className="w-4 h-4 mr-2" /> Delivery quote</Button>}
+        {trigger ?? <Button variant="outline"><Truck className="w-4 h-4 mr-2" /> {t("dealer.transportQuote.trigger")}</Button>}
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Get a delivery quote</DialogTitle>
-          <DialogDescription>We'll send you a transport quote to your postcode.</DialogDescription>
+          <DialogTitle>{t("dealer.transportQuote.title")}</DialogTitle>
+          <DialogDescription>{t("dealer.transportQuote.description")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <div><Label className="text-xs">Name</Label>
+            <div><Label className="text-xs">{t("dealer.transportQuote.name")}</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-            <div><Label className="text-xs">Phone</Label>
+            <div><Label className="text-xs">{t("dealer.transportQuote.phone")}</Label>
               <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           </div>
-          <div><Label className="text-xs">Email</Label>
+          <div><Label className="text-xs">{t("dealer.transportQuote.email")}</Label>
             <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-          <div><Label className="text-xs">Delivery postcode</Label>
+          <div><Label className="text-xs">{t("dealer.transportQuote.deliveryPostcode")}</Label>
             <Input value={form.delivery_postcode} onChange={(e) => setForm({ ...form, delivery_postcode: e.target.value })} /></div>
-          <div><Label className="text-xs">Notes (optional)</Label>
+          <div><Label className="text-xs">{t("dealer.transportQuote.notes")}</Label>
             <Textarea rows={3} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
           <Button onClick={submit} disabled={loading} className="w-full">
             {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Truck className="w-4 h-4 mr-2" />}
-            Request quote
+            {t("dealer.transportQuote.requestQuote")}
           </Button>
         </div>
       </DialogContent>

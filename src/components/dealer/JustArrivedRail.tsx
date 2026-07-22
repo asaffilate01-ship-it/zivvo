@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -19,6 +20,7 @@ interface Item {
 }
 
 const JustArrivedRail = ({ dealerId, days = 14 }: Props) => {
+  const { t } = useTranslation();
   const { config } = useCountry();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,10 +49,10 @@ const JustArrivedRail = ({ dealerId, days = 14 }: Props) => {
         <div className="flex items-end justify-between mb-5">
           <div>
             <Badge variant="secondary" className="mb-2">
-              <Sparkles className="w-3 h-3 mr-1" /> Just Arrived
+              <Sparkles className="w-3 h-3 mr-1" /> {t("dealer.justArrived.badge")}
             </Badge>
-            <h2 className="text-2xl md:text-3xl font-bold">New into stock</h2>
-            <p className="text-sm text-muted-foreground">Vehicles added in the last {days} days</p>
+            <h2 className="text-2xl md:text-3xl font-bold">{t("dealer.justArrived.heading")}</h2>
+            <p className="text-sm text-muted-foreground">{t("dealer.justArrived.subtitle", { days })}</p>
           </div>
         </div>
 
@@ -62,16 +64,16 @@ const JustArrivedRail = ({ dealerId, days = 14 }: Props) => {
                   {c.images?.[0] && (
                     <img src={c.images[0]} alt={c.title} className="w-full h-full object-cover" loading="lazy" />
                   )}
-                  <Badge className="absolute top-2 left-2">New in</Badge>
+                  <Badge className="absolute top-2 left-2">{t("dealer.justArrived.newIn")}</Badge>
                 </div>
                 <div className="p-3">
                   <div className="font-semibold text-sm line-clamp-1">{c.title}</div>
                   <div className="text-xs text-muted-foreground mb-2">
-                    {c.year}{c.mileage ? ` · ${c.mileage.toLocaleString()} mi` : ""}
+                    {c.year}{c.mileage ? ` · ${t("dealer.justArrived.mileage", { count: c.mileage.toLocaleString() })}` : ""}
                   </div>
                   <div className="font-bold text-primary">
                     {formatPrice(c.price, config)}
-                    {c.vat_qualifying && <span className="text-xs text-muted-foreground ml-1">+ VAT</span>}
+                    {c.vat_qualifying && <span className="text-xs text-muted-foreground ml-1">{t("dealer.justArrived.plusVat")}</span>}
                   </div>
                 </div>
               </Card>
