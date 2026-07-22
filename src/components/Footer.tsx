@@ -1,83 +1,79 @@
 import { Link } from "react-router-dom";
-import CountrySwitcher from "@/components/CountrySwitcher";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import zivvoLogo from "@/assets/zivvo-logo.png";
 
-const footerSections = [
-  {
-    title: "Marketplace",
-    links: [
-      { label: "Browse Cars", to: "/browse" },
-      { label: "Sell Your Car", to: "/sell" },
-      { label: "Saved Cars", to: "/saved" },
-      { label: "Compare Cars", to: "/compare" },
-      { label: "Blog & Guides", to: "/blog" },
-    ],
-  },
-  {
-    title: "For Business",
-    links: [
-      { label: "Dealer Plans", to: "/dealers" },
-      { label: "Trade Stock", to: "/trade-stock" },
-      { label: "Agent Program", to: "/contact" },
-      { label: "Dealer Dashboard", to: "/dashboard" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "Help Centre", to: "/help" },
-      { label: "Contact Us", to: "/contact" },
-      { label: "Complaints", to: "/complaints" },
-      { label: "Accessibility", to: "/accessibility" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { label: "Privacy Policy", to: "/privacy" },
-      { label: "Terms of Service", to: "/terms" },
-      { label: "Cookie Policy", to: "/cookies" },
-      { label: "GDPR & Data Rights", to: "/gdpr" },
-      { label: "Modern Slavery", to: "/modern-slavery" },
-    ],
-  },
-];
-
 const Footer = () => {
+  const { t } = useTranslation();
+
+  const footerSections = [
+    {
+      title: t("footer.sections.marketplace"),
+      links: [
+        { label: t("footer.links.browseCars"), to: "/browse" },
+        { label: t("footer.links.sellYourCar"), to: "/sell" },
+        { label: t("footer.links.savedCars"), to: "/saved" },
+        { label: t("footer.links.compareCars"), to: "/compare" },
+        { label: t("footer.links.blogGuides"), to: "/blog" },
+      ],
+    },
+    {
+      title: t("footer.sections.business"),
+      links: [
+        { label: t("footer.links.dealerPlans"), to: "/dealers" },
+        { label: t("footer.links.tradeStock"), to: "/trade-stock" },
+        { label: t("footer.links.financing"), to: "/finance" },
+        { label: t("footer.links.dealerDashboard"), to: "/dashboard" },
+      ],
+    },
+    {
+      title: t("footer.sections.company"),
+      links: [
+        { label: t("footer.links.helpCentre"), to: "/help" },
+        { label: t("footer.links.contactUs"), to: "/contact" },
+        { label: t("footer.links.complaints"), to: "/complaints" },
+        { label: t("footer.links.accessibility"), to: "/accessibility" },
+      ],
+    },
+    {
+      title: t("footer.sections.legal"),
+      links: [
+        { label: t("footer.links.privacyPolicy"), to: "/privacy" },
+        { label: t("footer.links.terms"), to: "/terms" },
+        { label: t("footer.links.cookiePolicy"), to: "/cookies" },
+        { label: t("footer.links.gdpr"), to: "/gdpr" },
+        { label: t("footer.links.impressum"), to: "/modern-slavery" },
+      ],
+    },
+  ];
+
   return (
     <footer className="border-t border-border bg-card">
       <div className="container mx-auto px-4 py-14">
         <div className="grid gap-10 md:grid-cols-6">
-          {/* Brand */}
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center gap-2.5" aria-label="Zivvo home">
-              <img src={zivvoLogo} alt="Zivvo — Vehicle Marketplace" className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200" />
+            <Link to="/" className="flex items-center gap-2.5" aria-label="Zivvo">
+              <img src={zivvoLogo} alt={`Zivvo — ${t("brand.tagline")}`} className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-              The trusted marketplace for buying and selling vehicles. Verified listings, transparent history, and secure transactions.
+              {t("footer.tagline")}
             </p>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Zivvo Ltd · Registered in England & Wales · Company No. 00000000<br />
-              Registered office: 1 Example Street, London, EC1A 1AA<br />
-              ICO Registration: ZA000000 · VAT: GB 000 0000 00
+            <p className="mt-3 whitespace-pre-line text-xs text-muted-foreground">
+              {t("footer.companyInfo")}
             </p>
             <div className="mt-5 flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-success" />
-              All systems operational
+              {t("footer.operational")}
             </div>
           </div>
 
-          {/* Links */}
           {footerSections.map((section) => (
             <div key={section.title}>
               <h4 className="font-display text-sm font-semibold text-foreground">{section.title}</h4>
               <ul className="mt-4 space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                    >
+                    <Link to={link.to} className="text-sm text-muted-foreground transition-colors hover:text-primary">
                       {link.label}
                     </Link>
                   </li>
@@ -87,30 +83,23 @@ const Footer = () => {
           ))}
         </div>
 
-        {/* Country Switcher + Bottom Bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 sm:flex-row">
+          <p className="text-xs text-muted-foreground">
+            {t("footer.copyright", { year: new Date().getFullYear() })}
+          </p>
+
           <div className="flex items-center gap-4">
-            <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Zivvo. All rights reserved.
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <CountrySwitcher variant="full" />
+            <LanguageSwitcher variant="full" />
             <div className="flex gap-6">
-              {[
-                { label: "Privacy", to: "/privacy" },
-                { label: "Terms", to: "/terms" },
-                { label: "Cookies", to: "/privacy#cookies" },
-              ].map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  className="text-xs text-muted-foreground transition-colors hover:text-primary"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              <Link to="/privacy" className="text-xs text-muted-foreground transition-colors hover:text-primary">
+                {t("footer.links.privacy")}
+              </Link>
+              <Link to="/terms" className="text-xs text-muted-foreground transition-colors hover:text-primary">
+                {t("footer.links.terms")}
+              </Link>
+              <Link to="/cookies" className="text-xs text-muted-foreground transition-colors hover:text-primary">
+                {t("footer.links.cookies")}
+              </Link>
             </div>
           </div>
         </div>
