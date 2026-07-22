@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { TrendingDown, TrendingUp, Minus, Award, Loader2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
+
 
 type PriceRating = "great" | "good" | "fair" | "high";
 
@@ -24,12 +26,13 @@ interface PriceIndicatorBadgeProps {
   className?: string;
 }
 
-const ratingConfig: Record<PriceRating, { label: string; icon: typeof Award; className: string }> = {
-  great: { label: "Great Price", icon: Award, className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
-  good: { label: "Good Price", icon: TrendingDown, className: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/20" },
-  fair: { label: "Fair Price", icon: Minus, className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/20" },
-  high: { label: "Above Market", icon: TrendingUp, className: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/20" },
+const ratingConfig: Record<PriceRating, { labelKey: string; icon: typeof Award; className: string }> = {
+  great: { labelKey: "priceIndicator.great", icon: Award, className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
+  good: { labelKey: "priceIndicator.good", icon: TrendingDown, className: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/20" },
+  fair: { labelKey: "priceIndicator.fair", icon: Minus, className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/20" },
+  high: { labelKey: "priceIndicator.high", icon: TrendingUp, className: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/20" },
 };
+
 
 // In-memory caches to prevent duplicate checks and repeated failing calls
 const priceCache = new Map<string, PriceCheckResult>();
@@ -37,8 +40,10 @@ const inFlightChecks = new Map<string, Promise<PriceCheckResult | null>>();
 let aiCreditsExhausted = false;
 
 const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB", className = "" }: PriceIndicatorBadgeProps) => {
+  const { t } = useTranslation();
   const [result, setResult] = useState<PriceCheckResult | null>(null);
   const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     if (!make || !model || !year || !price) return;
@@ -130,7 +135,7 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
     return (
       <Badge variant="outline" className={`text-[10px] text-muted-foreground gap-0.5 ${className}`}>
         <Loader2 className="h-3 w-3 animate-spin" />
-        Checking...
+        {t("priceIndicator.checking")}
       </Badge>
     );
   }
@@ -139,6 +144,7 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
 
   const config = ratingConfig[result.rating];
   const Icon = config.icon;
+  const currencySymbol = country === "DE" ? "€" : country === "US" ? "$" : country === "AE" ? "AED " : country === "PK" ? "₨" : "£";
 
   return (
     <TooltipProvider>
@@ -146,13 +152,14 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
         <TooltipTrigger asChild>
           <Badge variant="outline" className={`${config.className} text-[10px] font-semibold gap-0.5 cursor-help ${className}`}>
             <Icon className="h-3 w-3" />
-            {config.label}
+            {t(config.labelKey)}
           </Badge>
         </TooltipTrigger>
         <TooltipContent className="text-xs max-w-[220px]">
           <p>{result.explanation}</p>
           {result.market_average > 0 && (
-            <p className="mt-1 text-muted-foreground">Market avg: £{result.market_average.toLocaleString()}</p>
+            <p className="mt-1 text-muted-foreground">{t("priceIndicator.marketAvg")}: {currencySymbol}{result.market_average.toLocaleString()}</p>
+
           )}
         </TooltipContent>
       </Tooltip>

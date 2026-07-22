@@ -2839,5 +2839,14 @@
       "on": "AN",
       "off": "AUS"
     }
+  },
+  "priceIndicator": {
+    "checking": "Wird geprüft...",
+    "great": "Top-Preis",
+    "good": "Guter Preis",
+    "fair": "Fairer Preis",
+    "high": "Über Marktpreis",
+    "marketAvg": "Marktdurchschnitt"
   }
 }
+

@@ -2839,5 +2839,14 @@
       "on": "ON",
       "off": "OFF"
     }
+  },
+  "priceIndicator": {
+    "checking": "Checking...",
+    "great": "Great Price",
+    "good": "Good Price",
+    "fair": "Fair Price",
+    "high": "Above Market",
+    "marketAvg": "Market avg"
   }
 }
+
