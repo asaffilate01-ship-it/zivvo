@@ -242,7 +242,7 @@ const DealerPricing = () => {
       <section className="border-b border-border bg-muted/30">
         <div className="container mx-auto px-4 py-10">
           <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Portal-Synchronisation zu den führenden deutschen Marktplätzen
+            {t("pricing.portalSync")}
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-12">
             {partners.map((name) => (
