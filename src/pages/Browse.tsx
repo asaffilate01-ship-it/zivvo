@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CarCard from "@/components/CarCard";
+import SponsoredAdCard from "@/components/SponsoredAdCard";
 import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import SEOHead from "@/components/SEOHead";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
@@ -612,7 +613,10 @@ const Browse = () => {
                       : "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
                   }>
                     {listings.map((car, i) => (
-                      <CarCard key={car.id} car={car} index={i} layout={viewMode} />
+                      <Fragment key={car.id}>
+                        <CarCard car={car} index={i} layout={viewMode} />
+                        {i === 3 && viewMode === "grid" && <SponsoredAdCard />}
+                      </Fragment>
                     ))}
                   </div>
                 )}
