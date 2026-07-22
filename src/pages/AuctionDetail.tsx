@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
+import { useTranslation } from "react-i18next";
 
 const formatCurrency = (amount: number, country: string) => {
   const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.DE;
@@ -40,6 +41,7 @@ const AuctionDetail = () => {
   const { user } = useAuth();
   const { country } = useCountry();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [bidAmount, setBidAmount] = useState("");
   const [maxAutoBid, setMaxAutoBid] = useState("");
   const [useAutoBid, setUseAutoBid] = useState(false);
@@ -55,7 +57,7 @@ const AuctionDetail = () => {
   // Handle payment success redirect
   useEffect(() => {
     if (searchParams.get("payment") === "success") {
-      toast.success("Payment successful! Your purchase is being processed.");
+      toast.success(t("auctionDetail.toasts.paymentSuccess"));
       queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
     }
   }, [searchParams]);
@@ -162,7 +164,7 @@ const AuctionDetail = () => {
     if (!auction?.ends_at) return;
     const tick = () => {
       const diff = new Date(auction.ends_at).getTime() - Date.now();
-      if (diff <= 0) { setTimeLeft("Auction Ended"); return; }
+      if (diff <= 0) { setTimeLeft(t("auctionDetail.sidebar.auctionEnded")); return; }
       const d = Math.floor(diff / 86400000);
       const h = Math.floor((diff % 86400000) / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
@@ -176,7 +178,7 @@ const AuctionDetail = () => {
 
   const toggleWatch = useMutation({
     mutationFn: async () => {
-      if (!user || !id) throw new Error("Login required");
+      if (!user || !id) throw new Error(t("auctionDetail.errors.loginRequired"));
       if (isWatching) {
         await supabase.from("auction_watchers").delete().eq("auction_id", id).eq("user_id", user.id);
       } else {
@@ -186,22 +188,22 @@ const AuctionDetail = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auction-watching", id, user?.id] });
       queryClient.invalidateQueries({ queryKey: ["auction", id] });
-      toast.success(isWatching ? "Removed from watchlist" : "Added to watchlist");
+      toast.success(isWatching ? t("auctionDetail.toasts.watchRemoved") : t("auctionDetail.toasts.watchAdded"));
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const placeBid = useMutation({
     mutationFn: async () => {
-      if (!user || !auction) throw new Error("Login required");
+      if (!user || !auction) throw new Error(t("auctionDetail.errors.loginRequired"));
       const amount = parseFloat(bidAmount);
       const minBid = (auction.current_bid > 0 ? auction.current_bid : auction.starting_price) + getMinIncrement(auction.current_bid || auction.starting_price);
-      if (amount < minBid) throw new Error(`Minimum bid is ${formatCurrency(minBid, country)}`);
-      if (user.id === auction.seller_id) throw new Error("You cannot bid on your own auction");
+      if (amount < minBid) throw new Error(t("auctionDetail.errors.minimumBid", { amount: formatCurrency(minBid, country) }));
+      if (user.id === auction.seller_id) throw new Error(t("auctionDetail.errors.cannotBidOwnAuction"));
 
       // Check deposit
       if (!deposit || deposit.status !== "authorized") {
-        throw new Error("You need to pre-authorize a deposit before bidding");
+        throw new Error(t("auctionDetail.errors.depositRequired"));
       }
 
       const bidData: any = {
@@ -213,7 +215,7 @@ const AuctionDetail = () => {
 
       if (useAutoBid && maxAutoBid) {
         const maxAuto = parseFloat(maxAutoBid);
-        if (maxAuto < amount) throw new Error("Max auto-bid must be higher than your bid");
+        if (maxAuto < amount) throw new Error(t("auctionDetail.errors.maxAutoBidTooLow"));
         bidData.max_auto_bid = maxAuto;
       }
 
@@ -221,7 +223,7 @@ const AuctionDetail = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Bid placed successfully!");
+      toast.success(t("auctionDetail.toasts.bidPlaced"));
       setBidAmount("");
       setMaxAutoBid("");
       setShowBidConfirm(false);
@@ -243,11 +245,11 @@ const AuctionDetail = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Contract signed successfully!");
+      toast.success(t("auctionDetail.toasts.contractSigned"));
       queryClient.invalidateQueries({ queryKey: ["auction-contract", id] });
       setShowContract(false);
     },
-    onError: () => toast.error("Failed to sign contract"),
+    onError: () => toast.error(t("auctionDetail.toasts.contractSignFailed")),
   });
 
   const confirmHandover = useMutation({
@@ -260,10 +262,10 @@ const AuctionDetail = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Handover step confirmed!");
+      toast.success(t("auctionDetail.toasts.handoverConfirmed"));
       queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
     },
-    onError: () => toast.error("Failed to confirm"),
+    onError: () => toast.error(t("auctionDetail.toasts.handoverFailed")),
   });
 
   const requestDeposit = useMutation({
@@ -275,13 +277,13 @@ const AuctionDetail = () => {
 
   const payWinnerBalance = useMutation({
     mutationFn: async () => {
-      if (!user || !auction) throw new Error("Login required");
+      if (!user || !auction) throw new Error(t("auctionDetail.errors.loginRequired"));
       const { data, error } = await supabase.functions.invoke("winner-payment", {
         body: { auction_id: auction.id },
       });
       if (error) throw error;
       if (data?.fully_paid) {
-        toast.success("Payment complete! Deposit covered the full amount.");
+        toast.success(t("auctionDetail.toasts.paymentComplete"));
         queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
         return;
       }
@@ -293,7 +295,7 @@ const AuctionDetail = () => {
   });
 
   if (isLoading) return (<><Navbar /><div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div></>);
-  if (!auction) return (<><Navbar /><div className="min-h-screen flex items-center justify-center"><p>Auction not found</p></div></>);
+  if (!auction) return (<><Navbar /><div className="min-h-screen flex items-center justify-center"><p>{t("auctionDetail.notFound")}</p></div></>);
 
   const listing = auction.car_listings as any;
   const images = listing?.images || ["/placeholder.svg"];
@@ -308,13 +310,13 @@ const AuctionDetail = () => {
 
   return (
     <>
-      <SEOHead title={`${listing?.year} ${listing?.make} ${listing?.model} — Auction`} description={`Bid on this inspected ${listing?.make} ${listing?.model}. Condition rated ${auction.inspection_rating}/5. HPI checked.`} />
+      <SEOHead title={t("auctionDetail.seo.title", { year: listing?.year, make: listing?.make, model: listing?.model })} description={t("auctionDetail.seo.description", { make: listing?.make, model: listing?.model, rating: auction.inspection_rating })} />
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-6">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-            <Link to="/auctions" className="hover:text-primary">Auctions</Link>
+            <Link to="/auctions" className="hover:text-primary">{t("auctionDetail.breadcrumb")}</Link>
             <ChevronRight className="w-3 h-3" />
             <span className="text-foreground font-medium">{listing?.year} {listing?.make} {listing?.model}</span>
           </div>
@@ -334,8 +336,8 @@ const AuctionDetail = () => {
                   </>
                 )}
                 <div className="absolute top-3 left-3 flex gap-2">
-                  {isLive && <Badge className="bg-red-500 text-white border-0 animate-pulse"><span className="w-1.5 h-1.5 bg-white rounded-full mr-1.5 inline-block" />LIVE</Badge>}
-                  {auction.inspection_rating && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><Star className="w-3 h-3 mr-1 fill-primary text-primary" />{auction.inspection_rating}/5 Condition</Badge>}
+                  {isLive && <Badge className="bg-red-500 text-white border-0 animate-pulse"><span className="w-1.5 h-1.5 bg-white rounded-full mr-1.5 inline-block" />{t("auctionDetail.gallery.live")}</Badge>}
+                  {auction.inspection_rating && <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm"><Star className="w-3 h-3 mr-1 fill-primary text-primary" />{t("auctionDetail.gallery.condition", { rating: auction.inspection_rating })}</Badge>}
                 </div>
                 <div className="absolute top-3 right-3">
                   {user && (
@@ -345,7 +347,7 @@ const AuctionDetail = () => {
                   )}
                 </div>
                 <div className="absolute bottom-3 left-3 flex gap-2 text-xs">
-                  <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">{imageIdx + 1}/{images.length} photos</Badge>
+                  <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">{t("auctionDetail.gallery.photos", { current: imageIdx + 1, total: images.length })}</Badge>
                 </div>
               </div>
 
@@ -363,10 +365,10 @@ const AuctionDetail = () => {
               {/* Info Tabs */}
               <Tabs defaultValue="condition" className="w-full">
                 <TabsList className="w-full justify-start">
-                  <TabsTrigger value="condition">Condition Report</TabsTrigger>
-                  <TabsTrigger value="history">History & Checks</TabsTrigger>
-                  <TabsTrigger value="assets">What's Included</TabsTrigger>
-                  <TabsTrigger value="bids">Bid History ({bids.length})</TabsTrigger>
+                  <TabsTrigger value="condition">{t("auctionDetail.tabs.condition")}</TabsTrigger>
+                  <TabsTrigger value="history">{t("auctionDetail.tabs.history")}</TabsTrigger>
+                  <TabsTrigger value="assets">{t("auctionDetail.tabs.assets")}</TabsTrigger>
+                  <TabsTrigger value="bids">{t("auctionDetail.tabs.bids", { count: bids.length })}</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="condition" className="mt-4">
@@ -377,22 +379,22 @@ const AuctionDetail = () => {
                           <span className="text-2xl font-bold text-primary">{auction.inspection_rating || "—"}</span>
                         </div>
                         <div>
-                          <h3 className="font-semibold text-lg">Inspection Rating</h3>
-                          <p className="text-sm text-muted-foreground">Assessed by approved specialist</p>
+                          <h3 className="font-semibold text-lg">{t("auctionDetail.conditionTab.inspectionRating")}</h3>
+                          <p className="text-sm text-muted-foreground">{t("auctionDetail.conditionTab.assessedBy")}</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                          { icon: Paintbrush, label: "Paint Condition", value: conditionReport.paint_condition },
-                          { icon: Car, label: "Interior Condition", value: conditionReport.interior_condition },
-                          { icon: Wrench, label: "Mechanical Notes", value: conditionReport.mechanical_notes },
-                          { icon: Eye, label: "Tyres Condition", value: conditionReport.tyres_condition },
+                          { icon: Paintbrush, label: t("auctionDetail.conditionTab.paintCondition"), value: conditionReport.paint_condition },
+                          { icon: Car, label: t("auctionDetail.conditionTab.interiorCondition"), value: conditionReport.interior_condition },
+                          { icon: Wrench, label: t("auctionDetail.conditionTab.mechanicalNotes"), value: conditionReport.mechanical_notes },
+                          { icon: Eye, label: t("auctionDetail.conditionTab.tyresCondition"), value: conditionReport.tyres_condition },
                         ].map(({ icon: Icon, label, value }) => (
                           <div key={label} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                             <Icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                             <div>
                               <p className="font-medium text-sm">{label}</p>
-                              <p className="text-sm text-muted-foreground">{value || "Not assessed"}</p>
+                              <p className="text-sm text-muted-foreground">{value || t("auctionDetail.conditionTab.notAssessed")}</p>
                             </div>
                           </div>
                         ))}
@@ -406,10 +408,10 @@ const AuctionDetail = () => {
                     <CardContent className="p-6 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                          { label: "HPI Check", status: auction.hpi_clear, icon: Shield, ok: "Clear — No issues found", bad: "Pending" },
-                          { label: "Ownership Verified", status: auction.ownership_verified, icon: FileText, ok: "V5C confirmed with DVLA", bad: "Pending" },
-                          { label: "Seller Verified", status: auction.seller_verified, icon: CheckCircle2, ok: "Identity & address verified", bad: "Pending" },
-                          { label: "Accident History", status: !conditionReport.accident_history, icon: AlertTriangle, ok: "No accidents recorded", bad: conditionReport.accident_history || "Pending" },
+                          { label: t("auctionDetail.historyTab.hpiCheck"), status: auction.hpi_clear, icon: Shield, ok: t("auctionDetail.historyTab.hpiClear"), bad: t("auctionDetail.historyTab.pending") },
+                          { label: t("auctionDetail.historyTab.ownershipVerified"), status: auction.ownership_verified, icon: FileText, ok: t("auctionDetail.historyTab.ownershipOk"), bad: t("auctionDetail.historyTab.pending") },
+                          { label: t("auctionDetail.historyTab.sellerVerified"), status: auction.seller_verified, icon: CheckCircle2, ok: t("auctionDetail.historyTab.sellerVerifiedOk"), bad: t("auctionDetail.historyTab.pending") },
+                          { label: t("auctionDetail.historyTab.accidentHistory"), status: !conditionReport.accident_history, icon: AlertTriangle, ok: t("auctionDetail.historyTab.noAccidents"), bad: conditionReport.accident_history || t("auctionDetail.historyTab.pending") },
                         ].map(({ label, status, icon: Icon, ok, bad }) => (
                           <div key={label} className={`flex items-center gap-3 p-4 rounded-lg border ${status ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30" : "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30"}`}>
                             <Icon className={`w-5 h-5 ${status ? "text-emerald-600" : "text-amber-600"}`} />
@@ -429,10 +431,10 @@ const AuctionDetail = () => {
                     <CardContent className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                          { icon: Key, label: "Keys", value: conditionReport.keys_count ? `${conditionReport.keys_count} key(s)${conditionReport.spare_key ? " + spare" : ""}` : "Not specified" },
-                          { icon: FileText, label: "Service History", value: conditionReport.service_history || "Not specified" },
-                          { icon: Shield, label: "Warranty", value: conditionReport.warranty_info || "No warranty" },
-                          { icon: Car, label: "Additional Assets", value: conditionReport.assets_included || "None listed" },
+                          { icon: Key, label: t("auctionDetail.assetsTab.keys"), value: conditionReport.keys_count ? t("auctionDetail.assetsTab.keysCount", { count: conditionReport.keys_count, spare: conditionReport.spare_key ? t("auctionDetail.assetsTab.plusSpare") : "" }) : t("auctionDetail.assetsTab.notSpecified") },
+                          { icon: FileText, label: t("auctionDetail.assetsTab.serviceHistory"), value: conditionReport.service_history || t("auctionDetail.assetsTab.notSpecified") },
+                          { icon: Shield, label: t("auctionDetail.assetsTab.warranty"), value: conditionReport.warranty_info || t("auctionDetail.assetsTab.noWarranty") },
+                          { icon: Car, label: t("auctionDetail.assetsTab.additionalAssets"), value: conditionReport.assets_included || t("auctionDetail.assetsTab.noneListed") },
                         ].map(({ icon: Icon, label, value }) => (
                           <div key={label} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                             <Icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
@@ -448,9 +450,9 @@ const AuctionDetail = () => {
                           <div className="flex items-center gap-2">
                             <Truck className="w-5 h-5 text-primary" />
                             <div>
-                              <p className="font-medium text-sm">Delivery Available</p>
+                              <p className="font-medium text-sm">{t("auctionDetail.assetsTab.deliveryAvailable")}</p>
                               <p className="text-xs text-muted-foreground">
-                                Via our logistics partners{auction.delivery_cost_estimate ? ` — estimated ${formatCurrency(auction.delivery_cost_estimate, country)}` : ""}
+                                {t("auctionDetail.assetsTab.deliveryVia", { estimate: auction.delivery_cost_estimate ? t("auctionDetail.assetsTab.deliveryEstimate", { amount: formatCurrency(auction.delivery_cost_estimate, country) }) : "" })}
                               </p>
                             </div>
                           </div>
@@ -464,7 +466,7 @@ const AuctionDetail = () => {
                   <Card>
                     <CardContent className="p-6">
                       {bids.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-6">No bids yet. Be the first!</p>
+                        <p className="text-center text-muted-foreground py-6">{t("auctionDetail.bidsTab.noBids")}</p>
                       ) : (
                         <ScrollArea className="h-80">
                           <div className="space-y-2">
@@ -474,15 +476,15 @@ const AuctionDetail = () => {
                                   {i === 0 && <TrendingUp className="w-4 h-4 text-primary" />}
                                   <div>
                                     <p className="font-medium text-sm flex items-center gap-1.5">
-                                      {bid.bidder_id === user?.id ? "You" : `Bidder ***${bid.bidder_id.slice(-4)}`}
-                                      {bid.is_auto_bid && <Badge variant="outline" className="text-[9px] py-0"><Zap className="w-2.5 h-2.5 mr-0.5" />Auto</Badge>}
+                                      {bid.bidder_id === user?.id ? t("auctionDetail.bidsTab.you") : t("auctionDetail.bidsTab.bidderMasked", { last4: bid.bidder_id.slice(-4) })}
+                                      {bid.is_auto_bid && <Badge variant="outline" className="text-[9px] py-0"><Zap className="w-2.5 h-2.5 mr-0.5" />{t("auctionDetail.bidsTab.auto")}</Badge>}
                                     </p>
                                     <p className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleString()}</p>
                                   </div>
                                 </div>
                                 <div className="text-right">
                                   <p className={`font-bold ${i === 0 ? "text-primary" : ""}`}>{formatCurrency(bid.amount, country)}</p>
-                                  {bid.finance_preapproved && <Badge variant="outline" className="text-[9px] py-0">Finance</Badge>}
+                                  {bid.finance_preapproved && <Badge variant="outline" className="text-[9px] py-0">{t("auctionDetail.bidsTab.finance")}</Badge>}
                                 </div>
                               </div>
                             ))}
@@ -501,22 +503,22 @@ const AuctionDetail = () => {
               <Card className="border-primary/20 shadow-lg">
                 <CardContent className="p-6">
                   <div className="text-center mb-4">
-                    <p className="text-sm text-muted-foreground mb-1">{auction.bid_count > 0 ? "Current Bid" : "Starting Price"}</p>
+                    <p className="text-sm text-muted-foreground mb-1">{auction.bid_count > 0 ? t("auctionDetail.sidebar.currentBid") : t("auctionDetail.sidebar.startingPrice")}</p>
                     <p className="text-3xl font-bold text-primary">{formatCurrency(currentPrice, country)}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{auction.bid_count || 0} bids • {auction.watchers_count || 0} watchers</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t("auctionDetail.sidebar.bidsWatchers", { bids: auction.bid_count || 0, watchers: auction.watchers_count || 0 })}</p>
                   </div>
 
                   {!reserveMet && auction.status !== "draft" && (
                     <div className="flex items-center justify-center gap-1 mb-4">
                       <AlertTriangle className="w-3 h-3 text-amber-500" />
-                      <span className="text-xs text-amber-600 font-medium">Reserve not yet met</span>
+                      <span className="text-xs text-amber-600 font-medium">{t("auctionDetail.sidebar.reserveNotMet")}</span>
                     </div>
                   )}
 
                   <div className={`rounded-lg p-3 mb-4 text-center ${isLive ? "bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800" : "bg-muted"}`}>
                     <div className="flex items-center justify-center gap-2 mb-1">
                       <Clock className={`w-4 h-4 ${isLive ? "text-red-500" : "text-muted-foreground"}`} />
-                      <span className="text-xs font-medium">{isLive ? "Time Remaining" : "Auction " + auction.status}</span>
+                      <span className="text-xs font-medium">{isLive ? t("auctionDetail.sidebar.timeRemaining") : t("auctionDetail.sidebar.auctionStatus", { status: auction.status })}</span>
                     </div>
                     <p className={`text-xl font-bold font-mono ${isLive ? "text-red-600 dark:text-red-400" : ""}`}>{timeLeft || "—"}</p>
                   </div>
@@ -524,7 +526,7 @@ const AuctionDetail = () => {
                   {/* Watch button */}
                   {user && !isSeller && (
                     <Button variant="outline" className="w-full mb-3 gap-2" onClick={() => toggleWatch.mutate()} disabled={toggleWatch.isPending}>
-                      {isWatching ? <><HeartOff className="w-4 h-4" /> Unwatch</> : <><Heart className="w-4 h-4" /> Watch Auction</>}
+                      {isWatching ? <><HeartOff className="w-4 h-4" /> {t("auctionDetail.sidebar.unwatch")}</> : <><Heart className="w-4 h-4" /> {t("auctionDetail.sidebar.watchAuction")}</>}
                     </Button>
                   )}
 
@@ -536,14 +538,14 @@ const AuctionDetail = () => {
                           <div className="flex items-start gap-2">
                             <CreditCard className="w-4 h-4 text-amber-600 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">Verification Required</p>
-                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">Choose one option to start bidding:</p>
+                              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">{t("auctionDetail.sidebar.verificationRequired")}</p>
+                              <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">{t("auctionDetail.sidebar.chooseOption")}</p>
                               <div className="flex gap-2 mt-2">
                                 <Button size="sm" className="gap-1 flex-1" onClick={() => setShowDepositForm(true)}>
-                                  <CreditCard className="w-3 h-3" /> Card Deposit
+                                  <CreditCard className="w-3 h-3" /> {t("auctionDetail.sidebar.cardDeposit")}
                                 </Button>
                                 <Button size="sm" variant="outline" className="gap-1 flex-1" onClick={() => setShowFinanceForm(true)}>
-                                  <Banknote className="w-3 h-3" /> Finance
+                                  <Banknote className="w-3 h-3" /> {t("auctionDetail.sidebar.financeOption")}
                                 </Button>
                               </div>
                             </div>
@@ -583,14 +585,14 @@ const AuctionDetail = () => {
                         <div className="mb-3 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                           <span className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
-                            {deposit?.type === "finance_preapproval" ? "Finance pre-approved" : "Deposit pre-authorized"} — Ready to bid
+                            {deposit?.type === "finance_preapproval" ? t("auctionDetail.sidebar.financePreapproved") : t("auctionDetail.sidebar.depositPreauthorized")}{t("auctionDetail.sidebar.readyToBid")}
                           </span>
                         </div>
                       )}
 
                       <div className="space-y-3">
                         <div>
-                          <p className="text-xs text-muted-foreground mb-1">Your bid (min: {formatCurrency((currentPrice) + getMinIncrement(currentPrice), country)})</p>
+                          <p className="text-xs text-muted-foreground mb-1">{t("auctionDetail.sidebar.yourBidMin", { amount: formatCurrency((currentPrice) + getMinIncrement(currentPrice), country) })}</p>
                           <Input type="number" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} placeholder={`${(currentPrice + getMinIncrement(currentPrice))}`} className="text-lg font-semibold" disabled={!hasDeposit} />
                         </div>
 
@@ -598,41 +600,41 @@ const AuctionDetail = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Zap className="w-4 h-4 text-primary" />
-                            <Label className="text-sm cursor-pointer" htmlFor="auto-bid">Auto-bid (proxy)</Label>
+                            <Label className="text-sm cursor-pointer" htmlFor="auto-bid">{t("auctionDetail.sidebar.autoBid")}</Label>
                           </div>
                           <Switch id="auto-bid" checked={useAutoBid} onCheckedChange={setUseAutoBid} disabled={!hasDeposit} />
                         </div>
                         {useAutoBid && (
                           <div>
-                            <p className="text-xs text-muted-foreground mb-1">Maximum auto-bid ceiling</p>
+                            <p className="text-xs text-muted-foreground mb-1">{t("auctionDetail.sidebar.maxAutoBidCeiling")}</p>
                             <Input type="number" value={maxAutoBid} onChange={(e) => setMaxAutoBid(e.target.value)} placeholder="e.g. 15000" disabled={!hasDeposit} />
-                            <p className="text-[10px] text-muted-foreground mt-1">System bids minimum increments on your behalf up to this amount</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">{t("auctionDetail.sidebar.autoBidHint")}</p>
                           </div>
                         )}
 
                         <Button className="w-full h-12 text-lg gap-2" onClick={() => setShowBidConfirm(true)} disabled={!bidAmount || !hasDeposit}>
-                          <Gavel className="w-5 h-5" /> Place Bid
+                          <Gavel className="w-5 h-5" /> {t("auctionDetail.sidebar.placeBid")}
                         </Button>
                       </div>
                       <p className="text-[10px] text-muted-foreground text-center mt-2">
-                        3% buyer premium applies • Anti-sniping: bids in last 2 min extend auction
+                        {t("auctionDetail.sidebar.buyerPremiumNote")}
                       </p>
                     </>
                   )}
 
                   {!user && isLive && (
                     <div className="text-center">
-                      <p className="text-sm text-muted-foreground mb-3">Register & verify to bid</p>
-                      <Button asChild className="w-full"><Link to="/signup">Create Account</Link></Button>
+                      <p className="text-sm text-muted-foreground mb-3">{t("auctionDetail.sidebar.registerToBid")}</p>
+                      <Button asChild className="w-full"><Link to="/signup">{t("auctionDetail.sidebar.createAccount")}</Link></Button>
                     </div>
                   )}
 
                   {isSeller && (
                     <div className="text-center p-3 rounded-lg bg-muted">
-                      <p className="text-sm font-medium">This is your auction</p>
+                      <p className="text-sm font-medium">{t("auctionDetail.sidebar.yourAuction")}</p>
                       {auction.reserve_price && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          Reserve: {formatCurrency(auction.reserve_price, country)} {reserveMet ? "✅ Met" : "⏳ Not met"}
+                          {t("auctionDetail.sidebar.reserve", { amount: formatCurrency(auction.reserve_price, country), status: reserveMet ? t("auctionDetail.sidebar.reserveMet") : t("auctionDetail.sidebar.reserveNotMetShort") })}
                         </p>
                       )}
                     </div>
@@ -642,12 +644,12 @@ const AuctionDetail = () => {
 
               {/* Fee Breakdown */}
               <Card>
-                <CardHeader className="pb-2"><CardTitle className="text-sm">Fee Breakdown</CardTitle></CardHeader>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">{t("auctionDetail.feeBreakdown.title")}</CardTitle></CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-muted-foreground">Hammer Price</span><span>{formatCurrency(currentPrice, country)}</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Buyer Premium (3%)</span><span>{formatCurrency(currentPrice * 0.03, country)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.feeBreakdown.hammerPrice")}</span><span>{formatCurrency(currentPrice, country)}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.feeBreakdown.buyerPremium")}</span><span>{formatCurrency(currentPrice * 0.03, country)}</span></div>
                   <Separator />
-                  <div className="flex justify-between font-bold"><span>Total for Buyer</span><span>{formatCurrency(currentPrice * 1.03, country)}</span></div>
+                  <div className="flex justify-between font-bold"><span>{t("auctionDetail.feeBreakdown.totalForBuyer")}</span><span>{formatCurrency(currentPrice * 1.03, country)}</span></div>
                 </CardContent>
               </Card>
 
@@ -655,10 +657,10 @@ const AuctionDetail = () => {
               <Card>
                 <CardContent className="p-4 space-y-3">
                   {[
-                    { icon: Shield, label: "Payment Protected", desc: "Funds held until handover complete" },
-                    { icon: CreditCard, label: "Deposit Pre-auth", desc: "£500 held, not charged until you win" },
-                    { icon: FileText, label: "E-Sign Contract", desc: "Legally binding digital contract" },
-                    { icon: CheckCircle2, label: "Full Audit Trail", desc: "Every action logged & timestamped" },
+                    { icon: Shield, label: t("auctionDetail.trustBadges.paymentProtected"), desc: t("auctionDetail.trustBadges.paymentProtectedDesc") },
+                    { icon: CreditCard, label: t("auctionDetail.trustBadges.depositPreauth"), desc: t("auctionDetail.trustBadges.depositPreauthDesc") },
+                    { icon: FileText, label: t("auctionDetail.trustBadges.eSignContract"), desc: t("auctionDetail.trustBadges.eSignContractDesc") },
+                    { icon: CheckCircle2, label: t("auctionDetail.trustBadges.auditTrail"), desc: t("auctionDetail.trustBadges.auditTrailDesc") },
                   ].map(({ icon: Icon, label, desc }) => (
                     <div key={label} className="flex items-start gap-3">
                       <Icon className="w-4 h-4 text-primary mt-0.5" />
@@ -675,27 +677,27 @@ const AuctionDetail = () => {
               {(isSold || auction.status === "ended") && isWinner && escrow && escrow.status === "pending_deposit" && (
                 <Card className="border-amber-200 dark:border-amber-800">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-amber-600" /> Payment Required</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2"><CreditCard className="w-4 h-4 text-amber-600" /> {t("auctionDetail.winnerPayment.title")}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="text-sm space-y-1">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Total Due</span><span className="font-bold">{formatCurrency(Number(escrow.total_amount), country)}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Deposit Held</span><span>{deposit ? formatCurrency(Number(deposit.amount), country) : "—"}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.winnerPayment.totalDue")}</span><span className="font-bold">{formatCurrency(Number(escrow.total_amount), country)}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.winnerPayment.depositHeld")}</span><span>{deposit ? formatCurrency(Number(deposit.amount), country) : "—"}</span></div>
                       <Separator />
-                      <div className="flex justify-between font-bold"><span>Remaining Balance</span><span className="text-primary">{formatCurrency(Number(escrow.total_amount) - (deposit ? Number(deposit.amount) : 0), country)}</span></div>
+                      <div className="flex justify-between font-bold"><span>{t("auctionDetail.winnerPayment.remainingBalance")}</span><span className="text-primary">{formatCurrency(Number(escrow.total_amount) - (deposit ? Number(deposit.amount) : 0), country)}</span></div>
                     </div>
                     {(escrow as any).payment_deadline && (
                       <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
                         <Timer className="w-4 h-4 text-amber-600" />
                         <div>
-                          <p className="text-xs font-medium text-amber-800 dark:text-amber-200">Payment Deadline</p>
+                          <p className="text-xs font-medium text-amber-800 dark:text-amber-200">{t("auctionDetail.winnerPayment.paymentDeadline")}</p>
                           <p className="text-xs text-amber-600 dark:text-amber-400">{new Date((escrow as any).payment_deadline).toLocaleString()}</p>
                         </div>
                       </div>
                     )}
                     <Button className="w-full gap-2" onClick={() => payWinnerBalance.mutate()} disabled={payWinnerBalance.isPending}>
                       {payWinnerBalance.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-                      {payWinnerBalance.isPending ? "Processing..." : "Pay Remaining Balance"}
+                      {payWinnerBalance.isPending ? t("auctionDetail.winnerPayment.processing") : t("auctionDetail.winnerPayment.payRemainingBalance")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -704,29 +706,29 @@ const AuctionDetail = () => {
               {/* Post-Sale: Contract section for winner/seller */}
               {(isSold || auction.status === "ended") && (isWinner || isSeller) && contract && (
                 <Card className="border-primary/30">
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><FileText className="w-4 h-4" /> Sale Contract</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><FileText className="w-4 h-4" /> {t("auctionDetail.contract.title")}</CardTitle></CardHeader>
                   <CardContent className="space-y-3">
                     <div className="text-sm space-y-1">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Buyer signed</span><span>{contract.buyer_signed ? `✅ ${new Date(contract.buyer_signed_at).toLocaleDateString()}` : "⏳ Pending"}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Seller signed</span><span>{contract.seller_signed ? `✅ ${new Date(contract.seller_signed_at).toLocaleDateString()}` : "⏳ Pending"}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.contract.buyerSigned")}</span><span>{contract.buyer_signed ? `✅ ${new Date(contract.buyer_signed_at).toLocaleDateString()}` : t("auctionDetail.contract.pending")}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.contract.sellerSigned")}</span><span>{contract.seller_signed ? `✅ ${new Date(contract.seller_signed_at).toLocaleDateString()}` : t("auctionDetail.contract.pending")}</span></div>
                     </div>
                     {((isWinner && !contract.buyer_signed) || (isSeller && !contract.seller_signed)) && (
                       <Dialog open={showContract} onOpenChange={setShowContract}>
                         <DialogTrigger asChild>
-                          <Button className="w-full" variant="default">Review & Sign Contract</Button>
+                          <Button className="w-full" variant="default">{t("auctionDetail.contract.reviewAndSign")}</Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl">
                           <DialogHeader>
-                            <DialogTitle>Sale Contract</DialogTitle>
-                            <DialogDescription>Review the contract carefully before signing. Your IP address and timestamp will be recorded.</DialogDescription>
+                            <DialogTitle>{t("auctionDetail.contract.dialogTitle")}</DialogTitle>
+                            <DialogDescription>{t("auctionDetail.contract.dialogDesc")}</DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-80 border rounded-lg p-4 text-sm">
                             <div dangerouslySetInnerHTML={{ __html: contract.contract_html || generateContractHTML(auction, listing, currentPrice, country) }} />
                           </ScrollArea>
                           <DialogFooter>
-                            <p className="text-xs text-muted-foreground mr-auto">By signing, you agree to the terms above.</p>
+                            <p className="text-xs text-muted-foreground mr-auto">{t("auctionDetail.contract.agreeNote")}</p>
                             <Button onClick={() => signContract.mutate(isSeller ? "seller" : "buyer")} disabled={signContract.isPending}>
-                              {signContract.isPending ? "Signing..." : "I Agree — Sign Contract"}
+                              {signContract.isPending ? t("auctionDetail.contract.signing") : t("auctionDetail.contract.signButton")}
                             </Button>
                           </DialogFooter>
                         </DialogContent>
@@ -739,55 +741,55 @@ const AuctionDetail = () => {
               {/* Post-Sale: Handover Checklist */}
               {escrow && (isWinner || isSeller) && (
                 <Card className="border-primary/20">
-                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Package className="w-4 h-4" /> Handover Checklist</CardTitle></CardHeader>
+                  <CardHeader className="pb-2"><CardTitle className="text-sm flex items-center gap-2"><Package className="w-4 h-4" /> {t("auctionDetail.handover.title")}</CardTitle></CardHeader>
                   <CardContent className="space-y-3">
-                    <p className="text-xs text-muted-foreground">Funds released to seller once all steps confirmed</p>
+                    <p className="text-xs text-muted-foreground">{t("auctionDetail.handover.fundsNote")}</p>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-primary" />
-                          <span className="text-sm">V5C / Logbook Received</span>
+                          <span className="text-sm">{t("auctionDetail.handover.v5cReceived")}</span>
                         </div>
                         {escrow.v5c_received ? (
-                          <Badge className="bg-emerald-500 text-white border-0">✓ Confirmed</Badge>
+                          <Badge className="bg-emerald-500 text-white border-0">{t("auctionDetail.handover.confirmed")}</Badge>
                         ) : (
                           isSeller ? (
                             <Button size="sm" variant="outline" onClick={() => confirmHandover.mutate("v5c_received")} disabled={confirmHandover.isPending}>
-                              Confirm Sent
+                              {t("auctionDetail.handover.confirmSent")}
                             </Button>
-                          ) : <Badge variant="outline">Pending</Badge>
+                          ) : <Badge variant="outline">{t("auctionDetail.handover.pending")}</Badge>
                         )}
                       </div>
                       <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2">
                           <Key className="w-4 h-4 text-primary" />
-                          <span className="text-sm">Keys Handed Over</span>
+                          <span className="text-sm">{t("auctionDetail.handover.keysHandedOver")}</span>
                         </div>
                         {escrow.keys_handed_over ? (
-                          <Badge className="bg-emerald-500 text-white border-0">✓ Confirmed</Badge>
+                          <Badge className="bg-emerald-500 text-white border-0">{t("auctionDetail.handover.confirmed")}</Badge>
                         ) : (
                           isSeller ? (
                             <Button size="sm" variant="outline" onClick={() => confirmHandover.mutate("keys_handed_over")} disabled={confirmHandover.isPending}>
-                              Confirm Handed
+                              {t("auctionDetail.handover.confirmHanded")}
                             </Button>
-                          ) : <Badge variant="outline">Pending</Badge>
+                          ) : <Badge variant="outline">{t("auctionDetail.handover.pending")}</Badge>
                         )}
                       </div>
                       <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-primary" />
-                          <span className="text-sm">Contract Signed</span>
+                          <span className="text-sm">{t("auctionDetail.handover.contractSigned")}</span>
                         </div>
                         {escrow.contract_signed || (contract?.buyer_signed && contract?.seller_signed) ? (
-                          <Badge className="bg-emerald-500 text-white border-0">✓ Both Signed</Badge>
-                        ) : <Badge variant="outline">Pending</Badge>}
+                          <Badge className="bg-emerald-500 text-white border-0">{t("auctionDetail.handover.bothSigned")}</Badge>
+                        ) : <Badge variant="outline">{t("auctionDetail.handover.pending")}</Badge>}
                       </div>
                     </div>
 
                     <Separator />
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Protection Status</span>
+                      <span className="text-sm font-medium">{t("auctionDetail.handover.protectionStatus")}</span>
                       <Badge variant="outline" className="capitalize">{(escrow.status as string).replace(/_/g, " ")}</Badge>
                     </div>
 
@@ -795,7 +797,7 @@ const AuctionDetail = () => {
                     {isWinner && auction.delivery_available && (
                       <div className="pt-2">
                         <Button variant="outline" className="w-full gap-2" onClick={() => setShowDeliveryRequest(true)}>
-                          <Truck className="w-4 h-4" /> Request Delivery
+                          <Truck className="w-4 h-4" /> {t("auctionDetail.handover.requestDelivery")}
                         </Button>
                       </div>
                     )}
@@ -812,29 +814,29 @@ const AuctionDetail = () => {
       <Dialog open={showBidConfirm} onOpenChange={setShowBidConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Your Bid</DialogTitle>
-            <DialogDescription>This is a binding bid. Make sure you're ready to purchase.</DialogDescription>
+            <DialogTitle>{t("auctionDetail.bidDialog.title")}</DialogTitle>
+            <DialogDescription>{t("auctionDetail.bidDialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-4">
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Your Bid</span><span className="font-bold">{bidAmount ? formatCurrency(parseFloat(bidAmount), country) : "—"}</span></div>
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Buyer Premium (3%)</span><span>{bidAmount ? formatCurrency(parseFloat(bidAmount) * 0.03, country) : "—"}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("auctionDetail.bidDialog.yourBid")}</span><span className="font-bold">{bidAmount ? formatCurrency(parseFloat(bidAmount), country) : "—"}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("auctionDetail.bidDialog.buyerPremium")}</span><span>{bidAmount ? formatCurrency(parseFloat(bidAmount) * 0.03, country) : "—"}</span></div>
             <Separator />
-            <div className="flex justify-between font-bold"><span>Total if you win</span><span className="text-primary">{bidAmount ? formatCurrency(parseFloat(bidAmount) * 1.03, country) : "—"}</span></div>
+            <div className="flex justify-between font-bold"><span>{t("auctionDetail.bidDialog.totalIfWin")}</span><span className="text-primary">{bidAmount ? formatCurrency(parseFloat(bidAmount) * 1.03, country) : "—"}</span></div>
             {useAutoBid && maxAutoBid && (
               <>
                 <Separator />
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground flex items-center gap-1"><Zap className="w-3 h-3" /> Auto-bid ceiling</span>
+                  <span className="text-muted-foreground flex items-center gap-1"><Zap className="w-3 h-3" /> {t("auctionDetail.bidDialog.autoBidCeiling")}</span>
                   <span className="font-medium">{formatCurrency(parseFloat(maxAutoBid), country)}</span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">System will bid minimum increments on your behalf up to this amount</p>
+                <p className="text-[10px] text-muted-foreground">{t("auctionDetail.bidDialog.autoBidHint")}</p>
               </>
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBidConfirm(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setShowBidConfirm(false)}>{t("auctionDetail.bidDialog.cancel")}</Button>
             <Button onClick={() => placeBid.mutate()} disabled={placeBid.isPending}>
-              {placeBid.isPending ? "Placing..." : "Confirm Bid"}
+              {placeBid.isPending ? t("auctionDetail.bidDialog.placing") : t("auctionDetail.bidDialog.confirmBid")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -844,22 +846,22 @@ const AuctionDetail = () => {
       <Dialog open={showDeliveryRequest} onOpenChange={setShowDeliveryRequest}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Truck className="w-5 h-5" /> Request Delivery</DialogTitle>
-            <DialogDescription>Our logistics partners will arrange delivery to your address.</DialogDescription>
+            <DialogTitle className="flex items-center gap-2"><Truck className="w-5 h-5" /> {t("auctionDetail.deliveryDialog.title")}</DialogTitle>
+            <DialogDescription>{t("auctionDetail.deliveryDialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-4">
             <div className="p-4 rounded-lg bg-muted/50 space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Collection from</span><span className="font-medium">{auction.collection_address || listing?.location || "TBC"}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.deliveryDialog.collectionFrom")}</span><span className="font-medium">{auction.collection_address || listing?.location || t("auctionDetail.deliveryDialog.tbc")}</span></div>
               {auction.delivery_cost_estimate && (
-                <div className="flex justify-between"><span className="text-muted-foreground">Estimated cost</span><span className="font-medium">{formatCurrency(auction.delivery_cost_estimate, country)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{t("auctionDetail.deliveryDialog.estimatedCost")}</span><span className="font-medium">{formatCurrency(auction.delivery_cost_estimate, country)}</span></div>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Delivery cost is additional and paid by the buyer. Exact quote will be provided after confirming your delivery address.</p>
+            <p className="text-xs text-muted-foreground">{t("auctionDetail.deliveryDialog.note")}</p>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeliveryRequest(false)}>Cancel</Button>
-            <Button onClick={() => { toast.success("Delivery request submitted! Our team will contact you."); setShowDeliveryRequest(false); }}>
-              <Send className="w-4 h-4 mr-1" /> Submit Request
+            <Button variant="outline" onClick={() => setShowDeliveryRequest(false)}>{t("auctionDetail.deliveryDialog.cancel")}</Button>
+            <Button onClick={() => { toast.success(t("auctionDetail.toasts.deliveryRequestSubmitted")); setShowDeliveryRequest(false); }}>
+              <Send className="w-4 h-4 mr-1" /> {t("auctionDetail.deliveryDialog.submitRequest")}
             </Button>
           </DialogFooter>
         </DialogContent>

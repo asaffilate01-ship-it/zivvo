@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
@@ -56,6 +57,7 @@ interface ListingSummary {
 }
 
 const DealerDashboard = () => {
+  const { t } = useTranslation();
   const { user, subscription, refreshSubscription } = useAuth();
   const { config } = useCountry();
   const { toast } = useToast();
@@ -72,7 +74,7 @@ const DealerDashboard = () => {
   // Handle checkout success
   useEffect(() => {
     if (searchParams.get("checkout") === "success") {
-      toast({ title: "Subscription activated!", description: "Welcome to Zivvo Dealer!" });
+      toast({ title: t("dealerDashboard.toasts.subActivated"), description: t("dealerDashboard.toasts.subActivatedDesc") });
       refreshSubscription();
     }
   }, [searchParams]);
@@ -112,8 +114,8 @@ const DealerDashboard = () => {
       if (error) throw error;
       if (data?.error === "NO_SUBSCRIPTION") {
         toast({
-          title: "No subscription found",
-          description: data.message || "Please subscribe to a plan first to manage your subscription.",
+          title: t("dealerDashboard.toasts.noSub"),
+          description: data.message || t("dealerDashboard.toasts.noSubDesc"),
         });
         return;
       }
@@ -128,33 +130,33 @@ const DealerDashboard = () => {
   const deleteListing = async (listingId: string) => {
     const { error } = await supabase.from("car_listings").delete().eq("id", listingId);
     if (error) {
-      toast({ title: "Error deleting listing", variant: "destructive" });
+      toast({ title: t("dealerDashboard.toasts.deleteError"), variant: "destructive" });
     } else {
       setListings((prev) => prev.filter((l) => l.id !== listingId));
-      toast({ title: "Listing deleted" });
+      toast({ title: t("dealerDashboard.toasts.deleted") });
     }
   };
 
   const toggleStatus = async (listingId: string, currentStatus: string) => {
     // Block toggling under_review or expired listings
     if (currentStatus === "under_review") {
-      toast({ title: "Under Review", description: "This listing is pending admin approval and cannot be changed.", variant: "destructive" });
+      toast({ title: t("dealerDashboard.toasts.underReview"), description: t("dealerDashboard.toasts.underReviewDesc"), variant: "destructive" });
       return;
     }
     if (currentStatus === "expired") {
-      toast({ title: "Listing Expired", description: "Re-submit this listing for review to reactivate it.", variant: "destructive" });
+      toast({ title: t("dealerDashboard.toasts.expired"), description: t("dealerDashboard.toasts.expiredDesc"), variant: "destructive" });
       return;
     }
     const newStatus = currentStatus === "active" ? "draft" : "active";
     // Check listing limits
     if (newStatus === "active" && dealer && summary.active >= dealer.max_listings) {
-      toast({ title: "Listing limit reached", description: "Upgrade your plan to add more active listings.", variant: "destructive" });
+      toast({ title: t("dealerDashboard.toasts.limitReached"), description: t("dealerDashboard.toasts.limitReachedDesc"), variant: "destructive" });
       return;
     }
     // When activating, check logbook exists
     const listing = listings.find(l => l.id === listingId);
     if (newStatus === "active" && listing && !listing.logbook_url) {
-      toast({ title: "Logbook Required", description: "Upload your V5C logbook before activating this listing.", variant: "destructive" });
+      toast({ title: t("dealerDashboard.toasts.logbookRequired"), description: t("dealerDashboard.toasts.logbookRequiredDesc"), variant: "destructive" });
       return;
     }
     const { error } = await supabase.from("car_listings").update({ status: newStatus }).eq("id", listingId);
@@ -165,7 +167,7 @@ const DealerDashboard = () => {
         active: prev.active + (newStatus === "active" ? 1 : -1),
         draft: prev.draft + (newStatus === "draft" ? 1 : -1),
       }));
-      toast({ title: `Listing ${newStatus}` });
+      toast({ title: t("dealerDashboard.toasts.listingStatus", { status: newStatus }) });
     }
   };
 
@@ -188,9 +190,9 @@ const DealerDashboard = () => {
     if (!error) {
       setListings(prev => prev.map(l => ids.includes(l.id) ? { ...l, status: newStatus } : l));
       setSelectedIds(new Set());
-      toast({ title: `${ids.length} listings updated to ${newStatus}` });
+      toast({ title: t("dealerDashboard.toasts.bulkUpdated", { count: ids.length, status: newStatus }) });
     } else {
-      toast({ title: "Bulk update failed", variant: "destructive" });
+      toast({ title: t("dealerDashboard.toasts.bulkFailed"), variant: "destructive" });
     }
   };
 
@@ -206,7 +208,7 @@ const DealerDashboard = () => {
     const a = document.createElement("a");
     a.href = url; a.download = `listings-${new Date().toISOString().slice(0,10)}.csv`; a.click();
     URL.revokeObjectURL(url);
-    toast({ title: "CSV exported" });
+    toast({ title: t("dealerDashboard.toasts.csvExported") });
   };
 
   const viewsChartData = useMemo(() => {
@@ -249,9 +251,9 @@ const DealerDashboard = () => {
         <Navbar />
         <div className="container mx-auto flex flex-col items-center justify-center px-4 py-24 text-center">
           <Package className="h-16 w-16 text-muted-foreground" />
-          <h2 className="mt-4 font-display text-2xl font-bold text-foreground">No Dealer Account Found</h2>
-          <p className="mt-2 text-muted-foreground">Subscribe to a dealer plan to access your dashboard.</p>
-          <Link to="/dealers"><Button className="gradient-primary mt-6 border-0">View Dealer Plans</Button></Link>
+          <h2 className="mt-4 font-display text-2xl font-bold text-foreground">{t("dealerDashboard.noDealer.title")}</h2>
+          <p className="mt-2 text-muted-foreground">{t("dealerDashboard.noDealer.desc")}</p>
+          <Link to="/dealers"><Button className="gradient-primary mt-6 border-0">{t("dealerDashboard.noDealer.cta")}</Button></Link>
         </div>
         <Footer />
       </div>
@@ -271,13 +273,13 @@ const DealerDashboard = () => {
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <Badge className={tierColors[dealer.tier] || ""}>{dealer.tier.charAt(0).toUpperCase() + dealer.tier.slice(1)}</Badge>
               <Badge variant={dealer.subscription_status === "active" ? "default" : "destructive"}>{dealer.subscription_status}</Badge>
-              {dealer.kyc_verified && <Badge variant="outline" className="border-success text-success">KYC Verified</Badge>}
+              {dealer.kyc_verified && <Badge variant="outline" className="border-success text-success">{t("dealerDashboard.kycVerified")}</Badge>}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleManageSubscription} disabled={portalLoading}>
               <CreditCard className="mr-1 h-4 w-4" />
-              {portalLoading ? "Loading..." : "Manage Subscription"}
+              {portalLoading ? t("common.loading") : t("dealerDashboard.manageSubscription")}
             </Button>
             <DealerPageBuilder
               dealerId={dealer.id}
@@ -285,10 +287,10 @@ const DealerDashboard = () => {
               businessName={dealer.business_name}
               onSaved={() => {}}
             />
-            <Link to={`/dealer/${dealer.slug}`}><Button variant="outline" size="sm"><ExternalLink className="mr-1 h-4 w-4" /> Landing Page</Button></Link>
+            <Link to={`/dealer/${dealer.slug}`}><Button variant="outline" size="sm"><ExternalLink className="mr-1 h-4 w-4" /> {t("dealerDashboard.landingPage")}</Button></Link>
             <Link to="/dashboard/listings/new">
               <Button size="sm" className="gradient-primary border-0" disabled={summary.active >= dealer.max_listings && dealer.max_listings !== 9999}>
-                <Plus className="mr-1 h-4 w-4" /> Add Listing
+                <Plus className="mr-1 h-4 w-4" /> {t("dealerDashboard.addListing")}
               </Button>
             </Link>
           </div>
@@ -298,7 +300,7 @@ const DealerDashboard = () => {
         {dealer.max_listings !== 9999 && (
           <div className="mt-4 rounded-xl border border-border bg-card p-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Active Listings</span>
+              <span className="text-muted-foreground">{t("dealerDashboard.activeListings")}</span>
               <span className="font-medium text-card-foreground">{summary.active} / {dealer.max_listings}</span>
             </div>
             <div className="mt-2 h-2 rounded-full bg-muted">
@@ -309,7 +311,7 @@ const DealerDashboard = () => {
             </div>
             {listingLimitPercent >= 90 && (
               <p className="mt-2 text-xs text-destructive">
-                You're near your listing limit. <Link to="/dealers" className="underline">Upgrade your plan</Link> for more.
+                {t("dealerDashboard.nearLimit")} <Link to="/dealers" className="underline">{t("dealerDashboard.upgradePlan")}</Link> {t("dealerDashboard.forMore")}
               </p>
             )}
           </div>
@@ -318,10 +320,10 @@ const DealerDashboard = () => {
         {/* Stats Grid */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Active Listings", value: summary.active, icon: Car, color: "text-primary" },
-            { label: "Total Views", value: summary.totalViews, icon: Eye, color: "text-info" },
-            { label: "Enquiries", value: summary.totalEnquiries, icon: MessageSquare, color: "text-success" },
-            { label: "Sold", value: summary.sold, icon: TrendingUp, color: "text-warning" },
+            { label: t("dealerDashboard.activeListings"), value: summary.active, icon: Car, color: "text-primary" },
+            { label: t("dealerDashboard.totalViews"), value: summary.totalViews, icon: Eye, color: "text-info" },
+            { label: t("dealerDashboard.enquiries"), value: summary.totalEnquiries, icon: MessageSquare, color: "text-success" },
+            { label: t("dealerDashboard.sold"), value: summary.sold, icon: TrendingUp, color: "text-warning" },
           ].map((stat) => (
             <Card key={stat.label}>
               <CardContent className="flex items-center gap-4 p-5">
@@ -339,19 +341,19 @@ const DealerDashboard = () => {
 
         {/* DMS Tools */}
         <div className="mt-8">
-          <h2 className="font-display text-lg font-bold text-foreground mb-4">Dealer Management Tools</h2>
+          <h2 className="font-display text-lg font-bold text-foreground mb-4">{t("dealerDashboard.managementTools")}</h2>
           <Tabs defaultValue="stock-book">
             <TabsList className="flex w-full flex-wrap justify-start gap-1 h-auto">
-              <TabsTrigger value="stock-book">Stock Book</TabsTrigger>
-              <TabsTrigger value="costs">Costs & Profit</TabsTrigger>
-              <TabsTrigger value="reservations">Reservations</TabsTrigger>
-              <TabsTrigger value="bookings">Bookings</TabsTrigger>
-              <TabsTrigger value="staff">Staff</TabsTrigger>
-              <TabsTrigger value="ad-shop">Ad Shop</TabsTrigger>
-              <TabsTrigger value="pipeline">Sales Pipeline</TabsTrigger>
-              <TabsTrigger value="syndication">Syndication</TabsTrigger>
-              <TabsTrigger value="integrations">Integrations</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="stock-book">{t("dealerDashboard.tabs.stockBook")}</TabsTrigger>
+              <TabsTrigger value="costs">{t("dealerDashboard.tabs.costs")}</TabsTrigger>
+              <TabsTrigger value="reservations">{t("dealerDashboard.tabs.reservations")}</TabsTrigger>
+              <TabsTrigger value="bookings">{t("dealerDashboard.tabs.bookings")}</TabsTrigger>
+              <TabsTrigger value="staff">{t("dealerDashboard.tabs.staff")}</TabsTrigger>
+              <TabsTrigger value="ad-shop">{t("dealerDashboard.tabs.adShop")}</TabsTrigger>
+              <TabsTrigger value="pipeline">{t("dealerDashboard.tabs.pipeline")}</TabsTrigger>
+              <TabsTrigger value="syndication">{t("dealerDashboard.tabs.syndication")}</TabsTrigger>
+              <TabsTrigger value="integrations">{t("dealerDashboard.tabs.integrations")}</TabsTrigger>
+              <TabsTrigger value="analytics">{t("dealerDashboard.tabs.analytics")}</TabsTrigger>
             </TabsList>
             <TabsContent value="stock-book" className="mt-4"><StockBookManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="costs" className="mt-4"><VehicleCostsManager dealerId={dealer.id} /></TabsContent>
@@ -371,22 +373,22 @@ const DealerDashboard = () => {
         {/* Recent Listings */}
         <div className="mt-8">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-foreground">Your Listings</h2>
+            <h2 className="font-display text-lg font-bold text-foreground">{t("dealerDashboard.yourListings")}</h2>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={exportCSV} disabled={listings.length === 0}>
-                <Download className="mr-1 h-4 w-4" /> Export CSV
+                <Download className="mr-1 h-4 w-4" /> {t("dealerDashboard.exportCsv")}
               </Button>
-              <Link to="/inbox"><Button variant="ghost" size="sm">View Enquiries</Button></Link>
+              <Link to="/inbox"><Button variant="ghost" size="sm">{t("dealerDashboard.viewEnquiries")}</Button></Link>
             </div>
           </div>
 
           {/* Bulk Action Bar */}
           {selectedIds.size > 0 && (
             <div className="mt-3 flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3">
-              <span className="text-sm font-medium text-foreground">{selectedIds.size} selected</span>
-              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("active")}>Set Active</Button>
-              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("draft")}>Set Draft</Button>
-              <Button size="sm" variant="outline" className="text-destructive" onClick={() => setSelectedIds(new Set())}>Clear</Button>
+              <span className="text-sm font-medium text-foreground">{t("dealerDashboard.selected", { count: selectedIds.size })}</span>
+              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("active")}>{t("dealerDashboard.setActive")}</Button>
+              <Button size="sm" variant="outline" onClick={() => bulkUpdateStatus("draft")}>{t("dealerDashboard.setDraft")}</Button>
+              <Button size="sm" variant="outline" className="text-destructive" onClick={() => setSelectedIds(new Set())}>{t("common.close")}</Button>
             </div>
           )}
 
@@ -394,8 +396,8 @@ const DealerDashboard = () => {
             <Card className="mt-4">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Car className="h-12 w-12 text-muted-foreground" />
-                <p className="mt-3 text-muted-foreground">No listings yet</p>
-                <Link to="/dashboard/listings/new"><Button className="gradient-primary mt-4 border-0" size="sm"><Plus className="mr-1 h-4 w-4" /> Add Your First Listing</Button></Link>
+                <p className="mt-3 text-muted-foreground">{t("dealerDashboard.noListings")}</p>
+                <Link to="/dashboard/listings/new"><Button className="gradient-primary mt-4 border-0" size="sm"><Plus className="mr-1 h-4 w-4" /> {t("dealerDashboard.addFirstListing")}</Button></Link>
               </CardContent>
             </Card>
           ) : (
@@ -405,7 +407,7 @@ const DealerDashboard = () => {
                   checked={selectedIds.size === listings.length && listings.length > 0}
                   onCheckedChange={selectAll}
                 />
-                <span className="text-xs text-muted-foreground">Select all</span>
+                <span className="text-xs text-muted-foreground">{t("dealerDashboard.selectAll")}</span>
               </div>
               {listings.map((listing) => (
                 <Card key={listing.id} className={selectedIds.has(listing.id) ? "border-primary/40" : ""}>
@@ -424,7 +426,7 @@ const DealerDashboard = () => {
                       )}
                       <div>
                         <Link to={`/car/${listing.id}`} className="font-medium text-card-foreground hover:text-primary">{listing.title}</Link>
-                        <p className="text-sm text-muted-foreground">{listing.views_count || 0} views · {listing.enquiries_count || 0} enquiries</p>
+                        <p className="text-sm text-muted-foreground">{t("dealerDashboard.viewsEnquiries", { views: listing.views_count || 0, enquiries: listing.enquiries_count || 0 })}</p>
                       </div>
                       {listing.status === "active" && dealer && (
                         <ListingSyndicationStatus listingId={listing.id} dealerId={dealer.id} />
@@ -450,12 +452,12 @@ const DealerDashboard = () => {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete listing?</AlertDialogTitle>
-                            <AlertDialogDescription>This action cannot be undone. This will permanently delete "{listing.title}".</AlertDialogDescription>
+                            <AlertDialogTitle>{t("dealerDashboard.deleteTitle")}</AlertDialogTitle>
+                            <AlertDialogDescription>{t("dealerDashboard.deleteDesc", { title: listing.title })}</AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteListing(listing.id)} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+                            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteListing(listing.id)} className="bg-destructive text-destructive-foreground">{t("common.delete", "Delete")}</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>

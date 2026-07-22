@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -21,6 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCountry } from "@/contexts/CountryContext";
 
 const CreateListing = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { country, config } = useCountry();
   const navigate = useNavigate();
@@ -138,7 +140,7 @@ const CreateListing = () => {
         setExistingTradeInvoiceUrl((data as any).trade_invoice_url || null);
         setExistingFinanceLetterUrl((data as any).finance_settlement_letter_url || null);
       } else {
-        toast({ title: "Listing not found", variant: "destructive" });
+        toast({ title: t("createListing.listingNotFound"), variant: "destructive" });
         navigate("/dashboard");
       }
       setPageLoading(false);
@@ -154,7 +156,7 @@ const CreateListing = () => {
     const files = Array.from(e.target.files || []);
     const totalCount = existingImages.length + images.length + files.length;
     if (totalCount > 20) {
-      toast({ title: "Max 20 images", variant: "destructive" });
+      toast({ title: t("createListing.maxImages"), variant: "destructive" });
       return;
     }
     setImages((prev) => [...prev, ...files]);
@@ -182,7 +184,7 @@ const CreateListing = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > maxMb * 1024 * 1024) {
-      toast({ title: "File too large", description: `Max ${maxMb}MB for ${label}.`, variant: "destructive" });
+      toast({ title: t("createListing.fileTooLarge"), description: t("createListing.fileTooLargeDesc", { maxMb, label }), variant: "destructive" });
       return;
     }
     setter(file);
@@ -204,7 +206,7 @@ const CreateListing = () => {
 
   const runHpiCheck = async () => {
     if (!form.registration && !form.vin) {
-      toast({ title: "Registration or VIN required", description: "Enter a registration number or VIN to run an HPI check.", variant: "destructive" });
+      toast({ title: t("createListing.regOrVinRequired"), description: t("createListing.regOrVinRequiredDesc"), variant: "destructive" });
       return;
     }
     setHpiLoading(true);
@@ -215,12 +217,12 @@ const CreateListing = () => {
       if (error) throw error;
       if (data?.success) {
         setHpiCheckData(data.data);
-        toast({ title: "HPI Check Complete", description: data.data.stolen_reported ? "⚠️ Issues found — review results." : "✅ Vehicle passed all checks." });
+        toast({ title: t("createListing.hpiComplete"), description: data.data.stolen_reported ? t("createListing.hpiIssuesFound") : t("createListing.hpiPassed") });
       } else {
-        toast({ title: "HPI Check Failed", description: data?.error || "Could not complete HPI check. You can still submit for review.", variant: "destructive" });
+        toast({ title: t("createListing.hpiFailed"), description: data?.error || t("createListing.hpiFailedDesc"), variant: "destructive" });
       }
     } catch (err: any) {
-      toast({ title: "HPI Check Unavailable", description: "The HPI service is currently unavailable. You can still submit — admin will verify manually.", variant: "destructive" });
+      toast({ title: t("createListing.hpiUnavailable"), description: t("createListing.hpiUnavailableDesc"), variant: "destructive" });
     } finally {
       setHpiLoading(false);
     }
@@ -229,46 +231,46 @@ const CreateListing = () => {
   const handleSubmit = async (status: "draft" | "active") => {
     if (!user) return;
     if (!form.make || !form.model || !form.price) {
-      toast({ title: "Please fill required fields (make, model, price)", variant: "destructive" });
+      toast({ title: t("createListing.requiredFields"), variant: "destructive" });
       return;
     }
 
     // When publishing (not draft), enforce verification requirements
     if (status === "active") {
       if (!logbookFile && !existingLogbookUrl) {
-        toast({ title: "Logbook Required", description: "Please upload a V5C logbook / ownership document before publishing.", variant: "destructive" });
+        toast({ title: t("createListing.logbookRequired"), description: t("createListing.logbookRequiredDesc"), variant: "destructive" });
         return;
       }
       if (!photoIdFile && !existingPhotoIdUrl) {
-        toast({ title: "Photo ID Required", description: "Please upload a photo ID (passport or driving licence) matching the seller name.", variant: "destructive" });
+        toast({ title: t("createListing.photoIdRequired"), description: t("createListing.photoIdRequiredDesc"), variant: "destructive" });
         return;
       }
       if (form.sale_type === "consignment") {
         if (!form.owner_name.trim() || !form.owner_address.trim()) {
-          toast({ title: "Owner details required", description: "Please provide the registered owner's name and address for consignment sales.", variant: "destructive" });
+          toast({ title: t("createListing.ownerDetailsRequired"), description: t("createListing.ownerDetailsRequiredDesc"), variant: "destructive" });
           return;
         }
         if (!consignmentFile && !existingConsignmentUrl) {
-          toast({ title: "Consignment Agreement Required", description: "Upload the signed agreement between you and the registered owner.", variant: "destructive" });
+          toast({ title: t("createListing.consignmentAgreementRequired"), description: t("createListing.consignmentAgreementRequiredDesc"), variant: "destructive" });
           return;
         }
       }
       if (form.sale_type === "trade" && !tradeInvoiceFile && !existingTradeInvoiceUrl) {
-        toast({ title: "Trade Invoice Required", description: "Upload the purchase invoice showing how the vehicle was acquired into stock.", variant: "destructive" });
+        toast({ title: t("createListing.tradeInvoiceRequired"), description: t("createListing.tradeInvoiceRequiredDesc"), variant: "destructive" });
         return;
       }
       if (form.finance_outstanding) {
         if (!form.finance_lender.trim()) {
-          toast({ title: "Lender required", description: "Please name the finance company holding the vehicle.", variant: "destructive" });
+          toast({ title: t("createListing.lenderRequired"), description: t("createListing.lenderRequiredDesc"), variant: "destructive" });
           return;
         }
         if (!financeLetterFile && !existingFinanceLetterUrl) {
-          toast({ title: "Settlement Letter Required", description: "Upload a settlement letter from the finance company.", variant: "destructive" });
+          toast({ title: t("createListing.settlementLetterRequired"), description: t("createListing.settlementLetterRequiredDesc"), variant: "destructive" });
           return;
         }
       }
       if (!form.truth_declaration_accepted) {
-        toast({ title: "Declaration Required", description: "Please confirm the truth-of-information declaration before submitting.", variant: "destructive" });
+        toast({ title: t("createListing.declarationRequired"), description: t("createListing.declarationRequiredDesc"), variant: "destructive" });
         return;
       }
     }
@@ -381,7 +383,7 @@ const CreateListing = () => {
           .eq("id", editId)
           .eq("seller_id", user.id);
         if (error) throw error;
-        toast({ title: "Listing updated!" });
+        toast({ title: t("createListing.listingUpdated") });
       } else {
         // Check if user is a dealer
         const { data: dealer } = await supabase
@@ -393,12 +395,12 @@ const CreateListing = () => {
           dealer_id: dealer?.id || null,
         } as any);
         if (error) throw error;
-        toast({ title: status === "draft" ? "Draft saved" : "Listing submitted for review!" });
+        toast({ title: status === "draft" ? t("createListing.draftSaved") : t("createListing.listingSubmitted") });
       }
 
       navigate("/dashboard");
     } catch (err: any) {
-      toast({ title: "Error saving listing", description: err.message, variant: "destructive" });
+      toast({ title: t("createListing.errorSavingListing"), description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -422,19 +424,19 @@ const CreateListing = () => {
       <Navbar />
       <div className="container mx-auto max-w-3xl px-4 py-8">
         <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-          {editId ? "Edit Listing" : "Create Listing"}
+          {editId ? t("createListing.editTitle") : t("createListing.createTitle")}
         </h1>
         <p className="mt-1 text-muted-foreground">
-          {editId ? "Update your vehicle listing" : "Add a new vehicle to the marketplace"}
+          {editId ? t("createListing.editSubtitle") : t("createListing.createSubtitle")}
         </p>
 
         {/* Images */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle className="text-base">Photos ({totalImages}/20)</CardTitle>
+            <CardTitle className="text-base">{t("createListing.photos", { count: totalImages })}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-3 text-xs text-muted-foreground">Drag and drop to reorder. First image is the cover photo.</p>
+            <p className="mb-3 text-xs text-muted-foreground">{t("createListing.dragToReorder")}</p>
             <ImageReorder
               existingImages={existingImages}
               newPreviews={imagePreviews}
@@ -461,63 +463,63 @@ const CreateListing = () => {
         {/* Vehicle Details */}
         <Card className="mt-4">
           <CardHeader>
-            <CardTitle className="text-base">Vehicle Details</CardTitle>
+            <CardTitle className="text-base">{t("createListing.vehicleDetails")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Make *</Label>
+                <Label>{t("createListing.make")}</Label>
                 <Select value={form.make} onValueChange={(v) => updateField("make", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select make" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("createListing.selectMake")} /></SelectTrigger>
                   <SelectContent>
                     {makes.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Model *</Label>
-                <Input placeholder="e.g. A4, 3 Series" value={form.model} onChange={(e) => updateField("model", e.target.value)} />
+                <Label>{t("createListing.model")}</Label>
+                <Input placeholder={t("createListing.modelPlaceholder")} value={form.model} onChange={(e) => updateField("model", e.target.value)} />
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label>Year</Label>
+                <Label>{t("createListing.year")}</Label>
                 <Input type="number" value={form.year} onChange={(e) => updateField("year", parseInt(e.target.value))} />
               </div>
               <div className="space-y-2">
-                <Label>Price ({config.currency.symbol}) *</Label>
+                <Label>{t("createListing.price", { symbol: config.currency.symbol })}</Label>
                 <Input type="number" placeholder="25000" value={form.price} onChange={(e) => updateField("price", e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Mileage</Label>
+                <Label>{t("createListing.mileage")}</Label>
                 <Input type="number" placeholder="45000" value={form.mileage} onChange={(e) => updateField("mileage", e.target.value)} />
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label>Fuel Type</Label>
+                <Label>{t("createListing.fuelType")}</Label>
                 <Select value={form.fuel_type} onValueChange={(v) => updateField("fuel_type", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("createListing.select")} /></SelectTrigger>
                   <SelectContent>
                     {fuelTypes.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Transmission</Label>
+                <Label>{t("createListing.transmission")}</Label>
                 <Select value={form.transmission} onValueChange={(v) => updateField("transmission", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("createListing.select")} /></SelectTrigger>
                   <SelectContent>
-                    {transmissions.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    {transmissions.map((tr) => <SelectItem key={tr} value={tr}>{tr}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Body Type</Label>
+                <Label>{t("createListing.bodyType")}</Label>
                 <Select value={form.body_type} onValueChange={(v) => updateField("body_type", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("createListing.select")} /></SelectTrigger>
                   <SelectContent>
                     {bodyTypes.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
                   </SelectContent>
@@ -527,11 +529,11 @@ const CreateListing = () => {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label>Color</Label>
-                <Input placeholder="e.g. Silver" value={form.color} onChange={(e) => updateField("color", e.target.value)} />
+                <Label>{t("createListing.color")}</Label>
+                <Input placeholder={t("createListing.colorPlaceholder")} value={form.color} onChange={(e) => updateField("color", e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Doors</Label>
+                <Label>{t("createListing.doors")}</Label>
                 <Select value={form.doors} onValueChange={(v) => updateField("doors", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -540,14 +542,14 @@ const CreateListing = () => {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Engine Size</Label>
-                <Input placeholder="e.g. 2.0L" value={form.engine_size} onChange={(e) => updateField("engine_size", e.target.value)} />
+                <Label>{t("createListing.engineSize")}</Label>
+                <Input placeholder={t("createListing.engineSizePlaceholder")} value={form.engine_size} onChange={(e) => updateField("engine_size", e.target.value)} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Custom Title (optional)</Label>
-              <Input placeholder="Auto-generated from make/model/year if blank" value={form.title} onChange={(e) => updateField("title", e.target.value)} />
+              <Label>{t("createListing.customTitle")}</Label>
+              <Input placeholder={t("createListing.customTitlePlaceholder")} value={form.title} onChange={(e) => updateField("title", e.target.value)} />
             </div>
           </CardContent>
         </Card>
@@ -555,7 +557,7 @@ const CreateListing = () => {
         {/* Identification & Location */}
         <Card className="mt-4">
           <CardHeader>
-            <CardTitle className="text-base">Identification & Location</CardTitle>
+            <CardTitle className="text-base">{t("createListing.identificationLocation")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {country === "DE" && (
@@ -583,16 +585,16 @@ const CreateListing = () => {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>{config.terminology.registration}</Label>
-                <Input placeholder={"z.B. B-AB 1234"} value={form.registration} onChange={(e) => updateField("registration", e.target.value)} />
+                <Input placeholder={t("createListing.registrationPlaceholder")} value={form.registration} onChange={(e) => updateField("registration", e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>VIN</Label>
-                <Input placeholder="Vehicle Identification Number" value={form.vin} onChange={(e) => updateField("vin", e.target.value)} />
+                <Label>{t("createListing.vin")}</Label>
+                <Input placeholder={t("createListing.vinPlaceholder")} value={form.vin} onChange={(e) => updateField("vin", e.target.value)} />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Location</Label>
-              <Input placeholder={config.popularCities[0] ? `e.g. ${config.popularCities[0]}` : "e.g. London"} value={form.location} onChange={(e) => updateField("location", e.target.value)} />
+              <Label>{t("createListing.location")}</Label>
+              <Input placeholder={t("createListing.locationPlaceholder", { city: config.popularCities[0] || "London" })} value={form.location} onChange={(e) => updateField("location", e.target.value)} />
             </div>
           </CardContent>
         </Card>
@@ -600,7 +602,7 @@ const CreateListing = () => {
         {/* Description & Media */}
         <Card className="mt-4">
           <CardHeader>
-            <CardTitle className="text-base">Description & Media</CardTitle>
+            <CardTitle className="text-base">{t("createListing.descriptionMedia")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/30">
@@ -611,20 +613,20 @@ const CreateListing = () => {
                 onChange={(e) => updateField("vat_qualifying", e.target.checked as any)}
               />
               <span className="text-sm">
-                <span className="font-medium">VAT qualifying</span>
-                <span className="block text-xs text-muted-foreground">Show "+ VAT" next to price (for VAT-registered businesses).</span>
+                <span className="font-medium">{t("createListing.vatQualifying")}</span>
+                <span className="block text-xs text-muted-foreground">{t("createListing.vatQualifyingDesc")}</span>
               </span>
             </label>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Description</Label>
+                <Label>{t("createListing.descriptionLabel")}</Label>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={async () => {
                     if (!form.make || !form.model) {
-                      toast({ title: "Fill in make and model first", variant: "destructive" });
+                      toast({ title: t("createListing.fillMakeModelFirst"), variant: "destructive" });
                       return;
                     }
                     setAiLoading(true);
@@ -640,12 +642,12 @@ const CreateListing = () => {
                       if (error) throw error;
                       if (data?.description) {
                         updateField("description", data.description);
-                        toast({ title: "Description generated!" });
+                        toast({ title: t("createListing.descriptionGenerated") });
                       } else if (data?.error) {
-                        toast({ title: "AI Error", description: data.error, variant: "destructive" });
+                        toast({ title: t("createListing.aiError"), description: data.error, variant: "destructive" });
                       }
                     } catch (err: any) {
-                      toast({ title: "Could not generate description", description: err.message, variant: "destructive" });
+                      toast({ title: t("createListing.couldNotGenerateDescription"), description: err.message, variant: "destructive" });
                     } finally {
                       setAiLoading(false);
                     }
@@ -653,25 +655,25 @@ const CreateListing = () => {
                   disabled={aiLoading || !form.make || !form.model}
                 >
                   {aiLoading ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Sparkles className="mr-1 h-3 w-3" />}
-                  AI Write
+                  {t("createListing.aiWrite")}
                 </Button>
               </div>
               <Textarea
                 rows={5}
-                placeholder="Describe your vehicle — condition, history, features, reason for selling..."
+                placeholder={t("createListing.descriptionPlaceholder")}
                 value={form.description}
                 onChange={(e) => updateField("description", e.target.value)}
               />
             </div>
             <div className="space-y-3">
-              <Label>Video (optional)</Label>
+              <Label>{t("createListing.videoOptional")}</Label>
               <div className="space-y-2">
                 <Input
-                  placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                  placeholder={t("createListing.videoUrlPlaceholder")}
                   value={form.video_url}
                   onChange={(e) => updateField("video_url", e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">Paste a YouTube URL, or upload a video file (max 100MB)</p>
+                <p className="text-xs text-muted-foreground">{t("createListing.videoHint")}</p>
               </div>
               <div className="flex items-center gap-3">
                 {videoFile && (
@@ -682,7 +684,7 @@ const CreateListing = () => {
                 )}
                 {!form.video_url && (
                   <Button type="button" variant="outline" size="sm" onClick={() => videoInputRef.current?.click()}>
-                    <Upload className="mr-1 h-4 w-4" /> Upload Video
+                    <Upload className="mr-1 h-4 w-4" /> {t("createListing.uploadVideo")}
                   </Button>
                 )}
                 <input
@@ -694,7 +696,7 @@ const CreateListing = () => {
                     const file = e.target.files?.[0];
                     if (!file) return;
                     if (file.size > 100 * 1024 * 1024) {
-                      toast({ title: "Video too large", description: "Max 100MB for video uploads.", variant: "destructive" });
+                      toast({ title: t("createListing.videoTooLarge"), description: t("createListing.videoTooLargeDesc"), variant: "destructive" });
                       return;
                     }
                     setVideoFile(file);
@@ -710,14 +712,14 @@ const CreateListing = () => {
         <Card className="mt-4 border-primary/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Shield className="h-4 w-4 text-primary" /> Verification Documents
+              <Shield className="h-4 w-4 text-primary" /> {t("createListing.verificationDocuments")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Sale Type */}
             <div>
               <Label className="flex items-center gap-2 text-sm font-medium">
-                <FileText className="h-4 w-4" /> How are you selling this vehicle? *
+                <FileText className="h-4 w-4" /> {t("createListing.howSelling")}
               </Label>
               <RadioGroup
                 value={form.sale_type}
@@ -725,9 +727,9 @@ const CreateListing = () => {
                 className="mt-2 grid gap-2 sm:grid-cols-3"
               >
                 {[
-                  { value: "own", label: "My own vehicle", desc: "Registered in my name" },
-                  { value: "consignment", label: "On consignment", desc: "Selling on behalf of owner" },
-                  { value: "trade", label: "Trade stock", desc: "Dealer-acquired stock" },
+                  { value: "own", label: t("createListing.saleType.ownLabel"), desc: t("createListing.saleType.ownDesc") },
+                  { value: "consignment", label: t("createListing.saleType.consignmentLabel"), desc: t("createListing.saleType.consignmentDesc") },
+                  { value: "trade", label: t("createListing.saleType.tradeLabel"), desc: t("createListing.saleType.tradeDesc") },
                 ].map((opt) => (
                   <label
                     key={opt.value}
@@ -748,21 +750,21 @@ const CreateListing = () => {
             {/* Logbook Upload */}
             <div>
               <Label className="flex items-center gap-2 text-sm font-medium">
-                <FileCheck className="h-4 w-4" /> V5C Log Book / Ownership Document *
+                <FileCheck className="h-4 w-4" /> {t("createListing.logbookLabel")}
               </Label>
               <p className="mt-1 text-xs text-muted-foreground">
                 {form.sale_type === "consignment"
-                  ? "Upload the registered owner's V5C logbook."
-                  : "Upload your V5C logbook or equivalent ownership certificate."}
+                  ? t("createListing.logbookDescConsignment")
+                  : t("createListing.logbookDescOwn")}
               </p>
               <div className="mt-2 flex items-center gap-3">
                 {existingLogbookUrl || logbookFile ? (
                   <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
-                    <CheckCircle className="h-4 w-4" /> {logbookFile?.name || "Uploaded"}
+                    <CheckCircle className="h-4 w-4" /> {logbookFile?.name || t("createListing.uploaded")}
                   </div>
                 ) : null}
                 <Button type="button" variant="outline" size="sm" onClick={() => logbookInputRef.current?.click()}>
-                  <Upload className="mr-1 h-4 w-4" /> {existingLogbookUrl || logbookFile ? "Replace" : "Upload"}
+                  <Upload className="mr-1 h-4 w-4" /> {existingLogbookUrl || logbookFile ? t("createListing.replace") : t("createListing.upload")}
                 </Button>
                 <input ref={logbookInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleLogbookSelect} />
               </div>
@@ -771,19 +773,19 @@ const CreateListing = () => {
             {/* Photo ID */}
             <div>
               <Label className="flex items-center gap-2 text-sm font-medium">
-                <IdCard className="h-4 w-4" /> Photo ID (Driving Licence or Passport) *
+                <IdCard className="h-4 w-4" /> {t("createListing.photoIdLabel")}
               </Label>
               <p className="mt-1 text-xs text-muted-foreground">
-                Must match the seller (you). Used to confirm identity against the V5C / consignment agreement.
+                {t("createListing.photoIdDesc")}
               </p>
               <div className="mt-2 flex items-center gap-3">
                 {existingPhotoIdUrl || photoIdFile ? (
                   <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
-                    <CheckCircle className="h-4 w-4" /> {photoIdFile?.name || "Uploaded"}
+                    <CheckCircle className="h-4 w-4" /> {photoIdFile?.name || t("createListing.uploaded")}
                   </div>
                 ) : null}
                 <Button type="button" variant="outline" size="sm" onClick={() => photoIdInputRef.current?.click()}>
-                  <Upload className="mr-1 h-4 w-4" /> {existingPhotoIdUrl || photoIdFile ? "Replace" : "Upload"}
+                  <Upload className="mr-1 h-4 w-4" /> {existingPhotoIdUrl || photoIdFile ? t("createListing.replace") : t("createListing.upload")}
                 </Button>
                 <input ref={photoIdInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handlePhotoIdSelect} />
               </div>
@@ -792,42 +794,42 @@ const CreateListing = () => {
             {/* Consignment-specific */}
             {form.sale_type === "consignment" && (
               <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-4">
-                <p className="text-sm font-medium">Consignment Details</p>
+                <p className="text-sm font-medium">{t("createListing.consignmentDetails")}</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
-                    <Label className="text-xs">Registered owner's full name *</Label>
+                    <Label className="text-xs">{t("createListing.ownerFullName")}</Label>
                     <Input
                       value={form.owner_name}
                       onChange={(e) => updateField("owner_name", e.target.value)}
-                      placeholder="As shown on V5C"
+                      placeholder={t("createListing.ownerFullNamePlaceholder")}
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Owner's address *</Label>
+                    <Label className="text-xs">{t("createListing.ownerAddress")}</Label>
                     <Input
                       value={form.owner_address}
                       onChange={(e) => updateField("owner_address", e.target.value)}
-                      placeholder="As shown on V5C"
+                      placeholder={t("createListing.ownerAddressPlaceholder")}
                       className="mt-1"
                     />
                   </div>
                 </div>
                 <div>
                   <Label className="flex items-center gap-2 text-xs">
-                    <FileText className="h-3.5 w-3.5" /> Signed Consignment Agreement *
+                    <FileText className="h-3.5 w-3.5" /> {t("createListing.consignmentAgreementLabel")}
                   </Label>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Document signed by both you and the owner authorising you to sell on their behalf.
+                    {t("createListing.consignmentAgreementDesc")}
                   </p>
                   <div className="mt-2 flex items-center gap-3">
                     {existingConsignmentUrl || consignmentFile ? (
                       <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
-                        <CheckCircle className="h-4 w-4" /> {consignmentFile?.name || "Uploaded"}
+                        <CheckCircle className="h-4 w-4" /> {consignmentFile?.name || t("createListing.uploaded")}
                       </div>
                     ) : null}
                     <Button type="button" variant="outline" size="sm" onClick={() => consignmentInputRef.current?.click()}>
-                      <Upload className="mr-1 h-4 w-4" /> {existingConsignmentUrl || consignmentFile ? "Replace" : "Upload"}
+                      <Upload className="mr-1 h-4 w-4" /> {existingConsignmentUrl || consignmentFile ? t("createListing.replace") : t("createListing.upload")}
                     </Button>
                     <input ref={consignmentInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleConsignmentSelect} />
                   </div>
@@ -839,19 +841,19 @@ const CreateListing = () => {
             {form.sale_type === "trade" && (
               <div className="space-y-3 rounded-md border border-primary/30 bg-primary/5 p-4">
                 <Label className="flex items-center gap-2 text-sm font-medium">
-                  <FileText className="h-4 w-4" /> Trade Purchase Invoice *
+                  <FileText className="h-4 w-4" /> {t("createListing.tradeInvoiceLabel")}
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Invoice or auction receipt showing how the vehicle entered your stock.
+                  {t("createListing.tradeInvoiceDesc")}
                 </p>
                 <div className="flex items-center gap-3">
                   {existingTradeInvoiceUrl || tradeInvoiceFile ? (
                     <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
-                      <CheckCircle className="h-4 w-4" /> {tradeInvoiceFile?.name || "Uploaded"}
+                      <CheckCircle className="h-4 w-4" /> {tradeInvoiceFile?.name || t("createListing.uploaded")}
                     </div>
                   ) : null}
                   <Button type="button" variant="outline" size="sm" onClick={() => tradeInvoiceInputRef.current?.click()}>
-                    <Upload className="mr-1 h-4 w-4" /> {existingTradeInvoiceUrl || tradeInvoiceFile ? "Replace" : "Upload"}
+                    <Upload className="mr-1 h-4 w-4" /> {existingTradeInvoiceUrl || tradeInvoiceFile ? t("createListing.replace") : t("createListing.upload")}
                   </Button>
                   <input ref={tradeInvoiceInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleTradeInvoiceSelect} />
                 </div>
@@ -861,10 +863,10 @@ const CreateListing = () => {
             {/* Finance Disclosure */}
             <div className="space-y-3 rounded-md border border-amber-500/30 bg-amber-500/5 p-4">
               <Label className="flex items-center gap-2 text-sm font-medium">
-                <Banknote className="h-4 w-4 text-amber-500" /> Outstanding Finance Declaration *
+                <Banknote className="h-4 w-4 text-amber-500" /> {t("createListing.financeDeclarationLabel")}
               </Label>
               <p className="text-xs text-muted-foreground">
-                It is illegal to sell a vehicle with outstanding finance without the lender's consent.
+                {t("createListing.financeDeclarationDesc")}
               </p>
               <RadioGroup
                 value={form.finance_outstanding ? "yes" : "no"}
@@ -872,8 +874,8 @@ const CreateListing = () => {
                 className="grid gap-2 sm:grid-cols-2"
               >
                 {[
-                  { value: "no", label: "No outstanding finance" },
-                  { value: "yes", label: "Yes — finance is outstanding" },
+                  { value: "no", label: t("createListing.financeNo") },
+                  { value: "yes", label: t("createListing.financeYes") },
                 ].map((opt) => (
                   <label
                     key={opt.value}
@@ -891,16 +893,16 @@ const CreateListing = () => {
                 <div className="space-y-3 border-t border-amber-500/20 pt-3">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div>
-                      <Label className="text-xs">Finance company / lender *</Label>
+                      <Label className="text-xs">{t("createListing.financeLender")}</Label>
                       <Input
                         value={form.finance_lender}
                         onChange={(e) => updateField("finance_lender", e.target.value)}
-                        placeholder="e.g. Black Horse, Santander Consumer"
+                        placeholder={t("createListing.financeLenderPlaceholder")}
                         className="mt-1"
                       />
                     </div>
                     <div>
-                      <Label className="text-xs">Settlement amount ({config.currency.symbol})</Label>
+                      <Label className="text-xs">{t("createListing.settlementAmount", { symbol: config.currency.symbol })}</Label>
                       <Input
                         type="number"
                         step="0.01"
@@ -913,19 +915,19 @@ const CreateListing = () => {
                   </div>
                   <div>
                     <Label className="flex items-center gap-2 text-xs">
-                      <FileText className="h-3.5 w-3.5" /> Settlement Letter from Lender *
+                      <FileText className="h-3.5 w-3.5" /> {t("createListing.settlementLetterLabel")}
                     </Label>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Letter confirming settlement figure and that finance will be cleared on sale.
+                      {t("createListing.settlementLetterDesc")}
                     </p>
                     <div className="mt-2 flex items-center gap-3">
                       {existingFinanceLetterUrl || financeLetterFile ? (
                         <div className="flex items-center gap-2 rounded-md border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
-                          <CheckCircle className="h-4 w-4" /> {financeLetterFile?.name || "Uploaded"}
+                          <CheckCircle className="h-4 w-4" /> {financeLetterFile?.name || t("createListing.uploaded")}
                         </div>
                       ) : null}
                       <Button type="button" variant="outline" size="sm" onClick={() => financeLetterInputRef.current?.click()}>
-                        <Upload className="mr-1 h-4 w-4" /> {existingFinanceLetterUrl || financeLetterFile ? "Replace" : "Upload"}
+                        <Upload className="mr-1 h-4 w-4" /> {existingFinanceLetterUrl || financeLetterFile ? t("createListing.replace") : t("createListing.upload")}
                       </Button>
                       <input ref={financeLetterInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden" onChange={handleFinanceLetterSelect} />
                     </div>
@@ -937,10 +939,10 @@ const CreateListing = () => {
 
             <div>
               <Label className="flex items-center gap-2 text-sm font-medium">
-                <Shield className="h-4 w-4" /> HPI / Vehicle History Check
+                <Shield className="h-4 w-4" /> {t("createListing.hpiCheckLabel")}
               </Label>
               <p className="mt-1 text-xs text-muted-foreground">
-                Run an HPI check to verify the vehicle has no outstanding finance, theft records, or write-off history.
+                {t("createListing.hpiCheckDesc")}
               </p>
               <div className="mt-2 flex items-center gap-3">
                 {hpiCheckData ? (
@@ -950,9 +952,9 @@ const CreateListing = () => {
                       : "border-success/40 bg-success/10 text-success"
                   }`}>
                     {hpiCheckData.stolen_reported || hpiCheckData.finance_outstanding || hpiCheckData.write_off ? (
-                      <><AlertTriangle className="h-4 w-4" /> Issues found</>
+                      <><AlertTriangle className="h-4 w-4" /> {t("createListing.issuesFound")}</>
                     ) : (
-                      <><CheckCircle className="h-4 w-4" /> All clear</>
+                      <><CheckCircle className="h-4 w-4" /> {t("createListing.allClear")}</>
                     )}
                   </div>
                 ) : null}
@@ -964,11 +966,11 @@ const CreateListing = () => {
                   disabled={hpiLoading || (!form.registration && !form.vin)}
                 >
                   {hpiLoading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Shield className="mr-1 h-4 w-4" />}
-                  {hpiCheckData ? "Re-run HPI Check" : "Run HPI Check"}
+                  {hpiCheckData ? t("createListing.rerunHpiCheck") : t("createListing.runHpiCheck")}
                 </Button>
               </div>
               {!form.registration && !form.vin && (
-                <p className="mt-1 text-xs text-muted-foreground">Enter a registration or VIN above to enable HPI check.</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t("createListing.enterRegOrVin")}</p>
               )}
             </div>
 
@@ -980,17 +982,15 @@ const CreateListing = () => {
                 className="mt-0.5"
               />
               <div className="text-xs text-muted-foreground">
-                <p className="font-medium text-foreground">I declare that the information provided is true and accurate.</p>
+                <p className="font-medium text-foreground">{t("createListing.truthDeclarationTitle")}</p>
                 <p className="mt-1">
-                  I confirm I am legally entitled to sell this vehicle, that the documents uploaded are genuine, and that any
-                  outstanding finance has been disclosed. I understand that providing false information may result in my listing
-                  being removed, my account suspended, and may constitute a criminal offence.
+                  {t("createListing.truthDeclarationBody")}
                 </p>
               </div>
             </label>
 
             <div className="rounded-md border border-border bg-muted/50 p-3 text-xs text-muted-foreground">
-              <strong>Note:</strong> All listings are submitted for admin review. Your listing will go live once your documents and vehicle history have been verified by our team. Documents are stored privately and only visible to Zivvo admins.
+              <strong>{t("createListing.note")}</strong> {t("createListing.reviewNote")}
             </div>
           </CardContent>
         </Card>
@@ -998,10 +998,10 @@ const CreateListing = () => {
         {/* Actions */}
         <div className="mt-6 flex gap-3">
           <Button variant="outline" className="flex-1" onClick={() => handleSubmit("draft")} disabled={loading}>
-            Save as Draft
+            {t("createListing.saveAsDraft")}
           </Button>
           <Button className="gradient-primary flex-1 border-0" onClick={() => handleSubmit("active")} disabled={loading}>
-            {loading ? "Saving..." : editId ? "Update & Submit for Review" : "Submit for Review"}
+            {loading ? t("createListing.saving") : editId ? t("createListing.updateAndSubmit") : t("createListing.submitForReview")}
             <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
         </div>

@@ -1,73 +1,71 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { useTranslation } from "react-i18next";
 
-const Accessibility = () => (
-  <div className="min-h-screen bg-background">
-    <SEOHead
-      title="Accessibility Statement — Zivvo"
-      description="Zivvo's commitment to WCAG 2.1 AA accessibility standards and how to report issues."
-    />
-    <Navbar />
-    <div className="container mx-auto max-w-3xl px-4 py-12">
-      <h1 className="font-display text-3xl font-bold text-foreground">Accessibility Statement</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Last updated:{" "}
-        {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
-      </p>
+const Accessibility = () => {
+  const { t } = useTranslation("accessibility");
+  const whatWeDo = t("whatWeDo", { returnObjects: true }) as string[];
 
-      <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">Our Commitment</h2>
-          <p className="mt-2">
-            Zivvo is committed to making our platform accessible to everyone, regardless of ability or
-            technology. We aim to meet <strong>WCAG 2.1 Level AA</strong> standards across the website and apps.
-          </p>
-        </section>
+  return (
+    <div className="min-h-screen bg-background">
+      <SEOHead title={t("metaTitle")} description={t("metaDescription")} />
+      <Navbar />
+      <div className="container mx-auto max-w-3xl px-4 py-12">
+        <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {t("lastUpdated")}{" "}
+          {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+        </p>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">What We Do</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Semantic HTML and ARIA landmarks for screen-reader compatibility.</li>
-            <li>Full keyboard navigation, visible focus indicators, and skip-links.</li>
-            <li>Minimum 4.5:1 colour contrast across all text in both light and dark themes.</li>
-            <li>Resizable text up to 200% without loss of content.</li>
-            <li>Alt text on meaningful images; captions and transcripts on video content.</li>
-            <li>Accessible form labels and clear error messages.</li>
-          </ul>
-        </section>
+        <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("commitmentTitle")}</h2>
+            <p className="mt-2" dangerouslySetInnerHTML={{ __html: t("commitmentBody", { wcag: `<strong>${t("wcagStandard")}</strong>` }) }} />
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">Known Limitations</h2>
-          <p className="mt-2">
-            Some user-uploaded vehicle photos may lack descriptive alt text. We are working with sellers
-            to improve this and provide automated suggestions where possible.
-          </p>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("whatWeDoTitle")}</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {whatWeDo.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">Reporting Accessibility Issues</h2>
-          <p className="mt-2">
-            If you encounter any accessibility barriers, please email{" "}
-            <a href="mailto:accessibility@zivvo.co.uk" className="text-primary underline">accessibility@zivvo.co.uk</a>.
-            We aim to respond within 5 working days.
-          </p>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("limitationsTitle")}</h2>
+            <p className="mt-2">{t("limitationsBody")}</p>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">Enforcement</h2>
-          <p className="mt-2">
-            If you are not satisfied with our response, you can contact the Equality Advisory and Support
-            Service (EASS):{" "}
-            <a href="https://www.equalityadvisoryservice.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-              equalityadvisoryservice.com
-            </a>
-          </p>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("reportingTitle")}</h2>
+            <p className="mt-2">
+              {t("reportingBody", { email: "accessibility@zivvo.co.uk" }).split("accessibility@zivvo.co.uk").map((part, i, arr) => (
+                <span key={i}>
+                  {part}
+                  {i < arr.length - 1 && (
+                    <a href="mailto:accessibility@zivvo.co.uk" className="text-primary underline">accessibility@zivvo.co.uk</a>
+                  )}
+                </span>
+              ))}
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("enforcementTitle")}</h2>
+            <p className="mt-2">
+              {t("enforcementBody")}{" "}
+              <a href="https://www.equalityadvisoryservice.com" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                equalityadvisoryservice.com
+              </a>
+            </p>
+          </section>
+        </div>
       </div>
+      <Footer />
     </div>
-    <Footer />
-  </div>
-);
+  );
+};
 
 export default Accessibility;

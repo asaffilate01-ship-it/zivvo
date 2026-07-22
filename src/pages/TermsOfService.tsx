@@ -1,85 +1,81 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { useTranslation } from "react-i18next";
 
-const TermsOfService = () => (
-  <div className="min-h-screen bg-background">
-    <SEOHead title="Terms of Service — Zivvo" description="Read the terms and conditions for using Zivvo's vehicle marketplace." />
-    <Navbar />
-    <div className="container mx-auto max-w-3xl px-4 py-12">
-      <h1 className="font-display text-3xl font-bold text-foreground">Terms of Service</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Last updated: {new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+const TermsOfService = () => {
+  const { t } = useTranslation("terms");
+  const s2List = t("s2List", { returnObjects: true }) as string[];
+  const s3List = t("s3List", { returnObjects: true }) as string[];
+  const s5List = t("s5List", { returnObjects: true }) as string[];
+  const s6List = t("s6List", { returnObjects: true }) as string[];
 
-      <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">1. Acceptance of Terms</h2>
-          <p className="mt-2">By accessing or using Zivvo, you agree to be bound by these Terms of Service. If you do not agree, you may not use our platform.</p>
-        </section>
+  return (
+    <div className="min-h-screen bg-background">
+      <SEOHead title={t("metaTitle")} description={t("metaDescription")} />
+      <Navbar />
+      <div className="container mx-auto max-w-3xl px-4 py-12">
+        <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("lastUpdated")} {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}</p>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">2. User Accounts</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>You must provide accurate information when creating an account.</li>
-            <li>You are responsible for maintaining the security of your account credentials.</li>
-            <li>You must be at least 18 years old to use Zivvo.</li>
-            <li>One person may not maintain multiple accounts.</li>
-          </ul>
-        </section>
+        <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s1Title")}</h2>
+            <p className="mt-2">{t("s1Body")}</p>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">3. Listings</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Sellers are responsible for the accuracy of their listing information.</li>
-            <li>Listings must not contain fraudulent, misleading, or illegal content.</li>
-            <li>Zivvo reserves the right to remove any listing at its discretion.</li>
-            <li>Images must be of the actual vehicle being sold.</li>
-          </ul>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s2Title")}</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {s2List.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">4. Transactions</h2>
-          <p className="mt-2">Zivvo is a marketplace platform. We are not a party to any transaction between buyers and sellers. We do not guarantee the condition, legality, or safety of listed vehicles. Buyers should conduct their own due diligence.</p>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s3Title")}</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {s3List.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">5. Dealer Subscriptions</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Dealer plans are billed monthly via Stripe.</li>
-            <li>Subscriptions auto-renew unless cancelled before the next billing period.</li>
-            <li>You can manage or cancel your subscription from your dashboard.</li>
-            <li>Listing limits apply based on your subscription tier.</li>
-          </ul>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s4Title")}</h2>
+            <p className="mt-2">{t("s4Body")}</p>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">6. Prohibited Conduct</h2>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Posting false, fraudulent, or misleading listings.</li>
-            <li>Harassing, threatening, or abusing other users.</li>
-            <li>Attempting to circumvent security measures or access other users' accounts.</li>
-            <li>Using Zivvo for any illegal purpose.</li>
-            <li>Scraping or automated data collection without permission.</li>
-          </ul>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s5Title")}</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {s5List.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">7. Limitation of Liability</h2>
-          <p className="mt-2">Zivvo is provided "as is" without warranties of any kind. We are not liable for any damages arising from your use of the platform, including but not limited to losses from vehicle transactions.</p>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s6Title")}</h2>
+            <ul className="mt-2 list-disc space-y-1 pl-5">
+              {s6List.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">8. Changes to Terms</h2>
-          <p className="mt-2">We may update these terms from time to time. Continued use of Zivvo after changes constitutes acceptance of the new terms.</p>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s7Title")}</h2>
+            <p className="mt-2">{t("s7Body")}</p>
+          </section>
 
-        <section>
-          <h2 className="font-display text-lg font-semibold text-foreground">9. Contact</h2>
-          <p className="mt-2">For questions about these terms, contact us at legal@zivvo.co.uk.</p>
-        </section>
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s8Title")}</h2>
+            <p className="mt-2">{t("s8Body")}</p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s9Title")}</h2>
+            <p className="mt-2">{t("s9Body")}</p>
+          </section>
+        </div>
       </div>
+      <Footer />
     </div>
-    <Footer />
-  </div>
-);
+  );
+};
 
 export default TermsOfService;

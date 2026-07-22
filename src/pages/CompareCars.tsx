@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 
 const MAX_COMPARE = 3;
@@ -23,6 +24,7 @@ const MAX_COMPARE = 3;
 const CompareCars = () => {
   const { config } = useCountry();
   const { toast } = useToast();
+  const { t } = useTranslation("compareCars");
   const [searchParams] = useSearchParams();
   const initialCar = searchParams.get("car");
   const [selectedIds, setSelectedIds] = useState<string[]>(initialCar ? [initialCar] : []);
@@ -78,26 +80,26 @@ const CompareCars = () => {
   const handleShare = async () => {
     const url = `${window.location.origin}/compare?${selectedIds.map((id) => `car=${id}`).join("&")}`;
     if (navigator.share) {
-      try { await navigator.share({ title: "Car Comparison — Zivvo", url }); } catch {}
+      try { await navigator.share({ title: t("shareTitle"), url }); } catch {}
     } else {
       await navigator.clipboard.writeText(url);
-      toast({ title: "Comparison link copied!" });
+      toast({ title: t("linkCopied") });
     }
   };
 
   const handlePrint = () => window.print();
 
   const specRows = [
-    { label: "Price", key: "price", icon: Sparkles, fmt: (v: any) => v ? formatPrice(Number(v), config) : "N/A" },
-    { label: "Year", key: "year", icon: Calendar, fmt: (v: any) => v || "N/A" },
-    { label: config.terminology.mileage, key: "mileage", icon: Gauge, fmt: (v: any) => v ? formatDistance(Number(v), config) : "N/A" },
-    { label: "Fuel Type", key: "fuel_type", icon: Fuel, fmt: (v: any) => v || "N/A" },
-    { label: "Transmission", key: "transmission", icon: Settings2, fmt: (v: any) => v || "N/A" },
-    { label: "Body Type", key: "body_type", icon: Car, fmt: (v: any) => v || "N/A" },
-    { label: "Engine Size", key: "engine_size", icon: Cog, fmt: (v: any) => v || "N/A" },
-    { label: "Doors", key: "doors", icon: DoorOpen, fmt: (v: any) => v || "N/A" },
-    { label: "Color", key: "color", icon: Palette, fmt: (v: any) => v || "N/A" },
-    { label: "Location", key: "location", icon: MapPin, fmt: (v: any) => v || "N/A" },
+    { label: t("specs.price"), key: "price", icon: Sparkles, fmt: (v: any) => v ? formatPrice(Number(v), config) : t("na") },
+    { label: t("specs.year"), key: "year", icon: Calendar, fmt: (v: any) => v || t("na") },
+    { label: config.terminology.mileage, key: "mileage", icon: Gauge, fmt: (v: any) => v ? formatDistance(Number(v), config) : t("na") },
+    { label: t("specs.fuelType"), key: "fuel_type", icon: Fuel, fmt: (v: any) => v || t("na") },
+    { label: t("specs.transmission"), key: "transmission", icon: Settings2, fmt: (v: any) => v || t("na") },
+    { label: t("specs.bodyType"), key: "body_type", icon: Car, fmt: (v: any) => v || t("na") },
+    { label: t("specs.engineSize"), key: "engine_size", icon: Cog, fmt: (v: any) => v || t("na") },
+    { label: t("specs.doors"), key: "doors", icon: DoorOpen, fmt: (v: any) => v || t("na") },
+    { label: t("specs.color"), key: "color", icon: Palette, fmt: (v: any) => v || t("na") },
+    { label: t("specs.location"), key: "location", icon: MapPin, fmt: (v: any) => v || t("na") },
   ];
 
   // Collect all unique features across all cars
@@ -108,19 +110,19 @@ const CompareCars = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Compare Cars Side by Side"
-        description="Compare up to 3 vehicles side by side — specs, price, features, and more on Zivvo."
+        title={t("seoTitle")}
+        description={t("seoDescription")}
       />
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
         <nav className="mb-4 flex items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
-          <Link to="/" className="hover:text-primary">Home</Link>
+          <Link to="/" className="hover:text-primary">{t("breadcrumb.home")}</Link>
           <span>/</span>
-          <Link to="/browse" className="hover:text-primary">Browse</Link>
+          <Link to="/browse" className="hover:text-primary">{t("breadcrumb.browse")}</Link>
           <span>/</span>
-          <span className="text-foreground">Compare</span>
+          <span className="text-foreground">{t("breadcrumb.compare")}</span>
         </nav>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
@@ -129,17 +131,17 @@ const CompareCars = () => {
               <Button variant="ghost" size="icon"><ArrowLeft className="h-5 w-5" /></Button>
             </Link>
             <div>
-              <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">Compare Cars</h1>
-              <p className="text-sm text-muted-foreground">Select up to {MAX_COMPARE} vehicles to compare side by side</p>
+              <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("subtitle", { count: MAX_COMPARE })}</p>
             </div>
           </div>
           {cars.length >= 2 && (
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="mr-1 h-4 w-4" /> Share
+                <Share2 className="mr-1 h-4 w-4" /> {t("share")}
               </Button>
               <Button variant="outline" size="sm" onClick={handlePrint} className="hidden sm:flex">
-                <Printer className="mr-1 h-4 w-4" /> Print
+                <Printer className="mr-1 h-4 w-4" /> {t("print")}
               </Button>
             </div>
           )}
@@ -165,11 +167,11 @@ const CompareCars = () => {
                 </div>
                 <div className="absolute left-2 top-2 flex gap-1.5">
                   {car.is_featured && (
-                    <Badge className="gradient-primary border-0 text-primary-foreground text-[10px]">Featured</Badge>
+                    <Badge className="gradient-primary border-0 text-primary-foreground text-[10px]">{t("featured")}</Badge>
                   )}
                   {car.verified && (
                     <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm text-[10px]">
-                      <BadgeCheck className="mr-0.5 h-3 w-3 text-success" /> Verified
+                      <BadgeCheck className="mr-0.5 h-3 w-3 text-success" /> {t("verified")}
                     </Badge>
                   )}
                 </div>
@@ -213,7 +215,7 @@ const CompareCars = () => {
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
-                          placeholder="Search by make, model..."
+                          placeholder={t("searchPlaceholder")}
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="pl-10"
@@ -222,7 +224,7 @@ const CompareCars = () => {
                       </div>
                       <div className="max-h-60 overflow-y-auto space-y-1">
                         {searching && (
-                          <p className="text-center text-sm text-muted-foreground py-4">Searching...</p>
+                          <p className="text-center text-sm text-muted-foreground py-4">{t("searching")}</p>
                         )}
                         {searchResults
                           .filter((r) => !selectedIds.includes(r.id))
@@ -249,7 +251,7 @@ const CompareCars = () => {
                             </button>
                           ))}
                         {searchQuery && !searching && searchResults.length === 0 && (
-                          <p className="text-center text-sm text-muted-foreground py-4">No results found</p>
+                          <p className="text-center text-sm text-muted-foreground py-4">{t("noResults")}</p>
                         )}
                       </div>
                       <Button
@@ -258,7 +260,7 @@ const CompareCars = () => {
                         className="w-full"
                         onClick={() => { setShowSearch(false); setSearchQuery(""); }}
                       >
-                        Cancel
+                        {t("cancel")}
                       </Button>
                     </motion.div>
                   ) : (
@@ -272,10 +274,10 @@ const CompareCars = () => {
                       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                         <Plus className="h-6 w-6 text-muted-foreground" />
                       </div>
-                      <p className="mt-3 text-sm font-medium text-muted-foreground">Add a vehicle</p>
-                      <p className="text-xs text-muted-foreground mt-1">Search to add a car for comparison</p>
+                      <p className="mt-3 text-sm font-medium text-muted-foreground">{t("addVehicle")}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("addVehicleDesc")}</p>
                       <Button variant="outline" size="sm" className="mt-4" onClick={() => setShowSearch(true)}>
-                        <Search className="mr-2 h-4 w-4" /> Search Cars
+                        <Search className="mr-2 h-4 w-4" /> {t("searchCars")}
                       </Button>
                     </motion.div>
                   )}
@@ -289,13 +291,13 @@ const CompareCars = () => {
         {cars.length >= 2 && (
           <div ref={tableRef} className="mt-8">
             {/* Specifications */}
-            <h2 className="font-display text-lg font-bold text-foreground mb-4">Specifications</h2>
+            <h2 className="font-display text-lg font-bold text-foreground mb-4">{t("specifications")}</h2>
             <div className="overflow-x-auto rounded-xl border border-border bg-card">
               <table className="w-full border-separate border-spacing-0 text-sm">
                 <thead>
                   <tr>
                     <th className="sticky left-0 z-10 border-b border-border bg-card p-3 text-left font-medium text-muted-foreground min-w-[140px]">
-                      Specification
+                      {t("specification")}
                     </th>
                     {cars.map((car) => (
                       <th
@@ -335,7 +337,7 @@ const CompareCars = () => {
                                 variant="outline"
                                 className="ml-2 border-success text-success text-[10px] px-1 py-0"
                               >
-                                Best
+                                {t("best")}
                               </Badge>
                             )}
                           </td>
@@ -350,13 +352,13 @@ const CompareCars = () => {
             {/* Features Comparison */}
             {allFeatures.length > 0 && (
               <div className="mt-8">
-                <h2 className="font-display text-lg font-bold text-foreground mb-4">Features & Equipment</h2>
+                <h2 className="font-display text-lg font-bold text-foreground mb-4">{t("featuresEquipment")}</h2>
                 <div className="overflow-x-auto rounded-xl border border-border bg-card">
                   <table className="w-full border-separate border-spacing-0 text-sm">
                     <thead>
                       <tr>
                         <th className="sticky left-0 z-10 border-b border-border bg-card p-3 text-left font-medium text-muted-foreground min-w-[180px]">
-                          Feature
+                          {t("feature")}
                         </th>
                         {cars.map((car) => (
                           <th
@@ -396,7 +398,7 @@ const CompareCars = () => {
 
             {/* Verdict Summary */}
             <div className="mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6">
-              <h3 className="font-display text-base font-bold text-foreground">Quick Verdict</h3>
+              <h3 className="font-display text-base font-bold text-foreground">{t("quickVerdict")}</h3>
               <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {cars.map((car) => {
                   const featureCount = (car.features || []).length;
@@ -408,16 +410,16 @@ const CompareCars = () => {
                       <div className="mt-2 space-y-1 text-xs text-muted-foreground">
                         <p>💰 {formatPrice(Number(car.price), config)}</p>
                         <p>🛣️ {car.mileage ? formatDistance(car.mileage, config) : "N/A"}</p>
-                        <p>✨ {featureCount} feature{featureCount !== 1 ? "s" : ""}</p>
+                        <p>✨ {t("featureCount", { count: featureCount })}</p>
                         {car.verified && (
                           <p className="flex items-center gap-1 text-success">
-                            <BadgeCheck className="h-3 w-3" /> Verified
+                            <BadgeCheck className="h-3 w-3" /> {t("verified")}
                           </p>
                         )}
                       </div>
                       <Link to={`/car/${car.id}`}>
                         <Button size="sm" variant="outline" className="mt-3 w-full text-xs">
-                          View Details
+                          {t("viewDetails")}
                         </Button>
                       </Link>
                     </div>
@@ -431,20 +433,20 @@ const CompareCars = () => {
         {cars.length < 2 && cars.length > 0 && (
           <div className="mt-8 rounded-xl border border-border bg-muted/30 p-8 text-center">
             <Car className="mx-auto h-10 w-10 text-muted-foreground" />
-            <p className="mt-3 font-medium text-foreground">Add at least one more vehicle</p>
-            <p className="text-sm text-muted-foreground mt-1">Select another car to start comparing specs and features</p>
+            <p className="mt-3 font-medium text-foreground">{t("addOneMore")}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("addOneMoreDesc")}</p>
           </div>
         )}
 
         {cars.length === 0 && (
           <div className="mt-8 rounded-xl border border-border bg-muted/30 p-12 text-center">
             <Car className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 font-display text-lg font-bold text-foreground">No vehicles selected</p>
+            <p className="mt-4 font-display text-lg font-bold text-foreground">{t("noVehicles")}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Add vehicles above to compare specs, features, and pricing side by side
+              {t("noVehiclesDesc")}
             </p>
             <Link to="/browse">
-              <Button className="gradient-primary border-0 mt-4">Browse Cars</Button>
+              <Button className="gradient-primary border-0 mt-4">{t("browseCars")}</Button>
             </Link>
           </div>
         )}

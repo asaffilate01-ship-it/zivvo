@@ -9,8 +9,10 @@ import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+  const { t } = useTranslation("contact");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
@@ -27,29 +29,31 @@ const Contact = () => {
     setLoading(false);
 
     if (error) {
-      toast({ title: "Failed to send message", description: error.message, variant: "destructive" });
+      toast({ title: t("toastFailTitle"), description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Message sent!", description: "We'll get back to you within 24 hours." });
+      toast({ title: t("toastSuccessTitle"), description: t("toastSuccessDesc") });
       setForm({ name: "", email: "", subject: "", message: "" });
     }
   };
 
+  const infoItems = [
+    { icon: Mail, title: t("email"), detail: t("emailDetail"), sub: t("emailSub") },
+    { icon: Phone, title: t("phone"), detail: t("phoneDetail"), sub: t("phoneSub") },
+    { icon: MapPin, title: t("office"), detail: t("officeDetail"), sub: t("officeSub") },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title="Contact Us — Zivvo" description="Get in touch with the Zivvo team. We're here to help with any questions about buying, selling, or dealer subscriptions." />
+      <SEOHead title={t("metaTitle")} description={t("metaDescription")} />
       <Navbar />
       <div className="container mx-auto max-w-5xl px-4 py-12">
         <div className="text-center">
-          <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">Get in Touch</h1>
-          <p className="mt-2 text-muted-foreground">Have a question? We'd love to hear from you.</p>
+          <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">{t("title")}</h1>
+          <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>
         </div>
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
-          {[
-            { icon: Mail, title: "Email", detail: "support@zivvo.co.uk", sub: "We respond within 24 hours" },
-            { icon: Phone, title: "Phone", detail: "+44 20 7123 4567", sub: "Mon-Fri 9am-6pm GMT" },
-            { icon: MapPin, title: "Office", detail: "London, United Kingdom", sub: "By appointment only" },
-          ].map((item) => (
+          {infoItems.map((item) => (
             <Card key={item.title}>
               <CardContent className="flex flex-col items-center p-6 text-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
@@ -65,29 +69,29 @@ const Contact = () => {
 
         <Card className="mt-12">
           <CardContent className="p-6 md:p-8">
-            <h2 className="font-display text-xl font-bold text-card-foreground">Send us a message</h2>
+            <h2 className="font-display text-xl font-bold text-card-foreground">{t("sendMessageTitle")}</h2>
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">Name</label>
-                  <Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="Your name" required />
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">{t("nameLabel")}</label>
+                  <Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder={t("namePlaceholder")} required />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="you@example.com" required />
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">{t("emailLabel")}</label>
+                  <Input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder={t("emailPlaceholder")} required />
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Subject</label>
-                <Input value={form.subject} onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))} placeholder="How can we help?" required />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("subjectLabel")}</label>
+                <Input value={form.subject} onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))} placeholder={t("subjectPlaceholder")} required />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Message</label>
-                <Textarea value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder="Tell us more..." rows={5} required />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("messageLabel")}</label>
+                <Textarea value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder={t("messagePlaceholder")} rows={5} required />
               </div>
               <Button type="submit" className="gradient-primary border-0" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                Send Message
+                {t("sendMessage")}
               </Button>
             </form>
           </CardContent>

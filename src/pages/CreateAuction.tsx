@@ -15,9 +15,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { Gavel, Shield, Info, Clock, Truck, Key, FileText, Star, AlertTriangle } from "lucide-react";
 
 const CreateAuction = () => {
+  const { t } = useTranslation("createAuction");
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -61,9 +63,9 @@ const CreateAuction = () => {
 
   const createAuction = useMutation({
     mutationFn: async () => {
-      if (!user) throw new Error("Login required");
-      if (!listingId) throw new Error("Select a listing");
-      if (!startingPrice || parseFloat(startingPrice) <= 0) throw new Error("Set a starting price");
+      if (!user) throw new Error(t("errors.loginRequired"));
+      if (!listingId) throw new Error(t("errors.selectListing"));
+      if (!startingPrice || parseFloat(startingPrice) <= 0) throw new Error(t("errors.setStartingPrice"));
 
       const startsAt = new Date();
       startsAt.setHours(startsAt.getHours() + 1); // Start in 1 hour
@@ -103,7 +105,7 @@ const CreateAuction = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Auction submitted for inspection review!");
+      toast.success(t("toast.submitted"));
       navigate("/auctions");
     },
     onError: (e: Error) => toast.error(e.message),
@@ -111,7 +113,7 @@ const CreateAuction = () => {
 
   return (
     <>
-      <SEOHead title="Create Auction | Sell Your Car at Auction" description="List your verified vehicle for auction with professional inspection and payment protection." />
+      <SEOHead title={t("seoTitle")} description={t("seoDescription")} />
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -120,8 +122,8 @@ const CreateAuction = () => {
               <Gavel className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Create Auction</h1>
-              <p className="text-sm text-muted-foreground">Your car will be inspected by our specialists before going live</p>
+              <h1 className="text-2xl font-bold">{t("title")}</h1>
+              <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
             </div>
           </div>
 
@@ -130,15 +132,15 @@ const CreateAuction = () => {
             <CardContent className="p-4 flex items-start gap-3">
               <Info className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
               <div className="text-sm">
-                <p className="font-medium mb-1">How it works</p>
+                <p className="font-medium mb-1">{t("howItWorks.title")}</p>
                 <ol className="space-y-1 text-muted-foreground">
-                  <li>1. Submit your car for auction with condition details</li>
-                  <li>2. Our approved specialist inspects and rates your car (1-5)</li>
-                  <li>3. HPI check & ownership verification completed</li>
-                  <li>4. Auction goes live — verified buyers bid with pre-authorised funds</li>
-                  <li>5. Sale completed via Payment Protection + e-signed contract</li>
+                  <li>{t("howItWorks.step1")}</li>
+                  <li>{t("howItWorks.step2")}</li>
+                  <li>{t("howItWorks.step3")}</li>
+                  <li>{t("howItWorks.step4")}</li>
+                  <li>{t("howItWorks.step5")}</li>
                 </ol>
-                <p className="mt-2 text-xs">Platform fee: <strong>1.5% seller fee</strong> on successful sale. Buyer pays 3% premium.</p>
+                <p className="mt-2 text-xs">{t("howItWorks.fee")}</p>
               </div>
             </CardContent>
           </Card>
@@ -146,10 +148,10 @@ const CreateAuction = () => {
           <div className="space-y-6">
             {/* Select Listing */}
             <Card>
-              <CardHeader><CardTitle className="text-lg">Select Vehicle</CardTitle><CardDescription>Choose from your existing listings</CardDescription></CardHeader>
+              <CardHeader><CardTitle className="text-lg">{t("selectVehicle.title")}</CardTitle><CardDescription>{t("selectVehicle.desc")}</CardDescription></CardHeader>
               <CardContent>
                 <Select value={listingId} onValueChange={setListingId}>
-                  <SelectTrigger><SelectValue placeholder="Select a listing..." /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder={t("selectVehicle.placeholder")} /></SelectTrigger>
                   <SelectContent>
                     {listings.map((l: any) => (
                       <SelectItem key={l.id} value={l.id}>{l.year} {l.make} {l.model} — {l.title}</SelectItem>
@@ -157,63 +159,63 @@ const CreateAuction = () => {
                   </SelectContent>
                 </Select>
                 {listings.length === 0 && (
-                  <p className="text-sm text-muted-foreground mt-2">No listings found. <a href="/sell" className="text-primary hover:underline">Create a listing first</a>.</p>
+                  <p className="text-sm text-muted-foreground mt-2">{t("selectVehicle.noListings")} <a href="/sell" className="text-primary hover:underline">{t("selectVehicle.createFirst")}</a>.</p>
                 )}
               </CardContent>
             </Card>
 
             {/* Auction Settings */}
             <Card>
-              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Clock className="w-5 h-5" /> Auction Settings</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Clock className="w-5 h-5" /> {t("settings.title")}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Format</Label>
+                  <Label>{t("settings.format")}</Label>
                   <Select value={format} onValueChange={(v) => setFormat(v as any)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="timed">Timed Auction (Online)</SelectItem>
-                      <SelectItem value="live_event">Live Event Auction</SelectItem>
+                      <SelectItem value="timed">{t("settings.formatTimed")}</SelectItem>
+                      <SelectItem value="live_event">{t("settings.formatLiveEvent")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Starting Price</Label>
-                    <Input type="number" value={startingPrice} onChange={(e) => setStartingPrice(e.target.value)} placeholder="e.g. 5000" />
+                    <Label>{t("settings.startingPrice")}</Label>
+                    <Input type="number" value={startingPrice} onChange={(e) => setStartingPrice(e.target.value)} placeholder={t("settings.startingPricePlaceholder")} />
                   </div>
                   <div>
-                    <Label className="flex items-center gap-1">Reserve Price <Shield className="w-3 h-3 text-muted-foreground" /></Label>
-                    <Input type="number" value={reservePrice} onChange={(e) => setReservePrice(e.target.value)} placeholder="Secret minimum" />
-                    <p className="text-[10px] text-muted-foreground mt-1">Only visible to you & admin</p>
+                    <Label className="flex items-center gap-1">{t("settings.reservePrice")} <Shield className="w-3 h-3 text-muted-foreground" /></Label>
+                    <Input type="number" value={reservePrice} onChange={(e) => setReservePrice(e.target.value)} placeholder={t("settings.reservePricePlaceholder")} />
+                    <p className="text-[10px] text-muted-foreground mt-1">{t("settings.reservePriceNote")}</p>
                   </div>
                 </div>
 
                 {format === "timed" && (
                   <div>
-                    <Label>Duration</Label>
+                    <Label>{t("settings.duration")}</Label>
                     <Select value={duration} onValueChange={setDuration}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="3">3 days</SelectItem>
-                        <SelectItem value="5">5 days</SelectItem>
-                        <SelectItem value="7">7 days (recommended)</SelectItem>
-                        <SelectItem value="10">10 days</SelectItem>
-                        <SelectItem value="14">14 days</SelectItem>
+                        <SelectItem value="3">{t("settings.days3")}</SelectItem>
+                        <SelectItem value="5">{t("settings.days5")}</SelectItem>
+                        <SelectItem value="7">{t("settings.days7")}</SelectItem>
+                        <SelectItem value="10">{t("settings.days10")}</SelectItem>
+                        <SelectItem value="14">{t("settings.days14")}</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-[10px] text-muted-foreground mt-1">Anti-sniping: 2-minute extension on late bids</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{t("settings.antiSniping")}</p>
                   </div>
                 )}
 
                 {format === "live_event" && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>Event Name</Label>
-                      <Input value={liveEventName} onChange={(e) => setLiveEventName(e.target.value)} placeholder="e.g. Spring Auction" />
+                      <Label>{t("settings.eventName")}</Label>
+                      <Input value={liveEventName} onChange={(e) => setLiveEventName(e.target.value)} placeholder={t("settings.eventNamePlaceholder")} />
                     </div>
                     <div>
-                      <Label>Event Date</Label>
+                      <Label>{t("settings.eventDate")}</Label>
                       <Input type="datetime-local" value={liveEventDate} onChange={(e) => setLiveEventDate(e.target.value)} />
                     </div>
                   </div>
@@ -223,66 +225,66 @@ const CreateAuction = () => {
 
             {/* Condition Report */}
             <Card>
-              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Star className="w-5 h-5" /> Condition Details</CardTitle><CardDescription>Our inspector will verify and rate these</CardDescription></CardHeader>
+              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Star className="w-5 h-5" /> {t("condition.title")}</CardTitle><CardDescription>{t("condition.desc")}</CardDescription></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="flex items-center gap-1"><Key className="w-3 h-3" /> Number of Keys</Label>
+                    <Label className="flex items-center gap-1"><Key className="w-3 h-3" /> {t("condition.numberOfKeys")}</Label>
                     <Input type="number" value={keysCount} onChange={(e) => setKeysCount(e.target.value)} min="1" max="5" />
                   </div>
                   <div className="flex items-center justify-between pt-6">
-                    <Label>Spare Key Included</Label>
+                    <Label>{t("condition.spareKey")}</Label>
                     <Switch checked={spareKey} onCheckedChange={setSpareKey} />
                   </div>
                 </div>
 
                 <div>
-                  <Label><FileText className="w-3 h-3 inline mr-1" />Service History</Label>
+                  <Label><FileText className="w-3 h-3 inline mr-1" />{t("condition.serviceHistory")}</Label>
                   <Select value={serviceHistory} onValueChange={setServiceHistory}>
-                    <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t("condition.selectPlaceholder")} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Full dealer service history">Full dealer service history</SelectItem>
-                      <SelectItem value="Full service history (independent)">Full service history (independent)</SelectItem>
-                      <SelectItem value="Partial service history">Partial service history</SelectItem>
-                      <SelectItem value="No service history">No service history</SelectItem>
+                      <SelectItem value="Full dealer service history">{t("condition.serviceFullDealer")}</SelectItem>
+                      <SelectItem value="Full service history (independent)">{t("condition.serviceFullIndependent")}</SelectItem>
+                      <SelectItem value="Partial service history">{t("condition.servicePartial")}</SelectItem>
+                      <SelectItem value="No service history">{t("condition.serviceNone")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label><AlertTriangle className="w-3 h-3 inline mr-1" />Accident History</Label>
-                  <Textarea value={accidentHistory} onChange={(e) => setAccidentHistory(e.target.value)} placeholder="Describe any past accidents or 'No accidents'" rows={2} />
+                  <Label><AlertTriangle className="w-3 h-3 inline mr-1" />{t("condition.accidentHistory")}</Label>
+                  <Textarea value={accidentHistory} onChange={(e) => setAccidentHistory(e.target.value)} placeholder={t("condition.accidentHistoryPlaceholder")} rows={2} />
                 </div>
 
                 <div>
-                  <Label><Shield className="w-3 h-3 inline mr-1" />Warranty Information</Label>
-                  <Textarea value={warrantyInfo} onChange={(e) => setWarrantyInfo(e.target.value)} placeholder="e.g. 6 months through our warranty partner / None" rows={2} />
+                  <Label><Shield className="w-3 h-3 inline mr-1" />{t("condition.warrantyInfo")}</Label>
+                  <Textarea value={warrantyInfo} onChange={(e) => setWarrantyInfo(e.target.value)} placeholder={t("condition.warrantyInfoPlaceholder")} rows={2} />
                 </div>
 
                 <Separator />
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Tyre Condition</Label>
+                    <Label>{t("condition.tyreCondition")}</Label>
                     <Select value={tyresCondition} onValueChange={setTyresCondition}>
-                      <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("condition.selectPlaceholder")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Excellent (all new)">Excellent (all new)</SelectItem>
-                        <SelectItem value="Good (5mm+ tread)">Good (5mm+ tread)</SelectItem>
-                        <SelectItem value="Fair (3-5mm tread)">Fair (3-5mm tread)</SelectItem>
-                        <SelectItem value="Needs replacing">Needs replacing</SelectItem>
+                        <SelectItem value="Excellent (all new)">{t("condition.tyresExcellent")}</SelectItem>
+                        <SelectItem value="Good (5mm+ tread)">{t("condition.tyresGood")}</SelectItem>
+                        <SelectItem value="Fair (3-5mm tread)">{t("condition.tyresFair")}</SelectItem>
+                        <SelectItem value="Needs replacing">{t("condition.tyresPoor")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Paint Condition</Label>
+                    <Label>{t("condition.paintCondition")}</Label>
                     <Select value={paintCondition} onValueChange={setPaintCondition}>
-                      <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("condition.selectPlaceholder")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Excellent — no visible marks">Excellent</SelectItem>
-                        <SelectItem value="Good — minor stone chips">Good — minor chips</SelectItem>
-                        <SelectItem value="Fair — some scratches/dents">Fair — scratches/dents</SelectItem>
-                        <SelectItem value="Poor — significant damage">Poor — significant damage</SelectItem>
+                        <SelectItem value="Excellent — no visible marks">{t("condition.paintExcellent")}</SelectItem>
+                        <SelectItem value="Good — minor stone chips">{t("condition.paintGood")}</SelectItem>
+                        <SelectItem value="Fair — some scratches/dents">{t("condition.paintFair")}</SelectItem>
+                        <SelectItem value="Poor — significant damage">{t("condition.paintPoor")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -290,58 +292,58 @@ const CreateAuction = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Interior Condition</Label>
+                    <Label>{t("condition.interiorCondition")}</Label>
                     <Select value={interiorCondition} onValueChange={setInteriorCondition}>
-                      <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("condition.selectPlaceholder")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Excellent — like new">Excellent</SelectItem>
-                        <SelectItem value="Good — light wear">Good — light wear</SelectItem>
-                        <SelectItem value="Fair — visible wear">Fair — visible wear</SelectItem>
-                        <SelectItem value="Poor — heavy wear/damage">Poor — heavy wear</SelectItem>
+                        <SelectItem value="Excellent — like new">{t("condition.interiorExcellent")}</SelectItem>
+                        <SelectItem value="Good — light wear">{t("condition.interiorGood")}</SelectItem>
+                        <SelectItem value="Fair — visible wear">{t("condition.interiorFair")}</SelectItem>
+                        <SelectItem value="Poor — heavy wear/damage">{t("condition.interiorPoor")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Mechanical Notes</Label>
-                    <Textarea value={mechanicalNotes} onChange={(e) => setMechanicalNotes(e.target.value)} placeholder="Any known issues or recent work" rows={2} />
+                    <Label>{t("condition.mechanicalNotes")}</Label>
+                    <Textarea value={mechanicalNotes} onChange={(e) => setMechanicalNotes(e.target.value)} placeholder={t("condition.mechanicalNotesPlaceholder")} rows={2} />
                   </div>
                 </div>
 
                 <div>
-                  <Label>Additional Assets Included</Label>
-                  <Textarea value={assetsIncluded} onChange={(e) => setAssetsIncluded(e.target.value)} placeholder="e.g. Roof rack, winter tyres set, original toolkit" rows={2} />
+                  <Label>{t("condition.additionalAssets")}</Label>
+                  <Textarea value={assetsIncluded} onChange={(e) => setAssetsIncluded(e.target.value)} placeholder={t("condition.additionalAssetsPlaceholder")} rows={2} />
                 </div>
               </CardContent>
             </Card>
 
             {/* Logistics */}
             <Card>
-              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Truck className="w-5 h-5" /> Collection & Delivery</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg flex items-center gap-2"><Truck className="w-5 h-5" /> {t("logistics.title")}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Collection Address</Label>
-                  <Input value={collectionAddress} onChange={(e) => setCollectionAddress(e.target.value)} placeholder="Where the buyer can collect" />
+                  <Label>{t("logistics.collectionAddress")}</Label>
+                  <Input value={collectionAddress} onChange={(e) => setCollectionAddress(e.target.value)} placeholder={t("logistics.collectionAddressPlaceholder")} />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label>Delivery via Logistics Partners</Label>
-                    <p className="text-xs text-muted-foreground">Buyer pays delivery at additional cost</p>
+                    <Label>{t("logistics.deliveryPartners")}</Label>
+                    <p className="text-xs text-muted-foreground">{t("logistics.deliveryPartnersDesc")}</p>
                   </div>
                   <Switch checked={deliveryAvailable} onCheckedChange={setDeliveryAvailable} />
                 </div>
                 {deliveryAvailable && (
                   <div>
-                    <Label>Estimated Delivery Cost</Label>
-                    <Input type="number" value={deliveryCost} onChange={(e) => setDeliveryCost(e.target.value)} placeholder="e.g. 250" />
+                    <Label>{t("logistics.estimatedCost")}</Label>
+                    <Input type="number" value={deliveryCost} onChange={(e) => setDeliveryCost(e.target.value)} placeholder={t("logistics.estimatedCostPlaceholder")} />
                   </div>
                 )}
               </CardContent>
             </Card>
 
             <Button onClick={() => createAuction.mutate()} disabled={createAuction.isPending} className="w-full h-12 text-lg gap-2">
-              <Gavel className="w-5 h-5" /> {createAuction.isPending ? "Submitting..." : "Submit for Inspection & Review"}
+              <Gavel className="w-5 h-5" /> {createAuction.isPending ? t("submitting") : t("submit")}
             </Button>
-            <p className="text-xs text-center text-muted-foreground">Your auction will go live after inspection and admin approval</p>
+            <p className="text-xs text-center text-muted-foreground">{t("submitNote")}</p>
           </div>
         </div>
       </main>

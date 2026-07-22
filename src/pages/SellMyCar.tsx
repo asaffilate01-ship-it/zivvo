@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -21,18 +22,19 @@ import {
   Loader2, Search, Shield, Zap, Clock, Upload,
 } from "lucide-react";
 
-const steps = [
-  { icon: Search, label: "Vehicle Details", desc: "Enter your registration or details" },
-  { icon: Camera, label: "Photos", desc: "Upload photos of your vehicle" },
-  { icon: DollarSign, label: "Set Price", desc: "Choose your asking price" },
-  { icon: CheckCircle, label: "Review & Post", desc: "Confirm and publish" },
-];
-
 const SellMyCar = () => {
+  const { t } = useTranslation();
   const { config, country } = useCountry();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const steps = [
+    { icon: Search, label: t("sellMyCar.steps.vehicleDetails"), desc: t("sellMyCar.steps.vehicleDetailsDesc") },
+    { icon: Camera, label: t("sellMyCar.steps.photos"), desc: t("sellMyCar.steps.photosDesc") },
+    { icon: DollarSign, label: t("sellMyCar.steps.setPrice"), desc: t("sellMyCar.steps.setPriceDesc") },
+    { icon: CheckCircle, label: t("sellMyCar.steps.reviewPost"), desc: t("sellMyCar.steps.reviewPostDesc") },
+  ];
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [regLooking, setRegLooking] = useState(false);
@@ -74,12 +76,12 @@ const SellMyCar = () => {
           color: data.colour || p.color,
           title: `${data.make || ""} ${data.model || ""} ${data.yearOfManufacture || ""}`.trim(),
         }));
-        toast({ title: "Vehicle found!", description: `${data.make} ${data.model} (${data.yearOfManufacture})` });
+        toast({ title: t("sellMyCar.vehicleFound"), description: `${data.make} ${data.model} (${data.yearOfManufacture})` });
       } else {
-        toast({ title: "Not found", description: "Could not find vehicle. Please enter details manually.", variant: "destructive" });
+        toast({ title: t("sellMyCar.notFound"), description: t("sellMyCar.notFoundDesc"), variant: "destructive" });
       }
     } catch {
-      toast({ title: "Lookup failed", description: "Enter details manually.", variant: "destructive" });
+      toast({ title: t("sellMyCar.lookupFailed"), description: t("sellMyCar.lookupFailedDesc"), variant: "destructive" });
     }
     setRegLooking(false);
   };
@@ -98,7 +100,7 @@ const SellMyCar = () => {
 
   const handleSubmit = async () => {
     if (!user) {
-      toast({ title: "Sign in required", description: "Please sign in to post your listing.", variant: "destructive" });
+      toast({ title: t("sellMyCar.signInRequired"), description: t("sellMyCar.signInRequiredDesc"), variant: "destructive" });
       navigate("/login");
       return;
     }
@@ -149,10 +151,10 @@ const SellMyCar = () => {
       });
 
       if (error) throw error;
-      toast({ title: "Listing created!", description: "Your listing is under review and will be live soon." });
+      toast({ title: t("sellMyCar.listingCreated"), description: t("sellMyCar.listingCreatedDesc") });
       navigate("/dashboard");
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("sellMyCar.error"), description: err.message, variant: "destructive" });
     }
     setLoading(false);
   };
@@ -166,27 +168,27 @@ const SellMyCar = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead title={`Sell My Car — ${formatPrice(config.individualPlan.price, config)} Per Listing`} description={`Sell your car on Zivvo for just ${formatPrice(config.individualPlan.price, config)} per listing. Verified buyers, instant valuation.`} />
+      <SEOHead title={t("sellMyCar.seoTitle", { price: formatPrice(config.individualPlan.price, config) })} description={t("sellMyCar.seoDescription", { price: formatPrice(config.individualPlan.price, config) })} />
       <Navbar />
 
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-3xl">
           {/* Hero */}
           <div className="text-center mb-10">
-            <Badge variant="outline" className="mb-3 text-xs">{formatPrice(config.individualPlan.price, config)} {config.individualPlan.label}</Badge>
+            <Badge variant="outline" className="mb-3 text-xs">{t("sellMyCar.listingFee", { price: formatPrice(config.individualPlan.price, config), label: config.individualPlan.label })}</Badge>
             <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-              Sell Your Car
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"> The Easy Way</span>
+              {t("sellMyCar.heroTitle1")}
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{t("sellMyCar.heroTitle2")}</span>
             </h1>
             <p className="mt-2 text-muted-foreground">
-              List your car for just {formatPrice(config.individualPlan.price, config)}. Stays live until sold. If vehicle details change, it's treated as a new listing.
+              {t("sellMyCar.heroSubtitle", { price: formatPrice(config.individualPlan.price, config) })}
             </p>
 
             <div className="mt-6 flex justify-center gap-8 text-xs text-muted-foreground">
               {[
-                { icon: Zap, text: "Takes 5 mins" },
-                { icon: Shield, text: "Verified buyers" },
-                { icon: Clock, text: "Sell in days" },
+                { icon: Zap, text: t("sellMyCar.trust1") },
+                { icon: Shield, text: t("sellMyCar.trust2") },
+                { icon: Clock, text: t("sellMyCar.trust3") },
               ].map((i) => (
                 <span key={i.text} className="flex items-center gap-1">
                   <i.icon className="h-3.5 w-3.5 text-primary" /> {i.text}
@@ -227,14 +229,14 @@ const SellMyCar = () => {
                   {/* Step 0: Vehicle Details */}
                   {step === 0 && (
                     <div className="space-y-5">
-                      <h2 className="font-display text-lg font-semibold text-foreground">Vehicle Details</h2>
+                      <h2 className="font-display text-lg font-semibold text-foreground">{t("sellMyCar.vehicleDetailsHeading")}</h2>
 
                       {country === "DE" && (
                         <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-                          <Label className="text-xs text-muted-foreground">Enter your {config.terminology.registration} to auto-fill</Label>
+                          <Label className="text-xs text-muted-foreground">{t("sellMyCar.regLookupLabel", { registration: config.terminology.registration })}</Label>
                           <div className="mt-2 flex gap-2">
                             <Input
-                              placeholder="e.g. AB12 CDE"
+                              placeholder={t("sellMyCar.regPlaceholder")}
                               value={form.registration}
                               onChange={(e) => updateForm("registration", e.target.value.toUpperCase())}
                               className="uppercase font-mono"
@@ -248,20 +250,20 @@ const SellMyCar = () => {
 
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <Label>Make *</Label>
+                          <Label>{t("sellMyCar.make")}</Label>
                           <Select value={form.make} onValueChange={(v) => updateForm("make", v)}>
-                            <SelectTrigger><SelectValue placeholder="Select make" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t("sellMyCar.selectMake")} /></SelectTrigger>
                             <SelectContent>{config.makes.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Model *</Label>
-                          <Input placeholder="e.g. A4, Golf" value={form.model} onChange={(e) => updateForm("model", e.target.value)} />
+                          <Label>{t("sellMyCar.model")}</Label>
+                          <Input placeholder={t("sellMyCar.modelPlaceholder")} value={form.model} onChange={(e) => updateForm("model", e.target.value)} />
                         </div>
                       </div>
                       <div className="grid gap-4 sm:grid-cols-3">
                         <div className="space-y-2">
-                          <Label>Year *</Label>
+                          <Label>{t("sellMyCar.year")}</Label>
                           <Input type="number" value={form.year} onChange={(e) => updateForm("year", e.target.value)} />
                         </div>
                         <div className="space-y-2">
@@ -269,36 +271,36 @@ const SellMyCar = () => {
                           <Input type="number" placeholder="30000" value={form.mileage} onChange={(e) => updateForm("mileage", e.target.value)} />
                         </div>
                         <div className="space-y-2">
-                          <Label>Fuel Type</Label>
+                          <Label>{t("sellMyCar.fuelType")}</Label>
                           <Select value={form.fuel_type} onValueChange={(v) => updateForm("fuel_type", v)}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t("sellMyCar.select")} /></SelectTrigger>
                             <SelectContent>{config.fuelTypes.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
                           </Select>
                         </div>
                       </div>
                       <div className="grid gap-4 sm:grid-cols-3">
                         <div className="space-y-2">
-                          <Label>Transmission</Label>
+                          <Label>{t("sellMyCar.transmission")}</Label>
                           <Select value={form.transmission} onValueChange={(v) => updateForm("transmission", v)}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent>{config.transmissions.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                            <SelectTrigger><SelectValue placeholder={t("sellMyCar.select")} /></SelectTrigger>
+                            <SelectContent>{config.transmissions.map((tr) => <SelectItem key={tr} value={tr}>{tr}</SelectItem>)}</SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Body Type</Label>
+                          <Label>{t("sellMyCar.bodyType")}</Label>
                           <Select value={form.body_type} onValueChange={(v) => updateForm("body_type", v)}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t("sellMyCar.select")} /></SelectTrigger>
                             <SelectContent>{config.bodyTypes.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}</SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Colour</Label>
-                          <Input value={form.color} onChange={(e) => updateForm("color", e.target.value)} placeholder="e.g. Silver" />
+                          <Label>{t("sellMyCar.colour")}</Label>
+                          <Input value={form.color} onChange={(e) => updateForm("color", e.target.value)} placeholder={t("sellMyCar.colourPlaceholder")} />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label>Location</Label>
-                        <Input value={form.location} onChange={(e) => updateForm("location", e.target.value)} placeholder={`e.g. ${config.popularCities[0]}`} />
+                        <Label>{t("sellMyCar.location")}</Label>
+                        <Input value={form.location} onChange={(e) => updateForm("location", e.target.value)} placeholder={t("sellMyCar.locationPlaceholder", { city: config.popularCities[0] })} />
                       </div>
                     </div>
                   )}
@@ -306,8 +308,8 @@ const SellMyCar = () => {
                   {/* Step 1: Photos */}
                   {step === 1 && (
                     <div className="space-y-5">
-                      <h2 className="font-display text-lg font-semibold text-foreground">Upload Photos</h2>
-                      <p className="text-sm text-muted-foreground">Great photos help sell your car faster. Add up to 20 images.</p>
+                      <h2 className="font-display text-lg font-semibold text-foreground">{t("sellMyCar.uploadPhotosHeading")}</h2>
+                      <p className="text-sm text-muted-foreground">{t("sellMyCar.uploadPhotosDesc")}</p>
 
                       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                         {previews.map((p, i) => (
@@ -324,23 +326,23 @@ const SellMyCar = () => {
                         {previews.length < 20 && (
                           <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors hover:border-primary/50 hover:bg-muted/50">
                             <Upload className="h-6 w-6 text-muted-foreground" />
-                            <span className="mt-1 text-xs text-muted-foreground">Add Photo</span>
+                            <span className="mt-1 text-xs text-muted-foreground">{t("sellMyCar.addPhoto")}</span>
                             <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
                           </label>
                         )}
                       </div>
 
                       <div className="rounded-xl bg-muted/50 p-4">
-                        <h3 className="text-xs font-semibold text-foreground mb-2">📸 Photo Tips</h3>
+                        <h3 className="text-xs font-semibold text-foreground mb-2">{t("sellMyCar.photoTips")}</h3>
                         <ul className="grid grid-cols-2 gap-1 text-[11px] text-muted-foreground">
-                          <li>• Front 3/4 angle</li>
-                          <li>• Rear 3/4 angle</li>
-                          <li>• Both sides</li>
-                          <li>• Dashboard & interior</li>
-                          <li>• Odometer reading</li>
-                          <li>• Any damage/scratches</li>
-                          <li>• Engine bay</li>
-                          <li>• Boot space</li>
+                          <li>• {t("sellMyCar.tipFront")}</li>
+                          <li>• {t("sellMyCar.tipRear")}</li>
+                          <li>• {t("sellMyCar.tipSides")}</li>
+                          <li>• {t("sellMyCar.tipInterior")}</li>
+                          <li>• {t("sellMyCar.tipOdometer")}</li>
+                          <li>• {t("sellMyCar.tipDamage")}</li>
+                          <li>• {t("sellMyCar.tipEngine")}</li>
+                          <li>• {t("sellMyCar.tipBoot")}</li>
                         </ul>
                       </div>
                     </div>
@@ -349,26 +351,26 @@ const SellMyCar = () => {
                   {/* Step 2: Price */}
                   {step === 2 && (
                     <div className="space-y-5">
-                      <h2 className="font-display text-lg font-semibold text-foreground">Set Your Price</h2>
+                      <h2 className="font-display text-lg font-semibold text-foreground">{t("sellMyCar.setPriceHeading")}</h2>
 
                       <div className="space-y-2">
-                        <Label>Asking Price ({config.currency.symbol}) *</Label>
+                        <Label>{t("sellMyCar.askingPrice", { symbol: config.currency.symbol })}</Label>
                         <Input
                           type="number"
                           value={form.price}
                           onChange={(e) => updateForm("price", e.target.value)}
-                          placeholder="e.g. 15000"
+                          placeholder={t("sellMyCar.askingPricePlaceholder")}
                           className="text-xl font-bold"
                         />
                         {form.price && (
                           <p className="text-sm text-muted-foreground">
-                            Your asking price: <span className="font-semibold text-primary">{formatPrice(parseFloat(form.price), config)}</span>
+                            {t("sellMyCar.yourAskingPrice", { price: formatPrice(parseFloat(form.price), config) })}
                           </p>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Listing Title</Label>
+                        <Label>{t("sellMyCar.listingTitle")}</Label>
                         <Input
                           value={form.title}
                           onChange={(e) => updateForm("title", e.target.value)}
@@ -377,11 +379,11 @@ const SellMyCar = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label>Description</Label>
+                        <Label>{t("sellMyCar.descriptionLabel")}</Label>
                         <Textarea
                           value={form.description}
                           onChange={(e) => updateForm("description", e.target.value)}
-                          placeholder="Tell buyers about your car — condition, history, extras..."
+                          placeholder={t("sellMyCar.descriptionPlaceholder")}
                           rows={5}
                         />
                       </div>
@@ -391,7 +393,7 @@ const SellMyCar = () => {
                   {/* Step 3: Review */}
                   {step === 3 && (
                     <div className="space-y-5">
-                      <h2 className="font-display text-lg font-semibold text-foreground">Review Your Listing</h2>
+                      <h2 className="font-display text-lg font-semibold text-foreground">{t("sellMyCar.reviewHeading")}</h2>
 
                       <div className="rounded-xl border border-border p-4 space-y-3">
                         <h3 className="font-display text-xl font-bold text-foreground">
@@ -401,14 +403,14 @@ const SellMyCar = () => {
 
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           {[
-                            ["Make", form.make],
-                            ["Model", form.model],
-                            ["Year", form.year],
+                            [t("sellMyCar.reviewFields.make"), form.make],
+                            [t("sellMyCar.reviewFields.model"), form.model],
+                            [t("sellMyCar.reviewFields.year"), form.year],
                             [config.terminology.mileage, form.mileage || "—"],
-                            ["Fuel", form.fuel_type || "—"],
-                            ["Transmission", form.transmission || "—"],
-                            ["Body", form.body_type || "—"],
-                            ["Location", form.location || "—"],
+                            [t("sellMyCar.reviewFields.fuel"), form.fuel_type || "—"],
+                            [t("sellMyCar.reviewFields.transmission"), form.transmission || "—"],
+                            [t("sellMyCar.reviewFields.body"), form.body_type || "—"],
+                            [t("sellMyCar.reviewFields.location"), form.location || "—"],
                           ].map(([k, v]) => (
                             <div key={k}>
                               <span className="text-muted-foreground">{k}:</span>{" "}
@@ -433,7 +435,7 @@ const SellMyCar = () => {
 
                       {!user && (
                         <div className="rounded-xl border border-warning/30 bg-warning/5 p-4 text-sm text-warning-foreground">
-                          <strong>Sign in required</strong> — You'll be redirected to sign in before your listing goes live.
+                          <strong>{t("sellMyCar.signInRequiredNote")}</strong>{t("sellMyCar.signInRequiredNoteDesc")}
                         </div>
                       )}
                     </div>
@@ -444,16 +446,16 @@ const SellMyCar = () => {
               {/* Navigation */}
               <div className="mt-8 flex justify-between">
                 <Button variant="outline" onClick={() => setStep((s) => s - 1)} disabled={step === 0}>
-                  <ArrowLeft className="mr-1 h-4 w-4" /> Back
+                  <ArrowLeft className="mr-1 h-4 w-4" /> {t("sellMyCar.back")}
                 </Button>
                 {step < 3 ? (
                   <Button onClick={() => setStep((s) => s + 1)} disabled={!canNext()} className="gradient-primary border-0">
-                    Next <ArrowRight className="ml-1 h-4 w-4" />
+                    {t("sellMyCar.next")} <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 ) : (
                   <Button onClick={handleSubmit} disabled={loading} className="gradient-primary border-0">
                     {loading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-1 h-4 w-4" />}
-                    {loading ? "Posting..." : "Post Listing"}
+                    {loading ? t("sellMyCar.posting") : t("sellMyCar.postListing")}
                   </Button>
                 )}
               </div>
