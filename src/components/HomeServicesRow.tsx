@@ -1,46 +1,61 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calculator, Tag, ShieldCheck, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
-const services = [
-  {
-    icon: Calculator,
-    title: "Cut the cost of car finance",
-    bullets: ["Zero deposit available", "Soft-search — no impact on credit", "Decision in minutes"],
-    cta: "Get a quote",
-    href: "/finance",
-    accent: "from-primary/15 to-primary/5",
-    ribbon: "Rates from 8.9% APR",
-  },
-  {
-    icon: Tag,
-    title: "Sell your car",
-    bullets: ["List in under 2 minutes", "Reach 25K+ active buyers", "Free valuation in seconds"],
-    cta: "Get a free valuation",
-    href: "/valuation",
-    accent: "from-accent/15 to-accent/5",
-    ribbon: "Average sale: 7 days",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Vehicle history check",
-    bullets: ["Outstanding finance", "Stolen / written-off", "Mileage anomalies"],
-    cta: "Run an HPI check",
-    href: "/hpi-check",
-    accent: "from-success/15 to-success/5",
-    ribbon: "9 of 10 listings checked",
-  },
-];
-
 const HomeServicesRow = () => {
+  const { t } = useTranslation();
+
+  const services = [
+    {
+      icon: Calculator,
+      title: t("home.services.finance.title"),
+      bullets: [
+        t("home.services.finance.b1"),
+        t("home.services.finance.b2"),
+        t("home.services.finance.b3"),
+      ],
+      cta: t("home.services.finance.cta"),
+      href: "/finance",
+      accent: "from-primary/15 to-primary/5",
+      ribbon: t("home.services.finance.ribbon"),
+    },
+    {
+      icon: Tag,
+      title: t("home.services.sell.title"),
+      bullets: [
+        t("home.services.sell.b1"),
+        t("home.services.sell.b2"),
+        t("home.services.sell.b3"),
+      ],
+      cta: t("home.services.sell.cta"),
+      href: "/valuation",
+      accent: "from-accent/15 to-accent/5",
+      ribbon: t("home.services.sell.ribbon"),
+    },
+    {
+      icon: ShieldCheck,
+      title: t("home.services.hpi.title"),
+      bullets: [
+        t("home.services.hpi.b1"),
+        t("home.services.hpi.b2"),
+        t("home.services.hpi.b3"),
+      ],
+      cta: t("home.services.hpi.cta"),
+      href: "/hpi-check",
+      accent: "from-success/15 to-success/5",
+      ribbon: t("home.services.hpi.ribbon"),
+    },
+  ];
+
   return (
     <section className="bg-background py-14">
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-primary">Services</p>
-            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">All you need, in one place</h2>
+            <p className="text-xs font-medium uppercase tracking-wider text-primary">{t("home.services.eyebrow")}</p>
+            <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("home.services.title")}</h2>
           </div>
         </div>
 
