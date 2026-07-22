@@ -238,15 +238,14 @@ const HeroSearch = () => {
 
                   {/* Seller type */}
                   <Select value={sellerType || undefined} onValueChange={(v) => setSellerType(v === "any" ? "" : v)}>
-                    <SelectTrigger className="h-11"><SelectValue placeholder="Any seller" /></SelectTrigger>
+                    <SelectTrigger className="h-11"><SelectValue placeholder={t("hero.search.anySeller")} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any seller</SelectItem>
-                      <SelectItem value="Private">Private seller</SelectItem>
-                      <SelectItem value="Dealer">Dealer</SelectItem>
+                      <SelectItem value="any">{t("hero.search.anySeller")}</SelectItem>
+                      <SelectItem value="Private">{t("hero.search.privateSeller")}</SelectItem>
+                      <SelectItem value="Dealer">{t("hero.search.dealer")}</SelectItem>
                     </SelectContent>
                   </Select>
 
-                  {/* Budget mode toggle */}
                   <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-1">
                     <button
                       type="button"
@@ -255,7 +254,7 @@ const HeroSearch = () => {
                         budgetMode === "price" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                       }`}
                     >
-                      Full price
+                      {t("hero.search.fullPrice")}
                     </button>
                     <button
                       type="button"
@@ -264,7 +263,7 @@ const HeroSearch = () => {
                         budgetMode === "monthly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                       }`}
                     >
-                      Monthly cost
+                      {t("hero.search.monthlyCost")}
                     </button>
                   </div>
 
