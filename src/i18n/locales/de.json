@@ -206,5 +206,54 @@
     "de": "Deutsch",
     "en": "English",
     "switch": "Sprache wechseln"
+  },
+  "auth": {
+    "login": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melde dich in deinem Konto an",
+      "email": "E-Mail",
+      "emailPlaceholder": "du@beispiel.de",
+      "password": "Passwort",
+      "passwordPlaceholder": "••••••••",
+      "forgot": "Passwort vergessen?",
+      "submit": "Anmelden",
+      "submitting": "Anmeldung läuft…",
+      "noAccount": "Noch kein Konto?",
+      "signupLink": "Registrieren",
+      "failed": "Anmeldung fehlgeschlagen",
+      "welcome": "Willkommen zurück!"
+    },
+    "signup": {
+      "title": "Konto erstellen",
+      "subtitle": "Starte heute mit dem Kauf oder Verkauf von Fahrzeugen",
+      "fullName": "Vollständiger Name",
+      "namePlaceholder": "Max Mustermann",
+      "email": "E-Mail",
+      "emailPlaceholder": "du@beispiel.de",
+      "password": "Passwort",
+      "passwordPlaceholder": "Mind. 6 Zeichen",
+      "agree": "Ich akzeptiere die",
+      "terms": "AGB",
+      "and": "und die",
+      "privacy": "Datenschutzerklärung",
+      "acceptRequired": "Bitte AGB und Datenschutz akzeptieren",
+      "submit": "Konto erstellen",
+      "submitting": "Konto wird erstellt…",
+      "haveAccount": "Bereits ein Konto?",
+      "loginLink": "Anmelden",
+      "failed": "Registrierung fehlgeschlagen",
+      "checkEmail": "Bitte E-Mail prüfen",
+      "checkEmailDesc": "Wir haben dir einen Bestätigungslink gesendet."
+    },
+    "forgot": {
+      "title": "Passwort zurücksetzen",
+      "subtitle": "Gib deine E-Mail ein und wir senden dir einen Link zum Zurücksetzen.",
+      "sentTitle": "E-Mail prüfen",
+      "sentSubtitle": "Wir haben dir einen Link zum Zurücksetzen deines Passworts gesendet.",
+      "email": "E-Mail",
+      "submit": "Link senden",
+      "submitting": "Wird gesendet…",
+      "back": "Zurück zur Anmeldung"
+    }
   }
 }
