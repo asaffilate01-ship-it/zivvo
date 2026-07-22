@@ -258,6 +258,31 @@
    "back": "Back to login"
   }
  },
+ "seoLinks": {
+  "eyebrow": "Browse the marketplace",
+  "title": "Find used cars by make, body or city",
+  "tabs": {
+   "makes": "All makes",
+   "body": "Popular body styles",
+   "popular": "Popular searches",
+   "local": "Local searches"
+  },
+  "usedPrefix": "Used",
+  "usedCarsIn": "Used cars in {{city}}",
+  "popular": {
+   "under": "Cars under {{price}}",
+   "electric": "Electric cars",
+   "hybrid": "Hybrid cars",
+   "automatic": "Automatic cars",
+   "manual": "Manual cars",
+   "lowMileage": "Low mileage cars",
+   "convertibles": "Convertibles",
+   "familySuvs": "Family SUVs",
+   "firstTime": "First-time driver cars",
+   "diesel": "Diesel cars",
+   "vans": "Vans for sale"
+  }
+ },
  "home": {
   "featured": {
    "title": "Featured Vehicles",
