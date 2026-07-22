@@ -191,7 +191,7 @@ const DealerPricing = () => {
                   <span className="font-display text-4xl font-bold text-card-foreground">
                     {formatPrice(dealerPlan.price, config)}
                   </span>
-                  <span className="text-sm text-muted-foreground">/ Monat</span>
+                  <span className="text-sm text-muted-foreground">/ {t("pricing.perMonth")}</span>
                 </div>
                 <p className="mt-1 text-xs text-success">🎁 {t("pricing.dealer.trial")}</p>
 
