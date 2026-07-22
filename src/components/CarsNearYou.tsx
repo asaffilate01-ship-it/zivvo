@@ -68,12 +68,14 @@ const reverseGeocodeGoogle = async (lat: number, lng: number): Promise<string> =
 
 const CarsNearYou = () => {
   const { country, config } = useCountry();
+  const { t } = useTranslation();
   const [cars, setCars] = useState<any[]>([]);
   const [userCoords, setUserCoords] = useState<[number, number] | null>(null);
   const [locationName, setLocationName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [geoStatus, setGeoStatus] = useState<"prompt" | "loading" | "granted" | "denied">("loading");
   const [radius, setRadius] = useState("25");
+
 
   // Try to get GPS location
   useEffect(() => {
