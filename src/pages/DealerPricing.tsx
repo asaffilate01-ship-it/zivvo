@@ -44,7 +44,7 @@ const DealerPricing = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("checkout") === "canceled") {
-      toast({ title: "Zahlung abgebrochen", description: "Du kannst es jederzeit erneut versuchen." });
+      toast({ title: t("pricing.toast.canceledTitle"), description: t("pricing.toast.canceledDesc") });
     }
   }, []);
 
