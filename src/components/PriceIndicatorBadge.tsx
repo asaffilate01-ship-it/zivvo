@@ -135,7 +135,7 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
     return (
       <Badge variant="outline" className={`text-[10px] text-muted-foreground gap-0.5 ${className}`}>
         <Loader2 className="h-3 w-3 animate-spin" />
-        Checking...
+        {t("priceIndicator.checking")}
       </Badge>
     );
   }
@@ -144,6 +144,7 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
 
   const config = ratingConfig[result.rating];
   const Icon = config.icon;
+  const currencySymbol = country === "DE" ? "€" : country === "US" ? "$" : country === "AE" ? "AED " : country === "PK" ? "₨" : "£";
 
   return (
     <TooltipProvider>
@@ -151,13 +152,14 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
         <TooltipTrigger asChild>
           <Badge variant="outline" className={`${config.className} text-[10px] font-semibold gap-0.5 cursor-help ${className}`}>
             <Icon className="h-3 w-3" />
-            {config.label}
+            {t(config.labelKey)}
           </Badge>
         </TooltipTrigger>
         <TooltipContent className="text-xs max-w-[220px]">
           <p>{result.explanation}</p>
           {result.market_average > 0 && (
-            <p className="mt-1 text-muted-foreground">Market avg: £{result.market_average.toLocaleString()}</p>
+            <p className="mt-1 text-muted-foreground">{t("priceIndicator.marketAvg")}: {currencySymbol}{result.market_average.toLocaleString()}</p>
+
           )}
         </TooltipContent>
       </Tooltip>
