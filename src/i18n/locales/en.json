@@ -137,7 +137,8 @@
    "extraListing": "€9.99 per additional car",
    "photos": "10 photos per vehicle",
    "activeUntilSold": "Active until sold",
-   "noSubscription": "No subscription required"
+   "noSubscription": "No subscription required",
+   "perExtra": "per extra listing"
   },
   "dealer": {
    "title": "For Dealers",
@@ -153,7 +154,8 @@
    "featured": "Featured placements",
    "support": "Priority support",
    "syndication": "Portal syndication (mobile.de, AutoScout24)",
-   "financeIntegration": "Finance integration"
+   "financeIntegration": "Finance integration",
+   "verifiedBadge": "Verified dealer badge"
   },
   "hero": {
    "title": "Plans built to grow your dealership",
@@ -171,6 +173,37 @@
    "a3": "Yes — dealers get 2 months free to try all features.",
    "q4": "Do you take sales commission?",
    "a4": "No. We never take commission on vehicle sales. Your subscription covers everything."
+  },
+  "perMonth": "month",
+  "contactSales": "Contact sales",
+  "portalSync": "Portal syndication to leading German marketplaces",
+  "pillarsTitle": "Everything you need to sell more cars",
+  "pillars": {
+   "analyticsTitle": "Live analytics",
+   "analyticsDesc": "Views, leads and conversion in real time.",
+   "verifiedTitle": "Verified badge",
+   "verifiedDesc": "Build buyer trust with KYC verification.",
+   "reachTitle": "Multi-portal reach",
+   "reachDesc": "Automatically syndicated to mobile.de, AutoScout24 & more.",
+   "supportTitle": "German support",
+   "supportDesc": "Priority help from our team in Germany."
+  },
+  "finalCta": {
+   "title": "Ready to grow your dealership?",
+   "subtitle": "Start today with 2 months free — no contract, cancel anytime."
+  },
+  "dialog": {
+   "title": "Set up your dealership",
+   "description": "Enter your business name to get started. You can change this later.",
+   "businessName": "Business name",
+   "businessNamePlaceholder": "e.g. Premium Autohaus Berlin GmbH",
+   "continue": "Continue to payment",
+   "businessNameRequired": "Business name required"
+  },
+  "toast": {
+   "canceledTitle": "Payment canceled",
+   "canceledDesc": "You can try again at any time.",
+   "errorTitle": "Payment error"
   }
  },
  "finance": {
@@ -283,43 +316,42 @@
    "vans": "Vans for sale"
   }
  },
-  "home": {
+ "home": {
   "services": {
-    "eyebrow": "Services",
-    "title": "All you need, in one place",
-    "finance": {
-      "title": "Cut the cost of car finance",
-      "b1": "Zero deposit available",
-      "b2": "Soft-search — no impact on credit",
-      "b3": "Decision in minutes",
-      "cta": "Get a quote",
-      "ribbon": "Rates from 3.9% APR"
-    },
-    "sell": {
-      "title": "Sell your car",
-      "b1": "List in under 2 minutes",
-      "b2": "Reach 25K+ active buyers",
-      "b3": "Free valuation in seconds",
-      "cta": "Get a free valuation",
-      "ribbon": "Average sale: 7 days"
-    },
-    "hpi": {
-      "title": "Vehicle history check",
-      "b1": "Outstanding finance",
-      "b2": "Stolen / written-off",
-      "b3": "Mileage anomalies",
-      "cta": "Run a history check",
-      "ribbon": "9 of 10 listings checked"
-    }
+   "eyebrow": "Services",
+   "title": "All you need, in one place",
+   "finance": {
+    "title": "Cut the cost of car finance",
+    "b1": "Zero deposit available",
+    "b2": "Soft-search — no impact on credit",
+    "b3": "Decision in minutes",
+    "cta": "Get a quote",
+    "ribbon": "Rates from 3.9% APR"
+   },
+   "sell": {
+    "title": "Sell your car",
+    "b1": "List in under 2 minutes",
+    "b2": "Reach 25K+ active buyers",
+    "b3": "Free valuation in seconds",
+    "cta": "Get a free valuation",
+    "ribbon": "Average sale: 7 days"
+   },
+   "hpi": {
+    "title": "Vehicle history check",
+    "b1": "Outstanding finance",
+    "b2": "Stolen / written-off",
+    "b3": "Mileage anomalies",
+    "cta": "Run a history check",
+    "ribbon": "9 of 10 listings checked"
+   }
   },
   "featured": {
-    "title": "Featured Vehicles",
-    "badge": "Hot",
-    "subtitle": "Hand-picked premium listings",
-    "seeAll": "See all",
-    "empty": "No featured vehicles yet. Check back soon!"
-   },
-
+   "title": "Featured Vehicles",
+   "badge": "Hot",
+   "subtitle": "Hand-picked premium listings",
+   "seeAll": "See all",
+   "empty": "No featured vehicles yet. Check back soon!"
+  },
   "trust": {
    "badge": "Why Zivvo",
    "titleA": "Buy with",
@@ -505,7 +537,6 @@
    "plus": "{{price}}+"
   }
  },
-
  "carCard": {
   "signInToSave": "Sign in to save cars",
   "signInToSaveDesc": "Create an account to save your favourite listings.",

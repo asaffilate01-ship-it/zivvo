@@ -44,7 +44,7 @@ const DealerPricing = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("checkout") === "canceled") {
-      toast({ title: "Zahlung abgebrochen", description: "Du kannst es jederzeit erneut versuchen." });
+      toast({ title: t("pricing.toast.canceledTitle"), description: t("pricing.toast.canceledDesc") });
     }
   }, []);
 
@@ -56,7 +56,7 @@ const DealerPricing = () => {
 
   const handleCheckout = async () => {
     if (!businessName.trim()) {
-      toast({ title: "Firmenname erforderlich", variant: "destructive" });
+      toast({ title: t("pricing.dialog.businessNameRequired"), variant: "destructive" });
       return;
     }
     setLoading(selectedPriceId);
@@ -73,7 +73,7 @@ const DealerPricing = () => {
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
-      toast({ title: "Fehler bei der Zahlung", description: err.message, variant: "destructive" });
+      toast({ title: t("pricing.toast.errorTitle"), description: err.message, variant: "destructive" });
     } finally {
       setLoading(null);
     }
@@ -138,7 +138,7 @@ const DealerPricing = () => {
                   <span className="text-sm text-muted-foreground">/ {t("common.free").toLowerCase()}</span>
                 </div>
                 <p className="mt-1 text-xs text-success">
-                  + {formatPrice(privatePlan.price, config)} {privatePlan.label}
+                  + {formatPrice(privatePlan.price, config)} {t("pricing.private.perExtra")}
                 </p>
 
                 <p className="mt-4 text-sm text-muted-foreground">{t("pricing.private.subtitle")}</p>
@@ -191,7 +191,7 @@ const DealerPricing = () => {
                   <span className="font-display text-4xl font-bold text-card-foreground">
                     {formatPrice(dealerPlan.price, config)}
                   </span>
-                  <span className="text-sm text-muted-foreground">/ Monat</span>
+                  <span className="text-sm text-muted-foreground">/ {t("pricing.perMonth")}</span>
                 </div>
                 <p className="mt-1 text-xs text-success">🎁 {t("pricing.dealer.trial")}</p>
 
@@ -211,7 +211,19 @@ const DealerPricing = () => {
 
                 <div className="my-6 h-px bg-border" />
                 <ul className="space-y-3">
-                  {dealerPlan.features.map((f) => (
+                  {[
+                    t("pricing.dealer.vehicles"),
+                    t("pricing.dealer.photos"),
+                    t("pricing.dealer.videos"),
+                    t("pricing.dealer.trial"),
+                    t("pricing.dealer.analytics"),
+                    t("pricing.dealer.landingPage"),
+                    t("pricing.dealer.featured"),
+                    t("pricing.dealer.support"),
+                    t("pricing.dealer.syndication"),
+                    t("pricing.dealer.financeIntegration"),
+                    t("pricing.dealer.verifiedBadge"),
+                  ].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-card-foreground">
                       <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/15">
                         <Check className="h-3 w-3 text-primary" />
@@ -230,7 +242,7 @@ const DealerPricing = () => {
       <section className="border-b border-border bg-muted/30">
         <div className="container mx-auto px-4 py-10">
           <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Portal-Synchronisation zu den führenden deutschen Marktplätzen
+            {t("pricing.portalSync")}
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-12">
             {partners.map((name) => (
@@ -246,15 +258,15 @@ const DealerPricing = () => {
       <section className="container mx-auto px-4 py-16">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-            Alles, was du brauchst, um mehr Autos zu verkaufen
+            {t("pricing.pillarsTitle")}
           </h2>
         </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { icon: BarChart3, title: "Live-Analytik", desc: "Aufrufe, Leads und Conversion in Echtzeit." },
-            { icon: ShieldCheck, title: "Verifiziertes Abzeichen", desc: "Vertrauen der Käufer durch KYC-Verifizierung." },
-            { icon: Globe2, title: "Multi-Portal-Reichweite", desc: "Inserate automatisch zu mobile.de, AutoScout24 & mehr." },
-            { icon: Headphones, title: "Deutscher Support", desc: "Priorisierte Hilfe von unserem Team in Deutschland." },
+            { icon: BarChart3, title: t("pricing.pillars.analyticsTitle"), desc: t("pricing.pillars.analyticsDesc") },
+            { icon: ShieldCheck, title: t("pricing.pillars.verifiedTitle"), desc: t("pricing.pillars.verifiedDesc") },
+            { icon: Globe2, title: t("pricing.pillars.reachTitle"), desc: t("pricing.pillars.reachDesc") },
+            { icon: Headphones, title: t("pricing.pillars.supportTitle"), desc: t("pricing.pillars.supportDesc") },
           ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="group rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -298,17 +310,17 @@ const DealerPricing = () => {
           <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--primary)/0.15),transparent_60%)]" />
           <Sparkles className="mx-auto h-8 w-8 text-primary" />
           <h2 className="mt-4 font-display text-3xl font-bold text-foreground md:text-4xl">
-            Bereit, dein Autohaus wachsen zu lassen?
+            {t("pricing.finalCta.title")}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Starte jetzt mit 2 Monaten kostenlos — keine Vertragslaufzeit, jederzeit kündbar.
+            {t("pricing.finalCta.subtitle")}
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button size="lg" className="gradient-primary border-0 shadow-lg shadow-primary/20" onClick={() => handleSubscribe(dealerPlan.priceId)}>
               {t("pricing.dealer.cta")} <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" onClick={() => navigate("/contact")}>
-              Vertrieb kontaktieren
+              {t("pricing.contactSales")}
             </Button>
           </div>
         </div>
@@ -317,22 +329,22 @@ const DealerPricing = () => {
       <Dialog open={showBusinessDialog} onOpenChange={setShowBusinessDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-display">Autohaus einrichten</DialogTitle>
-            <DialogDescription>Gib deinen Firmennamen ein, um zu starten. Du kannst das später ändern.</DialogDescription>
+            <DialogTitle className="font-display">{t("pricing.dialog.title")}</DialogTitle>
+            <DialogDescription>{t("pricing.dialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="business-name">Firmenname</Label>
+              <Label htmlFor="business-name">{t("pricing.dialog.businessName")}</Label>
               <Input
                 id="business-name"
-                placeholder="z.B. Premium Autohaus Berlin GmbH"
+                placeholder={t("pricing.dialog.businessNamePlaceholder")}
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCheckout()}
               />
             </div>
             <Button className="gradient-primary w-full border-0" onClick={handleCheckout}>
-              Weiter zur Zahlung <ChevronRight className="ml-1 h-4 w-4" />
+              {t("pricing.dialog.continue")} <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           </div>
         </DialogContent>
