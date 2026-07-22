@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Search, SlidersHorizontal, MapPin, Car as CarIcon, Truck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,7 @@ import heroImage from "@/assets/hero-cars.jpg";
 
 const PRICE_STEPS = [500, 1000, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000, 50000, 75000, 100000];
 const MONTHLY_STEPS = [100, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1500];
-const DISTANCE_STEPS = [1, 2, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300];
+const DISTANCE_STEPS = [5, 10, 25, 50, 75, 100, 150, 200, 300, 500];
 
 // Carlingo-style approximation: ~£245/mo per £10k full-price → priceMax = monthlyMax / 0.0245
 const monthlyToPrice = (m: number) => Math.round(m / 0.0245);
@@ -22,6 +23,7 @@ const monthlyToPrice = (m: number) => Math.round(m / 0.0245);
 const HeroSearch = () => {
   const navigate = useNavigate();
   const { config } = useCountry();
+  const { t } = useTranslation();
   const { add: addRecentSearch } = useRecentSearches();
 
   const [budgetMode, setBudgetMode] = useState<"price" | "monthly">("price");
@@ -110,10 +112,11 @@ const HeroSearch = () => {
   };
 
   const countLabel = useMemo(() => {
-    if (counting && resultCount === null) return "Search vehicles";
-    if (resultCount === null) return "Search vehicles";
-    return `Search ${resultCount.toLocaleString()} ${vehicleType === "vans" ? "vans" : "cars"}`;
-  }, [counting, resultCount, vehicleType]);
+    if (counting && resultCount === null) return t("hero.search.searchDefault");
+    if (resultCount === null) return t("hero.search.searchDefault");
+    const type = vehicleType === "vans" ? t("hero.search.vans") : t("hero.search.cars");
+    return t("hero.search.searchCta", { count: resultCount.toLocaleString(config.currency.locale), type });
+  }, [counting, resultCount, vehicleType, t, config.currency.locale]);
 
   return (
     <section className="relative min-h-[640px] overflow-hidden md:min-h-[720px]">
@@ -134,25 +137,25 @@ const HeroSearch = () => {
           <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7 }}>
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-medium text-primary backdrop-blur-sm">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              Live marketplace — updated in real-time
+              {t("hero.badge")}
             </div>
 
             <h1 className="font-display text-4xl font-bold leading-[1.1] tracking-tight text-primary-foreground md:text-5xl lg:text-6xl">
-              Find Your<br />
+              {t("hero.title1")}<br />
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Perfect Drive
+                {t("hero.title2")}
               </span>
             </h1>
 
             <p className="mt-5 max-w-lg text-base leading-relaxed text-primary-foreground/65 md:text-lg">
-              Browse thousands of verified vehicles from trusted dealers and private sellers across the {config.name}.
+              {t("hero.subtitle")}
             </p>
 
             <div className="mt-8 flex gap-8">
               {[
-                { value: "25K+", label: "Listings" },
-                { value: "3.2K+", label: "Dealers" },
-                { value: "98%", label: "Satisfaction" },
+                { value: "25K+", label: t("hero.stats.listings") },
+                { value: "3.2K+", label: t("hero.stats.dealers") },
+                { value: "98%", label: t("hero.stats.satisfaction") },
               ].map((stat, i) => (
                 <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.1 }}>
                   <p className="font-display text-2xl font-bold text-primary-foreground md:text-3xl">{stat.value}</p>
@@ -169,26 +172,26 @@ const HeroSearch = () => {
                 {/* Vehicle type tabs */}
                 <div className="mb-4 inline-flex rounded-full bg-muted p-1">
                   {[
-                    { id: "cars" as const, icon: CarIcon, label: "Cars" },
-                    { id: "vans" as const, icon: Truck, label: "Vans" },
-                    { id: "electric" as const, icon: Zap, label: "Electric" },
-                  ].map((t) => (
+                    { id: "cars" as const, icon: CarIcon, label: t("hero.search.cars") },
+                    { id: "vans" as const, icon: Truck, label: t("hero.search.vans") },
+                    { id: "electric" as const, icon: Zap, label: t("hero.search.electric") },
+                  ].map((tab) => (
                     <button
-                      key={t.id}
+                      key={tab.id}
                       type="button"
-                      onClick={() => setVehicleType(t.id)}
+                      onClick={() => setVehicleType(tab.id)}
                       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                        vehicleType === t.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                        vehicleType === tab.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
-                      <t.icon className="h-3.5 w-3.5" />
-                      {t.label}
+                      <tab.icon className="h-3.5 w-3.5" />
+                      {tab.label}
                     </button>
                   ))}
                 </div>
 
-                <h2 className="font-display text-lg font-semibold text-card-foreground">Search vehicles</h2>
-                <p className="mb-4 text-xs text-muted-foreground">Find exactly what you're looking for</p>
+                <h2 className="font-display text-lg font-semibold text-card-foreground">{t("hero.search.title")}</h2>
+                <p className="mb-4 text-xs text-muted-foreground">{t("hero.search.subtitle")}</p>
 
                 <div className="space-y-3">
                   {/* Postcode + Distance */}
@@ -198,19 +201,19 @@ const HeroSearch = () => {
                       <Input
                         value={postcode}
                         onChange={(e) => setPostcode(e.target.value.toUpperCase())}
-                        placeholder={config.terminology.postcode}
+                        placeholder={t("hero.search.postcode")}
                         className="h-11 pl-9"
                         maxLength={10}
                       />
                     </div>
                     <Select value={distance} onValueChange={setDistance}>
-                      <SelectTrigger className="col-span-2 h-11"><SelectValue placeholder="Distance" /></SelectTrigger>
+                      <SelectTrigger className="col-span-2 h-11"><SelectValue placeholder={t("hero.search.distance")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="any">Any distance</SelectItem>
+                        <SelectItem value="any">{t("hero.search.anyDistance")}</SelectItem>
                         {DISTANCE_STEPS.map((d) => (
-                          <SelectItem key={d} value={String(d)}>Within {d} {config.distanceUnit}</SelectItem>
+                          <SelectItem key={d} value={String(d)}>{t("hero.search.within")} {d} km</SelectItem>
                         ))}
-                        <SelectItem value="nationwide">Nationwide (whole country)</SelectItem>
+                        <SelectItem value="nationwide">{t("hero.search.nationwide")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -218,14 +221,14 @@ const HeroSearch = () => {
                   {/* Make + Model */}
                   <div className="grid grid-cols-2 gap-3">
                     <Select value={make} onValueChange={(v) => { setMake(v); setModel(""); }}>
-                      <SelectTrigger className="h-11"><SelectValue placeholder="Any make" /></SelectTrigger>
+                      <SelectTrigger className="h-11"><SelectValue placeholder={t("hero.search.anyMake")} /></SelectTrigger>
                       <SelectContent>
                         {config.makes.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                       </SelectContent>
                     </Select>
                     <Select value={model} onValueChange={setModel} disabled={!make || modelsLoading}>
                       <SelectTrigger className="h-11">
-                        <SelectValue placeholder={!make ? "Select make first" : modelsLoading ? "Loading…" : models.length ? "Any model" : "No models"} />
+                        <SelectValue placeholder={!make ? t("hero.search.selectMakeFirst") : modelsLoading ? t("common.loading") : models.length ? t("hero.search.anyModel") : t("hero.search.noModels")} />
                       </SelectTrigger>
                       <SelectContent>
                         {models.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
@@ -235,15 +238,14 @@ const HeroSearch = () => {
 
                   {/* Seller type */}
                   <Select value={sellerType || undefined} onValueChange={(v) => setSellerType(v === "any" ? "" : v)}>
-                    <SelectTrigger className="h-11"><SelectValue placeholder="Any seller" /></SelectTrigger>
+                    <SelectTrigger className="h-11"><SelectValue placeholder={t("hero.search.anySeller")} /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="any">Any seller</SelectItem>
-                      <SelectItem value="Private">Private seller</SelectItem>
-                      <SelectItem value="Dealer">Dealer</SelectItem>
+                      <SelectItem value="any">{t("hero.search.anySeller")}</SelectItem>
+                      <SelectItem value="Private">{t("hero.search.privateSeller")}</SelectItem>
+                      <SelectItem value="Dealer">{t("hero.search.dealer")}</SelectItem>
                     </SelectContent>
                   </Select>
 
-                  {/* Budget mode toggle */}
                   <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-1">
                     <button
                       type="button"
@@ -252,7 +254,7 @@ const HeroSearch = () => {
                         budgetMode === "price" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                       }`}
                     >
-                      Full price
+                      {t("hero.search.fullPrice")}
                     </button>
                     <button
                       type="button"
@@ -261,7 +263,7 @@ const HeroSearch = () => {
                         budgetMode === "monthly" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
                       }`}
                     >
-                      Monthly cost
+                      {t("hero.search.monthlyCost")}
                     </button>
                   </div>
 
@@ -269,27 +271,27 @@ const HeroSearch = () => {
                   {budgetMode === "price" ? (
                     <div className="grid grid-cols-2 gap-3">
                       <Select value={priceMin} onValueChange={setPriceMin}>
-                        <SelectTrigger className="h-11"><SelectValue placeholder="Min price" /></SelectTrigger>
+                        <SelectTrigger className="h-11"><SelectValue placeholder={t("hero.search.minPrice")} /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="any">No min</SelectItem>
+                          <SelectItem value="any">{t("hero.search.noMin")}</SelectItem>
                           {PRICE_STEPS.map((p) => <SelectItem key={p} value={String(p)}>{formatPrice(p, config)}</SelectItem>)}
                         </SelectContent>
                       </Select>
                       <Select value={priceMax} onValueChange={setPriceMax}>
-                        <SelectTrigger className="h-11"><SelectValue placeholder="Max price" /></SelectTrigger>
+                        <SelectTrigger className="h-11"><SelectValue placeholder={t("hero.search.maxPrice")} /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="any">No max</SelectItem>
+                          <SelectItem value="any">{t("hero.search.noMax")}</SelectItem>
                           {PRICE_STEPS.map((p) => <SelectItem key={p} value={String(p)}>{formatPrice(p, config)}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                   ) : (
                     <Select value={monthlyMax} onValueChange={setMonthlyMax}>
-                      <SelectTrigger className="h-11"><SelectValue placeholder="Max monthly cost" /></SelectTrigger>
+                      <SelectTrigger className="h-11"><SelectValue placeholder={t("hero.search.maxMonthly")} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="any">No max</SelectItem>
+                        <SelectItem value="any">{t("hero.search.noMax")}</SelectItem>
                         {MONTHLY_STEPS.map((m) => (
-                          <SelectItem key={m} value={String(m)}>Up to {formatPrice(m, config)}/mo</SelectItem>
+                          <SelectItem key={m} value={String(m)}>{t("hero.search.upTo")} {formatPrice(m, config)}{t("hero.search.perMonth")}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -304,13 +306,13 @@ const HeroSearch = () => {
                 <div className="mt-3 flex items-center justify-between border-t border-border pt-3">
                   <Button variant="ghost" size="sm" type="button" className="text-xs text-muted-foreground" onClick={() => navigate("/browse")}>
                     <SlidersHorizontal className="mr-1 h-3.5 w-3.5" />
-                    Advanced filters
+                    {t("hero.search.advancedFilters")}
                   </Button>
                   <div className="flex flex-wrap gap-1.5">
                     {[
-                      { label: "Under £5K", path: "/browse?priceMax=5000" },
-                      { label: "Low mileage", path: "/browse?mileageMax=30000" },
-                      { label: "SUVs", path: "/browse?body=SUV" },
+                      { label: t("hero.search.underPrice", { price: "5.000 €" }), path: "/browse?priceMax=5000" },
+                      { label: t("hero.search.lowMileage"), path: "/browse?mileageMax=30000" },
+                      { label: t("hero.search.suvs"), path: "/browse?body=SUV" },
                     ].map((tag) => (
                       <button
                         key={tag.label}

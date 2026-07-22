@@ -229,7 +229,7 @@ const SellMyCar = () => {
                     <div className="space-y-5">
                       <h2 className="font-display text-lg font-semibold text-foreground">Vehicle Details</h2>
 
-                      {country === "GB" && (
+                      {country === "DE" && (
                         <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
                           <Label className="text-xs text-muted-foreground">Enter your {config.terminology.registration} to auto-fill</Label>
                           <div className="mt-2 flex gap-2">

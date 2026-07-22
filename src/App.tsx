@@ -66,6 +66,7 @@ const InspectorDashboard = lazy(() => import("./pages/InspectorDashboard"));
 const InspectorOnboard = lazy(() => import("./pages/InspectorOnboard"));
 const InspectorJob = lazy(() => import("./pages/InspectorJob"));
 const Pitch = lazy(() => import("./pages/Pitch"));
+const Finance = lazy(() => import("./pages/Finance"));
 
 const queryClient = new QueryClient();
 
@@ -110,6 +111,8 @@ const App = () => (
                       <Route path="/blog" element={<Blog />} />
                       <Route path="/blog/:id" element={<BlogPost />} />
                       <Route path="/valuation" element={<CarValuation />} />
+                      <Route path="/finance" element={<Finance />} />
+                      <Route path="/finanzierung" element={<Finance />} />
                       <Route path="/sell-my-car" element={<SellMyCar />} />
                       <Route path="/reviews" element={<CarReviews />} />
                       <Route path="/cars" element={<PopularCars />} />

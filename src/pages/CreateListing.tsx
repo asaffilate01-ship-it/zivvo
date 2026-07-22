@@ -558,7 +558,7 @@ const CreateListing = () => {
             <CardTitle className="text-base">Identification & Location</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {country === "GB" && (
+            {country === "DE" && (
               <VrmAutofill
                 value={form.registration}
                 onChange={(reg) => updateField("registration", reg)}
@@ -583,7 +583,7 @@ const CreateListing = () => {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>{config.terminology.registration}</Label>
-                <Input placeholder={country === "US" ? "e.g. ABC 1234" : country === "AE" ? "e.g. A 12345" : "e.g. AB12 CDE"} value={form.registration} onChange={(e) => updateField("registration", e.target.value)} />
+                <Input placeholder={"z.B. B-AB 1234"} value={form.registration} onChange={(e) => updateField("registration", e.target.value)} />
               </div>
               <div className="space-y-2">
                 <Label>VIN</Label>

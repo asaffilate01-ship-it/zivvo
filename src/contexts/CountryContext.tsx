@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
-import { CountryCode, CountryConfig, countryConfigs, getCountryFromCode } from "@/lib/countryConfig";
+import { createContext, useContext, ReactNode } from "react";
+import { CountryCode, CountryConfig, countryConfigs } from "@/lib/countryConfig";
 
 interface CountryContextType {
   country: CountryCode;
@@ -8,43 +8,27 @@ interface CountryContextType {
   detecting: boolean;
 }
 
+// Germany-only mode. The context is kept so existing consumers keep working,
+// but the market is fixed to DE and cannot be switched.
 const CountryContext = createContext<CountryContextType>({
-  country: "GB",
-  config: countryConfigs.GB,
+  country: "DE",
+  config: countryConfigs.DE,
   setCountry: () => {},
-  detecting: true,
+  detecting: false,
 });
 
 export const useCountry = () => useContext(CountryContext);
 
-const STORAGE_KEY = "zivvo_country";
-
 export const CountryProvider = ({ children }: { children: ReactNode }) => {
-  const [country, setCountryState] = useState<CountryCode>(
-    () => (localStorage.getItem(STORAGE_KEY) as CountryCode) || "GB"
-  );
-  const [detecting, setDetecting] = useState(!localStorage.getItem(STORAGE_KEY));
-
-  useEffect(() => {
-    // Skip detection if user has manually chosen
-    if (localStorage.getItem(STORAGE_KEY)) {
-      setDetecting(false);
-      return;
-    }
-
-    // Geo-detection disabled while only GB is active
-    setDetecting(false);
-  }, []);
-
-  const setCountry = useCallback((code: CountryCode) => {
-    setCountryState(code);
-    localStorage.setItem(STORAGE_KEY, code);
-  }, []);
-
-  const config = countryConfigs[country];
-
   return (
-    <CountryContext.Provider value={{ country, config, setCountry, detecting }}>
+    <CountryContext.Provider
+      value={{
+        country: "DE",
+        config: countryConfigs.DE,
+        setCountry: () => {},
+        detecting: false,
+      }}
+    >
       {children}
     </CountryContext.Provider>
   );

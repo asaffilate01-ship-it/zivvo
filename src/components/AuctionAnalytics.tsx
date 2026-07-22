@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Gavel, TrendingUp, Eye, Users, DollarSign, BarChart3, Target, Clock } from "lucide-react";
 
 const fmtCurrency = (amount: number, country: string) => {
-  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
+  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.DE;
   return formatPrice(amount, cfg);
 };
 
