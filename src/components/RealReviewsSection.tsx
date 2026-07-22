@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Star, Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+
 
 interface Review {
   id: string;
@@ -19,8 +21,10 @@ interface Review {
  * shows a transparent "founding members" CTA — no fake testimonials.
  */
 const RealReviewsSection = () => {
+  const { t, i18n } = useTranslation();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetch = async () => {
@@ -53,26 +57,23 @@ const RealReviewsSection = () => {
           <div className="relative flex flex-col items-center text-center">
             <Badge variant="outline" className="mb-4 gap-1.5 border-primary/30 text-xs">
               <Sparkles className="h-3 w-3 text-primary" />
-              Founding members
+              {t("home.founding.badge")}
             </Badge>
             <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-              Be one of the first to <span className="text-gradient-primary">join Zivvo</span>
+              {t("home.founding.titleA")} <span className="text-gradient-primary">{t("home.founding.titleB")}</span>
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
-              We're a brand-new UK marketplace built by car people, for car people.
-              No inflated review counts, no fake five-star averages — just real listings,
-              verified sellers, and honest pricing from day one. Your review will help
-              shape the platform.
+              {t("home.founding.subtitle")}
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link to="/sell">
                 <Button className="gradient-primary border-0">
-                  List your car free
+                  {t("home.founding.listFree")}
                   <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Button>
               </Link>
               <Link to="/dealer-pricing">
-                <Button variant="outline">Become a founding dealer</Button>
+                <Button variant="outline">{t("home.founding.becomeDealer")}</Button>
               </Link>
             </div>
           </div>
@@ -90,12 +91,13 @@ const RealReviewsSection = () => {
         viewport={{ once: true }}
         className="text-center"
       >
-        <Badge variant="outline" className="mb-4 text-xs">Real reviews</Badge>
-        <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">What our community says</h2>
+        <Badge variant="outline" className="mb-4 text-xs">{t("home.founding.reviewsBadge")}</Badge>
+        <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">{t("home.founding.reviewsTitle")}</h2>
         <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-          Verified reviews from real Zivvo sellers and buyers
+          {t("home.founding.reviewsSub")}
         </p>
       </motion.div>
+
 
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {reviews.map((r, i) => (
@@ -116,7 +118,7 @@ const RealReviewsSection = () => {
               "{r.comment}"
             </p>
             <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-              {new Date(r.created_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+              {new Date(r.created_at).toLocaleDateString(i18n.language === "de" ? "de-DE" : "en-GB", { month: "short", year: "numeric" })}
             </p>
           </motion.div>
         ))}
