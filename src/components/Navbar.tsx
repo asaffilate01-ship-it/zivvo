@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Menu, X, Car, User, Plus, Heart, LogOut, MessageSquare, Sun, Moon, Monitor,
-  LayoutDashboard, ShieldCheck, Users, Building2, HelpCircle, Phone, BookOpen,
+  LayoutDashboard, ShieldCheck, Users, Building2, HelpCircle, Phone, BookOpen, Percent,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import zivvoLogo from "@/assets/zivvo-logo.png";
-import CountrySwitcher from "@/components/CountrySwitcher";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/sheet";
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const { user, signOut, hasRole } = useAuth();
   const { theme, setTheme, resolved } = useTheme();
@@ -70,15 +72,16 @@ const Navbar = () => {
   );
 
   const mobileLinks = [
-    { to: "/browse", label: "Browse Cars", icon: Car },
-    { to: "/browse?body=Van", label: "Vans", icon: Car },
-    { to: "/sell-my-car", label: "Sell Your Car", icon: Plus },
-    { to: "/reviews", label: "Car Reviews", icon: BookOpen },
-    { to: "/dealers", label: "For Dealers", icon: Building2 },
-    { to: "/blog", label: "Blog & Guides", icon: BookOpen },
-    { to: "/saved", label: "Saved Cars", icon: Heart },
-    { to: "/help", label: "Help Centre", icon: HelpCircle },
-    { to: "/contact", label: "Contact Us", icon: Phone },
+    { to: "/browse", label: t("nav.browse"), icon: Car },
+    { to: "/browse?body=Transporter", label: t("nav.vans"), icon: Car },
+    { to: "/sell-my-car", label: t("nav.sell"), icon: Plus },
+    { to: "/finance", label: t("nav.finance"), icon: Percent },
+    { to: "/reviews", label: t("nav.reviews"), icon: BookOpen },
+    { to: "/dealers", label: t("nav.dealers"), icon: Building2 },
+    { to: "/blog", label: t("nav.blog"), icon: BookOpen },
+    { to: "/saved", label: t("nav.saved"), icon: Heart },
+    { to: "/help", label: t("nav.help"), icon: HelpCircle },
+    { to: "/contact", label: t("nav.contact"), icon: Phone },
   ];
 
   return (
@@ -106,7 +109,7 @@ const Navbar = () => {
 
         {/* Desktop right actions */}
         <div className="hidden items-center gap-1.5 md:flex">
-          <CountrySwitcher />
+          <LanguageSwitcher />
 
           {/* Theme */}
           <DropdownMenu>
@@ -158,52 +161,52 @@ const Navbar = () => {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem asChild>
                   <Link to="/profile" className="flex items-center gap-2">
-                    <User className="h-4 w-4" /> Profile
+                    <User className="h-4 w-4" /> {t("nav.profile")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to={getDashboardLink()} className="flex items-center gap-2">
-                    <LayoutDashboard className="h-4 w-4" /> Dashboard
+                    <LayoutDashboard className="h-4 w-4" /> {t("nav.dashboard")}
                   </Link>
                 </DropdownMenuItem>
                 {hasRole("admin") && (
                   <DropdownMenuItem asChild>
                     <Link to="/admin" className="flex items-center gap-2">
-                      <ShieldCheck className="h-4 w-4" /> Admin Panel
+                      <ShieldCheck className="h-4 w-4" /> {t("nav.admin")}
                     </Link>
                   </DropdownMenuItem>
                 )}
                 {hasRole("agent") && (
                   <DropdownMenuItem asChild>
                     <Link to="/agent" className="flex items-center gap-2">
-                      <Users className="h-4 w-4" /> Agent Panel
+                      <Users className="h-4 w-4" /> {t("nav.agent")}
                     </Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" /> Sign Out
+                  <LogOut className="mr-2 h-4 w-4" /> {t("nav.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Link to="/login">
               <Button variant="outline" size="sm" className="gap-1.5">
-                <User className="h-4 w-4" /> Sign In
+                <User className="h-4 w-4" /> {t("nav.signIn")}
               </Button>
             </Link>
           )}
 
           <Link to="/sell">
             <Button size="sm" className="gradient-primary border-0 gap-1.5">
-              <Plus className="h-4 w-4" /> Post Ad
+              <Plus className="h-4 w-4" /> {t("nav.postAd")}
             </Button>
           </Link>
         </div>
 
         {/* Mobile right */}
         <div className="flex items-center gap-1 md:hidden">
-          <CountrySwitcher />
+          <LanguageSwitcher />
           {user && <NotificationBell />}
           {user && (
             <Link to="/inbox">
@@ -276,29 +279,29 @@ const Navbar = () => {
                   <div className="flex flex-col gap-1">
                     <Link to="/profile" onClick={() => setMobileOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start gap-2">
-                        <User className="h-4 w-4 text-muted-foreground" /> Profile
+                        <User className="h-4 w-4 text-muted-foreground" /> {t("nav.profile")}
                       </Button>
                     </Link>
                     <Link to={getDashboardLink()} onClick={() => setMobileOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start gap-2">
-                        <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> Dashboard
+                        <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> {t("nav.dashboard")}
                       </Button>
                     </Link>
                     {hasRole("admin") && (
                       <Link to="/admin" onClick={() => setMobileOpen(false)}>
                         <Button variant="ghost" className="w-full justify-start gap-2">
-                          <ShieldCheck className="h-4 w-4 text-muted-foreground" /> Admin Panel
+                          <ShieldCheck className="h-4 w-4 text-muted-foreground" /> {t("nav.admin")}
                         </Button>
                       </Link>
                     )}
                     <Button variant="ghost" className="w-full justify-start gap-2 text-destructive hover:text-destructive" onClick={() => { signOut(); setMobileOpen(false); }}>
-                      <LogOut className="h-4 w-4" /> Sign Out
+                      <LogOut className="h-4 w-4" /> {t("nav.signOut")}
                     </Button>
                   </div>
                 ) : (
                   <Link to="/login" onClick={() => setMobileOpen(false)}>
                     <Button variant="outline" className="w-full gap-2">
-                      <User className="h-4 w-4" /> Sign In
+                      <User className="h-4 w-4" /> {t("nav.signIn")}
                     </Button>
                   </Link>
                 )}
@@ -307,7 +310,7 @@ const Navbar = () => {
               <div className="p-3">
                 <Link to="/sell" onClick={() => setMobileOpen(false)}>
                   <Button className="gradient-primary w-full border-0 gap-2">
-                    <Plus className="h-4 w-4" /> Post Your Ad
+                    <Plus className="h-4 w-4" /> {t("nav.postAd")}
                   </Button>
                 </Link>
               </div>
