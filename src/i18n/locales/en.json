@@ -255,5 +255,144 @@
       "submitting": "Sending…",
       "back": "Back to login"
     }
+  },
+  "home": {
+    "featured": {
+      "title": "Featured Vehicles",
+      "badge": "Hot",
+      "subtitle": "Hand-picked premium listings",
+      "seeAll": "See all",
+      "empty": "No featured vehicles yet. Check back soon!"
+    },
+    "trust": {
+      "badge": "Why Zivvo",
+      "titleA": "Buy with",
+      "titleB": "complete confidence",
+      "subtitle": "We go the extra mile to ensure every transaction is safe, transparent and hassle-free.",
+      "verifiedTitle": "Verified Listings",
+      "verifiedDesc": "Every dealer is vetted. Verified badges mean the vehicle has passed legality and finance checks.",
+      "financeTitle": "Finance & Legal Check",
+      "financeDesc": "Instantly check if a vehicle has outstanding finance, is reported stolen, or written off.",
+      "historyTitle": "Full History Reports",
+      "historyDesc": "MOT/TÜV history, mileage verification and previous owner details in one click.",
+      "verifiedClean": "Verified clean",
+      "verifiedCleanSub": "No finance · No theft"
+    },
+    "stats": {
+      "users": "Active users",
+      "listings": "Vehicles listed",
+      "soldValue": "Total value sold",
+      "rating": "Average rating"
+    },
+    "latest": {
+      "title": "Latest Listings",
+      "subtitle": "Just posted by sellers near you",
+      "empty": "No listings yet. Be the first to post!"
+    },
+    "blog": {
+      "badge": "Blog",
+      "title": "From the Blog",
+      "post1Title": "Used Car Buying Checklist 2026",
+      "post1Cat": "Buying Guide",
+      "post2Title": "Electric vs Hybrid: Which Is Right?",
+      "post2Cat": "EV Guide",
+      "post3Title": "10 Tips to Sell Your Car Fast",
+      "post3Cat": "Selling Tips"
+    },
+    "cta": {
+      "title": "Ready to find your next car?",
+      "subtitle": "Be among the first sellers and dealers on Zivvo. Listing your car is free — dealer subscriptions from {{price}}/mo.",
+      "postAd": "Post Your Ad — Free",
+      "dealerPlans": "Dealer Plans",
+      "newsletterPlaceholder": "Enter your email for weekly deals",
+      "subscribe": "Subscribe",
+      "noSpam": "No spam. Unsubscribe anytime."
+    },
+    "howItWorks": {
+      "badge": "How it works",
+      "title": "From search to driveway in 4 steps",
+      "subtitle": "A streamlined buying journey — backed by inspections, escrow and a 7-day guarantee.",
+      "step": "Step {{n}}",
+      "s1Title": "Search & Shortlist",
+      "s1Desc": "Filter by make, budget, fuel type and distance. Save searches and get instant alerts.",
+      "s2Title": "Reserve with Confidence",
+      "s2Desc": "Every dealer is KYC-verified. Buyer protection and pre-auth deposits keep your money safe.",
+      "s3Title": "Inspect & Check",
+      "s3Desc": "200-point inspections, full history, MOT/TÜV and finance status — all in one place.",
+      "s4Title": "Drive Away",
+      "s4Desc": "Collect locally or get nationwide home delivery. 7-day money-back guarantee on eligible cars."
+    },
+    "whyBuy": {
+      "titleA": "Why buy from",
+      "titleB": "?",
+      "subtitle": "We're building the most trusted car marketplace in the world.",
+      "verifiedTitle": "Verified Sellers",
+      "verifiedDesc": "Every dealer passes KYC verification. Private sellers are identity-checked.",
+      "checksTitle": "Finance & Theft Checks",
+      "checksDesc": "All vehicles are screened for outstanding finance, theft and write-off history.",
+      "paymentsTitle": "Secure Payments",
+      "paymentsDesc": "Stripe-powered transactions with buyer protection on every purchase.",
+      "supportTitle": "Dedicated Support",
+      "supportDesc": "Our team is available 7 days a week for questions or issues.",
+      "historyTitle": "Full History Reports",
+      "historyDesc": "MOT/TÜV history, mileage checks, and previous owner details instantly.",
+      "privacyTitle": "Data Privacy",
+      "privacyDesc": "Your personal data is encrypted and never shared with third parties."
+    },
+    "trustStrip": {
+      "headline": "Built for buyers, sellers & dealers in Germany",
+      "kycLabel": "KYC-Verified Dealers",
+      "kycSub": "Every seller checked",
+      "protectionLabel": "Buyer Protection",
+      "protectionSub": "Escrow & deposits",
+      "inspectionLabel": "200-Point Inspection",
+      "inspectionSub": "Detailed report",
+      "historyLabel": "History Checked",
+      "historySub": "Full history reports",
+      "guaranteeLabel": "7-Day Guarantee",
+      "guaranteeSub": "On eligible vehicles",
+      "foundingLabel": "Founding Members",
+      "foundingSub": "Be one of the first"
+    },
+    "bodyType": {
+      "badge": "Browse",
+      "title": "Shop by Body Type",
+      "subtitle": "Find the perfect style for your lifestyle",
+      "vehicles": "{{count}} vehicles"
+    },
+    "carOfWeek": {
+      "editorsPick": "Editor's Pick",
+      "badge": "Car of the Week",
+      "defaultDesc": "A stunning {{year}} {{make}} {{model}} in excellent condition.",
+      "year": "Year",
+      "mileage": "Mileage",
+      "views": "Views",
+      "na": "N/A",
+      "viewDetails": "View Details"
+    },
+    "recentlySold": {
+      "live": "Live",
+      "title": "Recently Sold on Zivvo",
+      "sold": "Sold",
+      "justNow": "Just now",
+      "hoursAgo": "{{h}}h ago",
+      "daysAgo": "{{d}}d ago"
+    }
+  },
+  "carCard": {
+    "signInToSave": "Sign in to save cars",
+    "signInToSaveDesc": "Create an account to save your favourite listings.",
+    "promoted": "🔥 Promoted",
+    "featured": "Featured",
+    "verified": "Verified",
+    "priceDrop": "Price drop",
+    "video": "Video",
+    "from": "From",
+    "perMonth": "/mo",
+    "homeDelivery": "Home delivery",
+    "dealer": "Dealer",
+    "private": "Private",
+    "syncedFrom": "Synced from {{source}}",
+    "vat": "+ VAT"
   }
 }
