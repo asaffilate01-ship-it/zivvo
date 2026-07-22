@@ -137,7 +137,8 @@
    "extraListing": "9,99 € pro weiteres Auto",
    "photos": "10 Fotos pro Fahrzeug",
    "activeUntilSold": "Aktiv bis zum Verkauf",
-   "noSubscription": "Keine Abo-Verpflichtung"
+   "noSubscription": "Keine Abo-Verpflichtung",
+   "perExtra": "pro zusätzliches Inserat"
   },
   "dealer": {
    "title": "Für Händler",
@@ -153,7 +154,8 @@
    "featured": "Hervorgehobene Platzierungen",
    "support": "Priorisierter Support",
    "syndication": "Portal-Synchronisation (mobile.de, AutoScout24)",
-   "financeIntegration": "Finanzierungs-Integration"
+   "financeIntegration": "Finanzierungs-Integration",
+   "verifiedBadge": "Verifiziertes Händler-Abzeichen"
   },
   "hero": {
    "title": "Tarife, die dein Autohaus wachsen lassen",
@@ -171,6 +173,37 @@
    "a3": "Ja — Händler erhalten 2 Monate kostenlos zum Testen aller Funktionen.",
    "q4": "Nehmt ihr eine Verkaufsprovision?",
    "a4": "Nein. Wir nehmen keine Provision auf Fahrzeugverkäufe. Dein Abo deckt alles ab."
+  },
+  "perMonth": "Monat",
+  "contactSales": "Vertrieb kontaktieren",
+  "portalSync": "Portal-Synchronisation zu den führenden deutschen Marktplätzen",
+  "pillarsTitle": "Alles, was du brauchst, um mehr Autos zu verkaufen",
+  "pillars": {
+   "analyticsTitle": "Live-Analytik",
+   "analyticsDesc": "Aufrufe, Leads und Conversion in Echtzeit.",
+   "verifiedTitle": "Verifiziertes Abzeichen",
+   "verifiedDesc": "Vertrauen der Käufer durch KYC-Verifizierung.",
+   "reachTitle": "Multi-Portal-Reichweite",
+   "reachDesc": "Inserate automatisch zu mobile.de, AutoScout24 & mehr.",
+   "supportTitle": "Deutscher Support",
+   "supportDesc": "Priorisierte Hilfe von unserem Team in Deutschland."
+  },
+  "finalCta": {
+   "title": "Bereit, dein Autohaus wachsen zu lassen?",
+   "subtitle": "Starte jetzt mit 2 Monaten kostenlos — keine Vertragslaufzeit, jederzeit kündbar."
+  },
+  "dialog": {
+   "title": "Autohaus einrichten",
+   "description": "Gib deinen Firmennamen ein, um zu starten. Du kannst das später ändern.",
+   "businessName": "Firmenname",
+   "businessNamePlaceholder": "z.B. Premium Autohaus Berlin GmbH",
+   "continue": "Weiter zur Zahlung",
+   "businessNameRequired": "Firmenname erforderlich"
+  },
+  "toast": {
+   "canceledTitle": "Zahlung abgebrochen",
+   "canceledDesc": "Du kannst es jederzeit erneut versuchen.",
+   "errorTitle": "Fehler bei der Zahlung"
   }
  },
  "finance": {
@@ -285,32 +318,32 @@
  },
  "home": {
   "services": {
-    "eyebrow": "Services",
-    "title": "Alles, was du brauchst – an einem Ort",
-    "finance": {
-      "title": "Autofinanzierung günstiger",
-      "b1": "Ohne Anzahlung möglich",
-      "b2": "Soft-Check – ohne SCHUFA-Einfluss",
-      "b3": "Entscheidung in Minuten",
-      "cta": "Angebot erhalten",
-      "ribbon": "Zinsen ab 3,9 % eff."
-    },
-    "sell": {
-      "title": "Auto verkaufen",
-      "b1": "In unter 2 Minuten inserieren",
-      "b2": "25.000+ aktive Käufer erreichen",
-      "b3": "Kostenlose Bewertung in Sekunden",
-      "cta": "Kostenlose Bewertung",
-      "ribbon": "Ø Verkauf: 7 Tage"
-    },
-    "hpi": {
-      "title": "Fahrzeughistorie prüfen",
-      "b1": "Offene Finanzierung",
-      "b2": "Gestohlen / Totalschaden",
-      "b3": "Auffälligkeiten beim Kilometerstand",
-      "cta": "Historie prüfen",
-      "ribbon": "9 von 10 Inseraten geprüft"
-    }
+   "eyebrow": "Services",
+   "title": "Alles, was du brauchst – an einem Ort",
+   "finance": {
+    "title": "Autofinanzierung günstiger",
+    "b1": "Ohne Anzahlung möglich",
+    "b2": "Soft-Check – ohne SCHUFA-Einfluss",
+    "b3": "Entscheidung in Minuten",
+    "cta": "Angebot erhalten",
+    "ribbon": "Zinsen ab 3,9 % eff."
+   },
+   "sell": {
+    "title": "Auto verkaufen",
+    "b1": "In unter 2 Minuten inserieren",
+    "b2": "25.000+ aktive Käufer erreichen",
+    "b3": "Kostenlose Bewertung in Sekunden",
+    "cta": "Kostenlose Bewertung",
+    "ribbon": "Ø Verkauf: 7 Tage"
+   },
+   "hpi": {
+    "title": "Fahrzeughistorie prüfen",
+    "b1": "Offene Finanzierung",
+    "b2": "Gestohlen / Totalschaden",
+    "b3": "Auffälligkeiten beim Kilometerstand",
+    "cta": "Historie prüfen",
+    "ribbon": "9 von 10 Inseraten geprüft"
+   }
   },
   "featured": {
    "title": "Empfohlene Fahrzeuge",
@@ -319,7 +352,6 @@
    "seeAll": "Alle anzeigen",
    "empty": "Noch keine empfohlenen Fahrzeuge. Schau bald wieder vorbei!"
   },
-
   "trust": {
    "badge": "Warum Zivvo",
    "titleA": "Kaufe mit",
@@ -505,7 +537,6 @@
    "plus": "{{price}}+"
   }
  },
-
  "carCard": {
   "signInToSave": "Zum Speichern anmelden",
   "signInToSaveDesc": "Erstelle ein Konto, um deine Favoriten zu speichern.",
