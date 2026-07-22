@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CarCard from "@/components/CarCard";
+import SponsoredAdCard from "@/components/SponsoredAdCard";
 import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import SEOHead from "@/components/SEOHead";
 import { CarGridSkeleton } from "@/components/LoadingSkeleton";
