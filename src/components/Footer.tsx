@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import zivvoLogo from "@/assets/zivvo-logo.png";
+import zivvoLogoEn from "@/assets/zivvo-logo.png";
+import zivvoLogoDe from "@/assets/zivvo-logo-de.png";
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const zivvoLogo = i18n.language?.startsWith("de") ? zivvoLogoDe : zivvoLogoEn;
 
   const footerSections = [
     {
