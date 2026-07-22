@@ -1,16 +1,18 @@
 import { motion } from "framer-motion";
 import { ShieldCheck, Award, Lock, Star, BadgeCheck, Sparkles } from "lucide-react";
-
-const badges = [
-  { icon: ShieldCheck, label: "KYC-Verified Dealers", sub: "Every seller checked" },
-  { icon: Lock, label: "Buyer Protection", sub: "Escrow & deposits" },
-  { icon: Award, label: "AA-Style Inspections", sub: "200-point report" },
-  { icon: BadgeCheck, label: "HPI & MOT Clear", sub: "Full history reports" },
-  { icon: Sparkles, label: "7-Day Guarantee", sub: "On eligible vehicles" },
-  { icon: Star, label: "Founding Members", sub: "Be one of the first" },
-];
+import { useTranslation } from "react-i18next";
 
 const TrustBrandStrip = () => {
+  const { t } = useTranslation();
+  const badges = [
+    { icon: ShieldCheck, label: t("home.trustStrip.kycLabel"), sub: t("home.trustStrip.kycSub") },
+    { icon: Lock, label: t("home.trustStrip.protectionLabel"), sub: t("home.trustStrip.protectionSub") },
+    { icon: Award, label: t("home.trustStrip.inspectionLabel"), sub: t("home.trustStrip.inspectionSub") },
+    { icon: BadgeCheck, label: t("home.trustStrip.historyLabel"), sub: t("home.trustStrip.historySub") },
+    { icon: Sparkles, label: t("home.trustStrip.guaranteeLabel"), sub: t("home.trustStrip.guaranteeSub") },
+    { icon: Star, label: t("home.trustStrip.foundingLabel"), sub: t("home.trustStrip.foundingSub") },
+  ];
+
   return (
     <section className="border-y border-border bg-gradient-to-b from-muted/40 to-background py-10">
       <div className="container mx-auto px-4">
@@ -20,7 +22,7 @@ const TrustBrandStrip = () => {
           viewport={{ once: true }}
           className="text-center text-xs font-medium uppercase tracking-wider text-muted-foreground"
         >
-          Built for UK buyers, sellers & dealers
+          {t("home.trustStrip.headline")}
         </motion.p>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
