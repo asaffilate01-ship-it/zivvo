@@ -1085,6 +1085,10 @@ const AdminDashboard = () => {
           <TabsContent value="payouts" className="mt-4">
             <AdminInspectorPayoutsPanel />
           </TabsContent>
+
+          <TabsContent value="ads" className="mt-4">
+            <AdManager />
+          </TabsContent>
         </Tabs>
 
         {/* Dealer Detail Dialog */}
