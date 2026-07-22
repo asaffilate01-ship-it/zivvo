@@ -55,12 +55,23 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
     currency: { symbol: "€", code: "EUR", locale: "de-DE" },
     distanceUnit: "km",
     driveSide: "right",
+    // All brands commonly sold / registered in Germany — not only German OEMs.
     makes: [
-      "Audi", "BMW", "Mercedes-Benz", "Volkswagen", "Porsche", "Opel",
-      "Ford", "Skoda", "Seat", "Cupra", "Peugeot", "Renault", "Citroën",
-      "Fiat", "Alfa Romeo", "Toyota", "Honda", "Hyundai", "Kia", "Nissan",
-      "Mazda", "Volvo", "Mini", "Smart", "Tesla", "Polestar", "Dacia",
-      "Suzuki", "Mitsubishi", "Land Rover", "Jaguar", "Lexus", "DS",
+      // German
+      "Audi", "BMW", "Mercedes-Benz", "Volkswagen", "Porsche", "Opel", "Mini", "Smart",
+      "Maybach", "Alpina",
+      // European
+      "Skoda", "Seat", "Cupra", "Peugeot", "Renault", "Citroën", "DS", "Fiat",
+      "Alfa Romeo", "Lancia", "Abarth", "Maserati", "Ferrari", "Lamborghini",
+      "Volvo", "Polestar", "Dacia", "Bentley", "Rolls-Royce", "Aston Martin",
+      "McLaren", "Jaguar", "Land Rover", "MG",
+      // Asian
+      "Toyota", "Lexus", "Honda", "Nissan", "Infiniti", "Mazda", "Mitsubishi",
+      "Subaru", "Suzuki", "Hyundai", "Kia", "Genesis", "SsangYong", "Isuzu",
+      "BYD", "Nio", "Great Wall", "GWM Ora", "Aiways", "Maxus",
+      // American
+      "Ford", "Tesla", "Chevrolet", "Cadillac", "Chrysler", "Dodge", "Jeep",
+      "Ram", "GMC", "Lincoln",
     ],
     bodyTypes: [
       "Limousine", "Kombi", "SUV", "Kleinwagen", "Coupé",
