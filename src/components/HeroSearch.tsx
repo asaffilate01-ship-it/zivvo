@@ -22,7 +22,7 @@ const monthlyToPrice = (m: number) => Math.round(m / 0.0245);
 
 const HeroSearch = () => {
   const navigate = useNavigate();
-  const { config } = useCountry();
+  const { config, country } = useCountry();
   const { t } = useTranslation();
   const { add: addRecentSearch } = useRecentSearches();
 
@@ -63,7 +63,7 @@ const HeroSearch = () => {
   useEffect(() => {
     const t = setTimeout(async () => {
       setCounting(true);
-      let q = supabase.from("car_listings").select("id", { count: "exact", head: true }).eq("status", "active");
+      let q = supabase.from("car_listings").select("id", { count: "exact", head: true }).eq("status", "active").eq("country", country);
       if (make) q = q.eq("make", make);
       if (model) q = q.eq("model", model);
       if (vehicleType === "vans") q = q.in("body_type", ["Van", "Pickup"]);
@@ -81,7 +81,7 @@ const HeroSearch = () => {
       setCounting(false);
     }, 350);
     return () => clearTimeout(t);
-  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType, sellerType]);
+  }, [make, model, priceMin, priceMax, monthlyMax, budgetMode, vehicleType, sellerType, country]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
