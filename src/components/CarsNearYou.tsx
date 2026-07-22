@@ -182,27 +182,31 @@ const CarsNearYou = () => {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Badge variant="outline" className="mb-3 text-xs">
-              <MapPin className="mr-1 h-3 w-3" /> Near You
+              <MapPin className="mr-1 h-3 w-3" /> {t("home.near.badge")}
             </Badge>
             <h2 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-              Cars Near {locationName || "You"}
+              {locationName
+                ? t("home.near.title", { location: locationName })
+                : t("home.near.titleFallback")}
             </h2>
             <p className="mt-1 text-muted-foreground">
               {geoStatus === "granted"
-                ? `Showing vehicles within ${radius === "national" ? "the whole country" : `${radius} ${config.distanceUnit}`}`
-                : "Browse vehicles available in your area"}
+                ? radius === "national"
+                  ? t("home.near.showingNationwide")
+                  : t("home.near.showingWithin", { radius, unit: config.distanceUnit })
+                : t("home.near.browsePrompt")}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <Select value={radius} onValueChange={setRadius}>
               <SelectTrigger className="h-9 w-[140px] text-sm">
-                <SelectValue placeholder="Distance" />
+                <SelectValue placeholder={t("home.near.distance")} />
               </SelectTrigger>
               <SelectContent>
                 {radiusOptions.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
-                    {opt.value === "national" ? "Nationwide" : `${opt.value} ${config.distanceUnit}`}
+                    {opt.value === "national" ? t("home.near.nationwide") : `${opt.value} ${config.distanceUnit}`}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -210,13 +214,13 @@ const CarsNearYou = () => {
 
             {geoStatus === "denied" && (
               <Button variant="outline" size="sm" onClick={requestLocation} className="gap-1 text-xs">
-                <Navigation className="h-3 w-3" /> Enable GPS
+                <Navigation className="h-3 w-3" /> {t("home.near.enableGps")}
               </Button>
             )}
 
             <Link to="/browse">
               <Button variant="ghost" size="sm" className="text-primary">
-                View All <ArrowRight className="ml-1 h-4 w-4" />
+                {t("home.near.viewAll")} <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>
           </div>
@@ -225,7 +229,7 @@ const CarsNearYou = () => {
         {geoStatus === "denied" && (
           <div className="mt-4 flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-4 py-2 text-sm text-muted-foreground">
             <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>Location access was denied. Showing results for {locationName || "your country"}. <button onClick={requestLocation} className="font-medium text-primary hover:underline">Try again</button></span>
+            <span>{t("home.near.locationDenied", { location: locationName || "" })} <button onClick={requestLocation} className="font-medium text-primary hover:underline">{t("home.near.tryAgain")}</button></span>
           </div>
         )}
       </motion.div>
@@ -238,11 +242,12 @@ const CarsNearYou = () => {
         ) : cars.length === 0 ? (
           <div className="flex flex-col items-center rounded-2xl border border-dashed border-border py-12 text-center">
             <MapPin className="h-8 w-8 text-muted-foreground" />
-            <p className="mt-3 text-muted-foreground">No cars found within {radius} {config.distanceUnit}.</p>
+            <p className="mt-3 text-muted-foreground">{t("home.near.empty", { radius, unit: config.distanceUnit })}</p>
             <Button variant="outline" size="sm" className="mt-3" onClick={() => setRadius("national")}>
-              Search Nationwide
+              {t("home.near.searchNationwide")}
             </Button>
           </div>
+
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cars.map((car, i) => (
