@@ -38,6 +38,7 @@ import AdminInspectionBookingsPanel from "@/components/AdminInspectionBookingsPa
 import AdminInspectorsPanel from "@/components/AdminInspectorsPanel";
 import AdminInspectorPayoutsPanel from "@/components/AdminInspectorPayoutsPanel";
 import AdminVerificationDialog from "@/components/AdminVerificationDialog";
+import AdManager from "@/components/admin/AdManager";
 
 
 
@@ -337,6 +338,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="inspections" className="gap-1"><Shield className="h-3 w-3" /> Inspections</TabsTrigger>
             <TabsTrigger value="inspectors" className="gap-1"><Shield className="h-3 w-3" /> Inspectors</TabsTrigger>
             <TabsTrigger value="payouts" className="gap-1"><DollarSign className="h-3 w-3" /> Payouts</TabsTrigger>
+            <TabsTrigger value="ads">Ads</TabsTrigger>
           </TabsList>
 
           {/* Dealers Tab */}
@@ -1083,6 +1085,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="payouts" className="mt-4">
             <AdminInspectorPayoutsPanel />
+          </TabsContent>
+
+          <TabsContent value="ads" className="mt-4">
+            <AdManager />
           </TabsContent>
         </Tabs>
 
