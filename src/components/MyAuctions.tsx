@@ -11,7 +11,7 @@ import { Gavel, Heart, Trophy, TrendingUp, Clock, Eye, Package } from "lucide-re
 import { Skeleton } from "@/components/ui/skeleton";
 
 const fmtCurrency = (amount: number, country: string) => {
-  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
+  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.DE;
   return formatPrice(amount, cfg);
 };
 

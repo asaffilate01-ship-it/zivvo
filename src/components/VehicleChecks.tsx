@@ -322,8 +322,8 @@ const VehicleChecks = ({ registration, vin, country }: VehicleChecksProps) => {
   };
 
   // Determine which buttons to show based on country
-  const isUK = country === "GB";
-  const isUS = country === "US";
+  const isUK = country === "DE";
+  const isUS = false;
 
   return (
     <>

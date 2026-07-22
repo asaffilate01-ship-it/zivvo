@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 
 const fmt = (amount: number, country: string) => {
-  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
+  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.DE;
   return formatPrice(amount, cfg);
 };
 

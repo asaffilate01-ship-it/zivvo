@@ -19,7 +19,7 @@ import { countryConfigs, formatPrice } from "@/lib/countryConfig";
 import LiveEventBanner from "@/components/LiveEventBanner";
 
 const fmtCurrency = (amount: number, country: string) => {
-  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
+  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.DE;
   return formatPrice(amount, cfg);
 };
 

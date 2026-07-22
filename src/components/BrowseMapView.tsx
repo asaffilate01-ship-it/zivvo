@@ -40,7 +40,7 @@ interface BrowseMapViewProps {
 const BrowseMapView = ({ listings, country }: BrowseMapViewProps) => {
   const { config } = useCountry();
   const center = defaultCenter[country] || { lat: 51.5, lng: -0.1 };
-  const zoom = country === "US" ? 4 : country === "PK" ? 5 : 6;
+  const zoom = 6;
 
   const escape = (s: string) => s.replace(/[<>"']/g, (c) =>
     ({ "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] || c)

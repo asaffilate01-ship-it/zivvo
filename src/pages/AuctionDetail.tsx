@@ -30,7 +30,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
 
 const formatCurrency = (amount: number, country: string) => {
-  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.GB;
+  const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.DE;
   return formatPrice(amount, cfg);
 };
 
