@@ -10,28 +10,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   listingId: string;
   trigger?: React.ReactNode;
 }
 
-const TIERS = [
+const getTiers = (t: (k: string) => string) => [
   {
     id: "standard_200" as const,
-    name: "Standard 200-point",
+    name: t("inspectionDialog.standardName"),
     price: 249,
-    bullets: ["200 visual & mechanical checks", "Diagnostic OBD scan", "Photo report (PDF)", "Result within 48 hours"],
+    bullets: [t("inspectionDialog.standardB1"), t("inspectionDialog.standardB2"), t("inspectionDialog.standardB3"), t("inspectionDialog.standardB4")],
   },
   {
     id: "premium_300" as const,
-    name: "Premium 300-point + Road Test",
+    name: t("inspectionDialog.premiumName"),
     price: 349,
-    bullets: ["Everything in Standard", "30-minute road test", "Paint depth measurements", "Underbody inspection on ramp"],
+    bullets: [t("inspectionDialog.premiumB1"), t("inspectionDialog.premiumB2"), t("inspectionDialog.premiumB3"), t("inspectionDialog.premiumB4")],
   },
 ];
 
 const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -47,7 +49,7 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
       return;
     }
     if (!phone || !address) {
-      toast({ title: "Missing details", description: "Phone and address are required.", variant: "destructive" });
+      toast({ title: t("inspectionDialog.missingTitle"), description: t("inspectionDialog.missingDesc"), variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -61,20 +63,21 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
         setOpen(false);
       }
     } catch (e: any) {
-      toast({ title: "Booking failed", description: e.message || "Try again", variant: "destructive" });
+      toast({ title: t("inspectionDialog.bookingFailed"), description: e.message || "Try again", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
-  const selectedTier = TIERS.find((t) => t.id === type)!;
+  const TIERS = getTiers(t);
+  const selectedTier = TIERS.find((tier) => tier.id === type)!;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" className="gap-2">
-            <Shield className="w-4 h-4" /> Book Inspection
+            <Shield className="w-4 h-4" /> {t("inspectionDialog.bookInspection")}
           </Button>
         )}
       </DialogTrigger>
@@ -82,10 +85,10 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            Independent Vehicle Inspection
+            {t("inspectionDialog.title")}
           </DialogTitle>
           <DialogDescription>
-            A qualified mechanic visits the seller and produces a full report. Pay only if the car checks out.
+            {t("inspectionDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -118,26 +121,26 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
 
           <div className="space-y-3 pt-2 border-t">
             <div>
-              <Label htmlFor="phone">Your phone *</Label>
+              <Label htmlFor="phone">{t("inspectionDialog.yourPhone")}</Label>
               <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XXX XXXXXX" />
             </div>
             <div>
-              <Label htmlFor="address">Your address *</Label>
+              <Label htmlFor="address">{t("inspectionDialog.yourAddress")}</Label>
               <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="For report delivery" />
             </div>
             <div>
-              <Label htmlFor="notes">Notes (optional)</Label>
-              <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything specific you want checked?" rows={2} />
+              <Label htmlFor="notes">{t("inspectionDialog.notes")}</Label>
+              <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("inspectionDialog.notesPlaceholder")} rows={2} />
             </div>
           </div>
 
           <div className="text-xs text-muted-foreground bg-muted/50 p-3 rounded">
-            <strong>How it works:</strong> Pay £{selectedTier.price} now. We'll contact the seller, schedule the visit, and email you the full report within 48–72 hours. Refund if seller refuses access.
+            <strong>{t("inspectionDialog.howItWorksLabel")}</strong> {t("inspectionDialog.howItWorksDesc", { price: selectedTier.price })}
           </div>
 
           <Button onClick={handleBook} disabled={loading} className="w-full" size="lg">
             {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Shield className="w-4 h-4 mr-2" />}
-            Pay £{selectedTier.price} & Book
+            {t("inspectionDialog.payAndBook", { price: selectedTier.price })}
           </Button>
         </div>
       </DialogContent>

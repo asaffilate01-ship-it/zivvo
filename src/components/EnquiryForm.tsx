@@ -7,6 +7,7 @@ import { Mail, Loader2, CheckCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface EnquiryFormProps {
   listingId: string;
@@ -17,6 +18,7 @@ interface EnquiryFormProps {
 const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -30,7 +32,7 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast({ title: "Sign in to send enquiries", variant: "destructive" });
+      toast({ title: t("enquiryForm.signInToSend"), variant: "destructive" });
       return;
     }
     if (!form.message.trim()) return;
@@ -47,7 +49,7 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
     }).select("id").single();
 
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("enquiryForm.error"), description: error.message, variant: "destructive" });
     } else {
       setSent(true);
       // Increment enquiries count
@@ -70,47 +72,47 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Mail className="mr-2 h-4 w-4" />
-          Send Message
+          {t("enquiryForm.sendMessage")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="font-display">Send Enquiry</DialogTitle>
-          <p className="text-sm text-muted-foreground">About: {listingTitle}</p>
+          <DialogTitle className="font-display">{t("enquiryForm.dialogTitle")}</DialogTitle>
+          <p className="text-sm text-muted-foreground">{t("enquiryForm.about", { title: listingTitle })}</p>
         </DialogHeader>
 
         {sent ? (
           <div className="flex flex-col items-center py-8 text-center">
             <CheckCircle className="h-12 w-12 text-success" />
-            <h3 className="mt-3 font-display text-lg font-semibold text-foreground">Message Sent!</h3>
-            <p className="mt-1 text-sm text-muted-foreground">The seller will be notified of your enquiry.</p>
+            <h3 className="mt-3 font-display text-lg font-semibold text-foreground">{t("enquiryForm.sentTitle")}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{t("enquiryForm.sentDesc")}</p>
             <Button className="mt-4" onClick={() => { setOpen(false); setSent(false); setForm({ message: "", sender_name: "", sender_email: "", sender_phone: "" }); }}>
-              Close
+              {t("enquiryForm.close")}
             </Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Your Name</label>
-              <Input value={form.sender_name} onChange={(e) => setForm((p) => ({ ...p, sender_name: e.target.value }))} placeholder="John Doe" />
+              <label className="mb-1 block text-sm font-medium text-foreground">{t("enquiryForm.yourName")}</label>
+              <Input value={form.sender_name} onChange={(e) => setForm((p) => ({ ...p, sender_name: e.target.value }))} placeholder={t("enquiryForm.namePlaceholder")} />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">Email</label>
-                <Input type="email" value={form.sender_email} onChange={(e) => setForm((p) => ({ ...p, sender_email: e.target.value }))} placeholder="john@example.com" />
+                <label className="mb-1 block text-sm font-medium text-foreground">{t("enquiryForm.email")}</label>
+                <Input type="email" value={form.sender_email} onChange={(e) => setForm((p) => ({ ...p, sender_email: e.target.value }))} placeholder={t("enquiryForm.emailPlaceholder")} />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">Phone</label>
-                <Input value={form.sender_phone} onChange={(e) => setForm((p) => ({ ...p, sender_phone: e.target.value }))} placeholder="+44 7123 456789" />
+                <label className="mb-1 block text-sm font-medium text-foreground">{t("enquiryForm.phone")}</label>
+                <Input value={form.sender_phone} onChange={(e) => setForm((p) => ({ ...p, sender_phone: e.target.value }))} placeholder={t("enquiryForm.phonePlaceholder")} />
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-foreground">Message *</label>
-              <Textarea value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder="Hi, I'm interested in this vehicle..." rows={4} required />
+              <label className="mb-1 block text-sm font-medium text-foreground">{t("enquiryForm.message")}</label>
+              <Textarea value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} placeholder={t("enquiryForm.messagePlaceholder")} rows={4} required />
             </div>
             <Button type="submit" className="gradient-primary w-full border-0" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Send Enquiry
+              {t("enquiryForm.sendEnquiry")}
             </Button>
           </form>
         )}
