@@ -11,6 +11,7 @@ import { formatPrice, formatDistance } from "@/lib/countryConfig";
 import PriceIndicatorBadge from "@/components/PriceIndicatorBadge";
 import DealerPerformanceBadge from "@/components/DealerPerformanceBadge";
 import InspectionBadge from "@/components/InspectionBadge";
+import { useTranslation } from "react-i18next";
 
 // Rough monthly finance estimate: 10% deposit, 60 months, 9.9% APR
 const estimateMonthly = (price: number) => {
@@ -55,10 +56,10 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { config } = useCountry();
+  const { t } = useTranslation();
   const liked = isSaved(car.id);
   const mainImage = car.images?.[0] || "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80";
 
-  // Show price drop badge if the listing dropped within the last 14 days
   const priceDroppedRecently = car.price_dropped_at
     ? (Date.now() - new Date(car.price_dropped_at).getTime()) < 14 * 24 * 60 * 60 * 1000
     : false;
@@ -66,7 +67,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
   const handleLike = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!user) {
-      toast({ title: "Sign in to save cars", description: "Create an account to save your favourite listings." });
+      toast({ title: t("carCard.signInToSave"), description: t("carCard.signInToSaveDesc") });
       return;
     }
     await toggle(car.id);
@@ -91,11 +92,11 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             <div className="relative h-auto w-48 shrink-0 sm:w-64">
               <img src={mainImage} alt={car.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
               <div className="absolute left-2 top-2 flex gap-1 flex-wrap">
-                {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-[10px]">🔥 Promoted</Badge>}
-                {car.is_featured && <Badge className="gradient-primary border-0 text-[10px] text-primary-foreground">Featured</Badge>}
-                {car.verified && <Badge variant="secondary" className="bg-background/90 text-[10px] backdrop-blur-sm"><BadgeCheck className="mr-0.5 h-3 w-3 text-success" />Verified</Badge>}
+                {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-[10px]">{t("carCard.promoted")}</Badge>}
+                {car.is_featured && <Badge className="gradient-primary border-0 text-[10px] text-primary-foreground">{t("carCard.featured")}</Badge>}
+                {car.verified && <Badge variant="secondary" className="bg-background/90 text-[10px] backdrop-blur-sm"><BadgeCheck className="mr-0.5 h-3 w-3 text-success" />{t("carCard.verified")}</Badge>}
                 {car.inspection_score && <InspectionBadge score={car.inspection_score} />}
-                {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-[10px]"><TrendingDown className="mr-0.5 h-3 w-3" />Price drop</Badge>}
+                {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-[10px]"><TrendingDown className="mr-0.5 h-3 w-3" />{t("carCard.priceDrop")}</Badge>}
               </div>
               <Button variant="ghost" size="icon" className="absolute right-2 top-2 h-7 w-7 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background" onClick={handleLike}>
                 <Heart className={`h-3.5 w-3.5 ${liked ? "fill-accent text-accent" : "text-foreground"}`} />
@@ -114,7 +115,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                   </div>
                   <p className="shrink-0 font-display text-lg font-bold text-primary sm:text-xl">
                     {formatPrice(Number(car.price), config)}
-                    {car.vat_qualifying && <span className="ml-1 text-xs font-medium text-muted-foreground">+ VAT</span>}
+                    {car.vat_qualifying && <span className="ml-1 text-xs font-medium text-muted-foreground">{t("carCard.vat")}</span>}
                   </p>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
@@ -128,13 +129,13 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                   {Number(car.price) > 1000 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
                       <Wallet className="h-3 w-3" />
-                      From {formatPrice(estimateMonthly(Number(car.price)), config)}/mo
+                      {t("carCard.from")} {formatPrice(estimateMonthly(Number(car.price)), config)}{t("carCard.perMonth")}
                     </span>
                   )}
                   {car.dealer_id && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 font-medium text-success">
                       <Truck className="h-3 w-3" />
-                      Home delivery
+                      {t("carCard.homeDelivery")}
                     </span>
                   )}
                 </div>
@@ -150,7 +151,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                   </div>
                 )}
                 <Badge variant={car.dealer_id ? "default" : "outline"} className="text-xs">
-                  {car.dealer_id ? <><Shield className="mr-1 h-3 w-3" /> Dealer</> : "Private"}
+                  {car.dealer_id ? <><Shield className="mr-1 h-3 w-3" /> {t("carCard.dealer")}</> : t("carCard.private")}
                 </Badge>
               </div>
             </div>
@@ -172,13 +173,13 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             <img src={mainImage} alt={car.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent" />
             <div className="absolute left-3 top-3 flex gap-1.5 flex-wrap">
-              {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-xs font-semibold">🔥 Promoted</Badge>}
-              {car.is_featured && <Badge className="gradient-primary border-0 text-xs font-semibold text-primary-foreground">Featured</Badge>}
-              {car.verified && <Badge variant="secondary" className="bg-background/90 text-xs backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" />Verified</Badge>}
+              {(car as any).is_promoted && <Badge className="bg-warning text-warning-foreground border-0 text-xs font-semibold">{t("carCard.promoted")}</Badge>}
+              {car.is_featured && <Badge className="gradient-primary border-0 text-xs font-semibold text-primary-foreground">{t("carCard.featured")}</Badge>}
+              {car.verified && <Badge variant="secondary" className="bg-background/90 text-xs backdrop-blur-sm"><BadgeCheck className="mr-1 h-3 w-3 text-success" />{t("carCard.verified")}</Badge>}
               {car.inspection_score && <InspectionBadge score={car.inspection_score} />}
-              {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-xs font-semibold"><TrendingDown className="mr-1 h-3 w-3" />Price drop</Badge>}
+              {priceDroppedRecently && <Badge className="bg-success text-success-foreground border-0 text-xs font-semibold"><TrendingDown className="mr-1 h-3 w-3" />{t("carCard.priceDrop")}</Badge>}
               {car.source && car.source !== "manual" && (
-                <Badge variant="outline" className="bg-background/90 text-[10px] backdrop-blur-sm capitalize" title={`Synced from ${car.source}`}>
+                <Badge variant="outline" className="bg-background/90 text-[10px] backdrop-blur-sm capitalize" title={t("carCard.syncedFrom", { source: car.source })}>
                   ⇄ {car.source.replace("_", " ")}
                 </Badge>
               )}
@@ -189,12 +190,12 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
             <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
               <p className="font-display text-2xl font-bold text-primary-foreground">
                 {formatPrice(Number(car.price), config)}
-                {car.vat_qualifying && <span className="ml-1 text-xs font-medium opacity-90">+ VAT</span>}
+                {car.vat_qualifying && <span className="ml-1 text-xs font-medium opacity-90">{t("carCard.vat")}</span>}
               </p>
               <div className="flex items-center gap-1.5">
                 {(car as any).video_url && (
                   <span className="flex items-center gap-0.5 rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-medium text-foreground backdrop-blur-sm">
-                    <Video className="h-3 w-3" /> Video
+                    <Video className="h-3 w-3" /> {t("carCard.video")}
                   </span>
                 )}
                 {car.images && car.images.length > 1 && (
@@ -225,13 +226,13 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
               {Number(car.price) > 1000 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-medium text-primary">
                   <Wallet className="h-3 w-3" />
-                  From {formatPrice(estimateMonthly(Number(car.price)), config)}/mo
+                  {t("carCard.from")} {formatPrice(estimateMonthly(Number(car.price)), config)}{t("carCard.perMonth")}
                 </span>
               )}
               {car.dealer_id && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 font-medium text-success">
                   <Truck className="h-3 w-3" />
-                  Home delivery
+                  {t("carCard.homeDelivery")}
                 </span>
               )}
             </div>
@@ -247,7 +248,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                 </div>
               )}
               <Badge variant={car.dealer_id ? "default" : "outline"} className="text-xs">
-                {car.dealer_id ? <><Shield className="mr-1 h-3 w-3" /> Dealer</> : "Private"}
+                {car.dealer_id ? <><Shield className="mr-1 h-3 w-3" /> {t("carCard.dealer")}</> : t("carCard.private")}
               </Badge>
             </div>
           </div>
