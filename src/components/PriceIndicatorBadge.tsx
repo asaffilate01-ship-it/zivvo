@@ -40,8 +40,10 @@ const inFlightChecks = new Map<string, Promise<PriceCheckResult | null>>();
 let aiCreditsExhausted = false;
 
 const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB", className = "" }: PriceIndicatorBadgeProps) => {
+  const { t } = useTranslation();
   const [result, setResult] = useState<PriceCheckResult | null>(null);
   const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     if (!make || !model || !year || !price) return;
