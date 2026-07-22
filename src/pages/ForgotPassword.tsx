@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const ForgotPassword = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -40,36 +42,34 @@ const ForgotPassword = () => {
               {sent ? <Mail className="h-7 w-7 text-primary-foreground" /> : <Car className="h-7 w-7 text-primary-foreground" />}
             </div>
             <h1 className="mt-4 font-display text-3xl font-bold text-foreground">
-              {sent ? "Check your email" : "Reset password"}
+              {sent ? t("auth.forgot.sentTitle") : t("auth.forgot.title")}
             </h1>
             <p className="mt-2 text-muted-foreground">
-              {sent
-                ? "We sent a password reset link to your email."
-                : "Enter your email and we'll send you a reset link."}
+              {sent ? t("auth.forgot.sentSubtitle") : t("auth.forgot.subtitle")}
             </p>
           </div>
 
           {!sent && (
             <form onSubmit={handleReset} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.forgot.email")}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="du@beispiel.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
               <Button type="submit" className="gradient-primary w-full border-0" disabled={loading}>
-                {loading ? "Sending..." : "Send Reset Link"}
+                {loading ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
               </Button>
             </form>
           )}
 
           <Link to="/login" className="flex items-center justify-center gap-1 text-sm text-primary hover:underline">
-            <ArrowLeft className="h-4 w-4" /> Back to login
+            <ArrowLeft className="h-4 w-4" /> {t("auth.forgot.back")}
           </Link>
         </div>
       </div>
