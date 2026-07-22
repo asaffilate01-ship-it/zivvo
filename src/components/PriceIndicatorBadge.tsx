@@ -26,12 +26,13 @@ interface PriceIndicatorBadgeProps {
   className?: string;
 }
 
-const ratingConfig: Record<PriceRating, { label: string; icon: typeof Award; className: string }> = {
-  great: { label: "Great Price", icon: Award, className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
-  good: { label: "Good Price", icon: TrendingDown, className: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/20" },
-  fair: { label: "Fair Price", icon: Minus, className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/20" },
-  high: { label: "Above Market", icon: TrendingUp, className: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/20" },
+const ratingConfig: Record<PriceRating, { labelKey: string; icon: typeof Award; className: string }> = {
+  great: { labelKey: "priceIndicator.great", icon: Award, className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/20" },
+  good: { labelKey: "priceIndicator.good", icon: TrendingDown, className: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/20" },
+  fair: { labelKey: "priceIndicator.fair", icon: Minus, className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/20" },
+  high: { labelKey: "priceIndicator.high", icon: TrendingUp, className: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/20" },
 };
+
 
 // In-memory caches to prevent duplicate checks and repeated failing calls
 const priceCache = new Map<string, PriceCheckResult>();
