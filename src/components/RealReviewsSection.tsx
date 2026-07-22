@@ -118,7 +118,7 @@ const RealReviewsSection = () => {
               "{r.comment}"
             </p>
             <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-              {new Date(r.created_at).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+              {new Date(r.created_at).toLocaleDateString(i18n.language === "de" ? "de-DE" : "en-GB", { month: "short", year: "numeric" })}
             </p>
           </motion.div>
         ))}
