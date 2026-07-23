@@ -643,6 +643,16 @@ const CreateListing = () => {
               <CardTitle className="text-base">{t("createListing.deDisclosures", "Pflichtangaben (DE)")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="rounded-md border border-amber-500/30 bg-amber-500/5 p-3 text-xs text-muted-foreground">
+                <strong className="text-foreground">
+                  {t("createListing.deSellerLiabilityTitle", "Verantwortung des Verkäufers")}
+                </strong>{" "}
+                {t(
+                  "createListing.deSellerLiabilityBody",
+                  "Alle Angaben zum Fahrzeug (Verbrauch, CO₂, Schadstoffklasse, HU/AU, Vorbesitzer, Unfallfreiheit etc.) werden ausschließlich vom Verkäufer gemacht und liegen in dessen Verantwortung gemäß Pkw-EnVKV, StVZO und BGB. Zivvo prüft die Richtigkeit dieser Angaben nicht und haftet nicht für deren Inhalt."
+                )}
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label>{t("createListing.firstRegistration", "Erstzulassung")}</Label>
