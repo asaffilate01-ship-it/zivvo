@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { CheckCircle, Zap, Calendar, Percent, ShieldCheck, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import LeasingCalculator from "@/components/LeasingCalculator";
 
 const Finance = () => {
   const { t } = useTranslation();
@@ -111,6 +112,12 @@ const Finance = () => {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 pt-12">
+        <div className="mx-auto max-w-4xl">
+          <LeasingCalculator />
         </div>
       </section>
 
