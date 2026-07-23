@@ -820,7 +820,9 @@ export type Database = {
       }
       car_listings: {
         Row: {
+          accident_free: boolean | null
           body_type: string | null
+          co2_emissions: number | null
           color: string | null
           consignment_agreement_url: string | null
           country: string
@@ -828,8 +830,10 @@ export type Database = {
           dealer_id: string | null
           description: string | null
           doors: number | null
+          emission_class: string | null
           engine_size: string | null
           enquiries_count: number | null
+          environmental_badge: string | null
           external_ref: string | null
           features: string[] | null
           finance_check_clear: boolean | null
@@ -837,8 +841,12 @@ export type Database = {
           finance_outstanding: boolean
           finance_settlement_amount: number | null
           finance_settlement_letter_url: string | null
+          first_registration: string | null
+          fuel_consumption_combined: number | null
           fuel_type: string | null
           hpi_check_data: Json | null
+          hsn: string | null
+          hu_expiry: string | null
           id: string
           images: string[] | null
           inspection_completed_at: string | null
@@ -854,9 +862,11 @@ export type Database = {
           make: string
           mileage: number | null
           model: string
+          non_smoker: boolean | null
           owner_address: string | null
           owner_name: string | null
           photo_id_url: string | null
+          previous_owners: number | null
           price: number
           price_dropped_at: string | null
           promoted_until: string | null
@@ -874,6 +884,7 @@ export type Database = {
           truth_declaration_accepted: boolean
           truth_declaration_at: string | null
           truth_declaration_ip: string | null
+          tsn: string | null
           updated_at: string
           vat_qualifying: boolean
           vat_scheme: string
@@ -883,10 +894,13 @@ export type Database = {
           video_url: string | null
           views_count: number | null
           vin: string | null
+          warranty_months: number | null
           year: number
         }
         Insert: {
+          accident_free?: boolean | null
           body_type?: string | null
+          co2_emissions?: number | null
           color?: string | null
           consignment_agreement_url?: string | null
           country?: string
@@ -894,8 +908,10 @@ export type Database = {
           dealer_id?: string | null
           description?: string | null
           doors?: number | null
+          emission_class?: string | null
           engine_size?: string | null
           enquiries_count?: number | null
+          environmental_badge?: string | null
           external_ref?: string | null
           features?: string[] | null
           finance_check_clear?: boolean | null
@@ -903,8 +919,12 @@ export type Database = {
           finance_outstanding?: boolean
           finance_settlement_amount?: number | null
           finance_settlement_letter_url?: string | null
+          first_registration?: string | null
+          fuel_consumption_combined?: number | null
           fuel_type?: string | null
           hpi_check_data?: Json | null
+          hsn?: string | null
+          hu_expiry?: string | null
           id?: string
           images?: string[] | null
           inspection_completed_at?: string | null
@@ -920,9 +940,11 @@ export type Database = {
           make: string
           mileage?: number | null
           model: string
+          non_smoker?: boolean | null
           owner_address?: string | null
           owner_name?: string | null
           photo_id_url?: string | null
+          previous_owners?: number | null
           price: number
           price_dropped_at?: string | null
           promoted_until?: string | null
@@ -940,6 +962,7 @@ export type Database = {
           truth_declaration_accepted?: boolean
           truth_declaration_at?: string | null
           truth_declaration_ip?: string | null
+          tsn?: string | null
           updated_at?: string
           vat_qualifying?: boolean
           vat_scheme?: string
@@ -949,10 +972,13 @@ export type Database = {
           video_url?: string | null
           views_count?: number | null
           vin?: string | null
+          warranty_months?: number | null
           year: number
         }
         Update: {
+          accident_free?: boolean | null
           body_type?: string | null
+          co2_emissions?: number | null
           color?: string | null
           consignment_agreement_url?: string | null
           country?: string
@@ -960,8 +986,10 @@ export type Database = {
           dealer_id?: string | null
           description?: string | null
           doors?: number | null
+          emission_class?: string | null
           engine_size?: string | null
           enquiries_count?: number | null
+          environmental_badge?: string | null
           external_ref?: string | null
           features?: string[] | null
           finance_check_clear?: boolean | null
@@ -969,8 +997,12 @@ export type Database = {
           finance_outstanding?: boolean
           finance_settlement_amount?: number | null
           finance_settlement_letter_url?: string | null
+          first_registration?: string | null
+          fuel_consumption_combined?: number | null
           fuel_type?: string | null
           hpi_check_data?: Json | null
+          hsn?: string | null
+          hu_expiry?: string | null
           id?: string
           images?: string[] | null
           inspection_completed_at?: string | null
@@ -986,9 +1018,11 @@ export type Database = {
           make?: string
           mileage?: number | null
           model?: string
+          non_smoker?: boolean | null
           owner_address?: string | null
           owner_name?: string | null
           photo_id_url?: string | null
+          previous_owners?: number | null
           price?: number
           price_dropped_at?: string | null
           promoted_until?: string | null
@@ -1006,6 +1040,7 @@ export type Database = {
           truth_declaration_accepted?: boolean
           truth_declaration_at?: string | null
           truth_declaration_ip?: string | null
+          tsn?: string | null
           updated_at?: string
           vat_qualifying?: boolean
           vat_scheme?: string
@@ -1015,6 +1050,7 @@ export type Database = {
           video_url?: string | null
           views_count?: number | null
           vin?: string | null
+          warranty_months?: number | null
           year?: number
         }
         Relationships: [
