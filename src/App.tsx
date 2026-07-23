@@ -16,6 +16,7 @@ import OnboardingTour from "@/components/OnboardingTour";
 import PageSkeleton from "@/components/PageSkeleton";
 import ScrollToTop from "@/components/ScrollToTop";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
+import PlausibleLoader from "@/components/PlausibleLoader";
 import BackToTopButton from "@/components/BackToTopButton";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -86,6 +87,7 @@ const App = () => (
                 <SavedCarsProvider>
                   <ScrollToTop />
                   <AnalyticsTracker />
+                  <PlausibleLoader />
                   <Suspense fallback={<PageSkeleton />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
