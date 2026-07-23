@@ -400,6 +400,18 @@ const CreateListing = () => {
         finance_settlement_letter_url: financeLetterUrl,
         truth_declaration_accepted: !!form.truth_declaration_accepted,
         truth_declaration_at: form.truth_declaration_accepted ? new Date().toISOString() : null,
+        co2_emissions: form.co2_emissions ? parseInt(form.co2_emissions) : null,
+        fuel_consumption_combined: form.fuel_consumption_combined ? parseFloat(form.fuel_consumption_combined) : null,
+        emission_class: form.emission_class || null,
+        environmental_badge: form.environmental_badge || null,
+        hu_expiry: form.hu_expiry || null,
+        first_registration: form.first_registration || null,
+        hsn: form.hsn || null,
+        tsn: form.tsn || null,
+        previous_owners: form.previous_owners ? parseInt(form.previous_owners) : null,
+        warranty_months: form.warranty_months ? parseInt(form.warranty_months) : null,
+        accident_free: !!form.accident_free,
+        non_smoker: !!form.non_smoker,
       };
 
       if (editId) {
