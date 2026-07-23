@@ -636,6 +636,95 @@ const CreateListing = () => {
           </CardContent>
         </Card>
 
+        {/* DE mandatory disclosures — Pkw-EnVKV & StVZO */}
+        {country === "DE" && (
+          <Card className="mt-4 border-primary/30">
+            <CardHeader>
+              <CardTitle className="text-base">{t("createListing.deDisclosures", "Pflichtangaben (DE)")}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>{t("createListing.firstRegistration", "Erstzulassung")}</Label>
+                  <Input type="date" value={form.first_registration} onChange={(e) => updateField("first_registration", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("createListing.huExpiry", "HU/AU gültig bis (TÜV)")}</Label>
+                  <Input type="date" value={form.hu_expiry} onChange={(e) => updateField("hu_expiry", e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>{t("createListing.co2", "CO₂ (g/km)")}</Label>
+                  <Input type="number" placeholder="120" value={form.co2_emissions} onChange={(e) => updateField("co2_emissions", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("createListing.consumption", "Verbrauch komb. (l/100km)")}</Label>
+                  <Input type="number" step="0.1" placeholder="5.8" value={form.fuel_consumption_combined} onChange={(e) => updateField("fuel_consumption_combined", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("createListing.emissionClass", "Schadstoffklasse")}</Label>
+                  <Select value={form.emission_class} onValueChange={(v) => updateField("emission_class", v)}>
+                    <SelectTrigger><SelectValue placeholder="Euro 6d" /></SelectTrigger>
+                    <SelectContent>
+                      {["Euro 1","Euro 2","Euro 3","Euro 4","Euro 5","Euro 6","Euro 6c","Euro 6d-TEMP","Euro 6d","Euro 6e"].map((e) => (
+                        <SelectItem key={e} value={e}>{e}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>{t("createListing.badge", "Umweltplakette")}</Label>
+                  <Select value={form.environmental_badge} onValueChange={(v) => updateField("environmental_badge", v)}>
+                    <SelectTrigger><SelectValue placeholder={t("createListing.select")} /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="4-gruen">4 (Grün)</SelectItem>
+                      <SelectItem value="3-gelb">3 (Gelb)</SelectItem>
+                      <SelectItem value="2-rot">2 (Rot)</SelectItem>
+                      <SelectItem value="1-keine">Keine</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("createListing.previousOwners", "Vorbesitzer")}</Label>
+                  <Input type="number" min="0" placeholder="1" value={form.previous_owners} onChange={(e) => updateField("previous_owners", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("createListing.warrantyMonths", "Restgarantie (Monate)")}</Label>
+                  <Input type="number" min="0" placeholder="12" value={form.warranty_months} onChange={(e) => updateField("warranty_months", e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>{t("createListing.hsn", "HSN (Herstellerschlüssel)")}</Label>
+                  <Input maxLength={4} placeholder="0603" value={form.hsn} onChange={(e) => updateField("hsn", e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{t("createListing.tsn", "TSN (Typschlüssel)")}</Label>
+                  <Input maxLength={3} placeholder="BNC" value={form.tsn} onChange={(e) => updateField("tsn", e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/30">
+                  <input type="checkbox" className="mt-1" checked={form.accident_free} onChange={(e) => updateField("accident_free", e.target.checked as any)} />
+                  <span className="text-sm font-medium">{t("createListing.accidentFree", "Unfallfrei")}</span>
+                </label>
+                <label className="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer hover:bg-muted/30">
+                  <input type="checkbox" className="mt-1" checked={form.non_smoker} onChange={(e) => updateField("non_smoker", e.target.checked as any)} />
+                  <span className="text-sm font-medium">{t("createListing.nonSmoker", "Nichtraucherfahrzeug")}</span>
+                </label>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+
         {/* Description & Media */}
         <Card className="mt-4">
           <CardHeader>
