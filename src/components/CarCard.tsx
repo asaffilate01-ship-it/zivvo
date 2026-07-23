@@ -213,10 +213,10 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
               <PriceIndicatorBadge price={car.price} make={car.make} model={car.model} year={car.year} mileage={car.mileage} />
               {car.dealer_id && <DealerPerformanceBadge dealerId={car.dealer_id} />}
             </div>
-            <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
+            <div className="mt-2 flex flex-wrap gap-3 text-sm leading-none text-muted-foreground">
               {specs.slice(0, 3).map((s, i) => (
-                <span key={i} className="flex items-center gap-1">
-                  <s.icon className="h-3.5 w-3.5" /> {s.value}
+                <span key={i} className="inline-flex items-center gap-1">
+                  <s.icon className="h-3.5 w-3.5 shrink-0 overflow-visible" /> {s.value}
                 </span>
               ))}
             </div>
