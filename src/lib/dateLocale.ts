@@ -1,4 +1,4 @@
-import i18n from "@/i18n/config";
+import i18n from "@/i18n";
 
 // Central date/number formatting helpers that follow the active i18n locale.
 // Use these instead of raw toLocaleDateString() / toLocaleString() so that

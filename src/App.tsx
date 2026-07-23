@@ -87,6 +87,7 @@ const App = () => (
                 <SavedCarsProvider>
                   <ScrollToTop />
                   <AnalyticsTracker />
+                  <PlausibleLoader />
                   <Suspense fallback={<PageSkeleton />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
