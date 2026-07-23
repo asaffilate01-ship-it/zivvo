@@ -21,15 +21,27 @@ serve(async (req) => {
       });
     }
 
-    const apiKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
-    if (!apiKey) {
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+    const gmKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
+    if (!lovableKey || !gmKey) {
       return new Response(JSON.stringify({ city: "your area" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=locality|postal_town|administrative_area_level_2&key=${apiKey}`;
-    const res = await fetch(url);
+    const url = `https://connector-gateway.lovable.dev/google_maps/maps/api/geocode/json?latlng=${lat},${lng}&result_type=locality|postal_town|administrative_area_level_2`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": gmKey,
+      },
+    });
+    if (!res.ok) {
+      console.error(`Reverse-geocode gateway failed [${res.status}]: ${await res.text()}`);
+      return new Response(JSON.stringify({ city: "your area" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const data = await res.json();
 
     let city = "your area";
