@@ -91,6 +91,19 @@ const CreateListing = () => {
     finance_lender: "",
     finance_settlement_amount: "",
     truth_declaration_accepted: false,
+    // DE mandatory disclosures (Pkw-EnVKV, StVZO)
+    co2_emissions: "",
+    fuel_consumption_combined: "",
+    emission_class: "",
+    environmental_badge: "",
+    hu_expiry: "",
+    first_registration: "",
+    hsn: "",
+    tsn: "",
+    previous_owners: "",
+    warranty_months: "",
+    accident_free: true,
+    non_smoker: false,
   });
 
   // Load existing listing for editing
@@ -131,6 +144,18 @@ const CreateListing = () => {
           finance_lender: (data as any).finance_lender || "",
           finance_settlement_amount: (data as any).finance_settlement_amount ? String((data as any).finance_settlement_amount) : "",
           truth_declaration_accepted: !!(data as any).truth_declaration_accepted,
+          co2_emissions: (data as any).co2_emissions != null ? String((data as any).co2_emissions) : "",
+          fuel_consumption_combined: (data as any).fuel_consumption_combined != null ? String((data as any).fuel_consumption_combined) : "",
+          emission_class: (data as any).emission_class || "",
+          environmental_badge: (data as any).environmental_badge || "",
+          hu_expiry: (data as any).hu_expiry || "",
+          first_registration: (data as any).first_registration || "",
+          hsn: (data as any).hsn || "",
+          tsn: (data as any).tsn || "",
+          previous_owners: (data as any).previous_owners != null ? String((data as any).previous_owners) : "",
+          warranty_months: (data as any).warranty_months != null ? String((data as any).warranty_months) : "",
+          accident_free: (data as any).accident_free ?? true,
+          non_smoker: !!(data as any).non_smoker,
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
