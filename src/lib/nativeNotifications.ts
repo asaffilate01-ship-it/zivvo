@@ -41,7 +41,7 @@ export async function initNativeNotifications(userId?: string) {
       console.log("Push token:", token.value);
       if (userId) {
         try {
-          await supabase.from("device_tokens").upsert(
+          await (supabase as any).from("device_tokens").upsert(
             {
               user_id: userId,
               token: token.value,
