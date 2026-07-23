@@ -118,10 +118,10 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                     {car.vat_qualifying && <span className="ml-1 text-xs font-medium text-muted-foreground">{t("carCard.vat")}</span>}
                   </p>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground">
+                <div className="mt-2 flex flex-wrap gap-3 text-sm leading-none text-muted-foreground">
                   {specs.map((s, i) => (
-                    <span key={i} className="flex items-center gap-1">
-                      <s.icon className="h-3.5 w-3.5" /> {s.value}
+                    <span key={i} className="inline-flex items-center gap-1">
+                      <s.icon className="h-3.5 w-3.5 shrink-0 overflow-visible" /> {s.value}
                     </span>
                   ))}
                 </div>
