@@ -19,6 +19,7 @@ import AnalyticsTracker from "@/components/AnalyticsTracker";
 import PlausibleLoader from "@/components/PlausibleLoader";
 import BackToTopButton from "@/components/BackToTopButton";
 import NotificationInitializer from "@/components/NotificationInitializer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -243,6 +244,7 @@ const App = () => (
                   <PWAInstallPrompt />
                   <OnboardingTour />
                   <BackToTopButton />
+                  <MobileBottomNav />
                 </SavedCarsProvider>
               </AuthProvider>
               </CountryProvider>

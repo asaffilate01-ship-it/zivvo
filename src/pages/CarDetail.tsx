@@ -12,6 +12,7 @@ import PartExchangeWidget from "@/components/PartExchangeWidget";
 import MakeOfferDialog from "@/components/MakeOfferDialog";
 import InspectionBookingDialog from "@/components/InspectionBookingDialog";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import MobileListingBar from "@/components/MobileListingBar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -576,6 +577,13 @@ const CarDetail = () => {
       </div>
 
       <Footer />
+
+      <MobileListingBar
+        listingId={car.id}
+        phone={dealer?.business_phone}
+        whatsappNumber={dealer?.business_phone}
+        title={car.title}
+      />
     </div>
   );
 };
