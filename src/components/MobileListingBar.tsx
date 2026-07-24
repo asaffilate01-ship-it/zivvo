@@ -33,7 +33,7 @@ const MobileListingBar = ({ listingId, phone, whatsappNumber, title, onMessageCl
           size="icon"
           aria-label={t("carDetail.save", "Speichern")}
           className={cn("h-12 w-12 shrink-0", saved && "text-red-500 border-red-500")}
-          onClick={() => toggleSaved(listingId)}
+          onClick={() => toggle(listingId)}
         >
           <Heart className={cn("h-5 w-5", saved && "fill-current")} />
         </Button>
