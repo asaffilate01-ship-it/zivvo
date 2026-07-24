@@ -19,7 +19,7 @@ interface Props {
  */
 const MobileListingBar = ({ listingId, phone, whatsappNumber, title, onMessageClick }: Props) => {
   const { t } = useTranslation();
-  const { isSaved, toggleSaved } = useSavedCars();
+  const { isSaved, toggle } = useSavedCars();
   const [revealed, setRevealed] = useState(false);
   const saved = isSaved(listingId);
 
