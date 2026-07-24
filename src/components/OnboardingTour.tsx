@@ -44,19 +44,21 @@ const OnboardingTour = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/50 p-4 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-foreground/50 sm:p-4 backdrop-blur-sm"
         onClick={handleComplete}
       >
         <motion.div
           key={step}
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-elevated"
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 40, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          className="relative w-full sm:max-w-sm rounded-t-3xl sm:rounded-2xl border border-border bg-card p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:pb-6 shadow-elevated"
           onClick={(e) => e.stopPropagation()}
         >
-          <Button variant="ghost" size="icon" className="absolute right-2 top-2 h-7 w-7" onClick={handleComplete}>
+          {/* mobile drag handle */}
+          <div className="sm:hidden mx-auto mb-3 h-1.5 w-10 rounded-full bg-muted" />
+          <Button variant="ghost" size="icon" className="absolute right-2 top-2 h-8 w-8" onClick={handleComplete} aria-label="Close">
             <X className="h-4 w-4" />
           </Button>
 
@@ -78,10 +80,10 @@ const OnboardingTour = () => {
           </div>
 
           <div className="mt-5 flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1" onClick={handleComplete}>
+            <Button variant="outline" className="flex-1 h-11" onClick={handleComplete}>
               {t("onboarding.skip")}
             </Button>
-            <Button size="sm" className="gradient-primary flex-1 border-0 gap-1" onClick={handleNext}>
+            <Button className="gradient-primary flex-1 h-11 border-0 gap-1" onClick={handleNext}>
               {step >= steps.length - 1 ? t("onboarding.start") : t("onboarding.next")}
               {step < steps.length - 1 && <ArrowRight className="h-3.5 w-3.5" />}
             </Button>
