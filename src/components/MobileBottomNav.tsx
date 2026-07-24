@@ -34,6 +34,8 @@ const MobileBottomNav = () => {
   // Hide on certain routes where a bottom bar gets in the way
   const hiddenOn = ["/login", "/signup", "/forgot-password", "/reset-password", "/pitch"];
   if (hiddenOn.some((p) => location.pathname.startsWith(p))) return null;
+  // Hide on listing detail pages — MobileListingBar takes the bottom slot there
+  if (location.pathname.startsWith("/car/")) return null;
   // Hide inside admin/dealer dashboards to avoid overlap with their own nav
   if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/agent") || location.pathname.startsWith("/inspector")) return null;
 
