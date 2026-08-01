@@ -1,22 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Use fetch-based Stripe API calls to avoid Deno.core.runMicrotasks crash
-async function cancelPaymentIntent(paymentIntentId: string, stripeKey: string): Promise<boolean> {
+// Cancels a held deposit PaymentIntent through the managed Stripe gateway.
+async function cancelPaymentIntent(paymentIntentId: string, _unused?: string): Promise<boolean> {
   try {
-    const res = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/cancel`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${stripeKey}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
-    return res.ok;
+    const stripe = createStripeClient(resolveStripeEnv());
+    await stripe.paymentIntents.cancel(paymentIntentId);
+    return true;
   } catch (e) {
     console.log(`⚠️ Stripe cancel failed for ${paymentIntentId}:`, e);
     return false;
@@ -56,7 +52,7 @@ serve(async (req) => {
     { auth: { persistSession: false } }
   );
 
-  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+  const stripeKey = "";
 
   try {
     // Find auctions that have ended

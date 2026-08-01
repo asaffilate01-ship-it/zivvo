@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -22,11 +22,7 @@ serve(async (req) => {
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) {
-      return new Response(JSON.stringify({ error: "Payments not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
+    const stripe = createStripeClient(resolveStripeEnv());
 
     // Look up listing for description
     const { data: listing } = await supabase.from("car_listings").select("title,make,model,year").eq("id", listing_id).maybeSingle();
