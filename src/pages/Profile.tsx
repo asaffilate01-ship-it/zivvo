@@ -138,16 +138,8 @@ const Profile = () => {
     if (!user) return;
     setDeleting(true);
     try {
-      // Delete user data in order
-      await supabase.from("saved_cars").delete().eq("user_id", user.id);
-      await supabase.from("saved_searches").delete().eq("user_id", user.id);
-      await supabase.from("notifications").delete().eq("user_id", user.id);
-      await supabase.from("messages").delete().or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
-      await supabase.from("enquiries").delete().eq("sender_id", user.id);
-      await supabase.from("car_listings").delete().eq("seller_id", user.id);
-      await supabase.from("user_roles").delete().eq("user_id", user.id);
-      await supabase.from("profiles").delete().eq("user_id", user.id);
-
+      const { error } = await supabase.functions.invoke("delete-account");
+      if (error) throw error;
       await signOut();
       toast({ title: t("toast.accountDeleted"), description: t("toast.accountDeletedDesc") });
       navigate("/");

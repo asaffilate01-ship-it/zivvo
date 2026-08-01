@@ -25,7 +25,7 @@ const InspectorOnboard = () => {
     bio: "",
     base_address: "",
     coverage_postcodes: "",
-    max_travel_miles: "30",
+    max_travel_miles: "50",
   });
   const [existingId, setExistingId] = useState<string | null>(null);
 
@@ -44,7 +44,7 @@ const InspectorOnboard = () => {
           bio: data.bio || "",
           base_address: data.base_address || "",
           coverage_postcodes: (data.coverage_postcodes || []).join(", "),
-          max_travel_miles: String(data.max_travel_miles || 30),
+          max_travel_miles: String(data.max_travel_miles || 50),
         });
       } else {
         setForm((f) => ({ ...f, email: user.email || "" }));
@@ -72,7 +72,7 @@ const InspectorOnboard = () => {
         base_address: form.base_address,
         coverage_postcodes: form.coverage_postcodes
           .split(",").map((p) => p.trim().toUpperCase()).filter(Boolean),
-        max_travel_miles: parseInt(form.max_travel_miles) || 30,
+        max_travel_miles: parseInt(form.max_travel_miles) || 50,
       };
       const { error } = existingId
         ? await supabase.from("inspector_profiles").update(payload).eq("id", existingId)
@@ -115,11 +115,11 @@ const InspectorOnboard = () => {
           <CardContent className="space-y-3">
             <div><Label>Base address</Label><Input value={form.base_address} onChange={(e) => setForm({ ...form, base_address: e.target.value })} /></div>
             <div>
-              <Label>Postcode prefixes covered (comma-separated)</Label>
-              <Input placeholder="e.g. SW, SE, E, EC, N, NW" value={form.coverage_postcodes} onChange={(e) => setForm({ ...form, coverage_postcodes: e.target.value })} />
+              <Label>Abgedeckte PLZ-Präfixe (kommagetrennt)</Label>
+              <Input placeholder="z. B. 10, 12, 14" value={form.coverage_postcodes} onChange={(e) => setForm({ ...form, coverage_postcodes: e.target.value })} />
               <p className="text-xs text-muted-foreground mt-1">Use the outward part only (first letters/digits before the space).</p>
             </div>
-            <div><Label>Max travel distance (miles)</Label><Input type="number" value={form.max_travel_miles} onChange={(e) => setForm({ ...form, max_travel_miles: e.target.value })} /></div>
+            <div><Label>Maximale Anfahrt (km)</Label><Input type="number" min={1} max={500} value={form.max_travel_miles} onChange={(e) => setForm({ ...form, max_travel_miles: e.target.value })} /></div>
           </CardContent>
         </Card>
 

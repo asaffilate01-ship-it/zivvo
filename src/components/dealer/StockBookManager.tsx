@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ const StockBookManager = ({ dealerId }: Props) => {
     notes: "",
   });
 
-  const load = async () => {
+  const load = useCallback(async () => {
     const { data } = await supabase
       .from("stock_book_entries" as any)
       .select("*")
@@ -47,9 +47,9 @@ const StockBookManager = ({ dealerId }: Props) => {
       .order("entry_date", { ascending: false })
       .limit(200);
     setEntries((data as any) || []);
-  };
+  }, [dealerId]);
 
-  useEffect(() => { load(); }, [dealerId]);
+  useEffect(() => { void load(); }, [load]);
 
   const submit = async () => {
     if (!form.party_name || !form.amount) {
@@ -98,7 +98,7 @@ const StockBookManager = ({ dealerId }: Props) => {
     const a = document.createElement("a");
     a.href = url; a.download = `stock-book-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
     URL.revokeObjectURL(url);
-    toast({ title: "Stock book exported (HMRC ready)" });
+    toast({ title: "Bestandsbuch exportiert" });
   };
 
   const purchases = entries.filter(e => e.entry_type === "purchase");
@@ -111,7 +111,7 @@ const StockBookManager = ({ dealerId }: Props) => {
       <CardHeader className="flex flex-row items-center justify-between gap-2">
         <div>
           <CardTitle className="flex items-center gap-2"><BookOpen className="h-5 w-5" /> Stock Book</CardTitle>
-          <p className="mt-1 text-xs text-muted-foreground">HMRC-compliant record of every vehicle purchase and sale.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Exportierbare Übersicht der erfassten Fahrzeugkäufe und -verkäufe. Steuerliche Vollständigkeit bitte fachlich prüfen.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportCSV} disabled={!entries.length}>
@@ -144,7 +144,7 @@ const StockBookManager = ({ dealerId }: Props) => {
                 <div className="sm:col-span-2"><Label>Address</Label><Input value={form.party_address} onChange={e => setForm({ ...form, party_address: e.target.value })} /></div>
                 <div><Label>Email</Label><Input type="email" value={form.party_email} onChange={e => setForm({ ...form, party_email: e.target.value })} /></div>
                 <div><Label>Phone</Label><Input value={form.party_phone} onChange={e => setForm({ ...form, party_phone: e.target.value })} /></div>
-                <div><Label>Amount (£) *</Label><Input type="number" step="0.01" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} /></div>
+                <div><Label>Amount (€) *</Label><Input type="number" step="0.01" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} /></div>
                 <div>
                   <Label>Payment Method</Label>
                   <Select value={form.payment_method} onValueChange={v => setForm({ ...form, payment_method: v })}>
@@ -172,8 +172,8 @@ const StockBookManager = ({ dealerId }: Props) => {
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Purchases</p><p className="font-display text-xl font-bold">{purchases.length}</p></div>
           <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Sales</p><p className="font-display text-xl font-bold">{sales.length}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash Out</p><p className="font-display text-lg font-bold text-destructive">£{totalIn.toLocaleString()}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash In</p><p className="font-display text-lg font-bold text-success">£{totalOut.toLocaleString()}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash Out</p><p className="font-display text-lg font-bold text-destructive">€{totalIn.toLocaleString()}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash In</p><p className="font-display text-lg font-bold text-success">€{totalOut.toLocaleString()}</p></div>
         </div>
 
         <Tabs defaultValue="all">
@@ -190,7 +190,7 @@ const StockBookManager = ({ dealerId }: Props) => {
                     </div>
                   </div>
                   <div className={`font-display font-semibold ${e.entry_type === "sale" ? "text-success" : "text-destructive"}`}>
-                    {e.entry_type === "sale" ? "+" : "−"}£{Number(e.amount).toLocaleString()}
+                    {e.entry_type === "sale" ? "+" : "−"}€{Number(e.amount).toLocaleString()}
                   </div>
                 </div>
               ))}

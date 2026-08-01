@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building2, ArrowLeft, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { idempotencyHeaders } from "@/lib/idempotency";
 
 const AgentOnboard = () => {
   const { user } = useAuth();
@@ -24,10 +24,8 @@ const AgentOnboard = () => {
     address: "",
     city: "",
     postcode: "",
-    country: "GB",
     website_url: "",
     description: "",
-    tier: "starter",
   });
 
   const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
@@ -42,36 +40,15 @@ const AgentOnboard = () => {
 
     setLoading(true);
 
-    // Create a slug from business name
-    const slug = form.business_name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-
-    // We need a user_id for the dealer - for now create a placeholder
-    // The dealer will claim this once they sign up and subscribe
-    const { data, error } = await supabase.from("dealers").insert({
-      business_name: form.business_name,
-      business_email: form.business_email || null,
-      business_phone: form.business_phone || null,
-      address: form.address || null,
-      city: form.city || null,
-      postcode: form.postcode || null,
-      country: form.country,
-      website_url: form.website_url || null,
-      description: form.description || null,
-      tier: form.tier as "starter" | "professional" | "enterprise",
-      slug,
-      onboarded_by_agent: user.id,
-      user_id: user.id, // Agent creates with their ID; dealer claims later
-      kyc_submitted_at: new Date().toISOString(),
-      subscription_status: "incomplete",
-    }).select().single();
+    const { error } = await supabase.functions.invoke("invite-dealer", {
+      headers: idempotencyHeaders(),
+      body: form,
+    });
 
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: "Einladung fehlgeschlagen", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Dealer onboarded!", description: `${form.business_name} has been added to your pipeline.` });
+      toast({ title: "Händler eingeladen", description: `${form.business_name} erhält eine sichere Konto-Einladung.` });
       navigate("/agent");
     }
 
@@ -84,7 +61,7 @@ const AgentOnboard = () => {
       <div className="container mx-auto max-w-2xl px-4 py-8">
         <Button variant="ghost" size="sm" className="mb-4" onClick={() => navigate("/agent")}>
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to Dashboard
+          Zurück zum Dashboard
         </Button>
 
         <Card>
@@ -94,81 +71,58 @@ const AgentOnboard = () => {
                 <Building2 className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">Onboard New Dealer</CardTitle>
-                <p className="text-sm text-muted-foreground">Register a dealer and earn 30% recurring commission</p>
+                <CardTitle className="text-xl">Neuen Händler einladen</CardTitle>
+                <p className="text-sm text-muted-foreground">Der Händler erhält ein eigenes Konto und durchläuft anschließend Abo und KYC.</p>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Business Name *</label>
-                <Input value={form.business_name} onChange={(e) => update("business_name", e.target.value)} placeholder="Acme Motors Ltd" required />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Firmenname *</label>
+                <Input value={form.business_name} onChange={(e) => update("business_name", e.target.value)} placeholder="Autohaus Beispiel GmbH" required />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">Business Email</label>
-                  <Input type="email" value={form.business_email} onChange={(e) => update("business_email", e.target.value)} placeholder="info@acmemotors.com" />
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">Geschäftliche E-Mail *</label>
+                  <Input required type="email" value={form.business_email} onChange={(e) => update("business_email", e.target.value)} placeholder="info@autohaus.de" />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">Business Phone</label>
-                  <Input value={form.business_phone} onChange={(e) => update("business_phone", e.target.value)} placeholder="+44 7123 456789" />
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">Telefon</label>
+                  <Input value={form.business_phone} onChange={(e) => update("business_phone", e.target.value)} placeholder="+49 30 12345678" />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Address</label>
-                <Input value={form.address} onChange={(e) => update("address", e.target.value)} placeholder="123 Motor Lane" />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Anschrift</label>
+                <Input value={form.address} onChange={(e) => update("address", e.target.value)} placeholder="Beispielstraße 1" />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">City</label>
-                  <Input value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="London" />
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">Ort</label>
+                  <Input value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="Berlin" />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">Postcode</label>
-                  <Input value={form.postcode} onChange={(e) => update("postcode", e.target.value)} placeholder="SW1A 1AA" />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">Country</label>
-                  <Select value={form.country} onValueChange={(v) => update("country", v)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="GB">United Kingdom</SelectItem>
-                      <SelectItem value="AE">UAE</SelectItem>
-                      <SelectItem value="US">United States</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <label className="mb-1.5 block text-sm font-medium text-foreground">PLZ</label>
+                  <Input value={form.postcode} onChange={(e) => update("postcode", e.target.value)} placeholder="10115" />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Website</label>
-                <Input value={form.website_url} onChange={(e) => update("website_url", e.target.value)} placeholder="https://acmemotors.com" />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Website (HTTPS)</label>
+                <Input value={form.website_url} onChange={(e) => update("website_url", e.target.value)} placeholder="https://autohaus.de" />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Recommended Plan</label>
-                <Select value={form.tier} onValueChange={(v) => update("tier", v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="starter">Starter (£49/mo)</SelectItem>
-                    <SelectItem value="professional">Professional (£99/mo)</SelectItem>
-                    <SelectItem value="enterprise">Enterprise (£199/mo)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Description / Notes</label>
-                <Textarea value={form.description} onChange={(e) => update("description", e.target.value)} placeholder="Additional notes about the business..." rows={3} />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Interne Notiz</label>
+                <Textarea value={form.description} onChange={(e) => update("description", e.target.value)} placeholder="Ansprechpartner und Kontext zur Einladung" rows={3} />
               </div>
 
               <Button type="submit" className="gradient-primary w-full border-0" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Onboard Dealer
+                Einladung senden
               </Button>
             </form>
           </CardContent>

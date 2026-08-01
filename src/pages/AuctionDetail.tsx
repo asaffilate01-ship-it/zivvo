@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { idempotencyHeaders } from "@/lib/idempotency";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCountry } from "@/contexts/CountryContext";
 import Navbar from "@/components/Navbar";
@@ -21,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { redirectToStripe } from "@/lib/safeNavigation";
 import {
   Gavel, Shield, Star, Clock, CheckCircle2, AlertTriangle, Key, FileText, Truck,
   ChevronLeft, ChevronRight, Eye, Users, TrendingUp, History, Car, Wrench, Paintbrush,
@@ -60,35 +62,42 @@ const AuctionDetail = () => {
       toast.success(t("auctionDetail.toasts.paymentSuccess"));
       queryClient.invalidateQueries({ queryKey: ["auction-escrow", id] });
     }
-  }, [searchParams]);
+  }, [id, queryClient, searchParams, t]);
 
   const { data: auction, isLoading } = useQuery({
     queryKey: ["auction", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("auctions")
-        .select("*, car_listings!inner(*)")
+        .from("auctions_public" as any)
+        .select("*")
         .eq("id", id!)
         .single();
       if (error) throw error;
-      return data;
+      const { data: listing, error: listingError } = await supabase
+        .from("car_listings_public")
+        .select("*")
+        .eq("id", (data as any).listing_id)
+        .single();
+      if (listingError) throw listingError;
+      return { ...(data as any), car_listings: listing } as any;
     },
     enabled: !!id,
+    refetchInterval: (query) => (query.state.data as any)?.status === "live" ? 5000 : false,
   });
 
   const { data: bids = [] } = useQuery({
     queryKey: ["auction-bids", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("auction_bids")
+      const { data, error } = await (supabase.from as any)("auction_bids_public")
         .select("*")
         .eq("auction_id", id!)
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     },
     enabled: !!id,
+    refetchInterval: auction?.status === "live" ? 5000 : false,
   });
 
   const { data: contract } = useQuery({
@@ -132,6 +141,20 @@ const AuctionDetail = () => {
     enabled: !!id && !!user,
   });
 
+  const { data: financeRequest } = useQuery({
+    queryKey: ["auction-finance", id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("auction_finance_requests" as any)
+        .select("status,approved_amount,expires_at")
+        .eq("auction_id", id!)
+        .eq("user_id", user!.id)
+        .maybeSingle();
+      return data as any;
+    },
+    enabled: !!id && !!user,
+  });
+
   const { data: isWatching } = useQuery({
     queryKey: ["auction-watching", id, user?.id],
     queryFn: async () => {
@@ -145,19 +168,6 @@ const AuctionDetail = () => {
     },
     enabled: !!id && !!user,
   });
-
-  // Realtime bid subscription
-  useEffect(() => {
-    if (!id) return;
-    const channel = supabase
-      .channel(`auction-bids-${id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "auction_bids", filter: `auction_id=eq.${id}` }, () => {
-        queryClient.invalidateQueries({ queryKey: ["auction-bids", id] });
-        queryClient.invalidateQueries({ queryKey: ["auction", id] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [id, queryClient]);
 
   // Countdown timer
   useEffect(() => {
@@ -174,7 +184,7 @@ const AuctionDetail = () => {
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [auction?.ends_at]);
+  }, [auction?.ends_at, t]);
 
   const toggleWatch = useMutation({
     mutationFn: async () => {
@@ -202,24 +212,22 @@ const AuctionDetail = () => {
       if (user.id === auction.seller_id) throw new Error(t("auctionDetail.errors.cannotBidOwnAuction"));
 
       // Check deposit
-      if (!deposit || deposit.status !== "authorized") {
+      const requestedMaximum = useAutoBid && maxAutoBid ? parseFloat(maxAutoBid) : amount;
+      const validFinance = financeRequest?.status === "verified"
+        && Number(financeRequest.approved_amount) >= requestedMaximum
+        && new Date(financeRequest.expires_at).getTime() > Date.now();
+      if ((!deposit || deposit.status !== "authorized") && !validFinance) {
         throw new Error(t("auctionDetail.errors.depositRequired"));
       }
 
-      const bidData: any = {
-        auction_id: auction.id,
-        bidder_id: user.id,
-        amount,
-        deposit_verified: true,
-      };
-
-      if (useAutoBid && maxAutoBid) {
-        const maxAuto = parseFloat(maxAutoBid);
-        if (maxAuto < amount) throw new Error(t("auctionDetail.errors.maxAutoBidTooLow"));
-        bidData.max_auto_bid = maxAuto;
-      }
-
-      const { error } = await supabase.from("auction_bids").insert(bidData);
+      const maxAuto = useAutoBid && maxAutoBid ? parseFloat(maxAutoBid) : null;
+      if (maxAuto !== null && maxAuto < amount) throw new Error(t("auctionDetail.errors.maxAutoBidTooLow"));
+      const { error } = await (supabase.rpc as any)("place_auction_bid", {
+        p_auction_id: auction.id,
+        p_amount: amount,
+        p_max_auto_bid: maxAuto,
+        p_request_id: crypto.randomUUID(),
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -232,16 +240,9 @@ const AuctionDetail = () => {
   });
 
   const signContract = useMutation({
-    mutationFn: async (role: "buyer" | "seller") => {
+    mutationFn: async (_role: "buyer" | "seller") => {
       if (!contract || !user) return;
-      const update = role === "buyer"
-        ? { buyer_signed: true, buyer_signed_at: new Date().toISOString(), buyer_ip: "recorded", status: "pending_seller" as const }
-        : { seller_signed: true, seller_signed_at: new Date().toISOString(), seller_ip: "recorded" };
-
-      const { error } = await supabase
-        .from("auction_contracts")
-        .update(update)
-        .eq("id", contract.id);
+      const { error } = await (supabase.rpc as any)("sign_auction_contract", { p_contract_id: contract.id });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -255,10 +256,10 @@ const AuctionDetail = () => {
   const confirmHandover = useMutation({
     mutationFn: async (field: "v5c_received" | "keys_handed_over") => {
       if (!escrow) return;
-      const { error } = await supabase
-        .from("auction_escrow")
-        .update({ [field]: true })
-        .eq("id", escrow.id);
+      const { error } = await (supabase.rpc as any)("confirm_auction_handover", {
+        p_escrow_id: escrow.id,
+        p_kind: field === "v5c_received" ? "documents_received" : "keys_handed_over",
+      });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -279,6 +280,7 @@ const AuctionDetail = () => {
     mutationFn: async () => {
       if (!user || !auction) throw new Error(t("auctionDetail.errors.loginRequired"));
       const { data, error } = await supabase.functions.invoke("winner-payment", {
+        headers: idempotencyHeaders(),
         body: { auction_id: auction.id },
       });
       if (error) throw error;
@@ -288,7 +290,7 @@ const AuctionDetail = () => {
         return;
       }
       if (data?.url) {
-        window.open(data.url, "_blank");
+        redirectToStripe(data.url);
       }
     },
     onError: (e: Error) => toast.error(e.message),
@@ -303,9 +305,10 @@ const AuctionDetail = () => {
   const conditionReport = (auction.condition_report || {}) as Record<string, any>;
   const isLive = auction.status === "live";
   const isSeller = user?.id === auction.seller_id;
-  const isWinner = auction.winning_bid_id && bids[0]?.bidder_id === user?.id;
+  const winningBid = bids.find((bid: any) => bid.id === auction.winning_bid_id);
+  const isWinner = Boolean(auction.winning_bid_id && winningBid?.is_own);
   const reserveMet = auction.reserve_price ? currentPrice >= auction.reserve_price : true;
-  const hasDeposit = deposit?.status === "authorized";
+  const hasDeposit = deposit?.status === "authorized" || (financeRequest?.status === "verified" && new Date(financeRequest.expires_at).getTime() > Date.now());
   const isSold = auction.status === "sold";
 
   return (
@@ -476,7 +479,7 @@ const AuctionDetail = () => {
                                   {i === 0 && <TrendingUp className="w-4 h-4 text-primary" />}
                                   <div>
                                     <p className="font-medium text-sm flex items-center gap-1.5">
-                                      {bid.bidder_id === user?.id ? t("auctionDetail.bidsTab.you") : t("auctionDetail.bidsTab.bidderMasked", { last4: bid.bidder_id.slice(-4) })}
+                                      {bid.is_own ? t("auctionDetail.bidsTab.you") : t("auctionDetail.bidsTab.bidderMasked", { last4: bid.bidder_alias.slice(0, 4).toUpperCase() })}
                                       {bid.is_auto_bid && <Badge variant="outline" className="text-[9px] py-0"><Zap className="w-2.5 h-2.5 mr-0.5" />{t("auctionDetail.bidsTab.auto")}</Badge>}
                                     </p>
                                     <p className="text-xs text-muted-foreground">{new Date(bid.created_at).toLocaleString()}</p>
@@ -484,7 +487,6 @@ const AuctionDetail = () => {
                                 </div>
                                 <div className="text-right">
                                   <p className={`font-bold ${i === 0 ? "text-primary" : ""}`}>{formatCurrency(bid.amount, country)}</p>
-                                  {bid.finance_preapproved && <Badge variant="outline" className="text-[9px] py-0">{t("auctionDetail.bidsTab.finance")}</Badge>}
                                 </div>
                               </div>
                             ))}
@@ -723,7 +725,7 @@ const AuctionDetail = () => {
                             <DialogDescription>{t("auctionDetail.contract.dialogDesc")}</DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-80 border rounded-lg p-4 text-sm">
-                            <div dangerouslySetInnerHTML={{ __html: contract.contract_html || generateContractHTML(auction, listing, currentPrice, country) }} />
+                            <ContractSummary snapshot={(contract as any).contract_snapshot} auction={auction} listing={listing} price={currentPrice} country={country} />
                           </ScrollArea>
                           <DialogFooter>
                             <p className="text-xs text-muted-foreground mr-auto">{t("auctionDetail.contract.agreeNote")}</p>
@@ -753,7 +755,7 @@ const AuctionDetail = () => {
                         {escrow.v5c_received ? (
                           <Badge className="bg-emerald-500 text-white border-0">{t("auctionDetail.handover.confirmed")}</Badge>
                         ) : (
-                          isSeller ? (
+                          isWinner ? (
                             <Button size="sm" variant="outline" onClick={() => confirmHandover.mutate("v5c_received")} disabled={confirmHandover.isPending}>
                               {t("auctionDetail.handover.confirmSent")}
                             </Button>
@@ -878,34 +880,27 @@ function getMinIncrement(currentPrice: number): number {
   return 1000;
 }
 
-function generateContractHTML(auction: any, listing: any, price: number, country: string): string {
-  return `
-    <h2 style="font-weight:bold;font-size:18px;margin-bottom:16px;">Vehicle Sale Agreement</h2>
-    <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-    <p><strong>Auction ID:</strong> ${auction.id}</p>
-    <hr style="margin:12px 0;"/>
-    <p><strong>Vehicle:</strong> ${listing?.year} ${listing?.make} ${listing?.model}</p>
-    <p><strong>Registration:</strong> ${listing?.registration || "N/A"}</p>
-    <p><strong>VIN:</strong> ${listing?.vin || "N/A"}</p>
-    <p><strong>Mileage:</strong> ${listing?.mileage?.toLocaleString() || "N/A"}</p>
-    <hr style="margin:12px 0;"/>
-    <p><strong>Hammer Price:</strong> £${price}</p>
-    <p><strong>Buyer Premium (3%):</strong> £${(price * 0.03).toFixed(2)}</p>
-    <p><strong>Total Due from Buyer:</strong> £${(price * 1.03).toFixed(2)}</p>
-    <p><strong>Seller Fee (1.5%):</strong> £${(price * 0.015).toFixed(2)}</p>
-    <p><strong>Seller Receives:</strong> £${(price * 0.985).toFixed(2)}</p>
-    <hr style="margin:12px 0;"/>
-    <h3 style="font-weight:bold;">Terms & Conditions</h3>
-    <ol style="padding-left:20px;font-size:13px;">
-      <li>The Seller agrees to transfer the vehicle to the Buyer upon receipt of full payment and completion of all handover requirements.</li>
-      <li>The Buyer agrees to pay the Total Due within 72 hours of auction close.</li>
-      <li>Funds are held under Payment Protection and released to the Seller only upon: (a) V5C/logbook transfer, (b) key handover, and (c) mutual contract signing.</li>
-      <li>The vehicle is sold as described in the inspection and condition report. The platform makes no additional warranty unless explicitly stated.</li>
-      <li>Delivery via logistics partners is at additional cost to the Buyer if arranged.</li>
-      <li>This agreement is legally binding upon digital signature by both parties. IP addresses and timestamps are recorded for audit purposes.</li>
-      <li>Any disputes shall be resolved through the platform's dispute resolution process.</li>
-    </ol>
-  `;
+function ContractSummary({ snapshot, auction, listing, price, country }: { snapshot: any; auction: any; listing: any; price: number; country: string }) {
+  const terms = snapshot || {
+    vehicle: { year: listing.year, make: listing.make, model: listing.model, registration: listing.registration || "–", vin: listing.vin || "–" },
+    hammer_price: price,
+    buyer_premium_pct: auction.buyer_premium_pct,
+    total_due: price * (1 + auction.buyer_premium_pct / 100),
+    sealed_at: null,
+  };
+  return (
+    <div className="space-y-4">
+      <div><h3 className="font-display text-lg font-semibold">Fahrzeugkaufvertrag</h3><p className="text-xs text-muted-foreground">Auktion {auction.id}</p></div>
+      <dl className="grid gap-2 sm:grid-cols-2">
+        <div><dt className="text-muted-foreground">Fahrzeug</dt><dd className="font-medium">{terms.vehicle.year} {terms.vehicle.make} {terms.vehicle.model}</dd></div>
+        <div><dt className="text-muted-foreground">FIN / Kennzeichen</dt><dd className="font-medium">{terms.vehicle.vin} / {terms.vehicle.registration}</dd></div>
+        <div><dt className="text-muted-foreground">Zuschlagspreis</dt><dd className="font-medium">{formatCurrency(Number(terms.hammer_price), country)}</dd></div>
+        <div><dt className="text-muted-foreground">Gesamtbetrag</dt><dd className="font-medium">{formatCurrency(Number(terms.total_due), country)}</dd></div>
+      </dl>
+      <p>Der Verkäufer übergibt Fahrzeug, Schlüssel und Fahrzeugdokumente wie im Prüfbericht beschrieben. Die Zahlung wird bis zur bestätigten Übergabe verwahrt.</p>
+      <p>Beide Parteien bestätigen mit ihrer Signatur die unveränderliche Vertragsfassung{terms.sealed_at ? ` vom ${new Date(terms.sealed_at).toLocaleString("de-DE")}` : ""}.</p>
+    </div>
+  );
 }
 
 export default AuctionDetail;

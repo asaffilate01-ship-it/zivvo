@@ -24,7 +24,9 @@ Allow: /
 Disallow: /profile
 Disallow: /inbox
 Disallow: /admin
-Disallow: /dealer-dashboard
-Disallow: /agent-dashboard
+Disallow: /dashboard
+Disallow: /agent
+Disallow: /inspector
+Disallow: /trade-stock
 
-Sitemap: https://zivvo.co.uk/sitemap.xml
+Sitemap: https://zxnyonbgophovotkjmwl.supabase.co/functions/v1/sitemap

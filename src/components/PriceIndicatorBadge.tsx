@@ -12,7 +12,7 @@ type PriceCheckResult = {
   rating: PriceRating;
   explanation: string;
   market_average: number;
-  source?: "ai" | "fallback";
+  source?: "zivvo_market";
   warning?: string;
 };
 
@@ -37,9 +37,8 @@ const ratingConfig: Record<PriceRating, { labelKey: string; icon: typeof Award; 
 // In-memory caches to prevent duplicate checks and repeated failing calls
 const priceCache = new Map<string, PriceCheckResult>();
 const inFlightChecks = new Map<string, Promise<PriceCheckResult | null>>();
-let aiCreditsExhausted = false;
 
-const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB", className = "" }: PriceIndicatorBadgeProps) => {
+const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "DE", className = "" }: PriceIndicatorBadgeProps) => {
   const { t } = useTranslation();
   const [result, setResult] = useState<PriceCheckResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,11 +51,6 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
 
     if (priceCache.has(cacheKey)) {
       setResult(priceCache.get(cacheKey)!);
-      return;
-    }
-
-    if (aiCreditsExhausted) {
-      setResult(null);
       return;
     }
 
@@ -84,14 +78,6 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
       })
       .then(({ data, error }) => {
         if (error || data?.error) {
-          const isCreditsError =
-            data?.error === "AI credits exhausted" ||
-            `${error?.message ?? ""}`.includes("402");
-
-          if (isCreditsError) {
-            aiCreditsExhausted = true;
-          }
-
           return null;
         }
 
@@ -103,10 +89,6 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
             source: data.source,
             warning: data.warning,
           };
-
-          if (data.warning === "AI credits exhausted") {
-            aiCreditsExhausted = true;
-          }
 
           priceCache.set(cacheKey, res);
           return res;
@@ -144,7 +126,7 @@ const PriceIndicatorBadge = ({ price, make, model, year, mileage, country = "GB"
 
   const config = ratingConfig[result.rating];
   const Icon = config.icon;
-  const currencySymbol = country === "DE" ? "€" : country === "US" ? "$" : country === "AE" ? "AED " : country === "PK" ? "₨" : "£";
+  const currencySymbol = "€";
 
   return (
     <TooltipProvider>

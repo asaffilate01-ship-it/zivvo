@@ -9,16 +9,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Send } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/hooks/useAnalytics";
 
 interface DealerEnquiryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  dealerId: string;
   dealerName: string;
-  dealerEmail?: string | null;
   accent?: string;
 }
 
-const DealerEnquiryDialog = ({ open, onOpenChange, dealerName, dealerEmail, accent }: DealerEnquiryDialogProps) => {
+const DealerEnquiryDialog = ({ open, onOpenChange, dealerId, dealerName, accent }: DealerEnquiryDialogProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [name, setName] = useState("");
@@ -34,20 +36,25 @@ const DealerEnquiryDialog = ({ open, onOpenChange, dealerName, dealerEmail, acce
       return;
     }
     setLoading(true);
-    // Open user's mail client as a reliable fallback (no public dealer contact endpoint exists)
-    const subject = encodeURIComponent(t("dealer.enquiryDialog.mailSubject", { name }));
-    const body = encodeURIComponent(
-      t("dealer.enquiryDialog.mailBody", { name, email, phone: phone || "—", message })
-    );
-    if (dealerEmail) {
-      window.location.href = `mailto:${dealerEmail}?subject=${subject}&body=${body}`;
+    const { error } = await supabase.functions.invoke("contact-submit", {
+      body: {
+        dealer_id: dealerId,
+        name,
+        email,
+        phone,
+        subject: t("dealer.enquiryDialog.mailSubject", { name }),
+        message,
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: t("dealer.enquiryDialog.errorTitle"), description: error.message, variant: "destructive" });
+      return;
     }
-    setTimeout(() => {
-      setLoading(false);
-      toast({ title: t("dealer.enquiryDialog.readyTitle"), description: t("dealer.enquiryDialog.readyDescription") });
-      onOpenChange(false);
-      setName(""); setEmail(""); setPhone(""); setMessage("");
-    }, 400);
+    void trackEvent("dealer_enquiry_sent", { dealer_id: dealerId });
+    toast({ title: t("dealer.enquiryDialog.readyTitle"), description: t("dealer.enquiryDialog.readyDescription") });
+    onOpenChange(false);
+    setName(""); setEmail(""); setPhone(""); setMessage("");
   };
 
   return (
@@ -62,16 +69,16 @@ const DealerEnquiryDialog = ({ open, onOpenChange, dealerName, dealerEmail, acce
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <Label htmlFor="enq-name" className="text-xs">{t("dealer.enquiryDialog.yourName")}</Label>
-            <Input id="enq-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Doe" required />
+            <Input id="enq-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Erika Mustermann" required />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="enq-email" className="text-xs">{t("dealer.enquiryDialog.email")}</Label>
-              <Input id="enq-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" required />
+              <Input id="enq-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="sie@beispiel.de" required />
             </div>
             <div>
               <Label htmlFor="enq-phone" className="text-xs">{t("dealer.enquiryDialog.phone")}</Label>
-              <Input id="enq-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07…" />
+              <Input id="enq-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+49 30 …" />
             </div>
           </div>
           <div>

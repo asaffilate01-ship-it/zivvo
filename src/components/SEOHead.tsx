@@ -16,23 +16,23 @@ interface SEOHeadProps {
   locale?: string;
 }
 
-const SITE_URL = "https://zivvo.co.uk";
+const SITE_URL = "https://zivvo.de";
 const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
 
 const SEOHead = ({
-  title = "Zivvo — Buy & Sell Cars with Confidence",
-  description = "Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing across UK, UAE, USA & Pakistan.",
+  title = "Zivvo — Fahrzeuge in Deutschland kaufen und verkaufen",
+  description = "Fahrzeuge von privaten Verkäufern und Händlern transparent vergleichen, anfragen und sicher bezahlen.",
   canonical,
   type = "website",
   image = DEFAULT_IMAGE,
-  imageAlt = "Zivvo — Used car marketplace",
+  imageAlt = "Zivvo Fahrzeugmarktplatz",
   jsonLd,
   noindex = false,
   publishedTime,
   modifiedTime,
   author = "Zivvo",
   keywords,
-  locale = "en_GB",
+  locale = "de_DE",
 }: SEOHeadProps) => {
   const fullTitle = title.includes("Zivvo") ? title : `${title} | Zivvo`;
   const canonicalUrl = canonical || (typeof window !== "undefined" ? `${SITE_URL}${window.location.pathname}` : SITE_URL);
@@ -71,8 +71,8 @@ const SEOHead = ({
       <meta name="twitter:image:alt" content={imageAlt} />
 
       {/* Geo targeting */}
-      <meta name="geo.region" content="GB" />
-      <meta name="geo.placename" content="United Kingdom" />
+      <meta name="geo.region" content="DE" />
+      <meta name="geo.placename" content="Deutschland" />
 
       {/* JSON-LD */}
       {jsonLdArray.map((ld, i) => (

@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw, AlertCircle, CheckCircle2, Activity } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 interface IntegrationRow {
   id: string;
@@ -21,11 +20,9 @@ interface IntegrationRow {
 }
 
 const AdminDmsHealthPanel = () => {
-  const { toast } = useToast();
   const [rows, setRows] = useState<IntegrationRow[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [retrying, setRetrying] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -46,27 +43,6 @@ const AdminDmsHealthPanel = () => {
   };
 
   useEffect(() => { load(); }, []);
-
-  const retry = async (row: IntegrationRow) => {
-    setRetrying(row.id);
-    const fn = row.provider === "virtualyard" ? "virtualyard-sync" : null;
-    if (!fn) {
-      toast({ title: "No retry handler", description: `Provider ${row.provider} has no auto-sync` });
-      setRetrying(null);
-      return;
-    }
-    const { data, error } = await supabase.functions.invoke(fn, { body: { dealer_id: row.dealer_id } });
-    setRetrying(null);
-    if (error) {
-      toast({ title: "Retry failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({
-        title: "Sync complete",
-        description: `${data?.processed ?? 0} processed · ${data?.created ?? 0} new · ${data?.updated ?? 0} updated · ${data?.failed ?? 0} failed`,
-      });
-    }
-    load();
-  };
 
   if (loading) return <div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin" /></div>;
 
@@ -152,11 +128,7 @@ const AdminDmsHealthPanel = () => {
                         {r.sync_pull && <Badge variant="outline" className="mr-1">Pull</Badge>}
                         {r.sync_push && <Badge variant="outline">Push</Badge>}
                       </td>
-                      <td className="py-2">
-                        <Button size="sm" variant="ghost" disabled={retrying === r.id || !r.is_enabled} onClick={() => retry(r)}>
-                          {retrying === r.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-                        </Button>
-                      </td>
+                      <td className="py-2 text-xs text-muted-foreground">Manuell verwaltet</td>
                     </tr>
                   ))}
                 </tbody>

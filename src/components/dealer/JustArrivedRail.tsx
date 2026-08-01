@@ -29,8 +29,8 @@ const JustArrivedRail = ({ dealerId, days = 14 }: Props) => {
     (async () => {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
-        .from("car_listings")
-        .select("id,title,price,year,mileage,images,created_at,vat_qualifying")
+        .from("car_listings_public")
+        .select("id,title,price,year,mileage,images,created_at")
         .eq("dealer_id", dealerId)
         .eq("status", "active")
         .gte("created_at", since)
@@ -73,7 +73,6 @@ const JustArrivedRail = ({ dealerId, days = 14 }: Props) => {
                   </div>
                   <div className="font-bold text-primary">
                     {formatPrice(c.price, config)}
-                    {c.vat_qualifying && <span className="text-xs text-muted-foreground ml-1">{t("dealer.justArrived.plusVat")}</span>}
                   </div>
                 </div>
               </Card>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { trackEvent } from "@/hooks/useAnalytics";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -13,9 +14,8 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, AlertTriangle, Sparkles, FileText, IdCard, Banknote } from "lucide-react";
+import { ArrowRight, Loader2, Upload, FileCheck, Shield, CheckCircle, Sparkles, FileText, IdCard, Banknote } from "lucide-react";
 import ImageReorder from "@/components/ImageReorder";
-import VrmAutofill from "@/components/VrmAutofill";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -42,11 +42,9 @@ const CreateListing = () => {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
 
-  // KYC: Logbook & HPI
+  // Ownership and identity verification
   const [logbookFile, setLogbookFile] = useState<File | null>(null);
   const [existingLogbookUrl, setExistingLogbookUrl] = useState<string | null>(null);
-  const [hpiCheckData, setHpiCheckData] = useState<any>(null);
-  const [hpiLoading, setHpiLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -159,7 +157,6 @@ const CreateListing = () => {
         });
         setExistingImages(data.images || []);
         setExistingLogbookUrl((data as any).logbook_url || null);
-        setHpiCheckData((data as any).hpi_check_data || null);
         setExistingPhotoIdUrl((data as any).photo_id_url || null);
         setExistingConsignmentUrl((data as any).consignment_agreement_url || null);
         setExistingTradeInvoiceUrl((data as any).trade_invoice_url || null);
@@ -171,7 +168,7 @@ const CreateListing = () => {
       setPageLoading(false);
     };
     loadListing();
-  }, [editId, user]);
+  }, [editId, navigate, t, toast, user]);
 
   const updateField = (field: string, value: string | number | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -227,30 +224,6 @@ const CreateListing = () => {
     const path = `${user!.id}/${prefix}-${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("listing-documents").upload(path, file);
     return error ? existingPath : path;
-  };
-
-  const runHpiCheck = async () => {
-    if (!form.registration && !form.vin) {
-      toast({ title: t("createListing.regOrVinRequired"), description: t("createListing.regOrVinRequiredDesc"), variant: "destructive" });
-      return;
-    }
-    setHpiLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("hpi-check", {
-        body: { registration: form.registration || undefined, vin: form.vin || undefined },
-      });
-      if (error) throw error;
-      if (data?.success) {
-        setHpiCheckData(data.data);
-        toast({ title: t("createListing.hpiComplete"), description: data.data.stolen_reported ? t("createListing.hpiIssuesFound") : t("createListing.hpiPassed") });
-      } else {
-        toast({ title: t("createListing.hpiFailed"), description: data?.error || t("createListing.hpiFailedDesc"), variant: "destructive" });
-      }
-    } catch (err: any) {
-      toast({ title: t("createListing.hpiUnavailable"), description: t("createListing.hpiUnavailableDesc"), variant: "destructive" });
-    } finally {
-      setHpiLoading(false);
-    }
   };
 
   const handleSubmit = async (status: "draft" | "active") => {
@@ -348,7 +321,7 @@ const CreateListing = () => {
       const allImages = [...existingImages, ...uploadedUrls];
       const title = form.title || `${form.year} ${form.make} ${form.model}`;
 
-      // Force under_review when publishing (admin must approve with logbook + HPI)
+      // Force under_review when publishing; an administrator verifies the evidence.
       const finalStatus = status === "active" ? "under_review" : status;
 
       // Geocode the location to live coordinates (best effort)
@@ -385,7 +358,6 @@ const CreateListing = () => {
         status: finalStatus,
         country,
         logbook_url: logbookUrl,
-        hpi_check_data: hpiCheckData,
         video_url: videoUrl,
         vat_qualifying: !!form.vat_qualifying,
         sale_type: form.sale_type,
@@ -435,6 +407,7 @@ const CreateListing = () => {
         toast({ title: status === "draft" ? t("createListing.draftSaved") : t("createListing.listingSubmitted") });
       }
 
+      void trackEvent(editId ? "listing_updated" : status === "draft" ? "listing_draft_created" : "listing_submitted");
       navigate("/dashboard");
     } catch (err: any) {
       toast({ title: t("createListing.errorSavingListing"), description: err.message, variant: "destructive" });
@@ -597,28 +570,6 @@ const CreateListing = () => {
             <CardTitle className="text-base">{t("createListing.identificationLocation")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {country === "DE" && (
-              <VrmAutofill
-                value={form.registration}
-                onChange={(reg) => updateField("registration", reg)}
-                onAutofill={(d) => {
-                  setForm((prev) => ({
-                    ...prev,
-                    registration: d.registration || prev.registration,
-                    make: d.make || prev.make,
-                    year: d.year_of_manufacture || prev.year,
-                    color: d.colour ? d.colour.charAt(0) + d.colour.slice(1).toLowerCase() : prev.color,
-                    fuel_type:
-                      d.fuel_type === "PETROL" ? "Petrol" :
-                      d.fuel_type === "DIESEL" ? "Diesel" :
-                      d.fuel_type === "ELECTRICITY" ? "Electric" :
-                      d.fuel_type === "HYBRID ELECTRIC" ? "Hybrid" :
-                      d.fuel_type ? d.fuel_type.charAt(0) + d.fuel_type.slice(1).toLowerCase() : prev.fuel_type,
-                    engine_size: d.engine_capacity || prev.engine_size,
-                  }));
-                }}
-              />
-            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>{config.terminology.registration}</Label>
@@ -631,7 +582,7 @@ const CreateListing = () => {
             </div>
             <div className="space-y-2">
               <Label>{t("createListing.location")}</Label>
-              <Input placeholder={t("createListing.locationPlaceholder", { city: config.popularCities[0] || "London" })} value={form.location} onChange={(e) => updateField("location", e.target.value)} />
+              <Input placeholder={t("createListing.locationPlaceholder", { city: config.popularCities[0] || "Berlin" })} value={form.location} onChange={(e) => updateField("location", e.target.value)} />
             </div>
           </CardContent>
         </Card>
@@ -844,7 +795,7 @@ const CreateListing = () => {
           </CardContent>
         </Card>
 
-        {/* KYC: Logbook & HPI Check */}
+        {/* Ownership and identity verification */}
         <Card className="mt-4 border-primary/30">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -1072,43 +1023,6 @@ const CreateListing = () => {
               )}
             </div>
 
-
-            <div>
-              <Label className="flex items-center gap-2 text-sm font-medium">
-                <Shield className="h-4 w-4" /> {t("createListing.hpiCheckLabel")}
-              </Label>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t("createListing.hpiCheckDesc")}
-              </p>
-              <div className="mt-2 flex items-center gap-3">
-                {hpiCheckData ? (
-                  <div className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${
-                    hpiCheckData.stolen_reported || hpiCheckData.finance_outstanding || hpiCheckData.write_off
-                      ? "border-destructive/40 bg-destructive/10 text-destructive"
-                      : "border-success/40 bg-success/10 text-success"
-                  }`}>
-                    {hpiCheckData.stolen_reported || hpiCheckData.finance_outstanding || hpiCheckData.write_off ? (
-                      <><AlertTriangle className="h-4 w-4" /> {t("createListing.issuesFound")}</>
-                    ) : (
-                      <><CheckCircle className="h-4 w-4" /> {t("createListing.allClear")}</>
-                    )}
-                  </div>
-                ) : null}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={runHpiCheck}
-                  disabled={hpiLoading || (!form.registration && !form.vin)}
-                >
-                  {hpiLoading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Shield className="mr-1 h-4 w-4" />}
-                  {hpiCheckData ? t("createListing.rerunHpiCheck") : t("createListing.runHpiCheck")}
-                </Button>
-              </div>
-              {!form.registration && !form.vin && (
-                <p className="mt-1 text-xs text-muted-foreground">{t("createListing.enterRegOrVin")}</p>
-              )}
-            </div>
 
             {/* Truth Declaration */}
             <label className="flex cursor-pointer items-start gap-3 rounded-md border border-primary/30 bg-primary/5 p-4">

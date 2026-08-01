@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +50,7 @@ const AdminInspectorPayoutsPanel = () => {
   const [editNotes, setEditNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data: payouts, error } = await supabase
       .from("inspector_payouts")
@@ -88,9 +88,9 @@ const AdminInspectorPayoutsPanel = () => {
     });
     setRows(merged);
     setLoading(false);
-  };
+  }, [toast]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { void load(); }, [load]);
 
   const filtered = useMemo(
     () => (statusFilter === "all" ? rows : rows.filter((r) => r.status === statusFilter)),
@@ -130,7 +130,7 @@ const AdminInspectorPayoutsPanel = () => {
     load();
   };
 
-  const fmt = (n: number) => `£${Number(n || 0).toFixed(2)}`;
+  const fmt = (n: number) => `€${Number(n || 0).toFixed(2)}`;
 
   return (
     <div className="space-y-4">
@@ -226,7 +226,7 @@ const AdminInspectorPayoutsPanel = () => {
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">Payment reference</label>
-                <Input value={editRef} onChange={(e) => setEditRef(e.target.value)} placeholder="e.g. BACS ref / Stripe payout id" />
+                <Input value={editRef} onChange={(e) => setEditRef(e.target.value)} placeholder="z. B. Überweisungs- oder Stripe-Referenz" />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground">Notes</label>

@@ -23,7 +23,7 @@ const ResetPassword = () => {
     if (!hash.includes("type=recovery")) {
       toast({ title: t("reset.invalid"), description: t("reset.invalidDesc"), variant: "destructive" });
     }
-  }, []);
+  }, [t, toast]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +62,8 @@ const ResetPassword = () => {
                   placeholder={t("reset.placeholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  minLength={6}
+                  minLength={12}
+                  autoComplete="new-password"
                   required
                 />
                 <button

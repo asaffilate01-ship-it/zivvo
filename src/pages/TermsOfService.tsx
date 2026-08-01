@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
+import { legalVersionDate, withLegalIdentity } from "@/lib/legalConfig";
 
 const TermsOfService = () => {
   const { t } = useTranslation("terms");
@@ -16,12 +17,12 @@ const TermsOfService = () => {
       <Navbar />
       <div className="container mx-auto max-w-3xl px-4 py-12">
         <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("lastUpdated")} {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t("lastUpdated")} {legalVersionDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}</p>
 
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s1Title")}</h2>
-            <p className="mt-2">{t("s1Body")}</p>
+            <p className="mt-2">{withLegalIdentity(t("s1Body"))}</p>
           </section>
 
           <section>
@@ -53,7 +54,7 @@ const TermsOfService = () => {
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s6Title")}</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              {s6List.map((item, i) => <li key={i}>{item}</li>)}
+              {s6List.map((item, i) => <li key={i}>{withLegalIdentity(item)}</li>)}
             </ul>
           </section>
 
@@ -64,7 +65,7 @@ const TermsOfService = () => {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s8Title")}</h2>
-            <p className="mt-2">{t("s8Body")}</p>
+            <p className="mt-2">{withLegalIdentity(t("s8Body"))}</p>
           </section>
 
           <section>

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { Shield, Loader2, Upload } from "lucide-react";
+import { openExternalUrl } from "@/lib/safeNavigation";
 
 interface Booking {
   id: string;
@@ -140,7 +141,7 @@ const AdminInspectionBookingsPanel = () => {
 
   const viewReport = async (path: string) => {
     const { data } = await supabase.storage.from("listing-documents").createSignedUrl(path, 600);
-    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+    if (data?.signedUrl) openExternalUrl(data.signedUrl);
   };
 
   return (
@@ -162,7 +163,7 @@ const AdminInspectionBookingsPanel = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge className={STATUS_COLORS[b.status]}>{b.status.replace("_", " ")}</Badge>
-                    <span className="text-sm font-medium">£{b.price} · {b.inspection_type === "premium_300" ? "Premium 300pt" : "Standard 200pt"}</span>
+                    <span className="text-sm font-medium">€{b.price} · {b.inspection_type === "premium_300" ? "Premium 300pt" : "Standard 200pt"}</span>
                     {b.score !== null && <Badge variant="outline">{b.score}/{b.total_points}</Badge>}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 truncate">
@@ -196,12 +197,12 @@ const AdminInspectionBookingsPanel = () => {
                       {matchingInspectors(editing).length === 0 && <SelectItem value="none" disabled>No verified inspectors</SelectItem>}
                       {matchingInspectors(editing).map((i) => (
                         <SelectItem key={i.user_id} value={i.user_id}>
-                          {i.full_name} · {(i.coverage_postcodes || []).slice(0, 4).join(", ")} · {i.total_inspections || 0} done
+                          {i.full_name} · {(i.coverage_postcodes || []).slice(0, 4).join(", ")} · {i.total_inspections || 0} abgeschlossen
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-[10px] text-muted-foreground mt-1">Filtered by postcode coverage matching buyer address.</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">Nach PLZ-Abdeckung der Käuferadresse gefiltert.</p>
                 </div>
 
                 <div>

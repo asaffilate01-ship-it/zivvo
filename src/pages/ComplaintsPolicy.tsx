@@ -4,15 +4,19 @@ import SEOHead from "@/components/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, Clock, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Fragment } from "react";
+import { legalConfig, legalVersionDate } from "@/lib/legalConfig";
+
+const renderBold = (line: string) => line.split(/(\*\*.*?\*\*)/g).map((part, index) =>
+  part.startsWith("**") && part.endsWith("**")
+    ? <strong key={index}>{part.slice(2, -2)}</strong>
+    : <Fragment key={index}>{part}</Fragment>,
+);
 
 const ComplaintsPolicy = () => {
   const { t } = useTranslation("complaints");
   const s2List = t("s2List", { returnObjects: true }) as string[];
   const s3List = t("s3List", { returnObjects: true }) as string[];
-
-  const renderBold = (line: string) => (
-    <span dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
-  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -22,7 +26,7 @@ const ComplaintsPolicy = () => {
         <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("lastUpdated")}{" "}
-          {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+          {legalVersionDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
         <p className="mt-4 rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
           {t("disclaimer")}
@@ -31,7 +35,7 @@ const ComplaintsPolicy = () => {
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           <Card><CardContent className="p-4"><Clock className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("acknowledgedWithin")}</p><p className="font-display font-semibold">{t("acknowledgedValue")}</p></CardContent></Card>
           <Card><CardContent className="p-4"><FileText className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("resolutionTarget")}</p><p className="font-display font-semibold">{t("resolutionValue")}</p></CardContent></Card>
-          <Card><CardContent className="p-4"><Mail className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("emailUs")}</p><p className="font-display text-sm font-semibold">{t("emailUs2")}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><Mail className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("emailUs")}</p><p className="font-display text-sm font-semibold">{legalConfig.email}</p></CardContent></Card>
         </div>
 
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
@@ -44,9 +48,9 @@ const ComplaintsPolicy = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s2Title")}</h2>
             <p className="mt-2">{t("s2Intro")}</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li><strong>{t("s2Email")}</strong> <a href={`mailto:${t("emailUs2")}`} className="text-primary underline">{t("emailUs2")}</a></li>
-              <li><strong>{t("s2Phone")}</strong> {t("s2PhoneValue")}</li>
-              <li><strong>{t("s2Post")}</strong> {t("s2PostValue")}</li>
+              <li><strong>{t("s2Email")}</strong> <a href={`mailto:${legalConfig.email}`} className="text-primary underline">{legalConfig.email}</a></li>
+              <li><strong>{t("s2Phone")}</strong> {legalConfig.phone}</li>
+              <li><strong>{t("s2Post")}</strong> {legalConfig.companyName} {legalConfig.legalForm}, {legalConfig.street}, {legalConfig.postcode} {legalConfig.city}</li>
               <li><strong>{t("s2Online")}</strong> {t("s2OnlineValue")} <a href="/contact" className="text-primary underline">{t("s2ContactPage")}</a> {t("s2page")}</li>
             </ul>
             <p className="mt-3">{t("s2Please")}</p>
@@ -65,10 +69,7 @@ const ComplaintsPolicy = () => {
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s4Title")}</h2>
             <p className="mt-2">
-              {t("s4Intro")}{" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                ec.europa.eu/consumers/odr
-              </a>
+              {t("s4Intro")}
             </p>
 
             <div className="mt-4">
@@ -76,9 +77,6 @@ const ComplaintsPolicy = () => {
               <p className="mt-1">{t("s4TeilnahmeBody")}</p>
             </div>
 
-            <div className="mt-4">
-              <p><strong>{t("s4Universal")}</strong> {t("s4UniversalDesc")}</p>
-            </div>
           </section>
 
           <section>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Image as ImageIcon, Download, Wand2, Share2, Facebook } from "lucide-react";
+import { openExternalUrl } from "@/lib/safeNavigation";
 
 interface Props { dealerId: string; logoUrl?: string | null; businessName: string; }
 
@@ -38,7 +39,7 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
     });
   }, [dealerId]);
 
-  const renderPreview = async () => {
+  const renderPreview = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas || !selected || !selected.images[imageIdx]) return;
     const ctx = canvas.getContext("2d");
@@ -55,7 +56,7 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
 
     // Price tag
     if (config.showPrice) {
-      const price = `£${Number(selected.price).toLocaleString()}`;
+      const price = `€${Number(selected.price).toLocaleString()}`;
       ctx.font = `bold ${Math.round(canvas.height * 0.06)}px Inter, sans-serif`;
       const padding = 24;
       const m = ctx.measureText(price);
@@ -95,9 +96,9 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
       ctx.fillText(config.bannerText, 0, 0);
       ctx.restore();
     }
-  };
+  }, [businessName, config, imageIdx, selected]);
 
-  useEffect(() => { if (open && selected) renderPreview(); }, [open, selected, imageIdx, config]);
+  useEffect(() => { if (open) void renderPreview(); }, [open, renderPreview]);
 
   const download = () => {
     const canvas = canvasRef.current;
@@ -115,13 +116,13 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
   const shareFacebook = () => {
     if (!selected) return;
     const url = `${window.location.origin}/car/${selected.id}`;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank", "width=600,height=600");
+    openExternalUrl(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "width=600,height=600");
   };
 
   const shareGoogle = () => {
     if (!selected) return;
     const url = `${window.location.origin}/car/${selected.id}`;
-    const text = `${selected.title} — £${Number(selected.price).toLocaleString()}`;
+    const text = `${selected.title} — €${Number(selected.price).toLocaleString()}`;
     navigator.clipboard.writeText(`${text}\n${url}`);
     toast({ title: "Copied for Google Business", description: "Paste into your Google Business Profile post." });
   };
@@ -143,7 +144,7 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
                   <img src={l.images[0]} alt={l.title} className="aspect-[4/3] w-full object-cover transition-transform group-hover:scale-105" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-left">
                     <p className="text-xs font-medium text-white truncate">{l.title}</p>
-                    <p className="text-xs text-white/80">£{Number(l.price).toLocaleString()}</p>
+                    <p className="text-xs text-white/80">€{Number(l.price).toLocaleString()}</p>
                   </div>
                 </button>
               ))}

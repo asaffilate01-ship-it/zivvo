@@ -37,13 +37,12 @@ const Finance = () => {
     e.preventDefault();
     if (!form.consent) return;
     setLoading(true);
-    // Log as a contact message so it lands in the existing admin inbox.
-    const { error } = await supabase.from("contact_messages").insert({
+    const { error } = await supabase.functions.invoke("contact-submit", { body: {
       name: form.name,
       email: form.email,
       subject: "Finanzierungsanfrage",
       message: `Betrag: €${form.amount}\nLaufzeit: ${form.term} Monate\nAnzahlung: €${form.downpayment || "0"}\nFahrzeug: ${form.vehicle || "—"}\nTelefon: ${form.phone}`,
-    });
+    } });
     setLoading(false);
     if (error) {
       toast({ title: "Fehler", description: error.message, variant: "destructive" });

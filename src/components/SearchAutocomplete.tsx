@@ -33,7 +33,7 @@ const SearchAutocomplete = ({ value, onChange, placeholder, className }: SearchA
     debounceRef.current = setTimeout(async () => {
       const q = value.toLowerCase();
       const { data } = await supabase
-        .from("car_listings")
+        .from("car_listings_public")
         .select("make, model, title")
         .eq("status", "active")
         .or(`make.ilike.%${q}%,model.ilike.%${q}%,title.ilike.%${q}%`)

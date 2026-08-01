@@ -57,7 +57,7 @@ export const INSPECTION_CHECKLIST: ChecklistSection[] = [
       "Drive belts condition", "Hoses condition (no perish)", "Battery condition & terminals",
       "Engine mounts intact", "Air filter housing", "Service intervals up to date",
       "Cambelt/chain status known", "No warning lights on dash",
-      "VIN matches V5C", "Engine number visible", "Underbonnet wiring tidy",
+      "VIN matches registration document", "Engine number visible", "Underbonnet wiring tidy",
       "Bonnet struts hold", "Bulkhead clean (no impact)"
     ], 2),
   },
@@ -142,7 +142,7 @@ export const INSPECTION_CHECKLIST: ChecklistSection[] = [
     icon: "🛣️",
     items: mk("rt", [
       "Cold start performance", "Acceleration smooth through gears", "Steering tracks straight",
-      "No vibration at speed (70mph)", "Brakes pull up straight", "ABS engages correctly",
+      "No vibration at motorway speed", "Brakes pull up straight", "ABS engages correctly",
       "Cruise control function", "Stop/start system works", "Engine temp normal", "No unusual noises during test"
     ], 2),
   },
@@ -151,9 +151,9 @@ export const INSPECTION_CHECKLIST: ChecklistSection[] = [
     title: "Documents & History",
     icon: "📄",
     items: mk("doc", [
-      "V5C/registration document", "MOT certificate(s)", "Service history present",
+      "Registration certificate Part II", "HU/AU certificate(s)", "Service history present",
       "Service book stamped", "Receipts/invoices", "Owner's handbook",
-      "Spare key present", "HPI clear (no finance)", "Mileage matches MOT history", "Previous owners count plausible"
+      "Spare key present", "Finance/legal status clear", "Mileage matches HU history", "Previous owners count plausible"
     ], 1),
   },
 ];

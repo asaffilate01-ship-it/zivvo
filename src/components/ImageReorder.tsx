@@ -129,9 +129,8 @@ const ImageReorder = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                item.type === "existing"
-                  ? onRemoveExisting(item.originalIndex)
-                  : onRemoveNew(item.originalIndex);
+                if (item.type === "existing") onRemoveExisting(item.originalIndex);
+                else onRemoveNew(item.originalIndex);
               }}
               className="absolute right-1 top-1 rounded-full bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
             >

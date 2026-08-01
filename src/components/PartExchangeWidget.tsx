@@ -1,153 +1,53 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { ArrowLeftRight, Calculator, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeftRight, Calculator, CheckCircle } from "lucide-react";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
+import { supabase } from "@/integrations/supabase/client";
 
-interface Props {
-  targetPrice?: number;
-}
+interface Props { targetPrice?: number }
+type Comparison = { available: boolean; market_average?: number; sample_size: number; warning?: string };
 
 const PartExchangeWidget = ({ targetPrice }: Props) => {
   const { config } = useCountry();
   const currentYear = new Date().getFullYear();
-  const [form, setForm] = useState({ make: "", model: "", year: String(currentYear - 4), mileage: "40000" });
-  const [result, setResult] = useState<{ value: number; remaining: number } | null>(null);
+  const [form, setForm] = useState({ make: "", model: "", year: String(currentYear - 4) });
+  const [result, setResult] = useState<Comparison | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleCalculate = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    setTimeout(() => {
-      const age = currentYear - parseInt(form.year);
-      const miles = parseInt(form.mileage) || 40000;
-      const premiumMakes = ["BMW", "Mercedes-Benz", "Audi", "Porsche", "Land Rover", "Jaguar", "Lexus", "Volvo"];
-      const base = premiumMakes.includes(form.make) ? 30000 : 15000;
-
-      let value = base;
-      for (let y = 0; y < age; y++) {
-        const rate = y === 0 ? 0.18 : y < 3 ? 0.12 : y < 5 ? 0.09 : 0.06;
-        value *= (1 - rate);
-      }
-
-      const avgMiles = age * 10000;
-      const mileDiff = miles - avgMiles;
-      value += mileDiff > 0 ? -mileDiff * 0.04 : -mileDiff * 0.02;
-      value = Math.max(300, Math.round(value * 0.85)); // trade-in discount
-
-      const remaining = targetPrice ? Math.max(0, targetPrice - value) : 0;
-      setResult({ value, remaining });
-      setLoading(false);
-    }, 1000);
+  const compare = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setLoading(true); setError(""); setResult(null);
+    const { data, error: functionError } = await supabase.functions.invoke<Comparison>("price-check", {
+      body: { make: form.make, model: form.model.trim(), year: Number(form.year) },
+    });
+    if (functionError || !data) setError("Vergleich momentan nicht verfügbar.");
+    else setResult(data);
+    setLoading(false);
   };
+
+  const remaining = result?.market_average !== undefined && targetPrice ? Math.max(0, targetPrice - result.market_average) : null;
 
   return (
     <Card className="border-border">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <ArrowLeftRight className="h-4 w-4 text-primary" />
-          Part-Exchange Estimator
-        </CardTitle>
-      </CardHeader>
+      <CardHeader className="pb-3"><CardTitle className="flex items-center gap-2 text-base"><ArrowLeftRight className="h-4 w-4 text-primary" /> Inzahlungnahme einordnen</CardTitle></CardHeader>
       <CardContent>
-        <form onSubmit={handleCalculate} className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Your Car's Make</Label>
-              <Select value={form.make} onValueChange={(v) => setForm((p) => ({ ...p, make: v }))}>
-                <SelectTrigger className="h-9 text-xs">
-                  <SelectValue placeholder="Make" />
-                </SelectTrigger>
-                <SelectContent>
-                  {config.makes.map((m) => (
-                    <SelectItem key={m} value={m}>{m}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Model</Label>
-              <Input
-                placeholder="e.g. Golf"
-                value={form.model}
-                onChange={(e) => setForm((p) => ({ ...p, model: e.target.value }))}
-                className="h-9 text-xs"
-                required
-              />
-            </div>
+        <form onSubmit={compare} className="space-y-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="space-y-1"><Label className="text-xs">Marke</Label><Select value={form.make} onValueChange={(make) => setForm((previous) => ({ ...previous, make }))}><SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Marke" /></SelectTrigger><SelectContent>{config.makes.map((make) => <SelectItem key={make} value={make}>{make}</SelectItem>)}</SelectContent></Select></div>
+            <div className="space-y-1"><Label className="text-xs">Modell</Label><Input required maxLength={120} className="h-9 text-xs" value={form.model} onChange={(event) => setForm((previous) => ({ ...previous, model: event.target.value }))} /></div>
+            <div className="space-y-1"><Label className="text-xs">Baujahr</Label><Input required type="number" min={1886} max={currentYear + 1} className="h-9 text-xs" value={form.year} onChange={(event) => setForm((previous) => ({ ...previous, year: event.target.value }))} /></div>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">Year</Label>
-              <Input
-                type="number"
-                min={2000}
-                max={currentYear}
-                value={form.year}
-                onChange={(e) => setForm((p) => ({ ...p, year: e.target.value }))}
-                className="h-9 text-xs"
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Mileage</Label>
-              <Input
-                type="number"
-                value={form.mileage}
-                onChange={(e) => setForm((p) => ({ ...p, mileage: e.target.value }))}
-                className="h-9 text-xs"
-                required
-              />
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full gradient-primary border-0 h-9 text-xs"
-            disabled={loading || !form.make || !form.model}
-          >
-            <Calculator className="mr-1.5 h-3.5 w-3.5" />
-            {loading ? "Calculating..." : "Estimate Part-Exchange"}
-          </Button>
+          <Button type="submit" className="w-full" disabled={loading || !form.make || !form.model.trim()}><Calculator className={`mr-1 h-4 w-4 ${loading ? "animate-spin" : ""}`} />{loading ? "Vergleich lädt …" : "Angebotspreise vergleichen"}</Button>
         </form>
-
-        {result && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            className="mt-4 space-y-3"
-          >
-            <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-center">
-              <p className="text-xs text-muted-foreground">Your car's estimated trade-in value</p>
-              <p className="font-display text-2xl font-bold text-primary">{formatPrice(result.value, config)}</p>
-            </div>
-
-            {targetPrice && targetPrice > 0 && (
-              <div className="rounded-xl bg-muted/50 p-4 text-center">
-                <p className="text-xs text-muted-foreground">You'd pay approximately</p>
-                <p className="font-display text-xl font-bold text-foreground">
-                  {formatPrice(result.remaining, config)}
-                </p>
-                <p className="text-[10px] text-muted-foreground mt-1">after part-exchange</p>
-              </div>
-            )}
-
-            <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-3">
-              <CheckCircle className="h-4 w-4 shrink-0 text-primary mt-0.5" />
-              <p className="text-[11px] text-muted-foreground">
-                This is an estimate. Final trade-in value depends on vehicle condition, service history, and inspection.
-              </p>
-            </div>
-          </motion.div>
-        )}
+        {error && <p role="alert" className="mt-3 text-xs text-destructive">{error}</p>}
+        {result && !result.available && <div className="mt-4 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground"><Database className="mr-1 inline h-3.5 w-3.5" />Noch zu wenige aktive Vergleichsangebote (gefunden: {result.sample_size}).</div>}
+        {result?.available && result.market_average !== undefined && <div className="mt-4 rounded-lg bg-primary/5 p-4"><p className="text-xs text-muted-foreground">Median aktiver Zivvo-Angebote</p><p className="text-xl font-bold text-primary">{formatPrice(result.market_average, config)}</p>{remaining !== null && <p className="mt-1 text-xs text-muted-foreground">Rechnerische Differenz zum ausgewählten Fahrzeug: {formatPrice(remaining, config)}</p>}<p className="mt-2 text-[10px] text-muted-foreground">Keine Inzahlungnahme-Zusage. Zustand, Ausstattung und Händlerangebot sind nicht berücksichtigt.</p></div>}
       </CardContent>
     </Card>
   );
