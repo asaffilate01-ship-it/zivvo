@@ -7,12 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Shield, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { idempotencyHeaders } from "@/lib/idempotency";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { redirectToStripe } from "@/lib/safeNavigation";
 
 interface Props {
   listingId: string;
@@ -57,12 +55,11 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("inspection-checkout", {
-        headers: idempotencyHeaders(),
         body: { listingId, inspectionType: type, buyerPhone: phone, buyerAddress: address, buyerNotes: notes },
       });
       if (error) throw error;
       if (data?.url) {
-        redirectToStripe(data.url);
+        window.open(data.url, "_blank");
         setOpen(false);
       }
     } catch (e: any) {
@@ -108,7 +105,7 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
                     <span className="font-semibold">{tier.name}</span>
-                    <span className="font-bold text-primary">€{tier.price}</span>
+                    <span className="font-bold text-primary">£{tier.price}</span>
                   </div>
                   <ul className="mt-2 space-y-1">
                     {tier.bullets.map((b) => (
@@ -125,11 +122,11 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
           <div className="space-y-3 pt-2 border-t">
             <div>
               <Label htmlFor="phone">{t("inspectionDialog.yourPhone")}</Label>
-              <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+49 30 …" />
+              <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07XXX XXXXXX" />
             </div>
             <div>
               <Label htmlFor="address">{t("inspectionDialog.yourAddress")}</Label>
-              <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Standort für die Fahrzeugprüfung" />
+              <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="For report delivery" />
             </div>
             <div>
               <Label htmlFor="notes">{t("inspectionDialog.notes")}</Label>

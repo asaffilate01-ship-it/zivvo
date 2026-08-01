@@ -22,12 +22,14 @@ const RecentlySoldFeed = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await (supabase.from as any)("recently_sold_public")
+      const { data } = await supabase
+        .from("car_listings")
         .select("id, title, price, images, updated_at")
+        .eq("status", "sold")
         .eq("country", country)
         .order("updated_at", { ascending: false })
         .limit(12);
-      if (data) setSoldCars(data as SoldCar[]);
+      if (data) setSoldCars(data);
     };
     fetch();
   }, [country]);

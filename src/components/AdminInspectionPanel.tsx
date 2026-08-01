@@ -53,10 +53,6 @@ const AdminInspectionPanel = ({ auction, onComplete }: AdminInspectionPanelProps
       toast.error("Inspector name is required");
       return;
     }
-    if (!hpiClear || !ownershipVerified || !sellerVerified) {
-      toast.error("Alle Verifizierungsprüfungen müssen bestätigt sein");
-      return;
-    }
     setSubmitting(true);
     try {
       const conditionReport = {
@@ -75,15 +71,16 @@ const AdminInspectionPanel = ({ auction, onComplete }: AdminInspectionPanelProps
         inspected_at: new Date().toISOString(),
       };
 
-      const { error: auctionErr } = await (supabase.rpc as any)("review_auction_submission", {
-        p_auction_id: auction.id,
-        p_approve: true,
-        p_inspection_rating: rating,
-        p_ownership_verified: ownershipVerified,
-        p_seller_verified: sellerVerified,
-        p_legal_check_clear: hpiClear,
-        p_condition_report: conditionReport,
-      });
+      // Update auction
+      const { error: auctionErr } = await supabase.from("auctions").update({
+        status: "live" as any,
+        inspection_rating: rating,
+        condition_report: conditionReport,
+        hpi_clear: hpiClear,
+        ownership_verified: ownershipVerified,
+        seller_verified: sellerVerified,
+        starts_at: new Date().toISOString(),
+      }).eq("id", auction.id);
 
       if (auctionErr) throw auctionErr;
 
@@ -98,6 +95,14 @@ const AdminInspectionPanel = ({ auction, onComplete }: AdminInspectionPanelProps
         summary: inspectorNotes || `Vehicle rated ${rating}/5. ${paintCondition ? `Paint: ${paintCondition}.` : ""} ${mechanicalNotes ? `Mechanical: ${mechanicalNotes}.` : ""}`,
       });
 
+      // Audit
+      await supabase.from("auction_audit_log").insert({
+        auction_id: auction.id,
+        actor_role: "admin",
+        action: "inspection_completed",
+        details: { rating, hpi_clear: hpiClear, inspector: inspectorName },
+      });
+
       toast.success("Auction approved and live!");
       onComplete();
     } catch (err: any) {
@@ -110,13 +115,13 @@ const AdminInspectionPanel = ({ auction, onComplete }: AdminInspectionPanelProps
   const handleReject = async () => {
     setSubmitting(true);
     try {
-      const { error } = await (supabase.rpc as any)("review_auction_submission", {
-        p_auction_id: auction.id, p_approve: false, p_inspection_rating: null,
-        p_ownership_verified: false, p_seller_verified: false,
-        p_legal_check_clear: false,
-        p_condition_report: { rejection_reason: inspectorNotes },
+      await supabase.from("auctions").update({ status: "cancelled" as any }).eq("id", auction.id);
+      await supabase.from("auction_audit_log").insert({
+        auction_id: auction.id,
+        actor_role: "admin",
+        action: "inspection_rejected",
+        details: { reason: inspectorNotes },
       });
-      if (error) throw error;
       toast.success("Auction rejected");
       onComplete();
     } catch (err: any) {
@@ -136,8 +141,8 @@ const AdminInspectionPanel = ({ auction, onComplete }: AdminInspectionPanelProps
           )}
           <div>
             <h3 className="font-semibold">{listing?.year} {listing?.make} {listing?.model}</h3>
-            <p className="text-sm text-muted-foreground">Kennzeichen: {listing?.registration || "–"} · {listing?.mileage?.toLocaleString("de-DE")} km</p>
-            <p className="text-sm text-muted-foreground">Startpreis: {Number(auction.starting_price).toLocaleString("de-DE", { style: "currency", currency: "EUR" })} · Format: {auction.format}</p>
+            <p className="text-sm text-muted-foreground">Reg: {listing?.registration || "N/A"} · {listing?.mileage?.toLocaleString()} miles</p>
+            <p className="text-sm text-muted-foreground">Starting: £{Number(auction.starting_price).toLocaleString()} · Format: {auction.format}</p>
           </div>
         </div>
 
@@ -279,9 +284,9 @@ const AdminInspectionPanel = ({ auction, onComplete }: AdminInspectionPanelProps
           <Label className="text-sm font-semibold flex items-center gap-2"><Shield className="w-4 h-4" /> Verification Checks</Label>
           <div className="space-y-2">
             {[
-              { label: "Register- und Finanznachweise geprüft", checked: hpiClear, onChange: setHpiClear, desc: "Finanzierung, Diebstahlhinweise und bekannte Schäden geprüft" },
-              { label: "Eigentum geprüft", checked: ownershipVerified, onChange: setOwnershipVerified, desc: "Zulassungsbescheinigung stimmt mit Verkäuferdaten überein" },
-              { label: "Verkäufer geprüft", checked: sellerVerified, onChange: setSellerVerified, desc: "Identität und Anschrift bestätigt" },
+              { label: "HPI Check Clear", checked: hpiClear, onChange: setHpiClear, desc: "No finance, write-off, or theft markers" },
+              { label: "Ownership Verified", checked: ownershipVerified, onChange: setOwnershipVerified, desc: "V5C matches seller identity" },
+              { label: "Seller Verified", checked: sellerVerified, onChange: setSellerVerified, desc: "Identity and address confirmed" },
             ].map(({ label, checked, onChange, desc }) => (
               <div key={label} className="flex items-center justify-between p-3 rounded-lg border">
                 <div>

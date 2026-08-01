@@ -35,6 +35,7 @@ import EnquiryForm from "@/components/EnquiryForm";
 import ReserveNowButton from "@/components/dealer/ReserveNowButton";
 import TestDriveDialog from "@/components/dealer/TestDriveDialog";
 import TransportQuoteDialog from "@/components/dealer/TransportQuoteDialog";
+import VehicleChecks from "@/components/VehicleChecks";
 import PriceHistoryChart from "@/components/PriceHistoryChart";
 import FinanceQuoteWidget from "@/components/FinanceQuoteWidget";
 import InspectionBadge from "@/components/InspectionBadge";
@@ -82,7 +83,7 @@ const CarDetail = () => {
   useEffect(() => {
     const fetchCar = async () => {
       const { data } = await supabase
-        .from("car_listings_public")
+        .from("car_listings")
         .select("*")
         .eq("id", id)
         .maybeSingle();
@@ -98,7 +99,8 @@ const CarDetail = () => {
           model: data.model,
           year: data.year,
         });
-        (supabase.rpc as any)("record_listing_view", { p_listing_id: id! }).then();
+        supabase.from("listing_views").insert({ listing_id: id, viewer_id: user?.id || null }).then();
+        supabase.from("car_listings").update({ views_count: (data.views_count || 0) + 1 }).eq("id", id).then();
         // Fetch inspection report
         supabase.from("inspection_reports" as any).select("*").eq("listing_id", id).maybeSingle().then(({ data: ir }) => {
           if (ir) setInspectionReport(ir);
@@ -108,7 +110,7 @@ const CarDetail = () => {
           if (d) setDealer(d);
         }
         const { data: similar } = await supabase
-          .from("car_listings_public")
+          .from("car_listings")
           .select("*")
           .eq("status", "active")
           .eq("country", data.country)
@@ -121,7 +123,7 @@ const CarDetail = () => {
       setLoading(false);
     };
     fetchCar();
-  }, [addViewed, id]);
+  }, [id]);
 
   if (loading) {
     return (
@@ -351,6 +353,12 @@ const CarDetail = () => {
 
             {/* Price History */}
             <PriceHistoryChart listingId={car.id} currentPrice={Number(car.price)} />
+
+            {/* Vehicle Checks */}
+            <div className="mt-8">
+              <h2 className="font-display text-xl font-bold text-foreground">{t("carDetail.vehicleChecks")}</h2>
+              <VehicleChecks registration={car.registration} vin={car.vin} country={car.country} />
+            </div>
 
             {/* Inspection Report */}
             {inspectionReport && (

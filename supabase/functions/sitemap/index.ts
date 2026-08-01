@@ -1,31 +1,83 @@
-import { HttpError, adminClient, env, safeError } from "../_shared/security.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-function escapeXml(value: string): string {
-  return value.replace(/[<>&"']/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" }[character]!));
-}
+serve(async (req) => {
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
 
-Deno.serve(async (req) => {
-  try {
-    if (req.method !== "GET") throw new HttpError(405, "Method not allowed");
-    const origin = new URL(env("APP_URL")).origin;
-    const admin = adminClient();
-    const [{ data: listings, error: listingError }, { data: dealers, error: dealerError }] = await Promise.all([
-      admin.from("car_listings_public").select("id,updated_at").order("updated_at", { ascending: false }).limit(10_000),
-      admin.from("dealer_landing_public").select("slug").not("slug", "is", null).limit(5_000),
-    ]);
-    if (listingError || dealerError) throw listingError || dealerError;
-    const staticPages = ["/", "/browse", "/dealers", "/auctions", "/sell", "/help", "/contact", "/privacy", "/terms", "/impressum"];
-    const entries = staticPages.map((path) => `<url><loc>${escapeXml(`${origin}${path}`)}</loc></url>`);
-    for (const listing of listings || []) {
-      const date = listing.updated_at ? new Date(listing.updated_at).toISOString().slice(0, 10) : null;
-      entries.push(`<url><loc>${escapeXml(`${origin}/car/${listing.id}`)}</loc>${date ? `<lastmod>${date}</lastmod>` : ""}</url>`);
-    }
-    for (const dealer of dealers || []) {
-      if (dealer.slug) entries.push(`<url><loc>${escapeXml(`${origin}/dealer/${encodeURIComponent(dealer.slug)}`)}</loc></url>`);
-    }
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries.join("")}</urlset>`;
-    return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=3600, s-maxage=3600", "X-Content-Type-Options": "nosniff" } });
-  } catch (error) {
-    return safeError(req, error);
+  const origin = req.headers.get("origin") || "https://zivvo.co.uk";
+
+  const { data: listings } = await supabase
+    .from("car_listings")
+    .select("id, updated_at, make, model, year")
+    .eq("status", "active")
+    .order("updated_at", { ascending: false })
+    .limit(1000);
+
+  const { data: dealers } = await supabase
+    .from("dealers_public")
+    .select("slug, updated_at")
+    .eq("is_active", true);
+
+  const staticPages = [
+    { loc: "/", priority: "1.0", changefreq: "daily" },
+    { loc: "/browse", priority: "0.9", changefreq: "daily" },
+    { loc: "/dealers", priority: "0.7", changefreq: "weekly" },
+    { loc: "/blog", priority: "0.7", changefreq: "weekly" },
+    { loc: "/valuation", priority: "0.6", changefreq: "monthly" },
+    { loc: "/help", priority: "0.4", changefreq: "monthly" },
+    { loc: "/contact", priority: "0.4", changefreq: "monthly" },
+    { loc: "/privacy", priority: "0.2", changefreq: "yearly" },
+    { loc: "/terms", priority: "0.2", changefreq: "yearly" },
+  ];
+
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+  for (const page of staticPages) {
+    xml += `
+  <url>
+    <loc>${origin}${page.loc}</loc>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`;
   }
+
+  if (listings) {
+    for (const l of listings) {
+      xml += `
+  <url>
+    <loc>${origin}/car/${l.id}</loc>
+    <lastmod>${new Date(l.updated_at).toISOString().split("T")[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    }
+  }
+
+  if (dealers) {
+    for (const d of dealers) {
+      if (d.slug) {
+        xml += `
+  <url>
+    <loc>${origin}/dealer/${d.slug}</loc>
+    <lastmod>${new Date(d.updated_at).toISOString().split("T")[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+      }
+    }
+  }
+
+  xml += `
+</urlset>`;
+
+  return new Response(xml, {
+    headers: {
+      "Content-Type": "application/xml",
+      "Cache-Control": "public, max-age=3600",
+    },
+  });
 });

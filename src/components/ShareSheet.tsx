@@ -5,7 +5,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Share2, Link as LinkIcon, MessageCircle, Twitter, Facebook } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { openExternalUrl } from "@/lib/safeNavigation";
 
 interface ShareSheetProps {
   title: string;
@@ -45,13 +44,13 @@ const ShareSheet = ({ title, text, url: propUrl }: ShareSheetProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem onClick={() => openExternalUrl(`https://wa.me/?text=${encodedText}%20${encoded}`)}>
+        <DropdownMenuItem onClick={() => window.open(`https://wa.me/?text=${encodedText}%20${encoded}`, "_blank")}>
           <MessageCircle className="mr-2 h-4 w-4 text-success" /> WhatsApp
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => openExternalUrl(`https://twitter.com/intent/tweet?text=${encodedText}&url=${encoded}`)}>
+        <DropdownMenuItem onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodedText}&url=${encoded}`, "_blank")}>
           <Twitter className="mr-2 h-4 w-4" /> Twitter / X
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => openExternalUrl(`https://www.facebook.com/sharer/sharer.php?u=${encoded}`)}>
+        <DropdownMenuItem onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encoded}`, "_blank")}>
           <Facebook className="mr-2 h-4 w-4" /> Facebook
         </DropdownMenuItem>
         <DropdownMenuItem onClick={copyLink}>

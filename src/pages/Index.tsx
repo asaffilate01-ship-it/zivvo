@@ -16,6 +16,7 @@ import HowItWorks from "@/components/HowItWorks";
 import TrustBrandStrip from "@/components/TrustBrandStrip";
 import HomeServicesRow from "@/components/HomeServicesRow";
 import RealReviewsSection from "@/components/RealReviewsSection";
+import HistoryCheckPromo from "@/components/HistoryCheckPromo";
 import SEOLinkBlock from "@/components/SEOLinkBlock";
 import AIChatWidget from "@/components/AIChatWidget";
 import Icon3D from "@/components/Icon3D";
@@ -35,7 +36,6 @@ import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import { trackEvent } from "@/hooks/useAnalytics";
 import trustImage from "@/assets/trust-verify.jpg";
 import blogChecklist from "@/assets/blog-buying-checklist.jpg";
 import blogEvHybrid from "@/assets/blog-ev-hybrid.jpg";
@@ -73,26 +73,29 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [featuredRes, latestRes, allListingsRes, statsRes] = await Promise.all([
-        supabase.from("car_listings_public").select("*").eq("country", country).eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
-        supabase.from("car_listings_public").select("*").eq("country", country).order("created_at", { ascending: false }).limit(8),
-        supabase.from("car_listings_public").select("body_type, fuel_type, price").eq("country", country),
-        (supabase.from as any)("platform_public_stats").select("users,active_listings,sold_value,average_rating").maybeSingle(),
+      const [featuredRes, latestRes, profilesRes, allListingsRes, soldRes, reviewsRes] = await Promise.all([
+        supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).eq("is_featured", true).order("created_at", { ascending: false }).limit(8),
+        supabase.from("car_listings").select("*").eq("status", "active").eq("country", country).order("created_at", { ascending: false }).limit(8),
+        supabase.from("profiles").select("user_id", { count: "exact", head: true }),
+        supabase.from("car_listings").select("body_type, fuel_type, status, price").eq("country", country),
+        supabase.from("car_listings").select("price").eq("status", "sold").eq("country", country),
+        supabase.from("seller_reviews").select("rating").limit(1000),
       ]);
       if (featuredRes.data) setFeatured(featuredRes.data);
       if (latestRes.data) setLatest(latestRes.data);
 
-      const stats = statsRes.data;
-      setPlatformStats({
-        users: Number(stats?.users || 0),
-        listings: Number(stats?.active_listings || 0),
-        soldValue: Number(stats?.sold_value || 0),
-        avgRating: Number(stats?.average_rating || 0),
-      });
+      // Real platform stats
+      const userCount = profilesRes.count || 0;
+      const activeListings = allListingsRes.data?.filter((l: any) => l.status === "active") || [];
+      const soldValue = soldRes.data?.reduce((a: number, l: any) => a + (l.price || 0), 0) || 0;
+      const avgRating = reviewsRes.data && reviewsRes.data.length > 0
+        ? Math.round(reviewsRes.data.reduce((a: number, r: any) => a + r.rating, 0) / reviewsRes.data.length * 10) / 10
+        : 0;
+      setPlatformStats({ users: userCount, listings: activeListings.length, soldValue, avgRating });
 
       if (allListingsRes.data) {
         const counts: Record<string, number> = {};
-        allListingsRes.data.forEach((l: any) => {
+        allListingsRes.data.filter((l: any) => l.status === "active").forEach((l: any) => {
           if (l.body_type) counts[l.body_type] = (counts[l.body_type] || 0) + 1;
           if (l.fuel_type === "Electric") counts["Electric"] = (counts["Electric"] || 0) + 1;
           if (l.fuel_type === "Hybrid") counts["Hybrid"] = (counts["Hybrid"] || 0) + 1;
@@ -108,11 +111,12 @@ const Index = () => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setSubscribing(true);
-    const { error } = await supabase.functions.invoke("newsletter-subscribe", { body: { email: newsletterEmail.trim() } });
-    if (error) {
+    const { error } = await supabase.from("newsletter_subscribers").insert({ email: newsletterEmail.trim() });
+    if (error?.code === "23505") {
+      toast({ title: "Already subscribed", description: "This email is already on our list." });
+    } else if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
-      void trackEvent("newsletter_subscribed", { placement: "home" });
       toast({ title: "Subscribed!", description: "You'll receive the latest listings and deals." });
       setNewsletterEmail("");
     }
@@ -122,14 +126,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Zivvo — Fahrzeugmarktplatz für Deutschland"
-        description="Aktive Fahrzeugangebote von Händlern und Privatverkäufern vergleichen, Verkäufer kontaktieren und verfügbare Prüf- und Verifizierungsstatus transparent einsehen."
-        canonical="https://zivvo.de"
+        title="Zivvo — Buy & Sell Cars with Confidence"
+        description="Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing."
+        canonical="https://zivvo.co.uk"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebApplication",
           "name": "Zivvo",
-          "description": "Vehicle marketplace for dealer and private listings in Germany.",
+          "description": "Buy & sell cars with verified dealers and private sellers.",
           "applicationCategory": "AutomotiveMarketplace",
           "operatingSystem": "Web",
         }}
@@ -140,7 +144,7 @@ const Index = () => {
       {/* Trust strip — instant credibility under the hero */}
       <TrustBrandStrip />
 
-      {/* Services row — Finance / Sell / vehicle checks */}
+      {/* Services row — Finance / Sell / HPI */}
       <HomeServicesRow />
 
       {/* How it works — buyer journey */}
@@ -294,6 +298,7 @@ const Index = () => {
       <EVSection />
 
       {/* Vehicle history check promo */}
+      <HistoryCheckPromo />
 
       {/* Why Buy From Us */}
       <WhyBuyFromUs />

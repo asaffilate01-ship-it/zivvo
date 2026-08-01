@@ -146,7 +146,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                     <MapPin className="h-3.5 w-3.5" />
                     {car.location}
                     {car._distance_km != null && (
-                      <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">{car._distance_km.toFixed(1)} km</span>
+                      <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">{(car._distance_km * 0.621371).toFixed(1)} mi</span>
                     )}
                   </div>
                 )}
@@ -243,7 +243,7 @@ const CarCard = ({ car, index = 0, layout = "grid" }: CarCardProps) => {
                   <MapPin className="h-3.5 w-3.5" />
                   {car.location}
                   {car._distance_km != null && (
-                    <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">{car._distance_km.toFixed(1)} km</span>
+                    <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">{(car._distance_km * 0.621371).toFixed(1)} mi</span>
                   )}
                 </div>
               )}

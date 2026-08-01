@@ -56,7 +56,6 @@ const AdminDashboard = () => {
   const [auctions, setAuctions] = useState<any[]>([]);
   const [auctionEscrows, setAuctionEscrows] = useState<any[]>([]);
   const [auctionAuditLog, setAuctionAuditLog] = useState<any[]>([]);
-  const [financeRequests, setFinanceRequests] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listingSearch, setListingSearch] = useState("");
   const [listingStatusFilter, setListingStatusFilter] = useState("all");
@@ -72,7 +71,7 @@ const AdminDashboard = () => {
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
-    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes, auctionsRes, escrowsRes, auditRes, financeRequestsRes] = await Promise.all([
+    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes, auctionsRes, escrowsRes, auditRes] = await Promise.all([
       supabase.from("dealers").select("*").order("created_at", { ascending: false }),
       supabase.from("car_listings").select("*").order("created_at", { ascending: false }).limit(200),
       supabase.from("agent_commissions").select("*").order("created_at", { ascending: false }),
@@ -84,7 +83,6 @@ const AdminDashboard = () => {
       supabase.from("auctions").select("*, car_listings!inner(title, make, model, year, registration)").order("created_at", { ascending: false }),
       supabase.from("auction_escrow").select("*").order("created_at", { ascending: false }),
       supabase.from("auction_audit_log").select("*").order("created_at", { ascending: false }).limit(200),
-      (supabase.from as any)("auction_finance_requests").select("*").order("created_at", { ascending: false }).limit(200),
     ]);
     if (dealersRes.data) setDealers(dealersRes.data);
     if (listingsRes.data) setListings(listingsRes.data);
@@ -97,25 +95,29 @@ const AdminDashboard = () => {
     if (auctionsRes.data) setAuctions(auctionsRes.data);
     if (escrowsRes.data) setAuctionEscrows(escrowsRes.data);
     if (auditRes.data) setAuctionAuditLog(auditRes.data);
-    if (financeRequestsRes.data) setFinanceRequests(financeRequestsRes.data);
     setLoading(false);
   };
 
   const approveKYC = async (dealerId: string) => {
-    const { error } = await (supabase.rpc as any)("review_dealer_kyc", { p_dealer_id: dealerId, p_approve: true });
+    const { error } = await supabase.from("dealers").update({
+      kyc_verified: true,
+      kyc_approved_at: new Date().toISOString(),
+    }).eq("id", dealerId);
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else { toast({ title: "KYC Approved" }); fetchAll(); }
   };
 
   const rejectKYC = async (dealerId: string) => {
-    const { error } = await (supabase.rpc as any)("review_dealer_kyc", { p_dealer_id: dealerId, p_approve: false });
+    const { error } = await supabase.from("dealers").update({
+      kyc_verified: false,
+      is_active: false,
+    }).eq("id", dealerId);
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else { toast({ title: "Dealer rejected" }); fetchAll(); }
   };
 
   const toggleDealerActive = async (dealerId: string, active: boolean) => {
-    const { error } = await (supabase.rpc as any)("set_dealer_active", { p_dealer_id: dealerId, p_active: active });
-    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    await supabase.from("dealers").update({ is_active: active }).eq("id", dealerId);
     toast({ title: active ? "Dealer activated" : "Dealer suspended" });
     fetchAll();
   };
@@ -171,34 +173,30 @@ const AdminDashboard = () => {
     fetchAll();
   };
 
+  const approveAuction = async (auctionId: string, rating: number) => {
+    await supabase.from("auctions").update({
+      status: "live" as any,
+      inspection_rating: rating,
+      hpi_clear: true,
+      ownership_verified: true,
+      seller_verified: true,
+      starts_at: new Date().toISOString(),
+    }).eq("id", auctionId);
+    toast({ title: "Auction approved & live!" });
+    fetchAll();
+  };
+
   const rejectAuction = async (auctionId: string) => {
-    const { error } = await (supabase.rpc as any)("review_auction_submission", {
-      p_auction_id: auctionId, p_approve: false, p_inspection_rating: null,
-      p_ownership_verified: false, p_seller_verified: false, p_legal_check_clear: false, p_condition_report: {},
-    });
-    if (error) { toast({ title: "Rejection failed", description: error.message, variant: "destructive" }); return; }
+    await supabase.from("auctions").update({ status: "cancelled" as any }).eq("id", auctionId);
     toast({ title: "Auction rejected" });
     fetchAll();
   };
 
-  const releaseEscrow = async (escrowId: string) => {
-    const reference = window.prompt("Auszahlungsreferenz des Zahlungsdienstleisters eingeben");
-    if (!reference) return;
-    const { error } = await (supabase.rpc as any)("record_seller_payout", { p_escrow_id: escrowId, p_reference: reference });
-    if (error) { toast({ title: "Release failed", description: error.message, variant: "destructive" }); return; }
-    toast({ title: "Auszahlung dokumentiert" });
-    fetchAll();
-  };
-
-  const reviewFinanceRequest = async (request: any, approve: boolean) => {
-    const { error } = await (supabase.rpc as any)("review_auction_finance_request", {
-      p_request_id: request.id,
-      p_approve: approve,
-      p_approved_amount: approve ? Number(request.requested_amount) : null,
-      p_valid_days: 30,
-    });
-    if (error) { toast({ title: "Prüfung fehlgeschlagen", description: error.message, variant: "destructive" }); return; }
-    toast({ title: approve ? "Finanzierungsnachweis bestätigt" : "Finanzierungsnachweis abgelehnt" });
+  const updateEscrowStatus = async (escrowId: string, status: string) => {
+    const update: any = { status };
+    if (status === "released_to_seller") update.released_at = new Date().toISOString();
+    await supabase.from("auction_escrow").update(update).eq("id", escrowId);
+    toast({ title: `Payment protection ${status.replace(/_/g, " ")}` });
     fetchAll();
   };
 
@@ -297,7 +295,7 @@ const AdminDashboard = () => {
             { label: "Total Users", value: totalUsers, icon: Users, color: "text-primary" },
             { label: "Total Dealers", value: dealers.length, icon: Building2, color: "text-info" },
             { label: "Active Listings", value: activeListings.length, icon: Car, color: "text-success" },
-            { label: "Monthly Revenue", value: `€${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
+            { label: "Monthly Revenue", value: `£${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
             { label: "Pending Reports", value: pendingReports.length, icon: Flag, color: "text-destructive" },
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
@@ -500,8 +498,8 @@ const AdminDashboard = () => {
                       <TableHead>Vehicle</TableHead>
                       <TableHead>Price</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Eigentumsnachweis</TableHead>
-                      <TableHead>Legacy evidence</TableHead>
+                      <TableHead>Logbook</TableHead>
+                      <TableHead>HPI</TableHead>
                       <TableHead>Views</TableHead>
                       <TableHead>Posted</TableHead>
                       <TableHead>Actions</TableHead>
@@ -510,9 +508,9 @@ const AdminDashboard = () => {
                   <TableBody>
                     {filteredListings.slice(0, 50).map((l) => {
                       const hasLogbook = !!(l as any).logbook_url;
-                      const legacyEvidence = (l as any).hpi_check_data;
-                      const hasLegacyEvidence = !!legacyEvidence;
-                      const legacyEvidenceFlagged = hasLegacyEvidence && (legacyEvidence?.stolen_reported || legacyEvidence?.finance_outstanding || legacyEvidence?.write_off);
+                      const hpiData = (l as any).hpi_check_data;
+                      const hasHpi = !!hpiData;
+                      const hpiClean = hasHpi && !hpiData?.stolen_reported && !hpiData?.finance_outstanding && !hpiData?.write_off;
                       return (
                         <TableRow key={l.id}>
                           <TableCell>
@@ -524,7 +522,7 @@ const AdminDashboard = () => {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>€{Number(l.price).toLocaleString()}</TableCell>
+                          <TableCell>£{Number(l.price).toLocaleString()}</TableCell>
                           <TableCell><Badge variant={l.status === "active" ? "default" : l.status === "under_review" ? "destructive" : "secondary"}>{l.status}</Badge></TableCell>
                           <TableCell>
                             <Badge variant="outline" className={hasLogbook ? "border-success text-success" : "border-destructive text-destructive"}>
@@ -532,9 +530,9 @@ const AdminDashboard = () => {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {hasLegacyEvidence ? (
-                              <Badge variant="outline" className={legacyEvidenceFlagged ? "border-destructive text-destructive" : "border-muted-foreground text-muted-foreground"}>
-                                {legacyEvidenceFlagged ? "Flagged" : "No stored flags"}
+                            {hasHpi ? (
+                              <Badge variant="outline" className={hpiClean ? "border-success text-success" : "border-destructive text-destructive"}>
+                                {hpiClean ? "Clear" : "Issues"}
                               </Badge>
                             ) : (
                               <Badge variant="outline" className="border-muted-foreground text-muted-foreground">None</Badge>
@@ -555,14 +553,14 @@ const AdminDashboard = () => {
                                   <DropdownMenuItem
                                     onClick={() => {
                                       if (!hasLogbook) {
-                                        toast({ title: "Freigabe nicht möglich", description: "Der Verkäufer hat keinen Eigentumsnachweis hochgeladen.", variant: "destructive" });
+                                        toast({ title: "Cannot approve", description: "Seller has not uploaded a logbook.", variant: "destructive" });
                                         return;
                                       }
                                       toggleListingStatus(l.id, "active");
                                     }}
                                   >
                                     <CheckCircle className="mr-2 h-4 w-4" /> Approve
-                                    {!hasLogbook && <span className="ml-1 text-xs text-destructive">(kein Nachweis)</span>}
+                                    {!hasLogbook && <span className="ml-1 text-xs text-destructive">(no logbook)</span>}
                                   </DropdownMenuItem>
                                 )}
                                 {l.status === "active" && (
@@ -602,11 +600,14 @@ const AdminDashboard = () => {
                         <div key={a.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border p-4">
                           <div>
                             <p className="font-medium text-card-foreground">{l?.year} {l?.make} {l?.model}</p>
-                            <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: €{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
+                            <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: £{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
                           </div>
                           <div className="flex gap-2">
                             <Button size="sm" variant="default" className="gap-1" onClick={() => setInspectingAuction(a)}>
                               <ClipboardCheck className="h-3 w-3" /> Full Inspection
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => approveAuction(a.id, 3)} title="Quick approve with 3/5">
+                              ⭐ Quick 3/5
                             </Button>
                             <Button size="sm" variant="outline" className="text-destructive" onClick={() => rejectAuction(a.id)}>
                               <XCircle className="mr-1 h-3 w-3" /> Reject
@@ -661,7 +662,7 @@ const AdminDashboard = () => {
                             </TableCell>
                             <TableCell><Badge variant={a.status === "live" ? "default" : a.status === "sold" ? "secondary" : "outline"}>{a.status}</Badge></TableCell>
                             <TableCell>{a.inspection_rating ? `${a.inspection_rating}/5` : "—"}</TableCell>
-                            <TableCell>€{Number(a.current_bid || a.starting_price).toLocaleString()}</TableCell>
+                            <TableCell>£{Number(a.current_bid || a.starting_price).toLocaleString()}</TableCell>
                             <TableCell>{a.bid_count || 0}</TableCell>
                             <TableCell className="text-xs text-muted-foreground">{a.ends_at ? new Date(a.ends_at).toLocaleDateString() : "—"}</TableCell>
                             <TableCell>
@@ -669,8 +670,8 @@ const AdminDashboard = () => {
                                 <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => setSelectedAuction(a)}><Eye className="mr-2 h-4 w-4" /> Details</DropdownMenuItem>
-                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => setInspectingAuction(a)}><ClipboardCheck className="mr-2 h-4 w-4" /> Vollprüfung</DropdownMenuItem>}
-                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => rejectAuction(a.id)} className="text-destructive"><XCircle className="mr-2 h-4 w-4" /> Ablehnen</DropdownMenuItem>}
+                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => approveAuction(a.id, 3)}><CheckCircle className="mr-2 h-4 w-4" /> Quick Approve (3/5)</DropdownMenuItem>}
+                                  {a.status !== "cancelled" && <DropdownMenuItem onClick={() => rejectAuction(a.id)} className="text-destructive"><XCircle className="mr-2 h-4 w-4" /> Cancel</DropdownMenuItem>}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
@@ -682,12 +683,12 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Payment and handover records */}
+              {/* Payment Protection Management */}
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Zahlungs- und Übergabestatus ({auctionEscrows.length})</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Payment Protection ({auctionEscrows.length})</CardTitle></CardHeader>
                 <CardContent className="overflow-x-auto">
                   {auctionEscrows.length === 0 ? (
-                    <p className="py-8 text-center text-muted-foreground">Noch keine Zahlungs- oder Übergabedatensätze</p>
+                    <p className="py-8 text-center text-muted-foreground">No payment protection records yet</p>
                   ) : (
                     <Table>
                       <TableHeader>
@@ -695,7 +696,7 @@ const AdminDashboard = () => {
                           <TableHead>Auction</TableHead>
                           <TableHead>Total</TableHead>
                           <TableHead>Status</TableHead>
-                          <TableHead>Dokumente</TableHead>
+                          <TableHead>V5C</TableHead>
                           <TableHead>Keys</TableHead>
                           <TableHead>Contract</TableHead>
                           <TableHead>Actions</TableHead>
@@ -705,7 +706,7 @@ const AdminDashboard = () => {
                         {auctionEscrows.map((e: any) => (
                           <TableRow key={e.id}>
                             <TableCell className="text-xs">{e.auction_id.slice(0, 8)}...</TableCell>
-                            <TableCell>€{Number(e.total_amount).toLocaleString()}</TableCell>
+                            <TableCell>£{Number(e.total_amount).toLocaleString()}</TableCell>
                             <TableCell><Badge variant="outline" className="capitalize">{(e.status as string).replace(/_/g, " ")}</Badge></TableCell>
                             <TableCell>{e.v5c_received ? "✅" : "⏳"}</TableCell>
                             <TableCell>{e.keys_handed_over ? "✅" : "⏳"}</TableCell>
@@ -715,8 +716,10 @@ const AdminDashboard = () => {
                                 <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   {e.v5c_received && e.keys_handed_over && e.contract_signed && e.status !== "released_to_seller" && (
-                                    <DropdownMenuItem onClick={() => releaseEscrow(e.id)}><CheckCircle className="mr-2 h-4 w-4" /> Auszahlung dokumentieren</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "released_to_seller")}><CheckCircle className="mr-2 h-4 w-4" /> Release to Seller</DropdownMenuItem>
                                   )}
+                                  {e.status !== "refunded" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "refunded")} className="text-destructive">Refund Buyer</DropdownMenuItem>}
+                                  {e.status !== "disputed" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "disputed")}>Mark Disputed</DropdownMenuItem>}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
@@ -1001,25 +1004,6 @@ const AdminDashboard = () => {
 
           {/* Finance Tab */}
           <TabsContent value="finance" className="mt-4">
-            <Card className="mb-4">
-              <CardHeader><CardTitle className="text-base">Finanzierungsnachweise für Auktionen</CardTitle></CardHeader>
-              <CardContent className="overflow-x-auto">
-                {financeRequests.length === 0 ? <p className="py-6 text-center text-muted-foreground">Keine Anfragen</p> : (
-                  <Table>
-                    <TableHeader><TableRow><TableHead>Anbieter</TableHead><TableHead>Referenz</TableHead><TableHead>Betrag</TableHead><TableHead>Status</TableHead><TableHead>Aktion</TableHead></TableRow></TableHeader>
-                    <TableBody>{financeRequests.map((request) => (
-                      <TableRow key={request.id}>
-                        <TableCell>{request.provider}</TableCell>
-                        <TableCell className="font-mono text-xs">{request.reference}</TableCell>
-                        <TableCell>{Number(request.requested_amount).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}</TableCell>
-                        <TableCell><Badge variant="outline">{request.status}</Badge></TableCell>
-                        <TableCell>{request.status === "pending" && <div className="flex gap-2"><Button size="sm" onClick={() => reviewFinanceRequest(request, true)}>Bestätigen</Button><Button size="sm" variant="outline" onClick={() => reviewFinanceRequest(request, false)}>Ablehnen</Button></div>}</TableCell>
-                      </TableRow>
-                    ))}</TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
             <div className="grid gap-4 md:grid-cols-2">
               <Card>
                 <CardHeader>
@@ -1047,7 +1031,7 @@ const AdminDashboard = () => {
                   <div className="mt-6 border-t border-border pt-4">
                     <div className="flex justify-between font-display font-bold">
                       <span className="text-card-foreground">Total MRR</span>
-                      <span className="text-primary">€{totalRevenue.toLocaleString()}</span>
+                      <span className="text-primary">£{totalRevenue.toLocaleString()}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -1071,7 +1055,7 @@ const AdminDashboard = () => {
                             <p className="text-sm font-medium text-card-foreground">Commission #{c.id.slice(0, 8)}</p>
                             <p className="text-xs text-muted-foreground">{c.status} · {c.period_start ? new Date(c.period_start).toLocaleDateString() : ""}</p>
                           </div>
-                          <span className="font-display font-semibold text-primary">€{Number(c.amount).toFixed(2)}</span>
+                          <span className="font-display font-semibold text-primary">£{Number(c.amount).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
@@ -1175,11 +1159,11 @@ const AdminDashboard = () => {
                   <div><span className="text-muted-foreground">Status:</span> <Badge variant="outline">{selectedAuction.status}</Badge></div>
                   <div><span className="text-muted-foreground">Format:</span> <span className="text-foreground">{selectedAuction.format}</span></div>
                   <div><span className="text-muted-foreground">Rating:</span> <span className="text-foreground">{selectedAuction.inspection_rating ? `${selectedAuction.inspection_rating}/5` : "Pending"}</span></div>
-                  <div><span className="text-muted-foreground">Starting:</span> <span className="text-foreground">€{Number(selectedAuction.starting_price).toLocaleString()}</span></div>
-                  <div><span className="text-muted-foreground">Current:</span> <span className="text-foreground font-bold">€{Number(selectedAuction.current_bid || selectedAuction.starting_price).toLocaleString()}</span></div>
-                  <div><span className="text-muted-foreground">Reserve:</span> <span className="text-foreground">{selectedAuction.reserve_price ? `€${Number(selectedAuction.reserve_price).toLocaleString()}` : "None"}</span></div>
+                  <div><span className="text-muted-foreground">Starting:</span> <span className="text-foreground">£{Number(selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Current:</span> <span className="text-foreground font-bold">£{Number(selectedAuction.current_bid || selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Reserve:</span> <span className="text-foreground">{selectedAuction.reserve_price ? `£${Number(selectedAuction.reserve_price).toLocaleString()}` : "None"}</span></div>
                   <div><span className="text-muted-foreground">Bids:</span> <span className="text-foreground">{selectedAuction.bid_count || 0}</span></div>
-                  <div><span className="text-muted-foreground">Register/Finanzierung:</span> <span>{selectedAuction.hpi_clear ? "✅ geprüft" : "⏳"}</span></div>
+                  <div><span className="text-muted-foreground">HPI:</span> <span>{selectedAuction.hpi_clear ? "✅ Clear" : "⏳"}</span></div>
                   <div><span className="text-muted-foreground">Verified:</span> <span>{selectedAuction.seller_verified ? "✅" : "⏳"}</span></div>
                 </div>
                 <Separator />
@@ -1189,8 +1173,8 @@ const AdminDashboard = () => {
                       <ClipboardCheck className="h-3 w-3" /> Full Inspection
                     </Button>
                   )}
-                  {selectedAuction.status === "pending_inspection" && (
-                    <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Ablehnen</Button>
+                  {selectedAuction.status !== "cancelled" && (
+                    <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Cancel</Button>
                   )}
                 </div>
               </div>

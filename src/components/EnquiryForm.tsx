@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import { trackEvent } from "@/hooks/useAnalytics";
 
 interface EnquiryFormProps {
   listingId: string;
@@ -39,7 +38,7 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
     if (!form.message.trim()) return;
 
     setLoading(true);
-    const { error } = await supabase.from("enquiries").insert({
+    const { data: enquiry, error } = await supabase.from("enquiries").insert({
       listing_id: listingId,
       seller_id: sellerId,
       sender_id: user.id,
@@ -47,13 +46,23 @@ const EnquiryForm = ({ listingId, sellerId, listingTitle }: EnquiryFormProps) =>
       sender_name: form.sender_name || null,
       sender_email: form.sender_email || null,
       sender_phone: form.sender_phone || null,
-    });
+    }).select("id").single();
 
     if (error) {
       toast({ title: t("enquiryForm.error"), description: error.message, variant: "destructive" });
     } else {
-      void trackEvent("listing_enquiry_sent", { listing_id: listingId });
       setSent(true);
+      // Increment enquiries count
+      const { data: listing } = await supabase.from("car_listings").select("enquiries_count").eq("id", listingId).single();
+      if (listing) {
+        await supabase.from("car_listings").update({ enquiries_count: (listing.enquiries_count || 0) + 1 }).eq("id", listingId);
+      }
+      // Trigger notification (fire-and-forget)
+      if (enquiry?.id) {
+        supabase.functions.invoke("notify-enquiry", {
+          body: { enquiryId: enquiry.id },
+        }).catch(() => {}); // silent fail
+      }
     }
     setLoading(false);
   };

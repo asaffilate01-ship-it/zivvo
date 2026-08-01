@@ -1,7 +1,7 @@
 {
-  "name": "Zivvo — Fahrzeugmarkt Deutschland",
+  "name": "Zivvo — Buy & Sell Cars",
   "short_name": "Zivvo",
-  "description": "Fahrzeuge in Deutschland suchen, vergleichen, kaufen und verkaufen.",
+  "description": "Browse thousands of verified vehicles from trusted dealers and private sellers.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -13,7 +13,6 @@
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
     { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
   ],
-  "lang": "de-DE",
-  "dir": "ltr",
-  "categories": ["auto", "shopping"]
+  "categories": ["auto", "shopping"],
+  "screenshots": []
 }

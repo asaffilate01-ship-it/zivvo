@@ -5,17 +5,7 @@ import { initNativeNotifications } from "@/lib/nativeNotifications";
 const NotificationInitializer = () => {
   const { user } = useAuth();
   useEffect(() => {
-    if (!user?.id) return;
-    let disposed = false;
-    let cleanup: (() => void) | undefined;
-    void initNativeNotifications(user.id).then((removeListeners) => {
-      if (disposed) removeListeners?.();
-      else cleanup = removeListeners;
-    });
-    return () => {
-      disposed = true;
-      cleanup?.();
-    };
+    initNativeNotifications(user?.id);
   }, [user?.id]);
   return null;
 };

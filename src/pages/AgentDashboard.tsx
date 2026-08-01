@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Euro,
+  PoundSterling,
   Building2,
   Clock,
   CheckCircle,
@@ -31,7 +31,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import SalesPipeline from "@/components/SalesPipeline";
 
-// Tier MRR assumptions (EUR / month) — used to forecast pending commission
+// Tier MRR assumptions (GBP / month) — used to forecast pending commission
 const TIER_MRR: Record<string, number> = {
   starter: 49,
   professional: 149,
@@ -151,9 +151,9 @@ const AgentDashboard = () => {
         {/* KPI Cards */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { label: "Total Earned", value: `€${totalEarned.toLocaleString()}`, icon: Euro, color: "text-success" },
-            { label: "Pending Payout", value: `€${totalPending.toLocaleString()}`, icon: Clock, color: "text-primary" },
-            { label: "Forecast / month", value: `€${forecastMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: TrendingUp, color: "text-primary", hint: `${activeDealers.length} active dealer${activeDealers.length === 1 ? "" : "s"}` },
+            { label: "Total Earned", value: `£${totalEarned.toLocaleString()}`, icon: PoundSterling, color: "text-success" },
+            { label: "Pending Payout", value: `£${totalPending.toLocaleString()}`, icon: Clock, color: "text-primary" },
+            { label: "Forecast / month", value: `£${forecastMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: TrendingUp, color: "text-primary", hint: `${activeDealers.length} active dealer${activeDealers.length === 1 ? "" : "s"}` },
             { label: "Pending Onboarding", value: pendingOnboarding, icon: AlertCircle, color: "text-destructive" },
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
@@ -183,7 +183,7 @@ const AgentDashboard = () => {
               <div>
                 <p className="text-sm font-semibold text-card-foreground">Next payout: {nextPayoutDate}</p>
                 <p className="text-xs text-muted-foreground">
-                  €{totalPending.toLocaleString()} pending · paid monthly to your registered bank account
+                  £{totalPending.toLocaleString()} pending · paid monthly to your registered bank account
                 </p>
               </div>
             </div>
@@ -288,13 +288,13 @@ const AgentDashboard = () => {
                         <TableRow key={row.dealerId}>
                           <TableCell className="font-medium">{row.businessName}</TableCell>
                           <TableCell className="text-right font-display font-semibold text-success">
-                            €{row.paid.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                            £{row.paid.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           </TableCell>
                           <TableCell className="text-right text-muted-foreground">
-                            €{row.pending.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                            £{row.pending.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           </TableCell>
                           <TableCell className="text-right font-display font-bold text-primary">
-                            €{(row.paid + row.pending).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                            £{(row.paid + row.pending).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -334,7 +334,7 @@ const AgentDashboard = () => {
                             {c.period_start ? `${c.period_start} → ${c.period_end}` : "N/A"}
                           </TableCell>
                           <TableCell className="text-right font-display font-semibold text-primary">
-                            €{Number(c.amount).toFixed(2)}
+                            £{Number(c.amount).toFixed(2)}
                           </TableCell>
                           <TableCell>{c.commission_rate}%</TableCell>
                           <TableCell>
@@ -360,15 +360,15 @@ const AgentDashboard = () => {
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Total Earned (All Time)</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-success">€{totalEarned.toLocaleString()}</p>
+                    <p className="mt-1 font-display text-2xl font-bold text-success">£{totalEarned.toLocaleString()}</p>
                   </div>
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Pending</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-card-foreground">€{totalPending.toLocaleString()}</p>
+                    <p className="mt-1 font-display text-2xl font-bold text-card-foreground">£{totalPending.toLocaleString()}</p>
                   </div>
                   <div className="rounded-lg border border-border p-4">
                     <p className="text-sm text-muted-foreground">Forecast / month</p>
-                    <p className="mt-1 font-display text-2xl font-bold text-primary">€{forecastMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                    <p className="mt-1 font-display text-2xl font-bold text-primary">£{forecastMonthly.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                   </div>
                 </div>
                 <p className="mt-4 text-xs text-muted-foreground">

@@ -1,30 +1,85 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
-import { appUrl, env, HttpError, json, parseJson, preflight, requireIdempotencyKey, requirePost, requireUser, requireUuid, safeError } from "../_shared/security.ts";
-import { CURRENCY, requireBoost } from "../_shared/payments.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-Deno.serve(async (req) => {
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[BOOST-CHECKOUT] ${step}${detailsStr}`);
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
   try {
-    const options = preflight(req); if (options) return options;
-    requirePost(req);
-    const idempotencyKey = requireIdempotencyKey(req);
-    const { user, admin } = await requireUser(req);
-    if (!user.email) throw new HttpError(400, "Your account needs a verified email address");
-    const body = await parseJson(req);
-    const listingId = requireUuid(body.listingId, "listingId");
-    const boost = requireBoost(body.days);
-    const { data: listing } = await admin.from("car_listings").select("id,title,status,seller_id,is_promoted,promoted_until").eq("id", listingId).maybeSingle();
-    if (!listing || listing.seller_id !== user.id) throw new HttpError(404, "Listing not found");
-    if (listing.status !== "active") throw new HttpError(409, "Only active listings can be boosted");
-    if (listing.promoted_until && new Date(listing.promoted_until) > new Date()) throw new HttpError(409, "This listing already has an active boost");
-    const stripe = new Stripe(env("STRIPE_SECRET_KEY"), { apiVersion: "2024-06-20" });
+    logStep("Function started");
+
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
+    if (!user?.email) throw new Error("User not authenticated");
+    logStep("User authenticated", { userId: user.id });
+
+    const { listingId, listingTitle, days, amount, currency } = await req.json();
+    if (!listingId || !days || !amount) throw new Error("Missing required fields");
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2023-10-16" });
+
+    // Find or reference existing customer
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customerId = customers.data.length > 0 ? customers.data[0].id : undefined;
+
+    const origin = req.headers.get("origin") || "https://nafsi.app";
+
     const session = await stripe.checkout.sessions.create({
-      customer_email: user.email,
-      line_items: [{ price_data: { currency: CURRENCY, unit_amount: boost.cents, product_data: { name: boost.label, description: `${listing.title} wird ${boost.days} Tage hervorgehoben.` } }, quantity: 1 }],
+      customer: customerId,
+      customer_email: customerId ? undefined : user.email,
+      line_items: [{
+        price_data: {
+          currency: currency || "gbp",
+          product_data: {
+            name: `Boost: ${listingTitle || "Listing"} (${days} days)`,
+            description: `Promoted placement for ${days} days`,
+          },
+          unit_amount: Math.round(amount * 100),
+        },
+        quantity: 1,
+      }],
       mode: "payment",
-      success_url: appUrl(`/dashboard?boost=success&listing=${listingId}`),
-      cancel_url: appUrl("/dashboard?boost=cancelled"),
-      metadata: { type: "boost", user_id: user.id, listing_id: listingId, days: String(boost.days), expected_amount: String(boost.cents), currency: CURRENCY },
-    }, { idempotencyKey });
-    return json(req, { url: session.url });
-  } catch (error) { return safeError(req, error); }
+      success_url: `${origin}/dashboard?boost=success&listing=${listingId}`,
+      cancel_url: `${origin}/dashboard`,
+      metadata: {
+        type: "boost",
+        user_id: user.id,
+        listing_id: listingId,
+        days: String(days),
+      },
+    });
+
+    logStep("Boost checkout session created", { sessionId: session.id, days, amount });
+
+    return new Response(JSON.stringify({ url: session.url }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR", { message: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
 });

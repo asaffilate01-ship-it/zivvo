@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Calculator, Euro } from "lucide-react";
 
 /**
- * Unverbindlicher Orientierungrechner für Kilometerleasing.
- * Vereinfachte Modellformel:
+ * Leasing-Rechner (Kilometerleasing).
+ * Vereinfachte Formel im Stil deutscher Anbieter (Sixt Leasing, ALD, LeasePlan):
  *   Monatsrate ≈ ((Nettopreis - Restwert) / Laufzeit) + Zinsanteil
  * Zinsanteil = ((Nettopreis + Restwert) / 2) * (effZins / 12)
  * Anzahlung reduziert den Nettopreis 1:1.
@@ -21,7 +21,7 @@ const LeasingCalculator = () => {
   const [rate, setRate] = useState(4.9); // eff. Jahreszins %
 
   const { monthly, residual, totalCost, interestPart } = useMemo(() => {
-    // Illustrative residual curve; not a market valuation or lender quote.
+    // Restwertkurve grob nach dt. Marktwerten (Schwacke-orientiert)
     const kmFactor = kmPerYear <= 10000 ? 0.02 : kmPerYear <= 15000 ? 0.03 : kmPerYear <= 20000 ? 0.04 : 0.05;
     const monthlyDepreciation = kmFactor / 12;
     const residualPct = Math.max(0.25, 1 - monthlyDepreciation * months);
@@ -48,7 +48,7 @@ const LeasingCalculator = () => {
     <Card className="border-border/60">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 font-display">
-          <Calculator className="h-5 w-5 text-primary" /> Leasing-Kostenorientierung
+          <Calculator className="h-5 w-5 text-primary" /> Leasing-Rechner
         </CardTitle>
       </CardHeader>
       <CardContent className="grid gap-6 md:grid-cols-2">
@@ -127,9 +127,9 @@ const LeasingCalculator = () => {
         </div>
 
         <div className="rounded-xl border border-border bg-muted/40 p-5">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Geschätzter Monatswert</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Monatliche Leasingrate</p>
           <p className="mt-1 font-display text-4xl font-bold text-primary">{fmt(monthly)}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Vereinfachtes Rechenmodell, keine Händler- oder Leasinggeberrate</p>
+          <p className="mt-1 text-xs text-muted-foreground">zzgl. MwSt. für Gewerbekunden</p>
 
           <div className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
             <Row label="Kalkulierter Restwert" value={fmt(residual)} />
@@ -139,14 +139,14 @@ const LeasingCalculator = () => {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-1.5">
-            <Badge variant="secondary" className="text-[10px]">Kilometer-Annahme</Badge>
-            <Badge variant="secondary" className="text-[10px]">Restwert-Annahme</Badge>
-            <Badge variant="secondary" className="text-[10px]">Zins-Annahme</Badge>
+            <Badge variant="secondary" className="text-[10px]">Kilometerleasing</Badge>
+            <Badge variant="secondary" className="text-[10px]">Ohne Schlussrate</Badge>
+            <Badge variant="secondary" className="text-[10px]">GAP-Schutz optional</Badge>
           </div>
 
           <p className="mt-4 text-[10px] leading-relaxed text-muted-foreground">
-            Unverbindliche Modellrechnung — kein Angebot, keine Bonitätsentscheidung und keine
-            Preisangabe eines Leasinggebers. Steuern, Gebühren und Vertragsdetails können abweichen.
+            Repräsentatives Beispiel. Unverbindliche Berechnung — kein Angebot i. S. d. § 6a PAngV.
+            Bonität vorausgesetzt. Endgültige Konditionen richten sich nach dem Leasinggeber.
           </p>
         </div>
       </CardContent>

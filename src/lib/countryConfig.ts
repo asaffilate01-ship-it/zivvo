@@ -8,7 +8,7 @@ export interface IndividualPlan {
   price: number;
   priceId: string;
   label: string;
-  /** maximum private listings created per calendar month */
+  /** number of free listings per calendar month before charges apply */
   freePerMonth: number;
   /** max photos per listing on this plan */
   maxPhotos: number;
@@ -87,21 +87,21 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
       "Stuttgart", "Düsseldorf", "Leipzig", "Dortmund", "Essen",
       "Bremen", "Dresden", "Hannover", "Nürnberg", "Duisburg",
     ],
-    // Private seller: up to 2 free listings per calendar month (10 photos each).
+    // Private seller: 2 free listings/month, then €9.99 per extra listing (10 photos)
     individualPlan: {
-      price: 0,
-      priceId: "",
-      label: "bis zu 2 Inserate pro Kalendermonat",
+      price: 9.99,
+      priceId: "price_de_private_extra_listing",
+      label: "pro zusätzliches Inserat",
       freePerMonth: 2,
       maxPhotos: 10,
     },
     // Dealer: single €49.99/mo plan — up to 30 cars, 15 photos + 2 videos each,
-    // 2 months free trial.
+    // 2 months free trial. Cheaper than mobile.de / AutoScout24.
     dealerPlans: [
       {
         name: "Händler",
         price: 49.99,
-        priceId: "dealer_de",
+        priceId: "price_de_dealer_pro",
         maxListings: 30,
         maxPhotos: 15,
         maxVideos: 2,
@@ -113,8 +113,11 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
           "2 Monate kostenlose Testphase",
           "Vollständige Analytik & Berichte",
           "Eigene Händler-Landingpage",
-          "Sicherer DMS-Import auf Anfrage",
-          "Transparenter Händler-Verifizierungsstatus",
+          "Hervorgehobene Platzierungen",
+          "Priorisierter Support",
+          "Portal-Synchronisation (mobile.de, AutoScout24, Kleinanzeigen)",
+          "Finanzierungs-Integration",
+          "Verifiziertes Händler-Abzeichen",
         ],
       },
     ],

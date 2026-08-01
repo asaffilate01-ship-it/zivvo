@@ -5,7 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Calculator, Euro } from "lucide-react";
+import { Calculator, PoundSterling } from "lucide-react";
 import { formatPrice } from "@/lib/countryConfig";
 import { useCountry } from "@/contexts/CountryContext";
 
@@ -78,7 +78,7 @@ const FinanceCalculator = ({ price, defaultApr = 9.9, onApply, compact }: Props)
 
         {onApply && (
           <Button className="w-full" onClick={onApply}>
-            <Euro className="w-4 h-4 mr-2" /> {t("dealer.financeCalculator.applyForFinance")}
+            <PoundSterling className="w-4 h-4 mr-2" /> {t("dealer.financeCalculator.applyForFinance")}
           </Button>
         )}
 

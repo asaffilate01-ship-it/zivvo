@@ -2688,10 +2688,8 @@ export type Database = {
           listing_id: string
           notes: string | null
           refunded_at: string | null
-          refund_status: string | null
           status: string
           stripe_payment_intent_id: string | null
-          stripe_refund_id: string | null
           stripe_session_id: string | null
           updated_at: string
         }
@@ -2709,10 +2707,8 @@ export type Database = {
           listing_id: string
           notes?: string | null
           refunded_at?: string | null
-          refund_status?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
-          stripe_refund_id?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }
@@ -2730,10 +2726,8 @@ export type Database = {
           listing_id?: string
           notes?: string | null
           refunded_at?: string | null
-          refund_status?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
-          stripe_refund_id?: string | null
           stripe_session_id?: string | null
           updated_at?: string
         }

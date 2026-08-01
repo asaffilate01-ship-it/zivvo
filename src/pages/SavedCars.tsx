@@ -46,7 +46,7 @@ const SavedCars = () => {
 
       if (savedRes.data && savedRes.data.length > 0) {
         const ids = savedRes.data.map((s: any) => s.listing_id);
-        const { data: cars } = await supabase.from("car_listings_public").select("*").in("id", ids);
+        const { data: cars } = await supabase.from("car_listings").select("*").in("id", ids);
         if (cars) setListings(cars);
       }
       if (searchRes.data) setSearches(searchRes.data as SavedSearch[]);

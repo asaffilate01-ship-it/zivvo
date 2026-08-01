@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, RefreshCw, CheckCircle2, Loader2 } from "lucide-react";
-import { idempotencyHeaders } from "@/lib/idempotency";
+import { CreditCard, RefreshCw, CheckCircle2 } from "lucide-react";
 
 interface Props { dealerId: string; }
 
@@ -28,8 +27,6 @@ const statusColors: Record<string, string> = {
   paid: "bg-success text-success-foreground",
   refunded: "bg-muted text-muted-foreground",
   applied_to_sale: "bg-primary text-primary-foreground",
-  refund_pending: "bg-warning text-warning-foreground",
-  refund_failed: "bg-destructive text-destructive-foreground",
   cancelled: "bg-destructive text-destructive-foreground",
 };
 
@@ -37,43 +34,33 @@ const ReservationsManager = ({ dealerId }: Props) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [items, setItems] = useState<Reservation[]>([]);
-  const [updating, setUpdating] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  const load = async () => {
     const { data } = await supabase
       .from("reservation_deposits" as any)
       .select("*")
       .eq("dealer_id", dealerId)
       .order("created_at", { ascending: false });
     setItems((data as any) || []);
-  }, [dealerId]);
+  };
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { load(); }, [dealerId]);
 
   const statusLabels: Record<string, string> = {
     pending: t("dealer.reservationsManager.statusPending"),
     paid: t("dealer.reservationsManager.statusPaid"),
     refunded: t("dealer.reservationsManager.statusRefunded"),
-    refund_pending: t("dealer.reservationsManager.statusRefundPending"),
-    refund_failed: t("dealer.reservationsManager.statusRefundFailed"),
     applied_to_sale: t("dealer.reservationsManager.statusAppliedToSale"),
     cancelled: t("dealer.reservationsManager.statusCancelled"),
   };
 
-  const updateStatus = async (id: string, action: "apply_to_sale" | "refund") => {
-    const prompt = action === "refund"
-      ? t("dealer.reservationsManager.confirmRefund")
-      : t("dealer.reservationsManager.confirmApply");
-    if (!window.confirm(prompt)) return;
-    setUpdating(`${id}:${action}`);
-    const { data, error } = await supabase.functions.invoke("reservation-action", {
-      body: { reservation_id: id, action },
-      headers: idempotencyHeaders(),
-    });
-    setUpdating(null);
-    if (error) { toast({ title: t("common.error"), description: error.message, variant: "destructive" }); return; }
-    toast({ title: t("dealer.reservationsManager.statusUpdated", { status: statusLabels[data?.status] || data?.status }) });
-    void load();
+  const updateStatus = async (id: string, status: string) => {
+    const updates: any = { status };
+    if (status === "refunded") updates.refunded_at = new Date().toISOString();
+    const { error } = await supabase.from("reservation_deposits" as any).update(updates).eq("id", id);
+    if (error) { toast({ title: t("common.error"), variant: "destructive" }); return; }
+    toast({ title: t("dealer.reservationsManager.statusUpdated", { status: statusLabels[status] || status }) });
+    load();
   };
 
   const totalHeld = items.filter(r => r.status === "paid").reduce((s, r) => s + Number(r.amount), 0);
@@ -89,7 +76,7 @@ const ReservationsManager = ({ dealerId }: Props) => {
       <CardContent>
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">{t("dealer.reservationsManager.activeReservations")}</p><p className="font-display text-xl font-bold">{items.filter(r => r.status === "paid").length}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">{t("dealer.reservationsManager.heldFunds")}</p><p className="font-display text-xl font-bold">€{totalHeld.toLocaleString()}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">{t("dealer.reservationsManager.heldFunds")}</p><p className="font-display text-xl font-bold">£{totalHeld.toLocaleString()}</p></div>
           <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">{t("dealer.reservationsManager.allTime")}</p><p className="font-display text-xl font-bold">{items.length}</p></div>
         </div>
 
@@ -108,16 +95,12 @@ const ReservationsManager = ({ dealerId }: Props) => {
                   <p className="text-xs text-muted-foreground mt-0.5">{new Date(r.created_at).toLocaleString()}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-display font-semibold">€{Number(r.amount).toLocaleString()}</span>
+                  <span className="font-display font-semibold">£{Number(r.amount).toLocaleString()}</span>
                   <Badge className={statusColors[r.status] || ""}>{statusLabels[r.status] || r.status}</Badge>
                   {r.status === "paid" && (
                     <>
-                      <Button size="sm" variant="outline" disabled={updating !== null} onClick={() => updateStatus(r.id, "apply_to_sale")}>
-                        {updating === `${r.id}:apply_to_sale` ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <CheckCircle2 className="mr-1 h-3 w-3" />} {t("dealer.reservationsManager.apply")}
-                      </Button>
-                      <Button size="sm" variant="outline" disabled={updating !== null} onClick={() => updateStatus(r.id, "refund")}>
-                        {updating === `${r.id}:refund` ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <RefreshCw className="mr-1 h-3 w-3" />} {t("dealer.reservationsManager.refund")}
-                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => updateStatus(r.id, "applied_to_sale")}><CheckCircle2 className="mr-1 h-3 w-3" /> {t("dealer.reservationsManager.apply")}</Button>
+                      <Button size="sm" variant="outline" onClick={() => updateStatus(r.id, "refunded")}><RefreshCw className="mr-1 h-3 w-3" /> {t("dealer.reservationsManager.refund")}</Button>
                     </>
                   )}
                 </div>

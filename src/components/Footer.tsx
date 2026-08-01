@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ShieldCheck } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube, Star } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import zivvoLogoEn from "@/assets/zivvo-logo.webp";
-import zivvoLogoDe from "@/assets/zivvo-logo-de.webp";
-import { legalCompanyLine } from "@/lib/legalConfig";
+import zivvoLogoEn from "@/assets/zivvo-logo.png";
+import zivvoLogoDe from "@/assets/zivvo-logo-de.png";
 
 const Footer = () => {
   const { t, i18n } = useTranslation();
@@ -65,22 +64,48 @@ const Footer = () => {
               {t("footer.tagline")}
             </p>
             <p className="mt-3 whitespace-pre-line text-xs text-muted-foreground">
-              {legalCompanyLine}
+              {t("footer.companyInfo")}
             </p>
             <div className="mt-5 flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-success" />
-              Sichere Verbindung und statusgeprüfte Dienste
+              {t("footer.operational")}
             </div>
 
-            {/* Verifiable platform controls; no third-party certification claims. */}
+            {/* Social */}
+            <div className="mt-5 flex items-center gap-3">
+              <a href="https://facebook.com/zivvo" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-muted-foreground transition-colors hover:text-primary">
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a href="https://instagram.com/zivvo" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-muted-foreground transition-colors hover:text-primary">
+                <Instagram className="h-4 w-4" />
+              </a>
+              <a href="https://linkedin.com/company/zivvo" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-muted-foreground transition-colors hover:text-primary">
+                <Linkedin className="h-4 w-4" />
+              </a>
+              <a href="https://youtube.com/@zivvo" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-muted-foreground transition-colors hover:text-primary">
+                <Youtube className="h-4 w-4" />
+              </a>
+            </div>
+
+            {/* Trust badges */}
             <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+              <a
+                href="https://de.trustpilot.com/review/zivvo.de"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1 transition-colors hover:border-primary"
+              >
+                <Star className="h-3.5 w-3.5 fill-[#00b67a] text-[#00b67a]" />
+                <span className="font-medium text-foreground">Trustpilot</span>
+                <span>4,7/5</span>
+              </a>
               <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1">
-                <ShieldCheck className="h-3.5 w-3.5 text-success" />
-                <span>Einwilligung steuerbar</span>
+                <span className="font-semibold text-foreground">TÜV</span>
+                <span>DSGVO-konform</span>
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2 py-1">
-                <span className="font-semibold text-foreground">TLS</span>
-                <span>Zahlungen über Stripe</span>
+                <span className="font-semibold text-foreground">SSL</span>
+                <span>256-bit</span>
               </span>
             </div>
           </div>

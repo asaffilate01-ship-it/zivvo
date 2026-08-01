@@ -138,7 +138,7 @@ const AdminAnalyticsPanel = () => {
         <CardHeader><CardTitle className="text-base">Conversion Events</CardTitle></CardHeader>
         <CardContent>
           {stats.eventCounts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No consented conversion events have been captured in this period.</p>
+            <p className="text-sm text-muted-foreground">No conversion events captured yet. Wire <code className="rounded bg-muted px-1">trackEvent('signup')</code> etc. to start measuring.</p>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
               {stats.eventCounts.map(([name, count]) => (

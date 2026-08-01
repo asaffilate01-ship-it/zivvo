@@ -1,37 +1,278 @@
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
-import { adminClient, env, json, preflight, requireCron, requirePost, safeError } from "../_shared/security.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-Deno.serve(async (req) => {
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+// Use fetch-based Stripe API calls to avoid Deno.core.runMicrotasks crash
+async function cancelPaymentIntent(paymentIntentId: string, stripeKey: string): Promise<boolean> {
   try {
-    const options = preflight(req); if (options) return options;
-    requirePost(req);
-    requireCron(req);
-    const admin = adminClient();
-    const stripe = new Stripe(env("STRIPE_SECRET_KEY"), { apiVersion: "2024-06-20" });
-    const { data: due, error } = await admin.from("auctions").select("id").eq("status", "live").lte("ends_at", new Date().toISOString()).order("ends_at").limit(50);
-    if (error) throw error;
-    const results: Array<{ auction_id: string; status: string; error?: string }> = [];
-    for (const row of due || []) {
-      try {
-        const { data, error: closeError } = await admin.rpc("close_due_auction", { p_auction_id: row.id });
-        if (closeError) throw closeError;
-        const closed = data?.[0];
-        const { data: deposits } = await admin.from("auction_deposits").select("id,user_id,stripe_payment_intent_id,status").eq("auction_id", row.id).eq("status", "authorized");
-        for (const deposit of deposits || []) {
-          if (closed?.winner_id && deposit.user_id === closed.winner_id) continue;
-          if (deposit.stripe_payment_intent_id) {
-            const intent = await stripe.paymentIntents.retrieve(deposit.stripe_payment_intent_id);
-            if (intent.status === "requires_capture") await stripe.paymentIntents.cancel(intent.id, {}, { idempotencyKey: `release-${row.id}-${deposit.id}` });
-          }
-          await admin.from("auction_deposits").update({ status: "released", released_at: new Date().toISOString() }).eq("id", deposit.id).eq("status", "authorized");
+    const res = await fetch(`https://api.stripe.com/v1/payment_intents/${paymentIntentId}/cancel`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${stripeKey}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    return res.ok;
+  } catch (e) {
+    console.log(`⚠️ Stripe cancel failed for ${paymentIntentId}:`, e);
+    return false;
+  }
+}
+
+async function releaseDeposits(
+  supabase: any,
+  deposits: any[],
+  stripeKey: string,
+  excludeUserId?: string
+) {
+  for (const dep of deposits) {
+    if (excludeUserId && dep.user_id === excludeUserId) continue;
+    if (!dep.stripe_payment_intent_id) continue;
+    const ok = await cancelPaymentIntent(dep.stripe_payment_intent_id, stripeKey);
+    if (ok) {
+      await supabase.from("auction_deposits").update({
+        status: "released",
+        released_at: new Date().toISOString(),
+      }).eq("id", dep.id);
+      console.log(`✅ Released deposit ${dep.id}`);
+    } else {
+      console.log(`⚠️ Failed to release deposit ${dep.id}`);
+    }
+  }
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
+  );
+
+  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+
+  try {
+    // Find auctions that have ended
+    const { data: endedAuctions, error: fetchError } = await supabase
+      .from("auctions")
+      .select("*, car_listings!inner(title, make, model, year, registration, vin, mileage)")
+      .eq("status", "live")
+      .lte("ends_at", new Date().toISOString());
+
+    if (fetchError) throw fetchError;
+    if (!endedAuctions || endedAuctions.length === 0) {
+      return new Response(JSON.stringify({ message: "No auctions to close", closed: 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    let closedCount = 0;
+
+    for (const auction of endedAuctions) {
+      const reserveMet = !auction.reserve_price || (auction.current_bid >= auction.reserve_price);
+      const hasBids = auction.bid_count > 0;
+      const newStatus = hasBids && reserveMet ? "sold" : hasBids ? "reserve_not_met" : "ended";
+
+      // Update auction status
+      await supabase.from("auctions").update({ status: newStatus }).eq("id", auction.id);
+
+      // Audit log
+      await supabase.from("auction_audit_log").insert({
+        auction_id: auction.id,
+        actor_id: null,
+        actor_role: "system",
+        action: "auction_closed",
+        details: {
+          final_bid: auction.current_bid,
+          bid_count: auction.bid_count,
+          reserve_met: reserveMet,
+          status: newStatus,
+        },
+      });
+
+      // Get all authorized deposits for this auction
+      const { data: allDeposits } = await supabase
+        .from("auction_deposits")
+        .select("*")
+        .eq("auction_id", auction.id)
+        .eq("status", "authorized");
+
+      if (newStatus === "sold" && auction.winning_bid_id) {
+        const { data: winningBid } = await supabase
+          .from("auction_bids")
+          .select("*")
+          .eq("id", auction.winning_bid_id)
+          .single();
+
+        if (winningBid) {
+          // Release deposits for non-winners
+          await releaseDeposits(supabase, allDeposits || [], stripeKey, winningBid.bidder_id);
+
+          const hammerPrice = winningBid.amount;
+          const buyerPremium = hammerPrice * (auction.buyer_premium_pct / 100);
+          const sellerFee = hammerPrice * (auction.seller_fee_pct / 100);
+          const totalAmount = hammerPrice + buyerPremium;
+          const platformRevenue = buyerPremium + sellerFee;
+          const paymentDeadline = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString();
+
+          await supabase.from("auction_escrow").insert({
+            auction_id: auction.id,
+            buyer_id: winningBid.bidder_id,
+            seller_id: auction.seller_id,
+            total_amount: totalAmount,
+            buyer_premium: buyerPremium,
+            seller_fee: sellerFee,
+            platform_revenue: platformRevenue,
+            status: "pending_deposit",
+            payment_deadline: paymentDeadline,
+          });
+
+          // Generate contract
+          const listing = auction.car_listings as any;
+          const contractHtml = `
+            <h2 style="font-weight:bold;font-size:18px;margin-bottom:16px;">Vehicle Sale Agreement</h2>
+            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <p><strong>Auction ID:</strong> ${auction.id}</p>
+            <hr style="margin:12px 0;"/>
+            <p><strong>Vehicle:</strong> ${listing?.year} ${listing?.make} ${listing?.model}</p>
+            <p><strong>Registration:</strong> ${listing?.registration || "N/A"}</p>
+            <p><strong>VIN:</strong> ${listing?.vin || "N/A"}</p>
+            <p><strong>Mileage:</strong> ${listing?.mileage?.toLocaleString() || "N/A"}</p>
+            <hr style="margin:12px 0;"/>
+            <p><strong>Hammer Price:</strong> ${hammerPrice.toFixed(2)}</p>
+            <p><strong>Buyer Premium (${auction.buyer_premium_pct}%):</strong> ${buyerPremium.toFixed(2)}</p>
+            <p><strong>Total Due from Buyer:</strong> ${totalAmount.toFixed(2)}</p>
+            <p><strong>Seller Fee (${auction.seller_fee_pct}%):</strong> ${sellerFee.toFixed(2)}</p>
+            <p><strong>Seller Receives:</strong> ${(hammerPrice - sellerFee).toFixed(2)}</p>
+            <hr style="margin:12px 0;"/>
+            <h3 style="font-weight:bold;">Terms & Conditions</h3>
+            <ol style="padding-left:20px;font-size:13px;">
+              <li>The Seller agrees to transfer the vehicle to the Buyer upon receipt of full payment.</li>
+              <li>The Buyer agrees to pay the Total Due within 72 hours of auction close.</li>
+              <li>Funds are held under Payment Protection and released to the Seller only upon: (a) V5C/logbook transfer, (b) key handover, and (c) mutual contract signing.</li>
+              <li>The vehicle is sold as described in the inspection and condition report.</li>
+              <li>Delivery via logistics partners is at additional cost to the Buyer if arranged.</li>
+              <li>This agreement is legally binding upon digital signature by both parties.</li>
+              <li>Any disputes shall be resolved through the platform's dispute resolution process.</li>
+            </ol>
+          `;
+
+          await supabase.from("auction_contracts").insert({
+            auction_id: auction.id,
+            buyer_id: winningBid.bidder_id,
+            seller_id: auction.seller_id,
+            contract_html: contractHtml,
+            status: "pending_buyer",
+          });
+
+          // Notify buyer and seller
+          await supabase.from("notifications").insert([
+            {
+              user_id: winningBid.bidder_id,
+              type: "auction",
+              title: "🎉 You won the auction!",
+              message: `You won ${listing?.year} ${listing?.make} ${listing?.model} for ${hammerPrice.toFixed(2)}. Please review and sign the contract.`,
+              link: `/auction/${auction.id}`,
+            },
+            {
+              user_id: auction.seller_id,
+              type: "auction",
+              title: "🔨 Your car has been sold!",
+              message: `Your ${listing?.year} ${listing?.make} ${listing?.model} sold for ${hammerPrice.toFixed(2)}. Please review and sign the contract.`,
+              link: `/auction/${auction.id}`,
+            },
+          ]);
+
+          await supabase.from("auction_audit_log").insert({
+            auction_id: auction.id,
+            actor_role: "system",
+            action: "sale_completed",
+            details: {
+              winner_id: winningBid.bidder_id,
+              hammer_price: hammerPrice,
+              buyer_premium: buyerPremium,
+              seller_fee: sellerFee,
+              total_amount: totalAmount,
+            },
+          });
         }
-        results.push({ auction_id: row.id, status: closed?.final_status || "closed" });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Unknown error";
-        await admin.from("auction_close_jobs").upsert({ auction_id: row.id, status: "failed", last_error: message.slice(0, 500), updated_at: new Date().toISOString() }, { onConflict: "auction_id" });
-        results.push({ auction_id: row.id, status: "failed", error: "Close failed" });
+      }
+
+      // Release ALL deposits for non-sold auctions
+      if (newStatus === "reserve_not_met" || newStatus === "ended") {
+        await releaseDeposits(supabase, allDeposits || [], stripeKey);
+
+        if (newStatus === "reserve_not_met") {
+          await supabase.from("notifications").insert({
+            user_id: auction.seller_id,
+            type: "auction",
+            title: "Reserve price not met",
+            message: `Your auction for ${(auction.car_listings as any)?.title} ended but the reserve was not met. Highest bid: ${auction.current_bid}`,
+            link: `/auction/${auction.id}`,
+          });
+        }
+      }
+
+      closedCount++;
+      console.log(`✅ Auction ${auction.id} closed → ${newStatus}`);
+    }
+
+    // Notify watchers of auctions ending within 1 hour
+    const oneHourFromNow = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    const { data: endingSoon } = await supabase
+      .from("auctions")
+      .select("id, ends_at, car_listings!inner(title, make, model, year)")
+      .eq("status", "live")
+      .lte("ends_at", oneHourFromNow)
+      .gt("ends_at", new Date().toISOString());
+
+    for (const soon of endingSoon || []) {
+      const listing = soon.car_listings as any;
+      const { data: existing } = await supabase
+        .from("notifications")
+        .select("id")
+        .eq("type", "auction")
+        .ilike("title", "%ending soon%")
+        .eq("link", `/auction/${soon.id}`)
+        .gte("created_at", new Date(Date.now() - 3600000).toISOString())
+        .limit(1);
+
+      if (existing && existing.length > 0) continue;
+
+      const { data: watchers } = await supabase
+        .from("auction_watchers")
+        .select("user_id")
+        .eq("auction_id", soon.id);
+
+      if (watchers?.length) {
+        await supabase.from("notifications").insert(
+          watchers.map((w) => ({
+            user_id: w.user_id,
+            type: "auction",
+            title: "Auction ending soon! ⏰",
+            message: `${listing?.year} ${listing?.make} ${listing?.model} ends in less than 1 hour.`,
+            link: `/auction/${soon.id}`,
+          }))
+        );
       }
     }
-    return json(req, { processed: results.length, results });
-  } catch (error) { return safeError(req, error); }
+
+    return new Response(JSON.stringify({ success: true, closed: closedCount }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(`[CLOSE-AUCTION] ERROR: ${msg}`);
+    return new Response(JSON.stringify({ success: false, error: msg }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
 });

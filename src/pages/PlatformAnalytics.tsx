@@ -52,7 +52,7 @@ const PlatformAnalytics = () => {
   const { data: arbDeals = [] } = useQuery({
     queryKey: ["analytics-arb"],
     queryFn: async () => {
-      const { data } = await (supabase.from as any)("arbitrage_deals_visible").select("id, status, seller_price, dealer_price, platform_markup, created_at").limit(1000);
+      const { data } = await supabase.from("arbitrage_deals").select("id, status, seller_price, dealer_price, platform_markup, created_at").limit(1000);
       return data || [];
     },
   });
@@ -188,7 +188,7 @@ const PlatformAnalytics = () => {
     URL.revokeObjectURL(url);
   };
 
-  const formatCurrency = (n: number) => `€${n.toLocaleString()}`;
+  const formatCurrency = (n: number) => `£${n.toLocaleString()}`;
 
   return (
     <>

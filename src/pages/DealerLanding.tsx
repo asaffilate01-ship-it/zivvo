@@ -16,7 +16,7 @@ import {
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
   Share2, Copy, Check, Eye, Calendar, CreditCard, Truck, FileCheck,
   HandCoins, ShieldCheck, TrendingUp, Search as SearchIcon, Gauge,
-  ChevronUp, HelpCircle, Send, Trophy, Zap, Users, Euro,
+  ChevronUp, HelpCircle, Send, Trophy, Zap, Users, PoundSterling,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
@@ -33,7 +33,6 @@ import VehicleFinderForm from "@/components/dealer/VehicleFinderForm";
 import ListingMiniActions from "@/components/dealer/ListingMiniActions";
 import FinanceCalculator from "@/components/dealer/FinanceCalculator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import defaultDealerHero from "@/assets/hero-cars.jpg";
 
 export interface LandingConfig {
   hero_title?: string;
@@ -91,22 +90,6 @@ const USP_ICONS: Record<string, any> = {
   clock: Clock,
 };
 
-const safeHttpsUrl = (value: unknown): string | undefined => {
-  if (typeof value !== "string") return undefined;
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === "https:" ? parsed.toString() : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-const safeCtaUrl = (value: unknown): string | undefined => {
-  if (typeof value !== "string") return undefined;
-  if (value.startsWith("/") && !value.startsWith("//")) return value;
-  return safeHttpsUrl(value);
-};
-
 const DealerLanding = () => {
   const { slug } = useParams();
   const { config: countryCfg } = useCountry();
@@ -146,7 +129,7 @@ const DealerLanding = () => {
         setDealer(d);
         setConfig((d.landing_page_config as LandingConfig) || {});
         const { data: cars } = await supabase
-          .from("car_listings_public")
+          .from("car_listings")
           .select("*")
           .eq("dealer_id", d.id)
           .eq("status", "active")
@@ -176,7 +159,7 @@ const DealerLanding = () => {
     if (budgetMode === "price" && budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
     // Approx monthly @ representative APR over 48 months — used purely for filtering
     if (budgetMode === "monthly" && monthlyMax !== null) {
-      const approxMonthly = (price: number) => Math.round((price * 0.0245)); // ~€245/mo per €10k
+      const approxMonthly = (price: number) => Math.round((price * 0.0245)); // ~£245/mo per £10k
       result = result.filter((c) => approxMonthly(c.price || 0) <= monthlyMax);
     }
     result.sort((a, b) => {
@@ -191,7 +174,7 @@ const DealerLanding = () => {
 
   const handleShare = async () => {
     const url = window.location.href;
-    const title = `${dealer?.business_name || "Händler"} auf Zivvo`;
+    const title = `${dealer?.business_name || "Dealer"} on Zivvo`;
     if (navigator.share) {
       try {
         await navigator.share({ title, url });
@@ -201,26 +184,26 @@ const DealerLanding = () => {
     try {
       await navigator.clipboard.writeText(url);
       setShared(true);
-      toast({ title: "Link kopiert", description: "Die Händlerseite kann jetzt geteilt werden." });
+      toast({ title: "Link copied", description: "Share it with your friends." });
       setTimeout(() => setShared(false), 2000);
     } catch {
-      toast({ title: "Kopieren fehlgeschlagen", description: "Bitte kopieren Sie die Adresse aus der Browserzeile.", variant: "destructive" });
+      toast({ title: "Copy failed", description: "Please copy from the address bar.", variant: "destructive" });
     }
   };
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail || !/^\S+@\S+\.\S+$/.test(newsletterEmail)) {
-      toast({ title: "Ungültige E-Mail-Adresse", description: "Bitte geben Sie eine gültige E-Mail-Adresse ein.", variant: "destructive" });
+      toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
       return;
     }
-    const { error } = await supabase.functions.invoke("newsletter-subscribe", { body: { email: newsletterEmail } });
+    const { error } = await supabase.from("newsletter_subscribers").insert({ email: newsletterEmail });
     if (error && !error.message.toLowerCase().includes("duplicate")) {
-      toast({ title: "Anmeldung fehlgeschlagen", description: error.message, variant: "destructive" });
+      toast({ title: "Couldn't subscribe", description: error.message, variant: "destructive" });
       return;
     }
     setNewsletterSent(true);
-    toast({ title: "Angemeldet", description: "Sie erhalten künftig Zivvo-Updates per E-Mail." });
+    toast({ title: "You're subscribed!", description: "We'll let you know when new stock arrives." });
     setNewsletterEmail("");
     setTimeout(() => setNewsletterSent(false), 4000);
   };
@@ -241,10 +224,10 @@ const DealerLanding = () => {
         <Navbar />
         <div className="container mx-auto flex flex-col items-center justify-center px-4 py-32 text-center">
           <Building2 className="h-16 w-16 text-muted-foreground" />
-          <h1 className="mt-4 font-display text-2xl font-bold">Händler nicht gefunden</h1>
-          <p className="mt-2 text-muted-foreground">Diese Händlerseite ist möglicherweise nicht mehr verfügbar.</p>
+          <h1 className="mt-4 font-display text-2xl font-bold">Dealer Not Found</h1>
+          <p className="mt-2 text-muted-foreground">This dealer page may no longer be available.</p>
           <Link to="/browse">
-            <Button className="mt-6 gradient-primary border-0">Alle Fahrzeuge ansehen</Button>
+            <Button className="mt-6 gradient-primary border-0">Browse All Cars</Button>
           </Link>
         </div>
         <Footer />
@@ -252,21 +235,13 @@ const DealerLanding = () => {
     );
   }
 
-  const accent = /^#[0-9a-f]{3,8}$/i.test(config.accent_color || "") ? config.accent_color! : "hsl(var(--primary))";
-  const heroImage = safeHttpsUrl(config.hero_image) || defaultDealerHero;
+  const accent = config.accent_color || "hsl(var(--primary))";
+  const heroImage = config.hero_image || "https://images.unsplash.com/photo-1567818735868-e71b99932e29?w=1920&q=80";
   const showPhone = config.show_phone !== false;
   const showEmail = config.show_email !== false;
   const showAddress = config.show_address !== false;
   const heroStyle = config.hero_style || "overlay";
-  const secondaryCtaUrl = safeCtaUrl(config.secondary_cta_url);
-  const websiteUrl = safeHttpsUrl(dealer.website_url);
-  const socialLinks = {
-    facebook: safeHttpsUrl(config.social_links?.facebook),
-    instagram: safeHttpsUrl(config.social_links?.instagram),
-    twitter: safeHttpsUrl(config.social_links?.twitter),
-    youtube: safeHttpsUrl(config.social_links?.youtube),
-  };
-  const hasSocials = Object.values(socialLinks).some(Boolean);
+  const hasSocials = config.social_links && Object.values(config.social_links).some(Boolean);
 
   const priceRange = listings.length > 0
     ? { min: Math.min(...listings.map((c) => c.price)), max: Math.max(...listings.map((c) => c.price)) }
@@ -275,8 +250,8 @@ const DealerLanding = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title={`${dealer.business_name} — Zivvo Händler`}
-        description={config.about_text || `Fahrzeuge von ${dealer.business_name} auf Zivvo ansehen.`}
+        title={`${dealer.business_name} — Zivvo Dealer`}
+        description={config.about_text || `Browse vehicles from ${dealer.business_name} on Zivvo.`}
       />
       <Navbar />
 
@@ -314,17 +289,17 @@ const DealerLanding = () => {
                 <div className="mt-8 flex flex-wrap gap-3">
                   <a href="#inventory">
                     <Button size="lg" className="border-0 text-white shadow-lg hover:shadow-xl transition-shadow" style={{ backgroundColor: accent }}>
-                      {config.cta_text || "Bestand ansehen"} <ArrowRight className="ml-1 h-4 w-4" />
+                      {config.cta_text || "View Inventory"} <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
                   </a>
-                  {config.secondary_cta_text && secondaryCtaUrl && (
-                    <a href={secondaryCtaUrl}>
+                  {config.secondary_cta_text && config.secondary_cta_url && (
+                    <a href={config.secondary_cta_url}>
                       <Button size="lg" variant="outline">{config.secondary_cta_text}</Button>
                     </a>
                   )}
                   {!config.secondary_cta_text && showPhone && dealer.business_phone && (
                     <a href={`tel:${dealer.business_phone}`}>
-                      <Button size="lg" variant="outline"><Phone className="mr-1 h-4 w-4" /> Anrufen</Button>
+                      <Button size="lg" variant="outline"><Phone className="mr-1 h-4 w-4" /> Call Us</Button>
                     </a>
                   )}
                 </div>
@@ -358,7 +333,7 @@ const DealerLanding = () => {
                 <div className="mt-4 flex gap-3 md:ml-auto md:mt-0">
                   <a href="#inventory">
                     <Button className="border-0 text-white" style={{ backgroundColor: accent }}>
-                      {config.cta_text || "Bestand ansehen"}
+                      {config.cta_text || "View Inventory"}
                     </Button>
                   </a>
                 </div>
@@ -404,11 +379,11 @@ const DealerLanding = () => {
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                   <a href="#inventory">
                     <Button size="lg" className="border-0 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ backgroundColor: accent }}>
-                      {config.cta_text || "Bestand durchsuchen"} <ArrowRight className="ml-1 h-4 w-4" />
+                      {config.cta_text || "Browse Inventory"} <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
                   </a>
-                  {config.secondary_cta_text && secondaryCtaUrl ? (
-                    <a href={secondaryCtaUrl}>
+                  {config.secondary_cta_text && config.secondary_cta_url ? (
+                    <a href={config.secondary_cta_url}>
                       <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
                         {config.secondary_cta_text}
                       </Button>
@@ -416,7 +391,7 @@ const DealerLanding = () => {
                   ) : showPhone && dealer.business_phone ? (
                     <a href={`tel:${dealer.business_phone}`}>
                       <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
-                        <Phone className="mr-1 h-4 w-4" /> Jetzt anrufen
+                        <Phone className="mr-1 h-4 w-4" /> Call Now
                       </Button>
                     </a>
                   ) : null}
@@ -443,8 +418,8 @@ const DealerLanding = () => {
               <div role="tablist" className="grid grid-cols-4 border-b border-border">
                 {[
                   { id: "buy" as const, label: "Buy", icon: Car },
-                  { id: "sell" as const, label: "Verkaufen", icon: Euro },
-                  { id: "finance" as const, label: "Finanzierung", icon: HandCoins },
+                  { id: "sell" as const, label: "Sell", icon: PoundSterling },
+                  { id: "finance" as const, label: "Finance", icon: HandCoins },
                   { id: "service" as const, label: "Service", icon: Wrench },
                 ].map((t) => {
                   const active = searchTab === t.id;
@@ -472,37 +447,37 @@ const DealerLanding = () => {
                   <div>
                     <div className="mb-4 flex items-center justify-between gap-3">
                       <h2 className={`${fontClass} text-lg font-bold text-foreground md:text-xl`}>
-                        Finden Sie das passende Fahrzeug im aktuellen Bestand
+                        You could be moments away from finding your next car…
                       </h2>
                       <Badge variant="outline" className="hidden whitespace-nowrap md:inline-flex">
-                        {listings.length} Fahrzeuge verfügbar
+                        {listings.length} cars available
                       </Badge>
                     </div>
 
                     {/* Make / Model / Fuel row */}
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                       <Select value={filterMake} onValueChange={(v) => { setFilterMake(v); setFilterModel("all"); }}>
-                        <SelectTrigger><SelectValue placeholder="Alle Marken" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder="Any Make" /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Alle Marken</SelectItem>
+                          <SelectItem value="all">Any Make</SelectItem>
                           {uniqueMakes.map((m) => (
                             <SelectItem key={m} value={m}>{m}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       <Select value={filterModel} onValueChange={setFilterModel} disabled={filterMake === "all"}>
-                        <SelectTrigger><SelectValue placeholder={filterMake === "all" ? "Zuerst Marke wählen" : "Alle Modelle"} /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={filterMake === "all" ? "Pick a make first" : "Any Model"} /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Alle Modelle</SelectItem>
+                          <SelectItem value="all">Any Model</SelectItem>
                           {[...new Set(listings.filter((c) => c.make === filterMake).map((c) => c.model).filter(Boolean))].map((m) => (
                             <SelectItem key={m as string} value={m as string}>{m}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       <Select value={filterFuel} onValueChange={setFilterFuel}>
-                        <SelectTrigger><SelectValue placeholder="Alle Kraftstoffarten" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder="Any Fuel" /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">Alle Kraftstoffarten</SelectItem>
+                          <SelectItem value="all">Any Fuel Type</SelectItem>
                           {[...new Set(listings.map((c) => c.fuel_type).filter(Boolean))].map((f) => (
                             <SelectItem key={f as string} value={f as string}>{f}</SelectItem>
                           ))}
@@ -523,7 +498,7 @@ const DealerLanding = () => {
                               active ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                             }`}
                           >
-                            {mode === "price" ? "Gesamtpreis" : "Monatsbudget"}
+                            {mode === "price" ? "Full Price" : "Monthly Budget"}
                           </button>
                         );
                       })}
@@ -533,15 +508,15 @@ const DealerLanding = () => {
                       {budgetMode === "price" ? (
                         <>
                           <Select value="any" onValueChange={() => {}} disabled>
-                            <SelectTrigger><SelectValue placeholder="Kein Mindestpreis" /></SelectTrigger>
-                            <SelectContent><SelectItem value="any">Kein Mindestpreis</SelectItem></SelectContent>
+                            <SelectTrigger><SelectValue placeholder="Any Min Price" /></SelectTrigger>
+                            <SelectContent><SelectItem value="any">Any Min Price</SelectItem></SelectContent>
                           </Select>
                           <Select value={budgetMax === null ? "any" : String(budgetMax)} onValueChange={(v) => setBudgetMax(v === "any" ? null : Number(v))}>
-                            <SelectTrigger><SelectValue placeholder="Kein Höchstpreis" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder="Any Max Price" /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="any">Kein Höchstpreis</SelectItem>
+                              <SelectItem value="any">Any Max Price</SelectItem>
                               {[5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000, 100000].map((p) => (
-                                <SelectItem key={p} value={String(p)}>Bis {formatPrice(p, countryCfg)}</SelectItem>
+                                <SelectItem key={p} value={String(p)}>Up to {formatPrice(p, countryCfg)}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -549,15 +524,15 @@ const DealerLanding = () => {
                       ) : (
                         <>
                           <Select value="any" onValueChange={() => {}} disabled>
-                            <SelectTrigger><SelectValue placeholder="Kein Minimum/Monat" /></SelectTrigger>
-                            <SelectContent><SelectItem value="any">Kein Minimum/Monat</SelectItem></SelectContent>
+                            <SelectTrigger><SelectValue placeholder="Any Min /mo" /></SelectTrigger>
+                            <SelectContent><SelectItem value="any">Any Min /mo</SelectItem></SelectContent>
                           </Select>
                           <Select value={monthlyMax === null ? "any" : String(monthlyMax)} onValueChange={(v) => setMonthlyMax(v === "any" ? null : Number(v))}>
-                            <SelectTrigger><SelectValue placeholder="Kein Maximum/Monat" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder="Any Max /mo" /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="any">Kein Maximum/Monat</SelectItem>
+                              <SelectItem value="any">Any Max /mo</SelectItem>
                               {[150, 200, 250, 300, 400, 500, 750, 1000].map((p) => (
-                                <SelectItem key={p} value={String(p)}>Bis {formatPrice(p, countryCfg)} /Monat</SelectItem>
+                                <SelectItem key={p} value={String(p)}>Up to {formatPrice(p, countryCfg)} /mo</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -572,13 +547,13 @@ const DealerLanding = () => {
                         style={{ backgroundColor: accent }}
                       >
                         <Search className="mr-2 h-4 w-4" />
-                        Suchen ({filteredListings.length})
+                        Search ({filteredListings.length})
                       </Button>
                     </a>
 
                     <p className="mt-3 text-center text-[11px] leading-relaxed text-muted-foreground">
-                      Monatsraten sind unverbindliche Rechenbeispiele. {config.finance_apr ? `Verwendete Zinsannahme: ${config.finance_apr}% effektiver Jahreszins. ` : ""}
-                      {config.finance_disclaimer || "Verfügbarkeit und vollständige Kreditbedingungen bestätigt ausschließlich der Händler."}
+                      Representative {config.finance_apr || "11.9"}% APR. We are a credit broker, not a lender.
+                      {config.finance_disclaimer ? ` ${config.finance_disclaimer}` : " Finance subject to status. Indicative monthly figures only."}
                     </p>
                   </div>
                 )}
@@ -589,18 +564,19 @@ const DealerLanding = () => {
                       className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"
                       style={{ backgroundColor: `${accent}15` }}
                     >
-                      <Euro className="h-7 w-7" style={{ color: accent }} />
+                      <PoundSterling className="h-7 w-7" style={{ color: accent }} />
                     </div>
                     <div>
-                      <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Unverbindliche Marktpreisorientierung</h3>
+                      <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Free valuation of your car or van</h3>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Vergleichen Sie Ihr Fahrzeug mit aktuellen Zivvo-Inseraten und fragen Sie eine Inzahlungnahme separat bei {dealer.business_name} an.
+                        Get an instant, no-obligation quote from {dealer.business_name}. Part-exchange welcome.
                       </p>
                     </div>
                     <div className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
-                      <Link to="/valuation" className="w-full sm:w-auto">
+                      <Input placeholder="Enter your reg (e.g. AB12 CDE)" className="uppercase" />
+                      <Link to="/valuation" className="sm:w-auto">
                         <Button size="lg" className="w-full border-0 text-white" style={{ backgroundColor: accent }}>
-                          Fahrzeug einordnen <ArrowRight className="ml-2 h-4 w-4" />
+                          Value My Car <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </Link>
                     </div>
@@ -617,15 +593,15 @@ const DealerLanding = () => {
                     </div>
                     <div>
                       <h3 className={`${fontClass} text-xl font-bold text-foreground`}>
-                        Finanzierung beim Händler anfragen
+                        Flexible finance from {config.finance_apr || "11.9"}% APR
                       </h3>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Verfügbarkeit, Anbieter, effektiver Jahreszins, Gesamtkosten und Händlerrolle müssen vor einem Antrag offengelegt werden.
+                        PCP, HP and personal loan options. Quick decisions, no impact on your credit score for a quote.
                       </p>
                     </div>
                     <div className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
                       <a href="#finance" className="flex-1">
-                        <Button size="lg" variant="outline" className="w-full">Rechenbeispiele ansehen</Button>
+                        <Button size="lg" variant="outline" className="w-full">See finance examples</Button>
                       </a>
                       <Button
                         size="lg"
@@ -633,11 +609,11 @@ const DealerLanding = () => {
                         style={{ backgroundColor: accent }}
                         onClick={() => setEnquiryOpen(true)}
                       >
-                        Anfrage senden <ArrowRight className="ml-2 h-4 w-4" />
+                        Apply Now <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Eine Anfrage ist keine Kreditzusage. Prüfen Sie die regulierten Unterlagen des tatsächlichen Anbieters.
+                      Finance subject to status. T&Cs apply. We are a credit broker, not a lender.
                     </p>
                   </div>
                 )}
@@ -653,7 +629,7 @@ const DealerLanding = () => {
                     <div>
                       <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Servicing & aftercare</h3>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Wartung, HU/AU, Reparaturen und Garantieleistungen können Sie direkt beim Händler anfragen. Umfang und Anbieter bestätigt der Händler individuell.
+                        Full service, MOT, repairs and warranty work — all carried out by our trusted in-house team.
                       </p>
                     </div>
                     <div className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
@@ -663,12 +639,12 @@ const DealerLanding = () => {
                         style={{ backgroundColor: accent }}
                         onClick={() => setEnquiryOpen(true)}
                       >
-                        Service anfragen
+                        Book a Service
                       </Button>
                       {(dealer as any)?.business_phone && (
                         <a href={`tel:${(dealer as any).business_phone}`} className="flex-1">
                           <Button size="lg" variant="outline" className="w-full">
-                            <Phone className="mr-2 h-4 w-4" /> Händler anrufen
+                            <Phone className="mr-2 h-4 w-4" /> Call Workshop
                           </Button>
                         </a>
                       )}
@@ -695,18 +671,18 @@ const DealerLanding = () => {
             className="mb-10 text-center"
           >
             <h2 className={`${fontClass} text-3xl font-bold text-foreground md:text-4xl`}>
-              Aktuellen Fahrzeugbestand vergleichen
+              Our cars speak for themselves
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Prüfen Sie die Angaben jedes Fahrzeugs und kontaktieren Sie den Händler bei Fragen.
+              Every vehicle prepared with care — so you can drive away with confidence.
             </p>
           </motion.div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: ShieldCheck, title: "Aktueller Bestand", desc: `${listings.length || "Verfügbare"} Fahrzeuge ansehen und wichtige Angaben selbst prüfen.`, href: "#inventory" },
-              { icon: FileCheck, title: "Dokumentenstatus", desc: "Jedes Inserat zeigt die aktuell verfügbaren Prüf- und Dokumentenangaben.", href: "#inventory" },
-              { icon: HandCoins, title: "Finanzierung anfragen", desc: config.finance_apr ? `Die angezeigte Zinsannahme von ${config.finance_apr}% ist nur ein Rechenwert. Fragen Sie den Händler nach Anbieter und vollständigen Bedingungen.` : "Fragen Sie den Händler, ob für ein bestimmtes Fahrzeug eine Finanzierung verfügbar ist.", href: "#inventory" },
-              { icon: Trophy, title: config.established_year ? `Gegründet ${config.established_year}` : "Händlerangaben", desc: config.established_year ? "Prüfen Sie Historie und aktuelle Unternehmensangaben des Händlers vor dem Kauf." : "Prüfen Sie das Händlerprofil und fordern Sie vor dem Kauf schriftliche Bedingungen an.", href: "#about" },
+              { icon: ShieldCheck, title: "Handpicked stock", desc: `Browse ${listings.length || "our"} quality vehicles, personally selected and ready to drive.`, href: "#inventory" },
+              { icon: FileCheck, title: "Multi-point inspection", desc: "Every car undergoes a thorough mechanical and cosmetic check before sale.", href: "#inventory" },
+              { icon: HandCoins, title: "Flexible finance", desc: config.finance_apr ? `Spread the cost from ${config.finance_apr}% APR. Quick decisions.` : "Spread the cost with affordable monthly payments. Apply in minutes.", href: "#inventory" },
+              { icon: Trophy, title: config.established_year ? `Trusted since ${config.established_year}` : "90-day warranty", desc: config.established_year ? "Years of expertise serving happy customers in your area." : "Drive away with peace of mind — every car covered as standard.", href: "#about" },
             ].map((f, i) => (
               <motion.a
                 key={f.title}
@@ -729,7 +705,7 @@ const DealerLanding = () => {
                   className="mt-4 inline-flex items-center text-sm font-semibold transition-transform group-hover:translate-x-1"
                   style={{ color: accent }}
                 >
-                  Mehr erfahren <ArrowRight className="ml-1 h-4 w-4" />
+                  Learn more <ArrowRight className="ml-1 h-4 w-4" />
                 </div>
               </motion.a>
             ))}
@@ -742,13 +718,13 @@ const DealerLanding = () => {
         <section className="border-b border-border bg-card">
           <div className="container mx-auto grid grid-cols-2 gap-px md:grid-cols-4">
             {[
-              { icon: Car, value: listings.length, label: "Fahrzeuge im Bestand", isString: false },
-              { icon: MapPin, value: dealer.city || "Deutschland", label: "Standort", isString: true },
-              { icon: Clock, value: config.opening_hours || "Nicht angegeben", label: "Öffnungszeiten", isString: true },
+              { icon: Car, value: listings.length, label: "Vehicles in Stock", isString: false },
+              { icon: Star, value: 4.9, label: "Customer Rating", isString: false, decimals: 1, suffix: "/5" },
+              { icon: Clock, value: config.opening_hours || "Mon–Sat 9–6", label: "Opening Hours", isString: true },
               {
                 icon: Shield,
-                value: priceRange ? `Ab ${formatPrice(priceRange.min, countryCfg)}` : (dealer.kyc_verified ? "Freigegeben" : "Profil"),
-                label: priceRange ? "Einstiegspreis" : "Händlerstatus",
+                value: priceRange ? `From ${formatPrice(priceRange.min, countryCfg)}` : "100%",
+                label: priceRange ? "Starting Price" : "Verified Dealer",
                 isString: true,
               },
             ].map((stat: any, i) => (
@@ -940,24 +916,24 @@ const DealerLanding = () => {
               {/* Social Links */}
               {hasSocials && (
                 <div className="mt-6 flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground font-medium">Folgen:</span>
-                  {socialLinks.facebook && (
-                    <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
+                  <span className="text-xs text-muted-foreground font-medium">Follow us:</span>
+                  {config.social_links?.facebook && (
+                    <a href={config.social_links.facebook} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
                       <Facebook className="h-4 w-4 text-muted-foreground" />
                     </a>
                   )}
-                  {socialLinks.instagram && (
-                    <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
+                  {config.social_links?.instagram && (
+                    <a href={config.social_links.instagram} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
                       <Instagram className="h-4 w-4 text-muted-foreground" />
                     </a>
                   )}
-                  {socialLinks.twitter && (
-                    <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
+                  {config.social_links?.twitter && (
+                    <a href={config.social_links.twitter} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
                       <Twitter className="h-4 w-4 text-muted-foreground" />
                     </a>
                   )}
-                  {socialLinks.youtube && (
-                    <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
+                  {config.social_links?.youtube && (
+                    <a href={config.social_links.youtube} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors">
                       <Youtube className="h-4 w-4 text-muted-foreground" />
                     </a>
                   )}
@@ -1003,14 +979,14 @@ const DealerLanding = () => {
                       </div>
                     </div>
                   )}
-                  {websiteUrl && (
-                    <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted">
+                  {dealer.website_url && (
+                    <a href={dealer.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted">
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ backgroundColor: `${accent}15` }}>
                         <Globe className="h-4 w-4" style={{ color: accent }} />
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Website</p>
-                        <p className="text-sm font-medium text-foreground">Website besuchen</p>
+                        <p className="text-sm font-medium text-foreground">Visit Website</p>
                       </div>
                     </a>
                   )}
@@ -1085,18 +1061,18 @@ const DealerLanding = () => {
       <section className="border-b border-border py-14 md:py-20">
         <div className="container mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <Badge variant="outline" className="mb-3 text-xs">Einfacher Ablauf</Badge>
-            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>So funktioniert der Kauf</h2>
-            <p className="mt-2 text-muted-foreground max-w-lg mx-auto">Vom Stöbern bis zur Übergabe — vier transparente Schritte.</p>
+            <Badge variant="outline" className="mb-3 text-xs">Simple Process</Badge>
+            <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>How buying from us works</h2>
+            <p className="mt-2 text-muted-foreground max-w-lg mx-auto">From browsing to driving away — a simple, transparent journey in 4 steps.</p>
           </motion.div>
 
           <div className="relative grid gap-8 md:grid-cols-4">
             <div className="hidden md:block absolute top-7 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-border to-transparent" />
             {[
-              { icon: SearchIcon, title: "Stöbern", desc: "Prüfen Sie verfügbare Fahrzeugdaten und Fotos im aktuellen Bestand." },
-              { icon: MessageCircle, title: "Anfragen", desc: "Stellen Sie Fragen und vereinbaren Sie Besichtigung oder Probefahrt direkt mit dem Händler." },
-              { icon: FileCheck, title: "Reservieren", desc: "Berechtigte Fahrzeuge zeigen Betrag, Frist und Erstattungsbedingungen vor der Zahlung." },
-              { icon: Truck, title: "Übernehmen", desc: "Vereinbaren Sie Abholung oder Lieferung und halten Sie die Übergabe schriftlich fest." },
+              { icon: SearchIcon, title: "Browse", desc: "Explore our verified inventory, with detailed specs and full photo galleries." },
+              { icon: MessageCircle, title: "Enquire", desc: "Ask questions, request a video walkaround or book a test drive." },
+              { icon: FileCheck, title: "Reserve", desc: "Secure your car with a small refundable deposit. We handle the paperwork." },
+              { icon: Truck, title: "Drive away", desc: "Collect in person or have it delivered to your door, fully prepared and inspected." },
             ].map((step, i) => (
               <motion.div
                 key={step.title}
@@ -1128,10 +1104,10 @@ const DealerLanding = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {[
-              { icon: ShieldCheck, label: dealer.kyc_verified ? "Identität durch Zivvo geprüft" : "Händlerprofil" },
-              { icon: BadgeCheck, label: "Fahrzeugangaben je Inserat" },
-              { icon: HandCoins, label: "Inzahlungnahme anfragen" },
-              { icon: CreditCard, label: "Finanzierung anfragen" },
+              { icon: ShieldCheck, label: "All cars HPI checked" },
+              { icon: BadgeCheck, label: "Verified dealer" },
+              { icon: HandCoins, label: "Part-exchange welcome" },
+              { icon: CreditCard, label: "Finance available" },
             ].map((b, i) => (
               <motion.div
                 key={b.label}
@@ -1153,10 +1129,20 @@ const DealerLanding = () => {
       <section className="border-b border-border py-10">
         <div className="container mx-auto px-4">
           <p className="mb-5 text-center text-xs uppercase tracking-[0.18em] text-muted-foreground font-semibold">
-            Vom Händler hinterlegte Mitgliedschaften
+            Trusted accreditations & partners
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12">
-            {(config.awards || []).map((a, i) => (
+            {(config.awards && config.awards.length > 0
+              ? config.awards
+              : [
+                  { name: "FCA Authorised" },
+                  { name: "RAC Approved" },
+                  { name: "AA Inspected" },
+                  { name: "HPI Checked" },
+                  { name: "Trustpilot 5★" },
+                  { name: "Auto Trader Partner" },
+                ]
+            ).map((a, i) => (
               <motion.div
                 key={a.name}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -1175,9 +1161,7 @@ const DealerLanding = () => {
                 )}
               </motion.div>
             ))}
-            {(!config.awards || config.awards.length === 0) && <p className="text-sm text-muted-foreground">Keine externen Mitgliedschaften hinterlegt.</p>}
           </div>
-          <p className="mt-4 text-center text-xs text-muted-foreground">Diese Angaben stammen vom Händler und stellen keine Zivvo-Zertifizierung dar.</p>
         </div>
       </section>
 
@@ -1223,7 +1207,7 @@ const DealerLanding = () => {
                     }`}
                     style={budgetMax === v ? { backgroundColor: accent } : undefined}
                   >
-                    Unter {formatPrice(v, countryCfg)}
+                    Under {formatPrice(v, countryCfg)}
                   </button>
                 ))}
               {budgetMax !== null && (
@@ -1232,7 +1216,7 @@ const DealerLanding = () => {
                   onClick={() => setBudgetMax(null)}
                   className="text-xs text-muted-foreground underline-offset-2 hover:underline"
                 >
-                  Zurücksetzen
+                  Clear
                 </button>
               )}
             </div>
@@ -1243,16 +1227,16 @@ const DealerLanding = () => {
             <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3">
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input placeholder="Marke oder Modell suchen…" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9 text-sm" />
+                <Input placeholder="Search make, model..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 h-9 text-sm" />
               </div>
               {uniqueFuels.length > 1 && (
                 <Select value={filterFuel} onValueChange={setFilterFuel}>
                   <SelectTrigger className="w-[130px] h-9 text-xs">
                     <Fuel className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
-                    <SelectValue placeholder="Kraftstoff" />
+                    <SelectValue placeholder="Fuel" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle Kraftstoffarten</SelectItem>
+                    <SelectItem value="all">All Fuels</SelectItem>
                     {uniqueFuels.map((f) => <SelectItem key={f} value={f!}>{f}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -1261,10 +1245,10 @@ const DealerLanding = () => {
                 <Select value={filterBody} onValueChange={setFilterBody}>
                   <SelectTrigger className="w-[130px] h-9 text-xs">
                     <Car className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
-                    <SelectValue placeholder="Karosserie" />
+                    <SelectValue placeholder="Body" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Alle Typen</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     {uniqueBodies.map((b) => <SelectItem key={b} value={b!}>{b}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -1275,11 +1259,11 @@ const DealerLanding = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Neueste zuerst</SelectItem>
-                  <SelectItem value="price-low">Preis: niedrig–hoch</SelectItem>
-                  <SelectItem value="price-high">Preis: hoch–niedrig</SelectItem>
-                  <SelectItem value="year">Baujahr: neueste</SelectItem>
-                  <SelectItem value="mileage">Kilometerstand: niedrigste</SelectItem>
+                  <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectItem value="price-low">Price: Low–High</SelectItem>
+                  <SelectItem value="price-high">Price: High–Low</SelectItem>
+                  <SelectItem value="year">Year: Newest</SelectItem>
+                  <SelectItem value="mileage">Mileage: Lowest</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1289,10 +1273,10 @@ const DealerLanding = () => {
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-20 text-center">
               <Car className="h-12 w-12 text-muted-foreground" />
               <h3 className={`mt-4 ${fontClass} text-lg font-semibold text-foreground`}>
-                {searchQuery || filterFuel !== "all" || filterBody !== "all" ? "Keine passenden Fahrzeuge" : "Noch keine Fahrzeuge eingestellt"}
+                {searchQuery || filterFuel !== "all" || filterBody !== "all" ? "No matching vehicles" : "No vehicles listed yet"}
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                {searchQuery ? "Passen Sie Ihre Suche an" : "Schauen Sie bald wieder nach neuem Bestand"}
+                {searchQuery ? "Try adjusting your search" : "Check back soon for new inventory"}
               </p>
             </div>
           ) : (
@@ -1312,7 +1296,7 @@ const DealerLanding = () => {
               {!showAllCars && filteredListings.length > 12 && (
                 <div className="mt-8 text-center">
                   <Button variant="outline" size="lg" onClick={() => setShowAllCars(true)}>
-                    Alle {filteredListings.length} Fahrzeuge anzeigen <ChevronDown className="ml-1 h-4 w-4" />
+                    Show All {filteredListings.length} Vehicles <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
                 </div>
               )}
@@ -1382,24 +1366,24 @@ const DealerLanding = () => {
                 <HandCoins className="h-6 w-6" style={{ color: accent }} />
               </div>
               <div>
-                <Badge variant="outline" className="mb-2 text-[10px]">Inzahlungnahme</Badge>
+                <Badge variant="outline" className="mb-2 text-[10px]">Part-Exchange</Badge>
                 <h3 className={`${fontClass} text-lg font-bold text-foreground md:text-xl`}>
-                  Aktuelles Fahrzeug in Zahlung geben
+                  Trade in your current car
                 </h3>
                 <p className="mt-1.5 text-sm text-muted-foreground">
-                  Erhalten Sie eine datenbasierte Marktpreisorientierung. Eine konkrete
-                  Inzahlungnahme und deren Bedingungen vereinbaren Sie separat mit dem Händler.
+                  Get an instant valuation and use it as part-payment toward any vehicle in our showroom.
+                  Free, no-obligation offers — usually within minutes.
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2 md:justify-end">
               <Link to="/valuation">
                 <Button className="border-0 text-white" style={{ backgroundColor: accent }}>
-                  Marktpreis einordnen <ArrowRight className="ml-1 h-4 w-4" />
+                  Get my valuation <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
               <Button variant="outline" onClick={() => setEnquiryOpen(true)}>
-                Händler kontaktieren
+                Talk to us
               </Button>
             </div>
           </motion.div>
@@ -1407,21 +1391,20 @@ const DealerLanding = () => {
       </section>
 
       {/* ─── Finance Representative Bar ─── */}
-      {config.show_finance_cta === true && (
+      {config.show_finance_cta !== false && (
         <section className="border-t border-border bg-muted/30 py-5">
           <div className="container mx-auto flex flex-wrap items-center justify-center gap-3 px-4 text-center text-xs text-muted-foreground md:text-sm">
-            <Euro className="h-4 w-4 shrink-0" style={{ color: accent }} />
+            <PoundSterling className="h-4 w-4 shrink-0" style={{ color: accent }} />
             <span>
-              <strong className="text-foreground">Finanzierung auf Anfrage.</strong>{" "}
-              {config.finance_apr ? `Verwendete Zinsannahme: ${config.finance_apr}% effektiver Jahreszins. ` : ""}
-              {config.finance_disclaimer || "Verfügbarkeit und vollständige Bedingungen bestätigt der Händler."}
+              <strong className="text-foreground">Representative {config.finance_apr || "9.9%"} APR.</strong>{" "}
+              {config.finance_disclaimer || "We are a credit broker, not a lender. Finance is subject to status. Terms and conditions apply."}
             </span>
           </div>
         </section>
       )}
 
       {/* ─── Finance CTA ─── */}
-      {config.show_finance_cta === true && (
+      {config.show_finance_cta !== false && (
         <section className="border-t border-border">
           <div className="container mx-auto px-4 py-12">
             <motion.div
@@ -1434,10 +1417,10 @@ const DealerLanding = () => {
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoLTZWMzRoNnptMC0zMHY2aC02VjRoNnptMCAxMnY2aC02di02aDZ6bTAgMTJ2Nmg2djZoLTZ2LTZoLTZ2LTZoNnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-50" />
               <div className="relative">
                 <h2 className="font-display text-2xl font-bold text-white md:text-3xl">
-                  {config.finance_cta_text || "Finanzierung anfragen"}
+                  {config.finance_cta_text || "Need Finance? We Can Help"}
                 </h2>
                 <p className="mt-3 text-white/80 max-w-lg mx-auto">
-                  Fragen Sie nach Verfügbarkeit und vollständigen Bedingungen für das konkrete Fahrzeug. Eine Anfrage ist keine Kreditzusage.
+                  Flexible finance options available on all vehicles. Get a quick quote with no impact on your credit score.
                 </p>
                 <div className="mt-6 flex flex-wrap justify-center gap-3">
                   <Button
@@ -1446,7 +1429,7 @@ const DealerLanding = () => {
                     className="bg-white hover:bg-white/90 font-semibold shadow-lg"
                     style={{ color: accent }}
                   >
-                    Finanzierung anfragen <ArrowRight className="ml-1 h-4 w-4" />
+                    Get a Finance Quote <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -1473,12 +1456,12 @@ const DealerLanding = () => {
               {(config.faqs && config.faqs.length > 0
                 ? config.faqs
                 : [
-                    { q: "Bieten Sie Finanzierung an?", a: "Senden Sie eine Finanzierungsanfrage. Der Händler teilt Ihnen Anbieter, Konditionen und seine Vermittlerrolle vor Abschluss transparent mit." },
-                    { q: "Nehmen Sie mein Fahrzeug in Zahlung?", a: "Eine Inzahlungnahme kann unverbindlich angefragt werden. Bewertung und Annahme erfolgen erst nach Prüfung durch den Händler." },
-                    { q: "Welche Fahrzeugprüfungen liegen vor?", a: "Verlassen Sie sich ausschließlich auf die Nachweise und Prüfkennzeichen im jeweiligen Inserat. Nicht jedes Fahrzeug besitzt einen externen Bericht." },
-                    { q: "Ist eine Lieferung möglich?", a: "Liefergebiet, Kosten und Übergabebedingungen vereinbaren Sie direkt mit dem Händler." },
-                    { q: "Welche Garantie gilt?", a: "Maßgeblich sind die Angaben im Inserat und im Kaufvertrag sowie die gesetzlichen Gewährleistungsrechte. Zusätzliche Garantien müssen ausdrücklich dokumentiert sein." },
-                    { q: "Kann ich online reservieren?", a: "Verfügbare Händlerfahrzeuge können über den ausgewiesenen Reservierungsprozess angefragt werden. Betrag, Frist und Erstattungsbedingungen werden vor Zahlung angezeigt." },
+                    { q: "Do you offer finance?", a: `Yes — we work with a panel of trusted lenders to offer competitive PCP, HP and personal loan packages on every vehicle. Representative ${config.finance_apr || "9.9%"} APR. We are a credit broker, not a lender.` },
+                    { q: "Will you take my car in part-exchange?", a: "Absolutely. We accept part-exchanges on any vehicle in our showroom. Get an instant online valuation or bring your car in — our team will give you a fair, no-obligation offer in minutes." },
+                    { q: "Are your cars HPI checked?", a: "Every vehicle we sell is fully HPI checked, has a verified mileage history and comes with a comprehensive multi-point inspection. You can review the full report on each listing." },
+                    { q: "Can you deliver the car to me?", a: "Yes — we offer nationwide UK delivery. Delivery costs are calculated based on distance and vehicle, and your car arrives fully prepared, valeted and ready to drive." },
+                    { q: "What warranty do you provide?", a: "All our vehicles come with a minimum 3-month comprehensive warranty as standard, with extended warranty options available at point of sale." },
+                    { q: "Can I reserve a car online?", a: "Yes — secure any vehicle in our stock with a small refundable deposit. Your car will be held for you while we arrange viewing, finance or delivery." },
                   ]
               ).map((faq, i) => (
                 <AccordionItem key={i} value={`item-${i}`}>
@@ -1548,26 +1531,26 @@ const DealerLanding = () => {
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${accent}15` }}>
                   <Send className="h-5 w-5" style={{ color: accent }} />
                 </div>
-                <h3 className={`${fontClass} mt-4 text-xl font-bold text-foreground`}>Zivvo-Neuigkeiten</h3>
+                <h3 className={`${fontClass} mt-4 text-xl font-bold text-foreground`}>Stock alerts & special offers</h3>
                 <p className="mt-1.5 text-sm text-muted-foreground">
-                  Erhalten Sie Marktplatz- und Produktneuigkeiten von Zivvo. Jederzeit abbestellbar.
+                  Be first to know when new vehicles arrive at {dealer.business_name}. No spam, unsubscribe anytime.
                 </p>
                 <form onSubmit={handleNewsletterSubmit} className="mt-5 flex flex-col gap-2 sm:flex-row">
                   <Input
                     type="email"
-                    placeholder="sie@beispiel.de"
+                    placeholder="you@example.com"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     className="flex-1"
-                    aria-label="E-Mail-Adresse"
+                    aria-label="Email address"
                     required
                   />
                   <Button type="submit" className="border-0 text-white" style={{ backgroundColor: accent }}>
-                    {newsletterSent ? <><Check className="mr-1 h-4 w-4" /> Angemeldet</> : <>Anmelden <ArrowRight className="ml-1 h-4 w-4" /></>}
+                    {newsletterSent ? <><Check className="mr-1 h-4 w-4" /> Subscribed</> : <>Subscribe <ArrowRight className="ml-1 h-4 w-4" /></>}
                   </Button>
                 </form>
                 <p className="mt-3 text-[11px] text-muted-foreground">
-                  Mit der Anmeldung stimmen Sie der in der Datenschutzerklärung beschriebenen Verarbeitung zu. Abmeldung jederzeit möglich.
+                  By subscribing you agree to our privacy policy. We never share your data.
                 </p>
               </div>
             </motion.div>
@@ -1584,7 +1567,7 @@ const DealerLanding = () => {
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: `${accent}15` }}>
                     <Clock className="h-5 w-5" style={{ color: accent }} />
                   </div>
-                  <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Öffnungszeiten</h3>
+                  <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Opening hours</h3>
                 </div>
                 <OpenNowBadge hours={config.opening_hours_table} accent={accent} />
               </div>
@@ -1592,7 +1575,13 @@ const DealerLanding = () => {
                 {(config.opening_hours_table && config.opening_hours_table.length > 0
                   ? config.opening_hours_table
                   : [
-                      { day: "Öffnungszeiten", hours: "Nicht angegeben" },
+                      { day: "Monday", hours: "9:00 – 18:00" },
+                      { day: "Tuesday", hours: "9:00 – 18:00" },
+                      { day: "Wednesday", hours: "9:00 – 18:00" },
+                      { day: "Thursday", hours: "9:00 – 18:00" },
+                      { day: "Friday", hours: "9:00 – 18:00" },
+                      { day: "Saturday", hours: "10:00 – 17:00" },
+                      { day: "Sunday", hours: "By appointment" },
                     ]
                 ).map((row) => (
                   <li key={row.day} className="flex items-center justify-between py-2.5">
@@ -1604,7 +1593,7 @@ const DealerLanding = () => {
               {showAddress && dealer.city && (
                 <div className="mt-5 flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
                   <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" style={{ color: accent }} />
-                  <span>Standort: <strong className="text-foreground">{dealer.city}{dealer.country ? `, ${dealer.country}` : ""}</strong>. Bitte bestätigen Sie Öffnungszeiten und Termin vor der Anreise.</span>
+                  <span>Visit us at <strong className="text-foreground">{dealer.city}{dealer.country ? `, ${dealer.country}` : ""}</strong>. Walk-ins welcome during opening hours.</span>
                 </div>
               )}
             </motion.div>
@@ -1617,9 +1606,9 @@ const DealerLanding = () => {
         <div className="container mx-auto px-4 py-14 text-center relative">
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className={`${fontClass} text-2xl font-bold text-foreground md:text-3xl`}>
-              Bereit für die Fahrzeugsuche?
+              Ready to find your next car?
             </h2>
-            <p className="mt-2 text-muted-foreground max-w-md mx-auto">Kontaktieren Sie den Händler oder durchsuchen Sie den aktuellen Bestand.</p>
+            <p className="mt-2 text-muted-foreground max-w-md mx-auto">Contact us today or browse our full range of quality vehicles</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
               {showPhone && dealer.business_phone && (
                 <a href={`tel:${dealer.business_phone}`}>
@@ -1637,22 +1626,25 @@ const DealerLanding = () => {
               )}
               {showEmail && dealer.business_email && (
                 <a href={`mailto:${dealer.business_email}`}>
-                  <Button size="lg" variant="outline"><Mail className="mr-1 h-4 w-4" /> E-Mail senden</Button>
+                  <Button size="lg" variant="outline"><Mail className="mr-1 h-4 w-4" /> Email Us</Button>
                 </a>
               )}
             </div>
 
             {/* Business credentials row */}
-      {(config.established_year || config.company_number || config.vat_number) && (
+            {(config.established_year || config.company_number || config.vat_number || config.fca_number) && (
               <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-3 border-t border-border/50 pt-6 md:grid-cols-4">
                 {config.established_year && (
-                  <BusinessFact label="Gegründet" value={String(config.established_year)} accent={accent} />
+                  <BusinessFact label="Established" value={String(config.established_year)} accent={accent} />
                 )}
                 {config.company_number && (
-                  <BusinessFact label="Registernummer" value={config.company_number} accent={accent} />
+                  <BusinessFact label="Company No." value={config.company_number} accent={accent} />
                 )}
                 {config.vat_number && (
-                  <BusinessFact label="USt-IdNr." value={config.vat_number} accent={accent} />
+                  <BusinessFact label="VAT No." value={config.vat_number} accent={accent} />
+                )}
+                {config.fca_number && (
+                  <BusinessFact label="FCA Reference" value={config.fca_number} accent={accent} />
                 )}
               </div>
             )}
@@ -1685,8 +1677,8 @@ const DealerLanding = () => {
       <DealerEnquiryDialog
         open={enquiryOpen}
         onOpenChange={setEnquiryOpen}
-        dealerId={dealer.id}
         dealerName={dealer.business_name}
+        dealerEmail={showEmail ? dealer.business_email : null}
         accent={accent}
       />
 
@@ -1696,7 +1688,7 @@ const DealerLanding = () => {
 
       <Dialog open={!!financeCar} onOpenChange={(o) => !o && setFinanceCar(null)}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Finanzierungsrechner</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Finance estimator</DialogTitle></DialogHeader>
           {financeCar && (
             <FinanceCalculator
               price={Number(financeCar.price) || 0}
@@ -1718,11 +1710,11 @@ const HeroBadges = ({ dealer, config, accent, isOnDark }: { dealer: any; config:
   <div className="mt-4 flex flex-wrap items-center justify-center gap-2 md:justify-start">
     {dealer.kyc_verified && (
       <Badge className="border-0" style={{ backgroundColor: `${accent}20`, color: accent }}>
-        <BadgeCheck className="mr-1 h-3 w-3" /> Händler freigegeben
+        <BadgeCheck className="mr-1 h-3 w-3" /> Verified Dealer
       </Badge>
     )}
     <Badge variant="secondary" className={isOnDark ? "bg-white/10 text-white/80 border-0" : ""}>
-      Zivvo Händler
+      {dealer.tier?.charAt(0).toUpperCase() + dealer.tier?.slice(1)} Dealer
     </Badge>
     {config.specialities?.[0] && (
       <Badge variant="outline" className={isOnDark ? "border-white/20 text-white/70" : ""}>
@@ -1747,8 +1739,8 @@ const ContactBar = ({ dealer, config, showPhone, showEmail, showAddress, isOnDar
         <Mail className="h-4 w-4" /> {dealer.business_email}
       </a>
     )}
-    {safeHttpsUrl(dealer.website_url) && (
-      <a href={safeHttpsUrl(dealer.website_url)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
+    {dealer.website_url && (
+      <a href={dealer.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
         <Globe className="h-4 w-4" /> Website
       </a>
     )}
@@ -1775,17 +1767,13 @@ const BusinessFact = ({ label, value, accent }: { label: string; value: string; 
 );
 
 const OpenNowBadge = ({ hours, accent }: { hours?: Array<{ day: string; hours: string }>; accent: string }) => {
-  if (!hours?.length) return <Badge variant="outline">Zeiten nicht angegeben</Badge>;
+  // Simple "Open now" indicator. Defaults to true unless explicit "Closed" today.
   const now = new Date();
-  const dayPrefixes = [
-    ["son", "sun"], ["mon"], ["die", "tue"], ["mit", "wed"],
-    ["don", "thu"], ["fre", "fri"], ["sam", "sat"],
-  ][now.getDay()];
-  const todayRow = hours.find((h) => dayPrefixes.some((prefix) => h.day.toLowerCase().startsWith(prefix)));
+  const dayName = now.toLocaleDateString("en-GB", { weekday: "long" });
+  const todayRow = hours?.find((h) => h.day.toLowerCase().startsWith(dayName.toLowerCase().slice(0, 3)));
   const todayHours = todayRow?.hours || "";
-  if (!todayRow) return <Badge variant="outline">Heute nicht angegeben</Badge>;
-  const isClosed = /geschlossen|closed/i.test(todayHours);
-  let isOpen = false;
+  const isClosed = /closed/i.test(todayHours);
+  let isOpen = !isClosed;
   const match = todayHours.match(/(\d{1,2}):?(\d{0,2})\s*[–\-to]+\s*(\d{1,2}):?(\d{0,2})/);
   if (match) {
     const start = parseInt(match[1], 10) * 60 + parseInt(match[2] || "0", 10);
@@ -1793,7 +1781,6 @@ const OpenNowBadge = ({ hours, accent }: { hours?: Array<{ day: string; hours: s
     const cur = now.getHours() * 60 + now.getMinutes();
     isOpen = cur >= start && cur <= end;
   }
-  if (!match && !isClosed) return <Badge variant="outline">Heute: {todayHours}</Badge>;
   return (
     <Badge
       variant="outline"
@@ -1801,7 +1788,7 @@ const OpenNowBadge = ({ hours, accent }: { hours?: Array<{ day: string; hours: s
       style={isOpen ? { borderColor: `${accent}40`, color: accent, backgroundColor: `${accent}10` } : undefined}
     >
       <span className={`h-2 w-2 rounded-full ${isOpen ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground"}`} />
-      {isOpen ? "Jetzt geöffnet" : "Geschlossen"}
+      {isOpen ? "Open now" : "Closed"}
     </Badge>
   );
 };

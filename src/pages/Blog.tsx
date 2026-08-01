@@ -10,7 +10,6 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { trackEvent } from "@/hooks/useAnalytics";
 
 const postMeta = [
   { id: "buying-used-car-checklist", image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80", author: "Zivvo Team", date: "2026-03-10", readTime: "8 min read" },
@@ -38,12 +37,13 @@ const Blog = () => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setSubscribing(true);
-    const { error } = await supabase.functions.invoke("newsletter-subscribe", { body: { email: newsletterEmail.trim() } });
+    const { error } = await supabase.from("newsletter_subscribers" as any).insert({ email: newsletterEmail.trim() });
     setSubscribing(false);
-    if (error) {
+    if (error?.code === "23505") {
+      toast({ title: t("toastAlreadySubscribedTitle"), description: t("toastAlreadySubscribedDesc") });
+    } else if (error) {
       toast({ title: t("toastFailTitle"), variant: "destructive" });
     } else {
-      void trackEvent("newsletter_subscribed", { placement: "blog" });
       toast({ title: t("toastSuccessTitle"), description: t("toastSuccessDesc") });
     }
     setNewsletterEmail("");
@@ -60,11 +60,11 @@ const Blog = () => {
           "@type": "Blog",
           "name": "Zivvo Blog",
           "description": "Expert advice on buying, selling, and maintaining your car.",
-          "url": "https://zivvo.de/blog",
+          "url": "https://zivvo.co.uk/blog",
           "publisher": {
             "@type": "Organization",
             "name": "Zivvo",
-            "logo": { "@type": "ImageObject", "url": "https://zivvo.de/icon-512.png" }
+            "logo": { "@type": "ImageObject", "url": "https://zivvo.co.uk/icon-512.png" }
           }
         }}
       />

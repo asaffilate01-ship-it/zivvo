@@ -21,13 +21,6 @@ const postMeta: Record<string, { image: string; author: string; date: string; re
 
 const allPostIds = Object.keys(postMeta);
 
-const renderInlineBold = (line: string) =>
-  line.split(/(\*\*.*?\*\*)/g).map((part, index) =>
-    part.startsWith("**") && part.endsWith("**")
-      ? <strong key={index}>{part.slice(2, -2)}</strong>
-      : part
-  );
-
 const BlogPost = () => {
   const { t } = useTranslation("blogPost");
   const { id } = useParams<{ id: string }>();
@@ -102,11 +95,11 @@ const BlogPost = () => {
           "publisher": {
             "@type": "Organization",
             "name": "Zivvo",
-            "logo": { "@type": "ImageObject", "url": "https://zivvo.de/icon-512.png" }
+            "logo": { "@type": "ImageObject", "url": "https://zivvo.co.uk/icon-512.png" }
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://zivvo.de/blog/${id}`
+            "@id": `https://zivvo.co.uk/blog/${id}`
           }
         }}
       />
@@ -162,10 +155,10 @@ const BlogPost = () => {
                       return <h2 key={j} id={headingId} className="font-display text-xl font-bold mt-8 mb-3 scroll-mt-20">{line.replace("## ", "")}</h2>;
                     }
                     if (line.startsWith("- **") || line.match(/^\d+\.\s\*\*/)) {
-                      return <p key={j} className="ml-4">{renderInlineBold(line)}</p>;
+                      return <p key={j} className="ml-4" dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />;
                     }
                     if (line.trim() === "") return null;
-                    return <p key={j}>{renderInlineBold(line)}</p>;
+                    return <p key={j} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />;
                   })}
                 </div>
               );

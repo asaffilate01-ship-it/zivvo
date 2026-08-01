@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CountryProvider } from "@/contexts/CountryContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import CookieConsent from "@/components/CookieConsent";
+import BugReportButton from "@/components/BugReportButton";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import OnboardingTour from "@/components/OnboardingTour";
 import PageSkeleton from "@/components/PageSkeleton";
@@ -68,6 +69,7 @@ const DealerIntegrations = lazy(() => import("./pages/DealerIntegrations"));
 const InspectorDashboard = lazy(() => import("./pages/InspectorDashboard"));
 const InspectorOnboard = lazy(() => import("./pages/InspectorOnboard"));
 const InspectorJob = lazy(() => import("./pages/InspectorJob"));
+const Pitch = lazy(() => import("./pages/Pitch"));
 const Finance = lazy(() => import("./pages/Finance"));
 const Leasing = lazy(() => import("./pages/Leasing"));
 
@@ -92,6 +94,7 @@ const App = () => (
                   <Suspense fallback={<PageSkeleton />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
+                      <Route path="/pitch" element={<Pitch />} />
                       <Route path="/browse" element={<Browse />} />
                       <Route path="/car/:id" element={<CarDetail />} />
                       <Route path="/login" element={<Login />} />
@@ -237,6 +240,7 @@ const App = () => (
                     </Routes>
                   </Suspense>
                   <CookieConsent />
+                  <BugReportButton />
                   <PWAInstallPrompt />
                   <OnboardingTour />
                   <BackToTopButton />

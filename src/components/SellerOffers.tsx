@@ -44,34 +44,37 @@ const SellerOffers = () => {
   const { data: offers = [], isLoading } = useQuery({
     queryKey: ["seller-arbitrage-offers", user?.id],
     queryFn: async () => {
-      const { data, error } = await (supabase.from as any)("arbitrage_deals_visible")
-        .select("*")
+      const { data, error } = await supabase
+        .from("arbitrage_deals")
+        .select("*, car_listings!inner(title, make, model, year, images, price)")
         .eq("seller_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data || []).map((deal: any) => ({
-        ...deal,
-        car_listings: {
-          title: deal.listing_title,
-          make: deal.listing_make,
-          model: deal.listing_model,
-          year: deal.listing_year,
-          images: deal.listing_images,
-          price: deal.listing_price,
-        },
-      }));
+      return data || [];
     },
     enabled: !!user,
   });
 
   const respondToOffer = useMutation({
     mutationFn: async ({ dealId, accept, reason }: { dealId: string; accept: boolean; reason?: string }) => {
-      const { error } = await (supabase.rpc as any)("transition_arbitrage_deal", {
-        p_deal_id: dealId,
-        p_action: accept ? "seller_accepted" : "seller_rejected",
-        p_note: accept ? null : reason || "Ohne Angabe",
-      });
+      const update: Record<string, any> = accept
+        ? { status: "seller_accepted" as any, seller_accepted_at: new Date().toISOString() }
+        : { status: "seller_rejected" as any, rejection_reason: reason || "Seller declined" };
+
+      const { error } = await supabase
+        .from("arbitrage_deals")
+        .update(update as never)
+        .eq("id", dealId)
+        .eq("seller_id", user!.id);
       if (error) throw error;
+
+      await supabase.from("arbitrage_audit_log").insert({
+        deal_id: dealId,
+        actor_id: user!.id,
+        actor_role: "seller",
+        action: accept ? "seller_accepted" : "seller_rejected",
+        details: accept ? {} : { reason: reason || "Seller declined" },
+      });
     },
     onSuccess: (_, { accept }) => {
       toast.success(accept ? "Offer accepted! We'll proceed with the sale." : "Offer declined.");
@@ -174,7 +177,7 @@ const SellerOffers = () => {
             {["listed_to_dealers", "dealer_accepted"].includes(deal.status) && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
-                <span>{deal.status === "listed_to_dealers" ? "Your car is being offered to dealers." : "A dealer has accepted. Review the recorded payment and handover status before taking action."}</span>
+                <span>{deal.status === "listed_to_dealers" ? "Your car is being offered to dealers." : "A dealer has been found! Payment coming soon."}</span>
               </div>
             )}
 

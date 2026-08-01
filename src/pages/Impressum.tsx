@@ -2,7 +2,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
-import { legalConfig, legalIdentityConfigured, legalVersionDate } from "@/lib/legalConfig";
 
 const Impressum = () => {
   const { t } = useTranslation("impressum");
@@ -15,49 +14,64 @@ const Impressum = () => {
         <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("lastUpdated")}{" "}
-          {legalVersionDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+          {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
-        {!legalIdentityConfigured && (
-          <p className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            Nicht veröffentlichen: Die rechtlichen Unternehmensangaben für diese Umgebung fehlen.
-          </p>
-        )}
+        <p className="mt-4 rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
+          {t("disclaimer")}
+        </p>
 
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s1Title")}</h2>
-            <p className="mt-2">{legalConfig.companyName} {legalConfig.legalForm}</p>
-            <p>{legalConfig.street}</p>
-            <p>{legalConfig.postcode} {legalConfig.city}</p>
+            <p className="mt-2">{t("companyName")}</p>
+            <p>{t("legalForm")}</p>
+            <p>{t("street")}</p>
+            <p>{t("cityLine")}</p>
             <p>{t("country")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s2Title")}</h2>
-            <p className="mt-2">{t("geschaeftsfuehrer")} {legalConfig.managingDirector}</p>
+            <p className="mt-2">{t("geschaeftsfuehrer")} {t("geschaeftsfuehrerValue")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s3Title")}</h2>
-            <p className="mt-2">{t("phoneLabel")} <a className="text-primary underline" href={`tel:${legalConfig.phone}`}>{legalConfig.phone}</a></p>
-            <p>{t("emailLabel")} <a className="text-primary underline" href={`mailto:${legalConfig.email}`}>{legalConfig.email}</a></p>
+            <p className="mt-2">{t("phoneLabel")} {t("phoneValue")}</p>
+            <p>{t("emailLabel")} {t("emailValue")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s4Title")}</h2>
-            <p className="mt-2">{t("registerCourt")} {legalConfig.registerCourt}</p>
-            <p>{t("registerNumber")} {legalConfig.registerNumber}</p>
+            <p className="mt-2">{t("registerCourt")} {t("registerCourtValue")}</p>
+            <p>{t("registerNumber")} {t("registerNumberValue")}</p>
           </section>
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s5Title")}</h2>
             <p className="mt-2">{t("vatBody")}</p>
-            <p>{legalConfig.vatId}</p>
+            <p>{t("vatValue")}</p>
           </section>
 
           <section>
-            <h2 className="font-display text-lg font-semibold text-foreground">Verantwortlich für journalistisch-redaktionelle Inhalte gemäß § 18 Abs. 2 MStV</h2>
-            <p className="mt-2">{legalConfig.contentResponsible}</p>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s6Title")}</h2>
+            <p className="mt-2">{t("s6Body")}</p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s7Title")}</h2>
+            <p className="mt-2">{t("s7Body")}</p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-lg font-semibold text-foreground">{t("s8Title")}</h2>
+            <p className="mt-2">
+              {t("s8Body")}{" "}
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                {t("s8LinkText")}
+              </a>
+            </p>
+            <p className="mt-2">{t("s8Body2")}</p>
           </section>
 
           <section>

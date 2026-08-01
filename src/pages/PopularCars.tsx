@@ -39,7 +39,7 @@ const PopularCars = () => {
     if (!makeName) return;
     setLoading(true);
     supabase
-      .from("car_listings_public")
+      .from("car_listings")
       .select("*")
       .eq("status", "active")
       .eq("country", country)
@@ -103,7 +103,7 @@ const PopularCars = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title={`Used ${makeName} Cars For Sale`}
-        description={`Browse active used ${makeName} listings on Zivvo and compare seller-provided vehicle details and prices.`}
+        description={`Browse verified used ${makeName} cars on Zivvo. Finance checks, full history, and transparent pricing.`}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -37,16 +37,16 @@ const StaffManager = ({ dealerId }: Props) => {
     admin_assistant: t("dealer.staffManager.roleAdminAssistant"),
   };
 
-  const load = useCallback(async () => {
+  const load = async () => {
     const { data } = await supabase
       .from("dealer_staff" as any)
       .select("*")
       .eq("dealer_id", dealerId)
       .order("invited_at", { ascending: false });
     setStaff((data as any) || []);
-  }, [dealerId]);
+  };
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { load(); }, [dealerId]);
 
   const invite = async () => {
     if (!form.email) { toast({ title: t("dealer.staffManager.emailRequired"), variant: "destructive" }); return; }

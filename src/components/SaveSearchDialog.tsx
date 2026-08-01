@@ -59,7 +59,7 @@ const SaveSearchDialog = ({ filters }: SaveSearchDialogProps) => {
         <div className="space-y-4 pt-2">
           <div className="space-y-1.5">
             <Label className="text-sm">Name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. BMW under €20k" />
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. BMW under £20k" />
           </div>
           <div className="flex items-center justify-between">
             <Label className="text-sm">Notify me of new matches</Label>

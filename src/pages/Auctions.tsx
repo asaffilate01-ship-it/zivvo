@@ -45,24 +45,15 @@ const Auctions = () => {
   const { data: auctions = [], isLoading } = useQuery({
     queryKey: ["auctions", tab, country],
     queryFn: async () => {
-      const statusFilter = tab === "live" ? "live" : tab === "ending" ? "live" : tab === "upcoming" ? "live" : "sold";
+      const statusFilter = tab === "live" ? "live" : tab === "ending" ? "live" : tab === "upcoming" ? "approved" : "sold";
       const { data, error } = await supabase
-        .from("auctions_public" as any)
-        .select("*")
+        .from("auctions")
+        .select("*, car_listings!inner(title, make, model, year, images, mileage, fuel_type, transmission, location, country)")
         .eq("status", statusFilter as any)
+        .eq("car_listings.country", country)
         .order(tab === "ending" ? "ends_at" : "created_at", { ascending: tab === "ending" });
       if (error) throw error;
-      const rows = (data || []) as any[];
-      const listingIds = rows.map((auction) => auction.listing_id);
-      if (!listingIds.length) return [];
-      const { data: listings, error: listingsError } = await supabase
-        .from("car_listings_public")
-        .select("id,title,make,model,year,images,mileage,fuel_type,transmission,location,country")
-        .in("id", listingIds)
-        .eq("country", country);
-      if (listingsError) throw listingsError;
-      const byId = new Map((listings || []).map((listing) => [listing.id, listing]));
-      return rows.filter((auction) => byId.has(auction.listing_id)).map((auction) => ({ ...auction, car_listings: byId.get(auction.listing_id) }));
+      return data || [];
     },
   });
 
@@ -213,7 +204,7 @@ const Auctions = () => {
                               <div className="absolute top-3 right-3">
                                 {auction.hpi_clear && (
                                   <Badge variant="secondary" className="bg-emerald-500/90 text-white border-0 backdrop-blur-sm">
-                                    <Shield className="w-3 h-3 mr-1" /> Finance/legal clear
+                                    <Shield className="w-3 h-3 mr-1" /> HPI Clear
                                   </Badge>
                                 )}
                               </div>

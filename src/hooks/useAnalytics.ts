@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { getConsent } from "@/components/CookieConsent";
 
 const SESSION_KEY = "zv_session_id";
 
@@ -47,20 +46,9 @@ const getUtm = () => {
 export const useAnalytics = () => {
   const location = useLocation();
   const lastPath = useRef<string | null>(null);
-  const [consentVersion, setConsentVersion] = useState(0);
-
-  useEffect(() => {
-    const onConsent = () => {
-      lastPath.current = null;
-      setConsentVersion((value) => value + 1);
-    };
-    window.addEventListener("zivvo:consent-change", onConsent);
-    return () => window.removeEventListener("zivvo:consent-change", onConsent);
-  }, []);
 
   useEffect(() => {
     const path = location.pathname + location.search;
-    if (!getConsent()?.analytics) return;
     if (lastPath.current === path) return;
     lastPath.current = path;
 
@@ -87,7 +75,7 @@ export const useAnalytics = () => {
         utm_campaign: utm.utm_campaign?.slice(0, 100) ?? null,
       });
     });
-  }, [location.pathname, location.search, consentVersion]);
+  }, [location.pathname, location.search]);
 };
 
 /**
@@ -98,7 +86,6 @@ export const trackEvent = async (
   metadata: Record<string, unknown> = {}
 ) => {
   try {
-    if (!getConsent()?.analytics) return;
     const session_id = getSessionId();
     const { data } = await supabase.auth.getUser();
     await (supabase.from("analytics_events") as any).insert({

@@ -14,7 +14,6 @@ import {
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { idempotencyHeaders } from "@/lib/idempotency";
 import { useToast } from "@/hooks/use-toast";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
@@ -25,7 +24,8 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import SEOHead from "@/components/SEOHead";
-import { redirectToStripe } from "@/lib/safeNavigation";
+
+const partners = ["mobile.de", "AutoScout24", "Kleinanzeigen", "AUTO1.com", "eBay Motors"];
 
 const DealerPricing = () => {
   const { t } = useTranslation();
@@ -46,7 +46,7 @@ const DealerPricing = () => {
     if (params.get("checkout") === "canceled") {
       toast({ title: t("pricing.toast.canceledTitle"), description: t("pricing.toast.canceledDesc") });
     }
-  }, [t, toast]);
+  }, []);
 
   const handleSubscribe = async (priceId: string) => {
     if (!user) { navigate("/signup"); return; }
@@ -63,14 +63,15 @@ const DealerPricing = () => {
     setShowBusinessDialog(false);
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        headers: idempotencyHeaders(),
         body: {
           priceId: selectedPriceId,
           businessName,
+          successUrl: `${window.location.origin}/dashboard?checkout=success`,
+          cancelUrl: `${window.location.origin}/dealers?checkout=canceled`,
         },
       });
       if (error) throw error;
-      if (data?.url) redirectToStripe(data.url);
+      if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
       toast({ title: t("pricing.toast.errorTitle"), description: err.message, variant: "destructive" });
     } finally {
@@ -136,6 +137,10 @@ const DealerPricing = () => {
                   <span className="font-display text-4xl font-bold text-card-foreground">{formatPrice(0, config)}</span>
                   <span className="text-sm text-muted-foreground">/ {t("common.free").toLowerCase()}</span>
                 </div>
+                <p className="mt-1 text-xs text-success">
+                  + {formatPrice(privatePlan.price, config)} {t("pricing.private.perExtra")}
+                </p>
+
                 <p className="mt-4 text-sm text-muted-foreground">{t("pricing.private.subtitle")}</p>
 
                 <Button className="mt-6 w-full" variant="outline" onClick={() => navigate("/sell")}>
@@ -213,6 +218,10 @@ const DealerPricing = () => {
                     t("pricing.dealer.trial"),
                     t("pricing.dealer.analytics"),
                     t("pricing.dealer.landingPage"),
+                    t("pricing.dealer.featured"),
+                    t("pricing.dealer.support"),
+                    t("pricing.dealer.syndication"),
+                    t("pricing.dealer.financeIntegration"),
                     t("pricing.dealer.verifiedBadge"),
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-card-foreground">
@@ -225,6 +234,22 @@ const DealerPricing = () => {
                 </ul>
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* PORTAL LOGOS */}
+      <section className="border-b border-border bg-muted/30">
+        <div className="container mx-auto px-4 py-10">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            {t("pricing.portalSync")}
+          </p>
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 sm:gap-x-12">
+            {partners.map((name) => (
+              <span key={name} className="font-display text-base font-semibold text-muted-foreground/70 sm:text-lg">
+                {name}
+              </span>
+            ))}
           </div>
         </div>
       </section>

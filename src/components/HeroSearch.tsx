@@ -17,7 +17,7 @@ const PRICE_STEPS = [500, 1000, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 300
 const MONTHLY_STEPS = [100, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1500];
 const DISTANCE_STEPS = [5, 10, 25, 50, 75, 100, 150, 200, 300, 500];
 
-// Carlingo-style approximation: ~€245/mo per €10k full-price → priceMax = monthlyMax / 0.0245
+// Carlingo-style approximation: ~£245/mo per £10k full-price → priceMax = monthlyMax / 0.0245
 const monthlyToPrice = (m: number) => Math.round(m / 0.0245);
 
 const HeroSearch = () => {
@@ -47,7 +47,7 @@ const HeroSearch = () => {
     if (!make) { setModels([]); setModel(""); return; }
     setModelsLoading(true);
     supabase
-      .from("car_listings_public")
+      .from("car_listings")
       .select("model")
       .eq("status", "active")
       .eq("make", make)
@@ -63,7 +63,7 @@ const HeroSearch = () => {
   useEffect(() => {
     const t = setTimeout(async () => {
       setCounting(true);
-      let q = supabase.from("car_listings_public").select("id", { count: "exact", head: true }).eq("country", country);
+      let q = supabase.from("car_listings").select("id", { count: "exact", head: true }).eq("status", "active").eq("country", country);
       if (make) q = q.eq("make", make);
       if (model) q = q.eq("model", model);
       if (vehicleType === "vans") q = q.in("body_type", ["Van", "Pickup"]);
@@ -151,9 +151,16 @@ const HeroSearch = () => {
               {t("hero.subtitle")}
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3 text-xs text-primary-foreground/70">
-              {["Deutschland", "Preise in EUR", "Prüfstatus je Inserat"].map((label) => (
-                <span key={label} className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5">{label}</span>
+            <div className="mt-8 flex gap-8">
+              {[
+                { value: "25K+", label: t("hero.stats.listings") },
+                { value: "3.2K+", label: t("hero.stats.dealers") },
+                { value: "98%", label: t("hero.stats.satisfaction") },
+              ].map((stat, i) => (
+                <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.1 }}>
+                  <p className="font-display text-2xl font-bold text-primary-foreground md:text-3xl">{stat.value}</p>
+                  <p className="text-xs text-primary-foreground/50">{stat.label}</p>
+                </motion.div>
               ))}
             </div>
           </motion.div>

@@ -6,14 +6,13 @@ import { Shield, X, Settings2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
-// TDDDG-compliant consent. Non-essential scripts (analytics, marketing) MUST NOT
+// TTDSG-compliant consent. Non-essential scripts (analytics, marketing) MUST NOT
 // load before the user opts in. We expose a global `window.__zivvoConsent` that
 // script loaders can gate on, and dispatch `zivvo:consent-change` on updates.
 
-const CONSENT_KEY = "zivvo_cookie_consent_v3";
+const CONSENT_KEY = "zivvo_cookie_consent_v2";
 
 export type ConsentState = {
-  version: 3;
   essential: true;
   analytics: boolean;
   marketing: boolean;
@@ -58,21 +57,8 @@ const CookieConsent = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    const open = () => {
-      const existing = getConsent();
-      setAnalytics(Boolean(existing?.analytics));
-      setMarketing(Boolean(existing?.marketing));
-      setCustomize(true);
-      setShow(true);
-    };
-    window.addEventListener("zivvo:open-consent", open);
-    return () => window.removeEventListener("zivvo:open-consent", open);
-  }, []);
-
   const save = (a: boolean, m: boolean) => {
     applyConsent({
-      version: 3,
       essential: true,
       analytics: a,
       marketing: m,

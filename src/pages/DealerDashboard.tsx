@@ -18,11 +18,12 @@ import BoostListingDialog from "@/components/BoostListingDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { redirectToStripe } from "@/lib/safeNavigation";
 import DashboardChart from "@/components/DashboardChart";
 import DealerPageBuilder from "@/components/DealerPageBuilder";
 import SellerAnalytics from "@/components/SellerAnalytics";
 import SalesPipeline from "@/components/SalesPipeline";
+import PortalSyndication from "@/components/PortalSyndication";
+import ListingSyndicationStatus from "@/components/ListingSyndicationStatus";
 import StockBookManager from "@/components/dealer/StockBookManager";
 import VehicleCostsManager from "@/components/dealer/VehicleCostsManager";
 import StaffManager from "@/components/dealer/StaffManager";
@@ -76,7 +77,7 @@ const DealerDashboard = () => {
       toast({ title: t("dealerDashboard.toasts.subActivated"), description: t("dealerDashboard.toasts.subActivatedDesc") });
       refreshSubscription();
     }
-  }, [refreshSubscription, searchParams, t, toast]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user) return;
@@ -118,7 +119,7 @@ const DealerDashboard = () => {
         });
         return;
       }
-      if (data?.url) redirectToStripe(data.url);
+      if (data?.url) window.open(data.url, "_blank");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
@@ -173,8 +174,7 @@ const DealerDashboard = () => {
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   };
@@ -351,6 +351,7 @@ const DealerDashboard = () => {
               <TabsTrigger value="staff">{t("dealerDashboard.tabs.staff")}</TabsTrigger>
               <TabsTrigger value="ad-shop">{t("dealerDashboard.tabs.adShop")}</TabsTrigger>
               <TabsTrigger value="pipeline">{t("dealerDashboard.tabs.pipeline")}</TabsTrigger>
+              <TabsTrigger value="syndication">{t("dealerDashboard.tabs.syndication")}</TabsTrigger>
               <TabsTrigger value="integrations">{t("dealerDashboard.tabs.integrations")}</TabsTrigger>
               <TabsTrigger value="analytics">{t("dealerDashboard.tabs.analytics")}</TabsTrigger>
             </TabsList>
@@ -363,6 +364,7 @@ const DealerDashboard = () => {
               <AdShopEditor dealerId={dealer.id} logoUrl={(dealer as any).logo_url} businessName={dealer.business_name} />
             </TabsContent>
             <TabsContent value="pipeline" className="mt-4"><SalesPipeline mode="dealer" dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="syndication" className="mt-4"><PortalSyndication dealerId={dealer.id} /></TabsContent>
             <TabsContent value="integrations" className="mt-4"><DmsConnectionsManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="analytics" className="mt-4"><SellerAnalytics /></TabsContent>
           </Tabs>
@@ -426,6 +428,9 @@ const DealerDashboard = () => {
                         <Link to={`/car/${listing.id}`} className="font-medium text-card-foreground hover:text-primary">{listing.title}</Link>
                         <p className="text-sm text-muted-foreground">{t("dealerDashboard.viewsEnquiries", { views: listing.views_count || 0, enquiries: listing.enquiries_count || 0 })}</p>
                       </div>
+                      {listing.status === "active" && dealer && (
+                        <ListingSyndicationStatus listingId={listing.id} dealerId={dealer.id} />
+                      )}
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
                       <span className="font-display font-semibold text-card-foreground">{formatPrice(Number(listing.price), config)}</span>
                       {listing.status === "active" && (

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,7 +53,7 @@ const InspectorDashboard = () => {
   const [payouts, setPayouts] = useState<{ pending: number; paid: number }>({ pending: 0, paid: 0 });
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
+  const load = async () => {
     if (!user) return;
     setLoading(true);
     const [{ data: profileData }, { data: jobsData }, { data: payoutData }] = await Promise.all([
@@ -79,9 +79,9 @@ const InspectorDashboard = () => {
       .reduce((a: number, b: any) => a + Number(b.amount || 0), 0);
     setPayouts({ pending, paid });
     setLoading(false);
-  }, [user]);
+  };
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { load(); }, [user]);
 
   if (loading) {
     return (
@@ -136,8 +136,8 @@ const InspectorDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <Card><CardContent className="p-4"><div className="text-2xl font-bold text-primary">{active.length}</div><p className="text-xs text-muted-foreground">Active jobs</p></CardContent></Card>
           <Card><CardContent className="p-4"><div className="text-2xl font-bold">{profile.total_inspections}</div><p className="text-xs text-muted-foreground">Completed</p></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-warning">€{payouts.pending.toFixed(0)}</div><p className="text-xs text-muted-foreground">Owed to you</p></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-success">€{payouts.paid.toFixed(0)}</div><p className="text-xs text-muted-foreground">Paid to date</p></CardContent></Card>
+          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-warning">£{payouts.pending.toFixed(0)}</div><p className="text-xs text-muted-foreground">Owed to you</p></CardContent></Card>
+          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-success">£{payouts.paid.toFixed(0)}</div><p className="text-xs text-muted-foreground">Paid to date</p></CardContent></Card>
         </div>
 
         {!profile.is_verified && (

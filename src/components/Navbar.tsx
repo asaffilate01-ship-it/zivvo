@@ -8,8 +8,8 @@ import {
   LayoutDashboard, ShieldCheck, Users, Building2, HelpCircle, Phone, BookOpen, Percent,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
-import zivvoLogoEn from "@/assets/zivvo-logo.webp";
-import zivvoLogoDe from "@/assets/zivvo-logo-de.webp";
+import zivvoLogoEn from "@/assets/zivvo-logo.png";
+import zivvoLogoDe from "@/assets/zivvo-logo-de.png";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";

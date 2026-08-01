@@ -41,7 +41,7 @@ const SEOLinkBlock = () => {
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase
-        .from("car_listings_public")
+        .from("car_listings")
         .select("make, body_type, location")
         .eq("status", "active")
         .eq("country", country)

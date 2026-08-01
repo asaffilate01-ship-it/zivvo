@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,7 +28,7 @@ const InspectorJob = () => {
   const [recommendation, setRecommendation] = useState("");
   const [activeTab, setActiveTab] = useState(INSPECTION_CHECKLIST[0].id);
 
-  const load = useCallback(async () => {
+  const load = async () => {
     if (!id || !user) return;
     setLoading(true);
     const { data: bk } = await supabase
@@ -57,9 +57,9 @@ const InspectorJob = () => {
       setRecommendation(sc.recommendation || "");
     }
     setLoading(false);
-  }, [id, user]);
+  };
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { load(); }, [id, user]);
 
   const liveScore = useMemo(() => calculateScore(data), [data]);
 
@@ -139,7 +139,7 @@ const InspectorJob = () => {
             <div className="flex items-start justify-between gap-3 flex-wrap">
               <div>
                 <h1 className="text-xl font-bold">{car?.year} {car?.make} {car?.model}</h1>
-                <p className="text-sm text-muted-foreground">{car?.registration} · {car?.mileage?.toLocaleString("de-DE")} km · {car?.location}</p>
+                <p className="text-sm text-muted-foreground">{car?.registration} · {car?.mileage?.toLocaleString()} miles · {car?.location}</p>
                 <Badge className="mt-2">{booking.inspection_type === "premium_300" ? "Premium 300pt" : "Standard 200pt"}</Badge>
               </div>
               <div className="text-right">

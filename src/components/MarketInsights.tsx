@@ -34,7 +34,7 @@ const MarketInsights = ({ listingId, make, model, year, price }: MarketInsightsP
     const fetchInsights = async () => {
       // Get similar listings for market comparison
       const { data: similar } = await supabase
-        .from("car_listings_public")
+        .from("car_listings")
         .select("price, created_at, views_count, enquiries_count")
         .eq("make", make)
         .eq("model", model)

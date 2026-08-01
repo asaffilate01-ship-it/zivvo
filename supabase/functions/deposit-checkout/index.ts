@@ -1,34 +1,107 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
-import { env, HttpError, json, parseJson, preflight, requireIdempotencyKey, requirePost, requireUser, requireUuid, safeError } from "../_shared/security.ts";
-import { AUCTION_DEPOSIT_CENTS, CURRENCY } from "../_shared/payments.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-Deno.serve(async (req) => {
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
+  const supabaseAdmin = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+  );
+
   try {
-    const options = preflight(req); if (options) return options;
-    requirePost(req);
-    const idempotencyKey = requireIdempotencyKey(req);
-    const { user, admin } = await requireUser(req);
-    if (!user.email) throw new HttpError(400, "Your account needs a verified email address");
-    const body = await parseJson(req);
-    const auctionId = requireUuid(body.auction_id, "auction_id");
-    const { data: auction } = await admin.from("auctions").select("id,seller_id,status,starts_at,ends_at").eq("id", auctionId).maybeSingle();
-    if (!auction || auction.status !== "live" || (auction.ends_at && new Date(auction.ends_at) <= new Date())) throw new HttpError(409, "Auction is not open for deposits");
-    if (auction.seller_id === user.id) throw new HttpError(403, "Sellers cannot bid on their own auction");
-    const { data: existing } = await admin.from("auction_deposits").select("id,status,stripe_payment_intent_id").eq("auction_id", auctionId).eq("user_id", user.id).in("status", ["pending", "authorized"]).maybeSingle();
-    if (existing?.status === "authorized") return json(req, { already_authorized: true, deposit_id: existing.id });
-    const stripe = new Stripe(env("STRIPE_SECRET_KEY"), { apiVersion: "2024-06-20" });
-    if (existing?.stripe_payment_intent_id) {
-      const intent = await stripe.paymentIntents.retrieve(existing.stripe_payment_intent_id);
-      return json(req, { client_secret: intent.client_secret, deposit_id: existing.id });
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user } } = await supabaseClient.auth.getUser(token);
+    if (!user?.email) throw new Error("Authentication required");
+
+    const { auction_id, amount } = await req.json();
+    if (!auction_id || !amount) throw new Error("auction_id and amount required");
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2023-10-16",
+    });
+
+    // Check if user already has an authorized deposit for this auction
+    const { data: existingDeposit } = await supabaseAdmin
+      .from("auction_deposits")
+      .select("*")
+      .eq("auction_id", auction_id)
+      .eq("user_id", user.id)
+      .eq("status", "authorized")
+      .maybeSingle();
+
+    if (existingDeposit) {
+      return new Response(JSON.stringify({ already_authorized: true, deposit_id: existingDeposit.id }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
-    const intent = await stripe.paymentIntents.create({
-      amount: AUCTION_DEPOSIT_CENTS, currency: CURRENCY, capture_method: "manual", customer: undefined,
-      receipt_email: user.email,
-      metadata: { type: "auction_deposit", auction_id: auctionId, user_id: user.id },
-      automatic_payment_methods: { enabled: true },
-    }, { idempotencyKey });
-    const { data: deposit, error } = await admin.from("auction_deposits").insert({ auction_id: auctionId, user_id: user.id, amount: AUCTION_DEPOSIT_CENTS / 100, type: "card_preauth", status: "pending", stripe_payment_intent_id: intent.id }).select("id").single();
-    if (error) { await stripe.paymentIntents.cancel(intent.id).catch(() => undefined); throw error; }
-    return json(req, { client_secret: intent.client_secret, deposit_id: deposit.id });
-  } catch (error) { return safeError(req, error); }
+
+    // Check/create Stripe customer
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    let customerId: string;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+    } else {
+      const customer = await stripe.customers.create({ email: user.email });
+      customerId = customer.id;
+    }
+
+    // Create a PaymentIntent with capture_method: manual (pre-authorization)
+    const depositAmount = Math.round(amount * 100); // Convert to pence/cents
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: depositAmount,
+      currency: "gbp",
+      customer: customerId,
+      capture_method: "manual", // Pre-auth only, don't capture yet
+      metadata: {
+        auction_id,
+        user_id: user.id,
+        type: "auction_deposit",
+      },
+    });
+
+    // Create deposit record
+    const { data: deposit, error: depositError } = await supabaseAdmin
+      .from("auction_deposits")
+      .insert({
+        auction_id,
+        user_id: user.id,
+        amount,
+        type: "card_preauth",
+        status: "pending",
+        stripe_payment_intent_id: paymentIntent.id,
+      })
+      .select()
+      .single();
+
+    if (depositError) throw depositError;
+
+    return new Response(JSON.stringify({
+      client_secret: paymentIntent.client_secret,
+      deposit_id: deposit.id,
+      payment_intent_id: paymentIntent.id,
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: msg }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+    });
+  }
 });

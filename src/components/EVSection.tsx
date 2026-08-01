@@ -13,10 +13,12 @@ const EVSection = () => {
   const { t } = useTranslation();
   const [fuelCost] = useState(1.75); // per litre (DE avg)
   const [elecCost] = useState(0.32); // per kWh
-  const [annualKilometres] = useState(15000);
+  const [annualMiles] = useState(15000); // km/year DE avg
 
-  const petrolCostYear = Math.round((annualKilometres / 100) * 7 * fuelCost);
-  const evCostYear = Math.round((annualKilometres / 5.5) * elecCost);
+  // 7 L/100km petrol → litres = miles/100*7
+  const petrolCostYear = Math.round((annualMiles / 100) * 7 * fuelCost);
+  // 5.5 km/kWh → kWh = miles / 5.5
+  const evCostYear = Math.round((annualMiles / 5.5) * elecCost);
 
   return (
     <section className="py-16 border-y border-border">
@@ -79,7 +81,7 @@ const EVSection = () => {
             <h3 className="font-display text-base font-semibold text-card-foreground mb-4">
               {t("home.ev.comparisonTitle")}
             </h3>
-            <p className="text-xs text-muted-foreground mb-6">{t("home.ev.comparisonSub", { miles: annualKilometres.toLocaleString(config.currency.locale) })}</p>
+            <p className="text-xs text-muted-foreground mb-6">{t("home.ev.comparisonSub", { miles: annualMiles.toLocaleString(config.currency.locale) })}</p>
 
             <div className="space-y-4">
               <div>

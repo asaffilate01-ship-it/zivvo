@@ -17,7 +17,7 @@ const CarOfTheWeek = () => {
   useEffect(() => {
     const fetchPick = async () => {
       const { data } = await supabase
-        .from("car_listings_public")
+        .from("car_listings")
         .select("*")
         .eq("status", "active")
         .eq("country", country)

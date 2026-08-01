@@ -52,7 +52,7 @@ const Inbox = () => {
           lastAt: "",
           unreadCount: 0,
         });
-      } catch { sessionStorage.removeItem("zivvo_open_chat"); }
+      } catch {}
     }
   }, []);
 
@@ -165,7 +165,7 @@ const Inbox = () => {
       supabase.removeChannel(channel);
       supabase.removeChannel(msgChannel);
     };
-  }, [t, toast, user]);
+  }, [user]);
 
   const handleReply = async (enquiryId: string) => {
     const text = replyText[enquiryId];

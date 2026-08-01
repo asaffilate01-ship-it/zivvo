@@ -10,7 +10,6 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
-import { legalConfig } from "@/lib/legalConfig";
 
 const Contact = () => {
   const { t } = useTranslation("contact");
@@ -21,7 +20,12 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.functions.invoke("contact-submit", { body: form });
+    const { error } = await supabase.from("contact_messages" as any).insert({
+      name: form.name,
+      email: form.email,
+      subject: form.subject,
+      message: form.message,
+    });
     setLoading(false);
 
     if (error) {
@@ -33,9 +37,9 @@ const Contact = () => {
   };
 
   const infoItems = [
-    { icon: Mail, title: t("email"), detail: legalConfig.email, sub: t("emailSub") },
-    { icon: Phone, title: t("phone"), detail: legalConfig.phone, sub: t("phoneSub") },
-    { icon: MapPin, title: t("office"), detail: `${legalConfig.street}, ${legalConfig.postcode} ${legalConfig.city}`, sub: `${legalConfig.companyName} ${legalConfig.legalForm}` },
+    { icon: Mail, title: t("email"), detail: t("emailDetail"), sub: t("emailSub") },
+    { icon: Phone, title: t("phone"), detail: t("phoneDetail"), sub: t("phoneSub") },
+    { icon: MapPin, title: t("office"), detail: t("officeDetail"), sub: t("officeSub") },
   ];
 
   return (

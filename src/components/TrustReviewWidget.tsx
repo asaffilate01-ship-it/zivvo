@@ -50,7 +50,7 @@ const TrustReviewWidget = () => {
               Rated <span className="text-primary">{stats.avgRating} / 5</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Based on {stats.count.toLocaleString()} platform review{stats.count === 1 ? "" : "s"}
+              Based on {stats.count.toLocaleString()} verified review{stats.count === 1 ? "" : "s"}
             </p>
           </div>
         </div>

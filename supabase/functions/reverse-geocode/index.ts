@@ -1,29 +1,85 @@
-import { adminClient, consumeAnonymousRateLimit, env, HttpError, json, parseJson, preflight, requirePost, safeError } from "../_shared/security.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-Deno.serve(async (req) => {
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    const options = preflight(req); if (options) return options;
-    requirePost(req);
-    const admin = adminClient();
-    await consumeAnonymousRateLimit(req, admin, "reverse-geocode", 30, 3600);
-    const body = await parseJson(req);
-    const lat = Number(body.lat); const lng = Number(body.lng);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) throw new HttpError(400, "Koordinaten sind ungültig");
-    const params = new URLSearchParams({
-      latlng: `${lat},${lng}`,
-      result_type: "locality|postal_town|administrative_area_level_2",
-      key: env("GOOGLE_MAPS_API_KEY"),
-    });
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?${params}`);
-    if (!response.ok) throw new HttpError(502, "Standortsuche ist vorübergehend nicht verfügbar");
-    const data = await response.json();
-    let city = "Ihre Umgebung";
-    for (const result of data.results || []) {
-      const component = (result.address_components || []).find((part: any) => part.types?.some((type: string) => ["locality", "postal_town", "administrative_area_level_2"].includes(type)));
-      if (component?.long_name) { city = component.long_name; break; }
+    const { lat, lng } = await req.json();
+
+    if (typeof lat !== "number" || typeof lng !== "number") {
+      return new Response(JSON.stringify({ error: "lat and lng required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
-    return json(req, { city });
-  } catch (error) {
-    return safeError(req, error);
+
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+    const gmKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
+    if (!lovableKey || !gmKey) {
+      return new Response(JSON.stringify({ city: "your area" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const url = `https://connector-gateway.lovable.dev/google_maps/maps/api/geocode/json?latlng=${lat},${lng}&result_type=locality|postal_town|administrative_area_level_2`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": gmKey,
+      },
+    });
+    if (!res.ok) {
+      console.error(`Reverse-geocode gateway failed [${res.status}]: ${await res.text()}`);
+      return new Response(JSON.stringify({ city: "your area" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const data = await res.json();
+
+    let city = "your area";
+    if (data.status === "OK" && data.results?.length > 0) {
+      // Extract city from address components
+      for (const result of data.results) {
+        for (const component of result.address_components || []) {
+          if (
+            component.types.includes("locality") ||
+            component.types.includes("postal_town")
+          ) {
+            city = component.long_name;
+            break;
+          }
+        }
+        if (city !== "your area") break;
+      }
+      // Fallback to admin area level 2
+      if (city === "your area") {
+        for (const result of data.results) {
+          for (const component of result.address_components || []) {
+            if (component.types.includes("administrative_area_level_2")) {
+              city = component.long_name;
+              break;
+            }
+          }
+          if (city !== "your area") break;
+        }
+      }
+    }
+
+    return new Response(JSON.stringify({ city }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

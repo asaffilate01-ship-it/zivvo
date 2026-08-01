@@ -2,7 +2,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
-import { legalVersionDate, withLegalIdentity } from "@/lib/legalConfig";
 
 const Widerruf = () => {
   const { t } = useTranslation("widerruf");
@@ -16,7 +15,7 @@ const Widerruf = () => {
         <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("lastUpdated")}{" "}
-          {legalVersionDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+          {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
         <p className="mt-4 rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
           {t("disclaimer")}
@@ -35,7 +34,7 @@ const Widerruf = () => {
 
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s2Title")}</h2>
-            <p className="mt-2">{withLegalIdentity(t("s2Body"))}</p>
+            <p className="mt-2">{t("s2Body")}</p>
           </section>
 
           <section>
@@ -51,7 +50,7 @@ const Widerruf = () => {
           <section className="rounded-lg border border-border bg-muted/30 p-4">
             <h2 className="font-display text-lg font-semibold text-foreground">{t("formTitle")}</h2>
             <p className="mt-2">{t("formIntro")}</p>
-            <p className="mt-2">{withLegalIdentity(t("formTo"))}</p>
+            <p className="mt-2">{t("formTo")}</p>
             <ul className="mt-3 space-y-2">
               {formBody.map((line, i) => (
                 <li key={i}>{line}</li>
