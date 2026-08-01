@@ -82,26 +82,6 @@ serve(async (req) => {
     const appUrl = Deno.env.get("APP_URL") ?? "https://zivvo.de";
     const inviteUrl = `${appUrl}/dealer/invite?token=${inviteToken}`;
 
-    // If the invitee already has an account, notify them in-app
-    try {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("user_id")
-        .eq("email", email)
-        .maybeSingle();
-      if (profile?.user_id) {
-        await supabase.from("notifications").insert({
-          user_id: profile.user_id,
-          type: "dealer_invite",
-          title: "Einladung zum Händlerteam",
-          message: `${dealer.business_name} hat Sie als ${role} eingeladen.`,
-          link: `/dealer/invite?token=${inviteToken}`,
-        });
-      }
-    } catch (_) {
-      // non-blocking
-    }
-
     console.log(`Dealer invite created for ${email} at dealer ${dealerId}`);
 
     return res({ ok: true, staffId: staff.id, inviteUrl });
