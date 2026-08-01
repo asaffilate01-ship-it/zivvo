@@ -39,7 +39,7 @@ const CompareCars = () => {
     if (selectedIds.length === 0) { setCars([]); return; }
     const fetchCars = async () => {
       const { data } = await supabase
-        .from("car_listings")
+        .from("car_listings_public")
         .select("*")
         .in("id", selectedIds)
         .eq("status", "active");
@@ -54,7 +54,7 @@ const CompareCars = () => {
       setSearching(true);
       const tsQuery = searchQuery.trim().split(/\s+/).join(" & ");
       const { data } = await supabase
-        .from("car_listings")
+        .from("car_listings_public")
         .select("id, title, make, model, year, price, images, verified, is_featured")
         .eq("status", "active")
         .textSearch("search_vector", tsQuery, { config: "english" })
@@ -80,7 +80,7 @@ const CompareCars = () => {
   const handleShare = async () => {
     const url = `${window.location.origin}/compare?${selectedIds.map((id) => `car=${id}`).join("&")}`;
     if (navigator.share) {
-      try { await navigator.share({ title: t("shareTitle"), url }); } catch {}
+      try { await navigator.share({ title: t("shareTitle"), url }); } catch { /* User cancelled the native share sheet. */ }
     } else {
       await navigator.clipboard.writeText(url);
       toast({ title: t("linkCopied") });

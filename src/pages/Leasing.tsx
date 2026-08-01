@@ -9,29 +9,29 @@ const Leasing = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Leasing-Rechner — Auto leasen ab günstiger Monatsrate | Zivvo"
-        description="Berechnen Sie Ihre monatliche Leasingrate in Sekunden. Kilometerleasing für Privat- und Gewerbekunden mit deutschen Leasingpartnern. Unverbindlich & transparent."
+        title="Leasing-Kostenrechner — unverbindliche Orientierung | Zivvo"
+        description="Variieren Sie Fahrzeugpreis, Laufzeit, Kilometerleistung und Beispielzins für eine unverbindliche Leasing-Kostenorientierung. Kein Angebot und keine Kreditentscheidung."
       />
       <Navbar />
       <main className="container mx-auto px-4 py-10">
         <div className="mx-auto max-w-4xl">
           <div className="mb-6">
             <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
-              Leasing-Rechner
+              Leasing-Kostenrechner
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Sofortige monatliche Leasingrate — Kilometerleasing für Privat- und Gewerbekunden.
-              Ohne Bonitätsanfrage, ohne Verpflichtung.
+              Unverbindliche Kostenorientierung für Kilometerleasing. Die Eingaben werden nur
+              für das Rechenbeispiel verwendet; es wird kein Antrag gestellt.
             </p>
           </div>
 
           <LeasingCalculator />
 
           <div className="mt-8 grid gap-4 md:grid-cols-4">
-            <Feature icon={ShieldCheck} title="TÜV-geprüfte Partner" body="Nur zertifizierte deutsche Leasinggeber." />
-            <Feature icon={Zap} title="Antwort in 24h" body="Verbindliches Angebot binnen einem Werktag." />
-            <Feature icon={Users} title="Privat & Gewerbe" body="Konditionen für alle Kundengruppen." />
-            <Feature icon={CheckCircle2} title="Ohne Anzahlung" body="Auf Wunsch 0 € Anzahlung möglich." />
+            <Feature icon={ShieldCheck} title="Keine Antragstellung" body="Die Berechnung löst keine Bonitätsprüfung aus." />
+            <Feature icon={Zap} title="Annahmen anpassbar" body="Zins, Laufzeit und Kilometerleistung selbst variieren." />
+            <Feature icon={Users} title="Nur Orientierung" body="Tatsächliche Angebote können deutlich abweichen." />
+            <Feature icon={CheckCircle2} title="Kosten transparent" body="Anzahlung und Rechenfaktoren bleiben sichtbar." />
           </div>
 
           <Card className="mt-8">
@@ -40,17 +40,18 @@ const Leasing = () => {
               <p>
                 Beim Kilometerleasing zahlen Sie eine feste Monatsrate für eine vereinbarte
                 Laufzeit und Jahreskilometerleistung. Am Vertragsende geben Sie das Fahrzeug
-                einfach zurück — kein Restwertrisiko, keine Verwertungsprobleme.
+                grundsätzlich zurück. Mehr- oder Minderkilometer, Schäden und Rückgabebedingungen
+                richten sich nach dem konkreten Vertrag.
               </p>
-              <h3 className="font-display text-foreground">Voraussetzungen</h3>
+              <h3 className="font-display text-foreground">Vor einem Vertragsabschluss prüfen</h3>
               <ul>
-                <li>Volljährigkeit und deutscher Wohnsitz</li>
-                <li>Positive Bonitätsprüfung (Schufa)</li>
-                <li>Für Gewerbekunden: Handelsregisterauszug / Gewerbeanmeldung</li>
+                <li>Gesamtbetrag, Sonderzahlung und Überführungs- oder Zulassungskosten</li>
+                <li>Regelungen für Mehrkilometer, Schäden, Wartung und Rückgabe</li>
+                <li>Bonitäts- und Vertragsanforderungen des jeweiligen Leasinggebers</li>
               </ul>
               <p className="text-xs">
-                Repräsentatives Beispiel: Nettokreditbetrag 30.000 €, Laufzeit 36 Monate,
-                eff. Jahreszins 4,9 %. Alle Angaben unverbindlich.
+                Das Ergebnis ist eine vereinfachte Modellrechnung, kein repräsentatives Beispiel,
+                kein Kredit- oder Leasingangebot und keine Aussage zur Verfügbarkeit.
               </p>
             </CardContent>
           </Card>

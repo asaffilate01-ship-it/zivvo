@@ -37,7 +37,6 @@ const SellMyCar = () => {
   ];
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [regLooking, setRegLooking] = useState(false);
 
   const [form, setForm] = useState({
     registration: "",
@@ -58,33 +57,6 @@ const SellMyCar = () => {
   const [previews, setPreviews] = useState<string[]>([]);
 
   const updateForm = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }));
-
-  const handleRegLookup = async () => {
-    if (!form.registration.trim()) return;
-    setRegLooking(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("dvla-lookup", {
-        body: { registration: form.registration.trim().toUpperCase() },
-      });
-      if (data && !error) {
-        setForm((p) => ({
-          ...p,
-          make: data.make || p.make,
-          model: data.model || p.model,
-          year: data.yearOfManufacture?.toString() || p.year,
-          fuel_type: data.fuelType || p.fuel_type,
-          color: data.colour || p.color,
-          title: `${data.make || ""} ${data.model || ""} ${data.yearOfManufacture || ""}`.trim(),
-        }));
-        toast({ title: t("sellMyCar.vehicleFound"), description: `${data.make} ${data.model} (${data.yearOfManufacture})` });
-      } else {
-        toast({ title: t("sellMyCar.notFound"), description: t("sellMyCar.notFoundDesc"), variant: "destructive" });
-      }
-    } catch {
-      toast({ title: t("sellMyCar.lookupFailed"), description: t("sellMyCar.lookupFailedDesc"), variant: "destructive" });
-    }
-    setRegLooking(false);
-  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -241,9 +213,6 @@ const SellMyCar = () => {
                               onChange={(e) => updateForm("registration", e.target.value.toUpperCase())}
                               className="uppercase font-mono"
                             />
-                            <Button onClick={handleRegLookup} disabled={regLooking} variant="outline">
-                              {regLooking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                            </Button>
                           </div>
                         </div>
                       )}

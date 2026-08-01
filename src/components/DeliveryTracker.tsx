@@ -96,7 +96,7 @@ const DeliveryTracker = ({ referenceType, referenceId, buyerId, sellerId, pickup
       const update: Record<string, any> = { status: newStatus };
       if (newStatus === "collected") update.collected_at = new Date().toISOString();
       if (newStatus === "delivered") update.delivered_at = new Date().toISOString();
-      const { error } = await supabase.from("delivery_tracking").update(update).eq("id", delivery!.id);
+      const { error } = await supabase.from("delivery_tracking").update(update as never).eq("id", delivery!.id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -139,14 +139,14 @@ const DeliveryTracker = ({ referenceType, referenceId, buyerId, sellerId, pickup
                     <Input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} />
                   </div>
                   <div>
-                    <Label>Delivery Cost (£)</Label>
+                    <Label>Delivery Cost (€)</Label>
                     <Input type="number" value={form.delivery_cost} onChange={(e) => setForm({ ...form, delivery_cost: e.target.value })} placeholder="0" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Courier / Transport Company</Label>
-                    <Input value={form.courier_name} onChange={(e) => setForm({ ...form, courier_name: e.target.value })} placeholder="e.g. RAC Transport" />
+                    <Input value={form.courier_name} onChange={(e) => setForm({ ...form, courier_name: e.target.value })} placeholder="z. B. beauftragtes Transportunternehmen" />
                   </div>
                   <div>
                     <Label>Tracking Reference</Label>
@@ -248,7 +248,7 @@ const DeliveryTracker = ({ referenceType, referenceId, buyerId, sellerId, pickup
           {delivery.delivery_cost > 0 && (
             <div>
               <p className="text-muted-foreground text-xs">Cost</p>
-              <p className="text-card-foreground font-medium">£{delivery.delivery_cost}</p>
+              <p className="text-card-foreground font-medium">€{delivery.delivery_cost}</p>
             </div>
           )}
         </div>

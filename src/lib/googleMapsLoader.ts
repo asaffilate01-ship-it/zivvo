@@ -3,12 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 let googleMapsPromise: Promise<void> | null = null;
 
-const BROWSER_KEY = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
-const TRACKING_ID = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID as string | undefined;
+const BROWSER_KEY = import.meta.env.VITE_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
 
 /**
  * Loads the Google Maps JS SDK exactly once across the app.
- * Uses the Lovable-managed Google Maps browser key (referrer-restricted, safe to embed).
+ * The browser key must be restricted to the production hostname in Google Cloud.
  */
 export const loadGoogleMaps = async (): Promise<void> => {
   if ((window as any).google?.maps) return;
@@ -34,8 +33,6 @@ export const loadGoogleMaps = async (): Promise<void> => {
       loading: "async",
       callback: "__initGoogleMaps",
     });
-    if (TRACKING_ID) params.set("channel", TRACKING_ID);
-
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?${params}`;
     script.async = true;
@@ -54,7 +51,7 @@ export interface GeocodeResult {
   formatted?: string;
 }
 
-/** Geocode an address string via the `geocode` edge function (routed through Lovable's Maps gateway). */
+/** Geocode an address string via the rate-limited `geocode` Edge Function. */
 export const geocodeAddress = async (
   address: string,
   country?: string

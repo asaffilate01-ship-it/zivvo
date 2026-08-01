@@ -1,76 +1,49 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { adminClient, consumeAnonymousRateLimit, env, HttpError, json, parseJson, preflight, requirePost, safeError } from "../_shared/security.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+type ChatMessage = { role: "user" | "assistant"; content: string };
+
+const aiEndpoint = (): string => {
+  const url = new URL(env("AI_API_URL"));
+  if (url.protocol !== "https:") throw new HttpError(500, "KI-Dienst ist nicht konfiguriert");
+  return url.toString();
 };
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+Deno.serve(async (req) => {
   try {
-    const { message, history } = await req.json();
-
-    const systemPrompt = `You are Zivvo AI, a friendly and knowledgeable car-finding assistant for Zivvo — a premium online car marketplace operating in the UK, US, Pakistan, and UAE.
-
-Your capabilities:
-- Help users find cars based on their budget, preferences, and needs
-- Explain Zivvo features: verified listings, finance checks, HPI checks, MOT history
-- Guide sellers through listing their car
-- Answer questions about car buying, selling, financing
-- Recommend body types based on lifestyle needs
-
-Key URLs to reference:
-- Browse cars: /browse
-- Sell your car: /sell-my-car
-- Car valuation: /valuation
-- Dealers: /dealers
-- Help: /help
-
-Keep responses concise (2-4 sentences). Be helpful, professional, and enthusiastic about cars. If asked about pricing, direct them to browse listings. Never make up specific car listings or prices.`;
-
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...(history || []).map((m: any) => ({ role: m.role, content: m.content })),
-      { role: "user", content: message },
-    ];
-
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!lovableApiKey) {
-      return new Response(
-        JSON.stringify({ reply: "I'm being set up — please try again in a moment!" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const options = preflight(req); if (options) return options;
+    requirePost(req);
+    const admin = adminClient();
+    await consumeAnonymousRateLimit(req, admin, "ai-chat", 20, 3600);
+    const body = await parseJson(req);
+    const message = typeof body.message === "string" ? body.message.trim() : "";
+    if (!message || message.length > 1000) throw new HttpError(400, "Nachricht ist ungültig");
+    const rawHistory = Array.isArray(body.history) ? body.history.slice(-8) : [];
+    const history: ChatMessage[] = rawHistory.map((entry: unknown) => {
+      if (!entry || typeof entry !== "object") throw new HttpError(400, "Chatverlauf ist ungültig");
+      const item = entry as Record<string, unknown>;
+      if ((item.role !== "user" && item.role !== "assistant") || typeof item.content !== "string" || item.content.length > 1000) throw new HttpError(400, "Chatverlauf ist ungültig");
+      return { role: item.role, content: item.content };
+    });
+    const response = await fetch(aiEndpoint(), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${lovableApiKey}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${env("AI_API_KEY")}` },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages,
+        model: env("AI_MODEL"),
         max_tokens: 300,
-        temperature: 0.7,
+        temperature: 0.4,
+        messages: [
+          { role: "system", content: "Du bist der Zivvo-Assistent für einen deutschen Fahrzeugmarktplatz. Antworte knapp auf Deutsch. Erfinde keine Inserate, Preise, Prüfungen, Garantien oder Finanzierungspartner. Verweise für konkrete Angebote auf /browse, für Verkauf auf /sell und für Hilfe auf /help. Bei Rechts-, Finanz- oder Sicherheitsfragen weise auf fachliche Beratung hin." },
+          ...history,
+          { role: "user", content: message },
+        ],
       }),
     });
-
+    if (!response.ok) throw new HttpError(response.status === 429 ? 429 : 502, "Der Assistent ist vorübergehend nicht verfügbar");
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't process that. Try asking another way!";
-
-    return new Response(JSON.stringify({ reply }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    const reply = data.choices?.[0]?.message?.content;
+    if (typeof reply !== "string" || !reply.trim()) throw new HttpError(502, "Der Assistent ist vorübergehend nicht verfügbar");
+    return json(req, { reply: reply.trim() });
   } catch (error) {
-    console.error("AI Chat error:", error);
-    return new Response(
-      JSON.stringify({ reply: "Something went wrong. Please try again!" }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-    );
+    return safeError(req, error);
   }
 });

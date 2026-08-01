@@ -143,7 +143,7 @@ const FullPreview = ({ config, businessName, previewMode }: { config: LandingPag
           {config.hero_subtitle && <p className="mt-1 text-[11px] text-white/70">{config.hero_subtitle}</p>}
           <div className="mt-3 flex gap-2">
             <span className="inline-block rounded-md px-4 py-1.5 text-[11px] font-medium text-white shadow" style={{ backgroundColor: accent }}>
-              {config.cta_text || "Browse Inventory"}
+              {config.cta_text || "Bestand ansehen"}
             </span>
             {config.secondary_cta_text && (
               <span className="inline-block rounded-md border border-white/20 px-4 py-1.5 text-[11px] font-medium text-white/80">
@@ -157,7 +157,7 @@ const FullPreview = ({ config, businessName, previewMode }: { config: LandingPag
       {/* Stats */}
       {config.show_stats !== false && (
         <div className="grid grid-cols-4 border-b border-border text-center text-[9px]">
-          {["🚗 Stock", "⭐ 4.9", `🕐 ${config.opening_hours || "Mon–Sat"}`, "✅ Verified"].map((s) => (
+          {["🚗 Bestand", "📍 Standort", `🕐 ${config.opening_hours || "Nicht angegeben"}`, "✅ Status sichtbar"].map((s) => (
             <div key={s} className="border-r border-border last:border-0 py-2 text-muted-foreground">{s}</div>
           ))}
         </div>
@@ -166,7 +166,7 @@ const FullPreview = ({ config, businessName, previewMode }: { config: LandingPag
       {/* USPs */}
       {config.show_usps !== false && config.usps && config.usps.length > 0 && (
         <div className="border-b border-border p-4">
-          <p className="text-[10px] font-semibold text-foreground mb-2 text-center">Why Choose Us</p>
+          <p className="text-[10px] font-semibold text-foreground mb-2 text-center">Warum dieser Händler?</p>
           <div className={`grid gap-2 ${previewMode === "mobile" ? "grid-cols-2" : "grid-cols-4"}`}>
             {config.usps.slice(0, 4).map((usp, i) => (
               <div key={i} className="rounded-lg border border-border bg-card p-2 text-center">
@@ -677,7 +677,7 @@ const DealerPageBuilder = ({ dealerId, currentConfig, businessName, onSaved }: D
                   <CardContent>
                     <div className="space-y-1">
                       <Label className="text-xs">WhatsApp Number (with country code)</Label>
-                      <Input className="h-8 text-sm" value={config.whatsapp_number} onChange={(e) => update("whatsapp_number", e.target.value)} placeholder="+44 7700 900000" />
+                      <Input className="h-8 text-sm" value={config.whatsapp_number} onChange={(e) => update("whatsapp_number", e.target.value)} placeholder="+49 151 23456789" />
                       <p className="text-[10px] text-muted-foreground">Adds a floating WhatsApp button to your page</p>
                     </div>
                   </CardContent>

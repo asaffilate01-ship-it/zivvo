@@ -2,6 +2,7 @@ import { useState } from "react";
 import heroTradeStock from "@/assets/hero-trade-stock.jpg";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { idempotencyHeaders } from "@/lib/idempotency";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCountry } from "@/contexts/CountryContext";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
@@ -23,6 +24,7 @@ import { toast } from "sonner";
 import SellerOffers from "@/components/SellerOffers";
 import ArbitragePipelineStepper from "@/components/ArbitragePipelineStepper";
 import { useTranslation } from "react-i18next";
+import { redirectToStripe } from "@/lib/safeNavigation";
 import {
   ArrowRightLeft, TrendingUp, Shield, Clock, CheckCircle2, XCircle,
   DollarSign, Truck, FileText, Search, Plus, Eye, Building2, CreditCard,
@@ -54,6 +56,7 @@ const TradeStock = () => {
   const queryClient = useQueryClient();
   const isAdmin = hasRole("admin");
   const isSeller = hasRole("seller");
+  const isDealer = hasRole("dealer");
   const [tab, setTab] = useState(isAdmin ? "all" : isSeller ? "my_offers" : "available");
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
@@ -78,9 +81,8 @@ const TradeStock = () => {
   const { data: deals = [], isLoading } = useQuery({
     queryKey: ["arbitrage-deals", tab],
     queryFn: async () => {
-      let query = supabase
-        .from("arbitrage_deals")
-        .select("*, car_listings!inner(title, make, model, year, images, mileage, fuel_type, location, country)")
+      let query = (supabase.from as any)("arbitrage_deals_visible")
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (tab === "available") {
@@ -92,9 +94,23 @@ const TradeStock = () => {
       
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return (data || []).map((deal: any) => ({
+        ...deal,
+        car_listings: {
+          title: deal.listing_title,
+          make: deal.listing_make,
+          model: deal.listing_model,
+          year: deal.listing_year,
+          images: deal.listing_images,
+          price: deal.listing_price,
+          mileage: deal.listing_mileage,
+          fuel_type: deal.listing_fuel_type,
+          location: deal.listing_location,
+          country: deal.listing_country,
+        },
+      }));
     },
-    enabled: !!user,
+    enabled: !!user && tab !== "my_offers" && tab !== "audit",
   });
 
   // Fetch listings for admin to create deals
@@ -160,19 +176,10 @@ const TradeStock = () => {
   // Update deal status (admin)
   const updateStatus = useMutation({
     mutationFn: async ({ dealId, newStatus, extra }: { dealId: string; newStatus: string; extra?: Record<string, any> }) => {
-      const { error } = await supabase
-        .from("arbitrage_deals")
-        .update({ status: newStatus as any, ...extra })
-        .eq("id", dealId);
-      if (error) throw error;
-
-      await supabase.from("arbitrage_audit_log").insert({
-        deal_id: dealId,
-        actor_id: user!.id,
-        actor_role: isAdmin ? "admin" : "dealer",
-        action: `status_updated_to_${newStatus}`,
-        details: extra || {},
+      const { error } = await (supabase.rpc as any)("transition_arbitrage_deal", {
+        p_deal_id: dealId, p_action: newStatus, p_note: extra?.payment_ref || extra?.reason || null,
       });
+      if (error) throw error;
     },
     onSuccess: () => {
       toast.success(t("tradeStock.toasts.dealUpdated"));
@@ -184,35 +191,8 @@ const TradeStock = () => {
   // Dealer accept deal
   const acceptDeal = useMutation({
     mutationFn: async (dealId: string) => {
-      const { data: dealer } = await supabase
-        .from("dealers")
-        .select("id")
-        .eq("user_id", user!.id)
-        .single();
-      if (!dealer) throw new Error(t("tradeStock.errors.mustBeDealer"));
-
-      const { error } = await supabase
-        .from("arbitrage_deals")
-        .update({
-          status: "dealer_accepted" as any,
-          buyer_dealer_id: dealer.id,
-          dealer_accepted_at: new Date().toISOString(),
-        })
-        .eq("id", dealId);
+      const { error } = await (supabase.rpc as any)("transition_arbitrage_deal", { p_deal_id: dealId, p_action: "dealer_accepted", p_note: null });
       if (error) throw error;
-
-      await supabase.from("arbitrage_audit_log").insert({
-        deal_id: dealId,
-        actor_id: user!.id,
-        actor_role: "dealer",
-        action: "dealer_accepted",
-        details: { dealer_id: dealer.id },
-      });
-
-      // Trigger notification
-      await supabase.functions.invoke("notify-arbitrage", {
-        body: { deal_id: dealId, action: "dealer_accepted" },
-      });
     },
     onSuccess: () => {
       toast.success(t("tradeStock.toasts.dealAccepted"));
@@ -226,11 +206,12 @@ const TradeStock = () => {
     mutationFn: async (dealId: string) => {
       setPayingDealId(dealId);
       const { data, error } = await supabase.functions.invoke("arbitrage-payment", {
+        headers: idempotencyHeaders(),
         body: { deal_id: dealId },
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, "_blank");
+        redirectToStripe(data.url);
       } else {
         throw new Error(t("tradeStock.errors.paymentSessionFailed"));
       }
@@ -245,28 +226,8 @@ const TradeStock = () => {
   // Admin: mark seller paid with ref
   const markSellerPaid = useMutation({
     mutationFn: async ({ dealId, ref }: { dealId: string; ref: string }) => {
-      const { error } = await supabase
-        .from("arbitrage_deals")
-        .update({
-          status: "seller_paid" as any,
-          seller_paid_at: new Date().toISOString(),
-          seller_payment_ref: ref,
-        })
-        .eq("id", dealId);
+      const { error } = await (supabase.rpc as any)("transition_arbitrage_deal", { p_deal_id: dealId, p_action: "seller_paid", p_note: ref });
       if (error) throw error;
-
-      await supabase.from("arbitrage_audit_log").insert({
-        deal_id: dealId,
-        actor_id: user!.id,
-        actor_role: "admin",
-        action: "seller_paid",
-        details: { payment_ref: ref },
-      });
-
-      // Notify seller
-      await supabase.functions.invoke("notify-arbitrage", {
-        body: { deal_id: dealId, action: "seller_paid" },
-      });
     },
     onSuccess: () => {
       toast.success(t("tradeStock.toasts.sellerPaid"));
@@ -427,7 +388,8 @@ const TradeStock = () => {
                     const img = listing?.images?.[0] || "/placeholder.svg";
                     const scColor = statusColors[deal.status] || statusColors.sourced;
                     const scLabel = t(`tradeStock.status.${deal.status}`, t("tradeStock.status.sourced"));
-                    const showDealerActions = deal.status === "listed_to_dealers" && !isAdmin;
+                    const showDealerActions = deal.status === "listed_to_dealers" && isDealer && !isAdmin;
+                    const showSellerActions = deal.status === "offer_sent" && deal.seller_id === user?.id;
                     const showAdminActions = isAdmin;
 
                     return (
@@ -437,10 +399,10 @@ const TradeStock = () => {
                           <div className="absolute top-3 left-3">
                             <Badge className={scColor}>{scLabel}</Badge>
                           </div>
-                          <div className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-1.5">
+                          {!showSellerActions && deal.dealer_price != null && (isAdmin || isDealer) && <div className="absolute bottom-3 right-3 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-1.5">
                             <p className="text-xs text-muted-foreground">{t("tradeStock.dealCard.tradePrice")}</p>
                             <p className="font-bold text-foreground">{fmt(deal.dealer_price, deal.country)}</p>
-                          </div>
+                          </div>}
                         </div>
                         <CardContent className="p-4 space-y-3">
                           <div>
@@ -453,6 +415,17 @@ const TradeStock = () => {
                           </div>
 
                           <ArbitragePipelineStepper status={deal.status} />
+
+                          {showSellerActions && (
+                            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                              <p className="text-sm text-muted-foreground">Angebot an Sie</p>
+                              <p className="text-xl font-bold">{fmt(deal.seller_price, deal.country)}</p>
+                              <div className="mt-3 flex gap-2">
+                                <Button size="sm" onClick={() => updateStatus.mutate({ dealId: deal.id, newStatus: "seller_accepted" })}>Annehmen</Button>
+                                <Button size="sm" variant="outline" onClick={() => updateStatus.mutate({ dealId: deal.id, newStatus: "seller_rejected" })}>Ablehnen</Button>
+                              </div>
+                            </div>
+                          )}
 
                           {isAdmin && (
                             <div className="text-xs space-y-1 p-2 rounded-lg bg-muted/50">
@@ -470,7 +443,7 @@ const TradeStock = () => {
                           )}
 
                           {/* Dealer: pay for accepted deal */}
-                          {!isAdmin && deal.status === "dealer_accepted" && (
+                          {isDealer && !isAdmin && deal.status === "dealer_accepted" && (
                             <Button className="w-full gap-2" onClick={() => payForDeal.mutate(deal.id)} disabled={payingDealId === deal.id}>
                               {payingDealId === deal.id ? <Spinner className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
                               {payingDealId === deal.id ? t("tradeStock.dealCard.openingPayment") : t("tradeStock.dealCard.pay", { amount: fmt(deal.dealer_price, deal.country) })}
@@ -483,7 +456,6 @@ const TradeStock = () => {
                               {deal.status === "sourced" && (
                                 <Button size="sm" variant="outline" onClick={async () => {
                                   await updateStatus.mutateAsync({ dealId: deal.id, newStatus: "offer_sent", extra: { seller_offer_sent_at: new Date().toISOString() } });
-                                  await supabase.functions.invoke("notify-arbitrage", { body: { deal_id: deal.id, action: "offer_sent" } });
                                 }}>
                                   {t("tradeStock.dealCard.sendToSeller")}
                                 </Button>
@@ -491,12 +463,11 @@ const TradeStock = () => {
                               {deal.status === "seller_accepted" && (
                                 <Button size="sm" onClick={async () => {
                                   await updateStatus.mutateAsync({ dealId: deal.id, newStatus: "listed_to_dealers", extra: { dealer_offer_sent_at: new Date().toISOString() } });
-                                  await supabase.functions.invoke("notify-arbitrage", { body: { deal_id: deal.id, action: "listed_to_dealers" } });
                                 }}>
                                   {t("tradeStock.dealCard.listToDealers")}
                                 </Button>
                               )}
-                              {deal.status === "dealer_accepted" && (
+                              {deal.status === "dealer_accepted" && deal.dealer_paid_at && (
                                 <Button size="sm" className="gap-1" onClick={() => setPayoutDialog(deal)}>
                                   <Banknote className="w-3.5 h-3.5" /> {t("tradeStock.dealCard.paySeller")}
                                 </Button>
@@ -504,7 +475,6 @@ const TradeStock = () => {
                               {deal.status === "seller_paid" && (
                                 <Button size="sm" variant="default" onClick={async () => {
                                   await updateStatus.mutateAsync({ dealId: deal.id, newStatus: "completed" });
-                                  await supabase.functions.invoke("notify-arbitrage", { body: { deal_id: deal.id, action: "completed" } });
                                 }}>
                                   {t("tradeStock.dealCard.completeDeal")}
                                 </Button>

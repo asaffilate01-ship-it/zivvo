@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +41,7 @@ const BookingsManager = ({ dealerId }: Props) => {
     cancelled: t("dealer.bookingsManager.statusCancelled"),
   };
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const [b, f, tr] = await Promise.all([
       supabase.from("test_drive_bookings").select("*").eq("dealer_id", dealerId).order("created_at", { ascending: false }),
@@ -52,9 +52,9 @@ const BookingsManager = ({ dealerId }: Props) => {
     setFinders(f.data || []);
     setTransports(tr.data || []);
     setLoading(false);
-  };
+  }, [dealerId]);
 
-  useEffect(() => { load(); }, [dealerId]);
+  useEffect(() => { void load(); }, [load]);
 
   const setStatus = async (table: "test_drive_bookings" | "vehicle_finder_requests" | "transport_quotes", id: string, status: string) => {
     const { error } = await supabase.from(table).update({ status }).eq("id", id);

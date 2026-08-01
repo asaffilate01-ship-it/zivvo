@@ -2,14 +2,18 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
+import { Fragment } from "react";
+import { legalConfig, legalVersionDate, withLegalIdentity } from "@/lib/legalConfig";
+
+const renderBold = (line: string) => withLegalIdentity(line).split(/(\*\*.*?\*\*)/g).map((part, index) =>
+  part.startsWith("**") && part.endsWith("**")
+    ? <strong key={index}>{part.slice(2, -2)}</strong>
+    : <Fragment key={index}>{part}</Fragment>,
+);
 
 const CookiePolicy = () => {
   const { t } = useTranslation("cookiePolicy");
   const s4List = t("s4List", { returnObjects: true }) as string[];
-
-  const renderBold = (line: string) => (
-    <span dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
-  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -19,7 +23,7 @@ const CookiePolicy = () => {
         <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("lastUpdated")}{" "}
-          {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+          {legalVersionDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
 
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
@@ -81,7 +85,7 @@ const CookiePolicy = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s5Title")}</h2>
             <p className="mt-2">
               {t("s5Body")}{" "}
-              <a href="mailto:privacy@zivvo.co.uk" className="text-primary underline">privacy@zivvo.co.uk</a>.
+              <a href={`mailto:${legalConfig.email}`} className="text-primary underline">{legalConfig.email}</a>.
             </p>
           </section>
         </div>

@@ -10,6 +10,7 @@ import { Car, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { trackEvent } from "@/hooks/useAnalytics";
 
 const Signup = () => {
   const { t } = useTranslation();
@@ -42,6 +43,7 @@ const Signup = () => {
     if (error) {
       toast({ title: t("auth.signup.failed"), description: error.message, variant: "destructive" });
     } else {
+      void trackEvent("signup_submitted");
       toast({
         title: t("auth.signup.checkEmail"),
         description: t("auth.signup.checkEmailDesc"),
@@ -76,7 +78,7 @@ const Signup = () => {
               <div className="space-y-2">
                 <Label htmlFor="password">{t("auth.signup.password")}</Label>
                 <div className="relative">
-                  <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("auth.signup.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required />
+                  <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("auth.signup.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} minLength={12} autoComplete="new-password" required />
                   <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>

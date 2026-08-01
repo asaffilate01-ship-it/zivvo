@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
+import { legalConfig, legalVersionDate } from "@/lib/legalConfig";
 
 const Accessibility = () => {
   const { t } = useTranslation("accessibility");
@@ -15,7 +16,7 @@ const Accessibility = () => {
         <h1 className="font-display text-3xl font-bold text-foreground">{t("title")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {t("lastUpdated")}{" "}
-          {new Date().toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
+          {legalVersionDate.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}
         </p>
         <p className="mt-4 rounded-lg border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
           {t("disclaimer")}
@@ -24,7 +25,7 @@ const Accessibility = () => {
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("commitmentTitle")}</h2>
-            <p className="mt-2" dangerouslySetInnerHTML={{ __html: t("commitmentBody", { wcag: `<strong>${t("wcagStandard")}</strong>` }) }} />
+            <p className="mt-2">{t("commitmentBody", { wcag: t("wcagStandard") })}</p>
           </section>
 
           <section>
@@ -49,11 +50,11 @@ const Accessibility = () => {
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("reportingTitle")}</h2>
             <p className="mt-2">
-              {t("reportingBody", { email: "accessibility@zivvo.de" }).split("accessibility@zivvo.de").map((part, i, arr) => (
+              {t("reportingBody", { email: legalConfig.email }).split(legalConfig.email).map((part, i, arr) => (
                 <span key={i}>
                   {part}
                   {i < arr.length - 1 && (
-                    <a href="mailto:accessibility@zivvo.de" className="text-primary underline">accessibility@zivvo.de</a>
+                    <a href={`mailto:${legalConfig.email}`} className="text-primary underline">{legalConfig.email}</a>
                   )}
                 </span>
               ))}

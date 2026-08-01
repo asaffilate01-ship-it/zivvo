@@ -6,12 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CreditCard, Shield, Loader2 } from "lucide-react";
+import { idempotencyHeaders } from "@/lib/idempotency";
 
-// The publishable key is stored as a secret; we retrieve it via an edge function
-// For now we use a config approach - this will be set by the user
-const stripePromise = loadStripe(
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder"
-);
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.trim();
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 interface DepositFormProps {
   auctionId: string;
@@ -19,7 +17,7 @@ interface DepositFormProps {
   onCancel: () => void;
 }
 
-const CheckoutForm = ({ depositId, paymentIntentId, onSuccess }: { depositId: string; paymentIntentId: string; onSuccess: () => void }) => {
+const CheckoutForm = ({ depositId, onSuccess }: { depositId: string; onSuccess: () => void }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [processing, setProcessing] = useState(false);
@@ -44,7 +42,7 @@ const CheckoutForm = ({ depositId, paymentIntentId, onSuccess }: { depositId: st
       if (paymentIntent && (paymentIntent.status === "requires_capture" || paymentIntent.status === "succeeded")) {
         // Confirm deposit in our backend
         const { error: confirmErr } = await supabase.functions.invoke("confirm-deposit", {
-          body: { deposit_id: depositId, payment_intent_id: paymentIntentId },
+          body: { deposit_id: depositId },
         });
         if (confirmErr) throw confirmErr;
         toast.success("Deposit pre-authorized! You can now bid.");
@@ -62,10 +60,10 @@ const CheckoutForm = ({ depositId, paymentIntentId, onSuccess }: { depositId: st
       <PaymentElement />
       <Button type="submit" disabled={!stripe || processing} className="w-full h-11 gap-2">
         {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Shield className="w-4 h-4" />}
-        {processing ? "Authorizing..." : "Pre-authorize £500 Deposit"}
+        {processing ? "Autorisierung…" : "500 € Kaution vorautorisieren"}
       </Button>
       <p className="text-[10px] text-muted-foreground text-center">
-        This holds £500 on your card. You will only be charged if you win the auction.
+        500 € werden auf Ihrer Karte reserviert und nur bei einem Auktionsgewinn belastet.
       </p>
     </form>
   );
@@ -74,16 +72,20 @@ const CheckoutForm = ({ depositId, paymentIntentId, onSuccess }: { depositId: st
 const StripeDepositForm = ({ auctionId, onSuccess, onCancel }: DepositFormProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [depositId, setDepositId] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const initDeposit = async () => {
+    if (!stripePromise) {
+      setError("Die Zahlungsfunktion ist noch nicht konfiguriert.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const { data, error: fnErr } = await supabase.functions.invoke("deposit-checkout", {
-        body: { auction_id: auctionId, amount: 500 },
+        headers: idempotencyHeaders(),
+        body: { auction_id: auctionId },
       });
       if (fnErr) throw fnErr;
 
@@ -96,7 +98,6 @@ const StripeDepositForm = ({ auctionId, onSuccess, onCancel }: DepositFormProps)
       if (data?.client_secret) {
         setClientSecret(data.client_secret);
         setDepositId(data.deposit_id);
-        setPaymentIntentId(data.payment_intent_id);
       } else {
         throw new Error("Failed to create deposit session");
       }
@@ -117,8 +118,8 @@ const StripeDepositForm = ({ auctionId, onSuccess, onCancel }: DepositFormProps)
             <div>
               <h3 className="font-semibold">Pre-authorize Deposit</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                A £500 hold will be placed on your card. This is <strong>not a charge</strong> — 
-                it's released automatically if you don't win.
+                500 € werden auf Ihrer Karte reserviert. Das ist <strong>noch keine Belastung</strong> –
+                wenn Sie nicht gewinnen, wird die Reservierung automatisch aufgehoben.
               </p>
             </div>
           </div>
@@ -156,7 +157,7 @@ const StripeDepositForm = ({ auctionId, onSuccess, onCancel }: DepositFormProps)
     <Card className="border-primary/20">
       <CardContent className="p-6">
         <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "stripe" } }}>
-          <CheckoutForm depositId={depositId!} paymentIntentId={paymentIntentId!} onSuccess={onSuccess} />
+          <CheckoutForm depositId={depositId!} onSuccess={onSuccess} />
         </Elements>
         <Button variant="ghost" size="sm" onClick={onCancel} className="w-full mt-2">
           Cancel

@@ -6,9 +6,11 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Rocket, Zap, Crown, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { idempotencyHeaders } from "@/lib/idempotency";
 import { useToast } from "@/hooks/use-toast";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
+import { redirectToStripe } from "@/lib/safeNavigation";
 
 interface BoostListingDialogProps {
   listingId: string;
@@ -22,25 +24,23 @@ const boostOptions = [
   { days: 14, label: "14-Day Boost", icon: Crown, basePrice: 18, description: "Maximum exposure with priority placement for 14 days" },
 ];
 
-const BoostListingDialog = ({ listingId, listingTitle, isPromoted }: BoostListingDialogProps) => {
+const BoostListingDialog = ({ listingId, isPromoted }: BoostListingDialogProps) => {
   const [loading, setLoading] = useState<number | null>(null);
   const { toast } = useToast();
   const { config } = useCountry();
 
-  const handleBoost = async (days: number, price: number) => {
+  const handleBoost = async (days: number) => {
     setLoading(days);
     try {
       const { data, error } = await supabase.functions.invoke("boost-checkout", {
+        headers: idempotencyHeaders(),
         body: {
           listingId,
-          listingTitle,
           days,
-          amount: price,
-          currency: config.currency.code.toLowerCase(),
         },
       });
       if (error) throw error;
-      if (data?.url) window.open(data.url, "_blank");
+      if (data?.url) redirectToStripe(data.url);
     } catch {
       toast({ title: "Error", description: "Could not create checkout session. Try again.", variant: "destructive" });
     } finally {
@@ -65,7 +65,7 @@ const BoostListingDialog = ({ listingId, listingTitle, isPromoted }: BoostListin
           {boostOptions.map((opt) => (
             <button
               key={opt.days}
-              onClick={() => handleBoost(opt.days, opt.basePrice)}
+              onClick={() => handleBoost(opt.days)}
               disabled={loading !== null}
               className={`relative flex items-center gap-3 rounded-xl border p-4 text-left transition-all hover:border-primary hover:shadow-md ${opt.popular ? "border-primary bg-primary/5" : "border-border"}`}
             >

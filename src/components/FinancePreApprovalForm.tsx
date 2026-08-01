@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,17 +13,6 @@ interface FinancePreApprovalFormProps {
   auctionId: string;
   onApproved: () => void;
 }
-
-const FINANCE_PROVIDERS = [
-  "Moneybarn",
-  "Black Horse Finance",
-  "Close Brothers",
-  "Santander Consumer Finance",
-  "Barclays Partner Finance",
-  "Zuto",
-  "CarFinance 247",
-  "Other",
-];
 
 const FinancePreApprovalForm = ({ auctionId, onApproved }: FinancePreApprovalFormProps) => {
   const { user } = useAuth();
@@ -37,33 +25,27 @@ const FinancePreApprovalForm = ({ auctionId, onApproved }: FinancePreApprovalFor
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !provider || !reference || !amount) {
-      toast.error("Please fill in all fields");
+      toast.error("Bitte füllen Sie alle Felder aus");
       return;
     }
 
     setSubmitting(true);
     try {
-      // Create a deposit record with finance details
-      const { error } = await supabase.from("auction_deposits").insert({
-        auction_id: auctionId,
-        user_id: user.id,
-        amount: 0, // No card hold for finance
-        type: "finance_preapproval",
-        status: "authorized",
-        authorized_at: new Date().toISOString(),
-        finance_provider: provider,
-        finance_reference: reference,
-        finance_amount: parseFloat(amount),
-      } as any);
+      const { error } = await (supabase.rpc as any)("submit_auction_finance_request", {
+        p_auction_id: auctionId,
+        p_provider: provider,
+        p_reference: reference,
+        p_amount: parseFloat(amount),
+      });
 
       if (error) throw error;
 
       // Also mark any future bids as finance_preapproved
       setSubmitted(true);
-      toast.success("Finance pre-approval recorded! You can now bid.");
+      toast.success("Finanzierungsnachweis eingereicht. Nach Prüfung können Sie bieten.");
       onApproved();
     } catch (err: any) {
-      toast.error(err.message || "Failed to submit finance details");
+      toast.error(err.message || "Finanzierungsnachweis konnte nicht eingereicht werden");
     } finally {
       setSubmitting(false);
     }
@@ -75,8 +57,8 @@ const FinancePreApprovalForm = ({ auctionId, onApproved }: FinancePreApprovalFor
         <CardContent className="p-4 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           <div>
-            <p className="font-medium text-sm">Finance Pre-approved</p>
-            <p className="text-xs text-muted-foreground">{provider} — Ref: {reference}</p>
+            <p className="font-medium text-sm">Finanzierung zur Prüfung eingereicht</p>
+            <p className="text-xs text-muted-foreground">{provider} – Referenz: {reference}</p>
           </div>
         </CardContent>
       </Card>
@@ -87,54 +69,46 @@ const FinancePreApprovalForm = ({ auctionId, onApproved }: FinancePreApprovalFor
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
-          <Banknote className="w-4 h-4 text-primary" /> Finance Pre-approval
+          <Banknote className="w-4 h-4 text-primary" /> Finanzierungsnachweis
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <Label className="text-xs">Finance Provider</Label>
-            <Select value={provider} onValueChange={setProvider}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select provider" />
-              </SelectTrigger>
-              <SelectContent>
-                {FINANCE_PROVIDERS.map((p) => (
-                  <SelectItem key={p} value={p}>{p}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="text-xs">Kreditgeber laut Ihrem Nachweis</Label>
+            <Input value={provider} onChange={(event) => setProvider(event.target.value)} maxLength={120} placeholder="Name des Kreditgebers" className="mt-1" />
           </div>
 
           <div>
-            <Label className="text-xs">Pre-approval Reference</Label>
+            <Label className="text-xs">Vorgangs- oder Zusagereferenz</Label>
             <Input
               value={reference}
               onChange={(e) => setReference(e.target.value)}
-              placeholder="e.g. FA-2024-12345"
+              placeholder="z. B. FA-2026-12345"
               className="mt-1"
             />
           </div>
 
           <div>
-            <Label className="text-xs">Approved Amount (£)</Label>
+            <Label className="text-xs">Beantragter Betrag (€)</Label>
             <Input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="e.g. 25000"
+              placeholder="z. B. 25000"
+              min="1"
+              max="10000000"
               className="mt-1"
             />
           </div>
 
           <Button type="submit" size="sm" className="w-full gap-2" disabled={submitting}>
             {submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Banknote className="w-3 h-3" />}
-            {submitting ? "Submitting..." : "Submit Pre-approval"}
+            {submitting ? "Wird eingereicht…" : "Nachweis einreichen"}
           </Button>
 
           <p className="text-[10px] text-muted-foreground">
-            Finance pre-approval allows you to bid without a card deposit. Your bid will show a 
-            <Badge variant="outline" className="text-[8px] py-0 mx-1">Finance</Badge> badge.
+            Die Angaben werden von Zivvo geprüft. Erst ein verifizierter, ausreichend hoher Nachweis ersetzt die Kartenkaution.
           </p>
         </form>
       </CardContent>

@@ -12,7 +12,7 @@ interface Props {
 }
 
 const docFields: { key: string; label: string }[] = [
-  { key: "logbook_url", label: "V5C Logbook" },
+  { key: "logbook_url", label: "Zulassungsbescheinigung Teil II" },
   { key: "photo_id_url", label: "Photo ID" },
   { key: "consignment_agreement_url", label: "Consignment Agreement" },
   { key: "trade_invoice_url", label: "Trade Invoice" },
@@ -37,8 +37,8 @@ const AdminVerificationDialog = ({ listing, open, onClose }: Props) => {
   }, [open, listing]);
 
   if (!listing) return null;
-  const hpi = listing.hpi_check_data;
-  const hpiIssues = hpi && (hpi.stolen_reported || hpi.finance_outstanding || hpi.write_off);
+  const legacyEvidence = listing.hpi_check_data;
+  const legacyIssues = legacyEvidence && (legacyEvidence.stolen_reported || legacyEvidence.finance_outstanding || legacyEvidence.write_off);
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -69,22 +69,23 @@ const AdminVerificationDialog = ({ listing, open, onClose }: Props) => {
             {listing.finance_outstanding && (
               <div className="mt-2 text-xs">
                 <p>Lender: <strong>{listing.finance_lender || "—"}</strong></p>
-                <p>Settlement: <strong>£{Number(listing.finance_settlement_amount || 0).toLocaleString()}</strong></p>
+                <p>Settlement: <strong>€{Number(listing.finance_settlement_amount || 0).toLocaleString()}</strong></p>
               </div>
             )}
           </div>
 
-          {hpi && (
-            <div className={`rounded-md border p-3 ${hpiIssues ? "border-destructive/40 bg-destructive/5" : "border-success/40 bg-success/5"}`}>
-              <p className="font-medium">HPI Cross-Check {hpiIssues ? "⚠️ Issues" : "✅ Clear"}</p>
+          {legacyEvidence && (
+            <div className={`rounded-md border p-3 ${legacyIssues ? "border-destructive/40 bg-destructive/5" : "border-success/40 bg-success/5"}`}>
+              <p className="font-medium">Legacy vehicle evidence {legacyIssues ? "⚠️ Flagged" : "✅ No stored flags"}</p>
               <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
-                <div>Stolen: {hpi.stolen_reported ? "❌" : "✅"}</div>
-                <div>Finance: {hpi.finance_outstanding ? "❌" : "✅"}</div>
-                <div>Write-off: {hpi.write_off ? "❌" : "✅"}</div>
+                <div>Theft flag: {legacyEvidence.stolen_reported ? "❌" : "—"}</div>
+                <div>Finance flag: {legacyEvidence.finance_outstanding ? "❌" : "—"}</div>
+                <div>Damage flag: {legacyEvidence.write_off ? "❌" : "—"}</div>
               </div>
-              {hpi.finance_outstanding && !listing.finance_outstanding && (
-                <p className="mt-2 text-xs text-destructive">⚠️ HPI shows finance, but seller declared NONE — investigate before approving.</p>
+              {legacyEvidence.finance_outstanding && !listing.finance_outstanding && (
+                <p className="mt-2 text-xs text-destructive">⚠️ Stored legacy evidence conflicts with the seller declaration. Verify the source and recency before approving.</p>
               )}
+              <p className="mt-2 text-[11px] text-muted-foreground">This historical data is not a current third-party certificate and must be independently verified.</p>
             </div>
           )}
 
