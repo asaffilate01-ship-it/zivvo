@@ -96,7 +96,7 @@ const DeliveryTracker = ({ referenceType, referenceId, buyerId, sellerId, pickup
       const update: Record<string, any> = { status: newStatus };
       if (newStatus === "collected") update.collected_at = new Date().toISOString();
       if (newStatus === "delivered") update.delivered_at = new Date().toISOString();
-      const { error } = await supabase.from("delivery_tracking").update(update).eq("id", delivery!.id);
+      const { error } = await supabase.from("delivery_tracking").update(update as never).eq("id", delivery!.id);
       if (error) throw error;
     },
     onSuccess: () => {

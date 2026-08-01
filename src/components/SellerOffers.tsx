@@ -63,7 +63,7 @@ const SellerOffers = () => {
 
       const { error } = await supabase
         .from("arbitrage_deals")
-        .update(update)
+        .update(update as never)
         .eq("id", dealId)
         .eq("seller_id", user!.id);
       if (error) throw error;

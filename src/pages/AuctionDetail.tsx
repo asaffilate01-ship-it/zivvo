@@ -257,7 +257,7 @@ const AuctionDetail = () => {
       if (!escrow) return;
       const { error } = await supabase
         .from("auction_escrow")
-        .update({ [field]: true })
+        .update({ [field]: true } as never)
         .eq("id", escrow.id);
       if (error) throw error;
     },
