@@ -118,6 +118,7 @@ const SponsoredAdCard = ({ manualAd }: SponsoredAdCardProps) => {
             href={ad.href}
             target="_blank"
             rel="noopener sponsored"
+            onClick={trackClick}
             className="block h-full min-h-[320px]"
           >
             <img
