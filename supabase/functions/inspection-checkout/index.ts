@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -41,7 +41,7 @@ serve(async (req) => {
     const price = inspectionType === "premium_300" ? 349 : 249;
     const productName = inspectionType === "premium_300" ? "Premium 300-point Inspection" : "200-point Vehicle Inspection";
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2023-10-16" });
+    const stripe = createStripeClient(resolveStripeEnv());
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     const customerId = customers.data[0]?.id;
 
