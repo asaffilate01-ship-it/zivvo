@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_campaigns: {
+        Row: {
+          advertiser: string | null
+          clicks: number
+          country: string
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          html_snippet: string | null
+          id: string
+          image_url: string | null
+          impressions: number
+          is_active: boolean
+          link_url: string | null
+          name: string
+          placement: string
+          starts_at: string | null
+          updated_at: string
+          weight: number
+        }
+        Insert: {
+          advertiser?: string | null
+          clicks?: number
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          html_snippet?: string | null
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          is_active?: boolean
+          link_url?: string | null
+          name: string
+          placement?: string
+          starts_at?: string | null
+          updated_at?: string
+          weight?: number
+        }
+        Update: {
+          advertiser?: string | null
+          clicks?: number
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          html_snippet?: string | null
+          id?: string
+          image_url?: string | null
+          impressions?: number
+          is_active?: boolean
+          link_url?: string | null
+          name?: string
+          placement?: string
+          starts_at?: string | null
+          updated_at?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       agent_commissions: {
         Row: {
           agent_id: string
