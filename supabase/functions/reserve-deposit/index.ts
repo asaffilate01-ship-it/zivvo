@@ -22,10 +22,6 @@ serve(async (req) => {
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) {
-      return new Response(JSON.stringify({ error: "Payments not configured" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
     const stripe = createStripeClient(resolveStripeEnv());
 
     // Look up listing for description
