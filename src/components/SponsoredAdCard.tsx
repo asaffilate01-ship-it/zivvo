@@ -1,6 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+
 
 /**
  * Sponsored ad slot — sized to match a CarCard in the results grid.
@@ -43,10 +45,38 @@ const SponsoredAdCard = ({ manualAd }: SponsoredAdCardProps) => {
   const insRef = useRef<HTMLModElement | null>(null);
   const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined;
   const slot = import.meta.env.VITE_ADSENSE_SLOT as string | undefined;
+  const [campaign, setCampaign] = useState<{ id: string; ad: ManualAd } | null>(null);
 
-  const ad = manualAd ?? readManualAdFromStorage();
+  // Load a live campaign managed in the admin dashboard (falls back silently)
+  useEffect(() => {
+    if (manualAd) return;
+    let cancelled = false;
+    supabase.functions
+      .invoke("ad-campaigns", { method: "GET" })
+      .then(({ data }) => {
+        const c = (data as any)?.campaigns?.[0];
+        if (cancelled || !c) return;
+        setCampaign({
+          id: c.id,
+          ad: { imageUrl: c.image_url ?? undefined, href: c.link_url ?? undefined, html: c.html_snippet ?? undefined, alt: c.name },
+        });
+        supabase.functions.invoke("ad-campaigns", { body: { campaignId: c.id, event: "impression" } }).catch(() => {});
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [manualAd]);
+
+  const trackClick = () => {
+    if (!campaign) return;
+    supabase.functions.invoke("ad-campaigns", { body: { campaignId: campaign.id, event: "click" } }).catch(() => {});
+  };
+
+  const ad = manualAd ?? campaign?.ad ?? readManualAdFromStorage();
   const hasManual = Boolean(ad && (ad.imageUrl || ad.html));
   const enabled = !hasManual && Boolean(client && slot);
+
 
   useEffect(() => {
     if (!enabled) return;
@@ -88,6 +118,7 @@ const SponsoredAdCard = ({ manualAd }: SponsoredAdCardProps) => {
             href={ad.href}
             target="_blank"
             rel="noopener sponsored"
+            onClick={trackClick}
             className="block h-full min-h-[320px]"
           >
             <img
