@@ -1,24 +1,43 @@
-# ZIVVO
+# Zivvo
 
-https://dubai.dubizzle.com/motors/used-cars/, autotrader.com, autotrade.co.uk, build a saas and native mobile app like these, check what they have what they do and how we can use the best of their functions an improve and any gaps fill them, we need good ui/ux, good colours, and access for indivudual sellers per vehicle, dealers of various sizes on subscription. pics, details links to check cars are legal and any finance outstanding, agent login for commissions, they can get dealers onboarded and get commission of 30% of teh subscription per month, they onboard dealer and do all kyc and admin aproves, onc esubs come they get paid and can see all the kpi, due, outstanding and pipelines etc, admin can do everything approve, onboard, kyc, verification etc, user roles and permissions, finance pulse, charts, filters, reports, pdf view, print, upload, download, csv,s, day/month/week/year views plus to and from dates etc, the full details, dealers also get as above but for own cars and they also get a landing page for themselves with own cars etc as well as the marketplace and they can manange landing page with full customisation, stripe etc all wired with good flow
+Zivvo is a Germany-first vehicle marketplace for private sellers, dealers, buyers, agents, inspectors, and platform administrators. This production upgrade includes marketplace search, dealer inventory and landing pages, auctions, reservations, inspections, enquiries, subscriptions, agent onboarding, stock feeds, and role-specific operations dashboards.
 
-This project was built with [Lovable](https://lovable.dev).
+## Production upgrade
 
-## Build with Lovable
+The upgrade replaces browser-trusted payment and auction flows with server-verified operations, narrows public database access to safe views, adds rate limits and idempotency, encrypts DMS credentials, and provides account deletion and consent-aware advertising. It also removes unavailable UK-specific checks and syndication claims, standardises the experience on Germany/EUR, and improves legal, accessibility, responsive, performance, and deployment foundations.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/71e05ea0-398f-4b98-9ca6-b7d3a863e158).
+See [docs/UPGRADE_SUMMARY.md](docs/UPGRADE_SUMMARY.md) for the audit outcome and [docs/PRODUCTION_RUNBOOK.md](docs/PRODUCTION_RUNBOOK.md) for the release procedure.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## Local development
 
-## Development
+Requirements: Node.js 22+, npm 10+, and a Supabase project.
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+```bash
+cp .env.example .env.local
+npm ci
 npm run dev
 ```
+
+Only `VITE_*` values are exposed to the browser. Keep service-role, Stripe secret, DMS encryption, cron, AI, and server Maps keys in Supabase Edge Function secrets.
+
+## Quality checks
+
+```bash
+npm run typecheck
+npm run lint
+npm run test
+npm run build
+npm run audit:production
+```
+
+`npm run build:production` additionally rejects missing, placeholder, non-HTTPS, and non-live production configuration. It is intentionally expected to fail until real operator, Supabase, Stripe, and Maps values are supplied.
+
+## Architecture
+
+- React 18, TypeScript, Vite, Tailwind CSS, and Radix UI
+- Supabase Auth, Postgres/RLS, Storage, and Edge Functions
+- Stripe Checkout and webhook-confirmed payment/subscription state
+- Capacitor foundations for Android and iOS packaging
+- German default locale and EUR money flows
+
+Do not deploy from a working tree that has not passed the go-live gates in the production runbook.
