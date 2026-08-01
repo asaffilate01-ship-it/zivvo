@@ -27,4 +27,4 @@ Disallow: /admin
 Disallow: /dealer-dashboard
 Disallow: /agent-dashboard
 
-Sitemap: https://zivvo.co.uk/sitemap.xml
+Sitemap: https://zivvo.de/sitemap.xml
