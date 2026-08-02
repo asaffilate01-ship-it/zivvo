@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
+import { safeInternalPath } from "@/lib/safeNavigation";
 
 interface Notification {
   id: string;
@@ -81,7 +82,7 @@ const NotificationBell = () => {
       setUnreadCount((c) => Math.max(0, c - 1));
     }
     if (notif.link) {
-      navigate(notif.link);
+      navigate(safeInternalPath(notif.link));
       setOpen(false);
     }
   };

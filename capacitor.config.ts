@@ -1,13 +1,28 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
+const developmentServerUrl = process.env.CAPACITOR_DEV_SERVER_URL?.trim();
+
+const developmentServer = (() => {
+  if (!developmentServerUrl) return undefined;
+
+  const url = new URL(developmentServerUrl);
+  const isLocalHost = ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && isLocalHost)) {
+    throw new Error("CAPACITOR_DEV_SERVER_URL must use HTTPS unless it targets localhost");
+  }
+
+  return {
+    url: url.toString(),
+    cleartext: url.protocol === "http:",
+  };
+})();
+
 const config: CapacitorConfig = {
-  appId: 'app.lovable.71e05ea0398f4b989ca6b7d3a863e158',
+  appId: 'de.zivvo.app',
   appName: 'Zivvo',
   webDir: 'dist',
-  server: {
-    url: 'https://71e05ea0-398f-4b98-9ca6-b7d3a863e158.lovableproject.com?forceHideBadge=true',
-    cleartext: true,
-  },
+  server: developmentServer,
   plugins: {
     PushNotifications: {
       presentationOptions: ['badge', 'sound', 'alert'],

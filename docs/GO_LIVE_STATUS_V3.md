@@ -1,5 +1,8 @@
 # Go-live status — v1.2.0-rc.1
 
+> Historical V3 report. The current repository gate and remaining work are documented in
+> `docs/GO_LIVE_STATUS_V4.md`.
+
 Updated: 2026-08-02
 
 ## Automated release gates

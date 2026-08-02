@@ -9,14 +9,16 @@
     "build:production": "node scripts/validate-production-env.mjs && vite build --mode production",
     "build:dev": "vite build --mode development",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "check": "npm run check:repo && npm run test:production-config && npm run typecheck && npm run lint && npm run test && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "audit:production": "npm audit --omit=dev --audit-level=high",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "check:repo": "node scripts/check-repository-hygiene.mjs",
+    "test:production-config": "node scripts/test-production-env.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",

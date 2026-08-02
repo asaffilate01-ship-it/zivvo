@@ -1,92 +1,83 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import {
+  appUrl,
+  HttpError,
+  json,
+  optionalString,
+  parseJson,
+  preflight,
+  requirePost,
+  requireUser,
+  requireUuid,
+  safeError,
+} from "../_shared/security.ts";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const ROLES = ["owner", "manager", "sales", "viewer"];
-
-function res(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
+const ROLES = new Set(["owner", "manager", "sales", "viewer"]);
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  if (req.method !== "POST") return res({ error: "Method not allowed" }, 405);
-
   try {
-    const token = (req.headers.get("Authorization") ?? "").replace("Bearer ", "").trim();
-    if (!token) return res({ error: "Not authenticated" }, 401);
+    const options = preflight(req);
+    if (options) return options;
+    requirePost(req);
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } },
-    );
+    const { user, admin } = await requireUser(req);
+    const body = await parseJson(req);
+    const dealerId = requireUuid(body.dealerId, "dealerId");
+    const email = optionalString(body.email, 254)?.toLowerCase() || "";
+    const fullName = optionalString(body.fullName, 100);
+    const requestedRole = optionalString(body.role, 20) || "sales";
 
-    const { data: userData } = await supabase.auth.getUser(token);
-    const user = userData?.user;
-    if (!user) return res({ error: "Not authenticated" }, 401);
+    if (!EMAIL.test(email)) throw new HttpError(400, "Email is invalid");
+    if (!ROLES.has(requestedRole)) throw new HttpError(400, "Role is invalid");
 
-    const body = await req.json().catch(() => ({}));
-    const dealerId = String(body.dealerId ?? "");
-    const email = String(body.email ?? "").trim().toLowerCase();
-    const fullName = body.fullName ? String(body.fullName).trim().slice(0, 100) : null;
-    const role = ROLES.includes(String(body.role)) ? String(body.role) : "sales";
-
-    if (!/^[0-9a-f-]{36}$/i.test(dealerId)) return res({ error: "Invalid dealerId" }, 400);
-    if (!EMAIL.test(email)) return res({ error: "Invalid email" }, 400);
-
-    // Only the dealer owner (or an admin) may invite staff
-    const { data: dealer } = await supabase
+    const { data: dealer, error: dealerError } = await admin
       .from("dealers")
-      .select("id, owner_id, business_name")
+      .select("id, owner_id")
       .eq("id", dealerId)
       .maybeSingle();
-    if (!dealer) return res({ error: "Dealer not found" }, 404);
 
-    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-    if (dealer.owner_id !== user.id && !isAdmin) return res({ error: "Not authorised" }, 403);
+    if (dealerError) throw dealerError;
+    if (!dealer) throw new HttpError(404, "Dealer not found");
 
-    const { data: existing } = await supabase
+    const { data: isAdmin, error: roleError } = await admin.rpc("has_role", {
+      _user_id: user.id,
+      _role: "admin",
+    });
+
+    if (roleError) throw roleError;
+    if (dealer.owner_id !== user.id && !isAdmin) throw new HttpError(403, "Not authorised");
+
+    const { data: existing, error: existingError } = await admin
       .from("dealer_staff")
       .select("id")
       .eq("dealer_id", dealerId)
       .eq("email", email)
       .maybeSingle();
-    if (existing) return res({ error: "This person has already been invited" }, 409);
 
-    const inviteToken = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+    if (existingError) throw existingError;
+    if (existing) throw new HttpError(409, "This person has already been invited");
 
-    const { data: staff, error } = await supabase
+    const inviteToken = `${crypto.randomUUID().replaceAll("-", "")}${crypto.randomUUID().replaceAll("-", "")}`;
+    const { data: staff, error: insertError } = await admin
       .from("dealer_staff")
       .insert({
         dealer_id: dealerId,
         email,
         full_name: fullName,
-        role,
+        role: requestedRole,
         invite_token: inviteToken,
         is_active: true,
       })
       .select("id")
       .single();
-    if (error) throw error;
 
-    const appUrl = Deno.env.get("APP_URL") ?? "https://zivvo.de";
-    const inviteUrl = `${appUrl}/dealer/invite?token=${inviteToken}`;
+    if (insertError) throw insertError;
 
-    console.log(`Dealer invite created for ${email} at dealer ${dealerId}`);
-
-    return res({ ok: true, staffId: staff.id, inviteUrl });
-  } catch (e) {
-    console.error("invite-dealer error", e);
-    return res({ error: "Request failed" }, 500);
+    const inviteUrl = new URL("/dealer/invite", appUrl("/"));
+    inviteUrl.searchParams.set("token", inviteToken);
+    return json(req, { ok: true, staffId: staff.id, inviteUrl: inviteUrl.toString() });
+  } catch (error) {
+    return safeError(req, error);
   }
 });

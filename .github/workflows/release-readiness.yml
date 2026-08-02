@@ -1,0 +1,61 @@
+name: Production release readiness
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-release-readiness
+  cancel-in-progress: false
+
+jobs:
+  build-production:
+    name: Validate and build production artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      VITE_APP_URL: ${{ vars.VITE_APP_URL }}
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PROJECT_ID: ${{ vars.VITE_SUPABASE_PROJECT_ID }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+      VITE_GOOGLE_MAPS_BROWSER_KEY: ${{ secrets.VITE_GOOGLE_MAPS_BROWSER_KEY }}
+      VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+      VITE_PLAUSIBLE_DOMAIN: ${{ vars.VITE_PLAUSIBLE_DOMAIN }}
+      VITE_PLAUSIBLE_SRC: ${{ vars.VITE_PLAUSIBLE_SRC }}
+      VITE_ADSENSE_CLIENT: ${{ vars.VITE_ADSENSE_CLIENT }}
+      VITE_ADSENSE_SLOT: ${{ vars.VITE_ADSENSE_SLOT }}
+      VITE_LEGAL_COMPANY_NAME: ${{ vars.VITE_LEGAL_COMPANY_NAME }}
+      VITE_LEGAL_FORM: ${{ vars.VITE_LEGAL_FORM }}
+      VITE_LEGAL_MANAGING_DIRECTOR: ${{ vars.VITE_LEGAL_MANAGING_DIRECTOR }}
+      VITE_LEGAL_STREET: ${{ vars.VITE_LEGAL_STREET }}
+      VITE_LEGAL_POSTCODE: ${{ vars.VITE_LEGAL_POSTCODE }}
+      VITE_LEGAL_CITY: ${{ vars.VITE_LEGAL_CITY }}
+      VITE_LEGAL_PHONE: ${{ vars.VITE_LEGAL_PHONE }}
+      VITE_LEGAL_EMAIL: ${{ vars.VITE_LEGAL_EMAIL }}
+      VITE_LEGAL_REGISTER_COURT: ${{ vars.VITE_LEGAL_REGISTER_COURT }}
+      VITE_LEGAL_REGISTER_NUMBER: ${{ vars.VITE_LEGAL_REGISTER_NUMBER }}
+      VITE_LEGAL_VAT_ID: ${{ vars.VITE_LEGAL_VAT_ID }}
+      VITE_LEGAL_CONTENT_RESPONSIBLE: ${{ vars.VITE_LEGAL_CONTENT_RESPONSIBLE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:repo
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run audit:production
+      - run: npm run build:production
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zivvo-production-dist-${{ github.sha }}
+          path: dist
+          if-no-files-found: error
+          retention-days: 14

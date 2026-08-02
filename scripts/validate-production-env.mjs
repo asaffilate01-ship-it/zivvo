@@ -32,26 +32,75 @@ const required = [
   "VITE_LEGAL_CONTENT_RESPONSIBLE",
 ];
 
-const missing = required.filter((name) => !resolved[name]?.trim());
-const placeholders = required.filter((name) => /replace|example|000000|muster/i.test(resolved[name] || ""));
-const failures = [...new Set([...missing, ...placeholders])];
+const failures = new Set();
+const fail = (name) => failures.add(name);
+const placeholderPattern = /replace|example|000000|muster|changeme|not[ _-]?configured|\[(?:company|street|postcode|city|email|phone|name)[^\]]*\]|\b(?:todo|tbd)\b/i;
 
-for (const name of ["VITE_APP_URL", "VITE_SUPABASE_URL"]) {
-  const value = resolved[name];
-  if (!value) continue;
+for (const name of required) {
+  const value = resolved[name]?.trim();
+  if (!value || placeholderPattern.test(value)) fail(name);
+}
+
+const parseHttpsUrl = (name) => {
+  const value = resolved[name]?.trim();
+  if (!value) return null;
   try {
-    if (new URL(value).protocol !== "https:") failures.push(name);
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.username || url.password) fail(name);
+    return url;
   } catch {
-    failures.push(name);
+    fail(name);
+    return null;
+  }
+};
+
+const appUrl = parseHttpsUrl("VITE_APP_URL");
+if (appUrl) {
+  const host = appUrl.hostname.toLowerCase();
+  if (host !== "zivvo.de" && host !== "www.zivvo.de") fail("VITE_APP_URL");
+  if (appUrl.pathname !== "/" || appUrl.search || appUrl.hash) fail("VITE_APP_URL");
+}
+
+const supabaseUrl = parseHttpsUrl("VITE_SUPABASE_URL");
+if (supabaseUrl) {
+  const expectedHost = `${resolved.VITE_SUPABASE_PROJECT_ID?.trim()}.supabase.co`;
+  if (supabaseUrl.hostname !== expectedHost || supabaseUrl.pathname !== "/" || supabaseUrl.search || supabaseUrl.hash) {
+    fail("VITE_SUPABASE_URL");
+    fail("VITE_SUPABASE_PROJECT_ID");
   }
 }
 
-if (resolved.VITE_STRIPE_PUBLISHABLE_KEY && !resolved.VITE_STRIPE_PUBLISHABLE_KEY.startsWith("pk_live_")) {
-  failures.push("VITE_STRIPE_PUBLISHABLE_KEY");
+if (!/^pk_live_[A-Za-z0-9_]{16,}$/.test(resolved.VITE_STRIPE_PUBLISHABLE_KEY || "")) {
+  fail("VITE_STRIPE_PUBLISHABLE_KEY");
 }
 
-if (failures.length) {
-  console.error(`Production configuration is incomplete or unsafe: ${[...new Set(failures)].join(", ")}`);
+if (!/^AIza[A-Za-z0-9_-]{20,}$/.test(resolved.VITE_GOOGLE_MAPS_BROWSER_KEY || "")) {
+  fail("VITE_GOOGLE_MAPS_BROWSER_KEY");
+}
+
+if (!/^0x4[A-Za-z0-9_-]{20,}$/.test(resolved.VITE_TURNSTILE_SITE_KEY || "")) {
+  fail("VITE_TURNSTILE_SITE_KEY");
+}
+
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(resolved.VITE_LEGAL_EMAIL || "")) fail("VITE_LEGAL_EMAIL");
+if ((resolved.VITE_LEGAL_PHONE || "").replace(/\D/g, "").length < 7) fail("VITE_LEGAL_PHONE");
+if (!/^DE\d{9}$/.test((resolved.VITE_LEGAL_VAT_ID || "").replace(/\s/g, ""))) fail("VITE_LEGAL_VAT_ID");
+
+const publishableKey = resolved.VITE_SUPABASE_PUBLISHABLE_KEY || "";
+if (/service[_-]?role/i.test(publishableKey)) fail("VITE_SUPABASE_PUBLISHABLE_KEY");
+
+const jwtParts = publishableKey.split(".");
+if (jwtParts.length === 3) {
+  try {
+    const payload = JSON.parse(Buffer.from(jwtParts[1], "base64url").toString("utf8"));
+    if (payload.role === "service_role") fail("VITE_SUPABASE_PUBLISHABLE_KEY");
+  } catch {
+    fail("VITE_SUPABASE_PUBLISHABLE_KEY");
+  }
+}
+
+if (failures.size > 0) {
+  console.error(`Production configuration is incomplete or unsafe: ${[...failures].sort().join(", ")}`);
   process.exit(1);
 }
 
