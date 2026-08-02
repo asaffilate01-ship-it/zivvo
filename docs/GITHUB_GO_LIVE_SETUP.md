@@ -26,7 +26,7 @@ Enable GitHub secret scanning with push protection, Dependabot alerts/security u
 
 Create `staging` and `production` Environments. Require a reviewer for both and prevent self-review where the plan supports it. Restrict `production` deployments to `main`; add a wait timer if the operational change process requires one.
 
-Populate the variables and secrets referenced by `.github/workflows/release-readiness.yml`. The real legal identity and monitored contact values belong in Environment variables, not source control. Browser keys that can be abused or billed remain Environment secrets even though their final values are visible in compiled JavaScript.
+Populate the variables and secrets referenced by `.github/workflows/release-readiness.yml` and `.github/workflows/production-candidate.yml`. The real legal identity and monitored contact values belong in Environment variables, not source control. Browser keys that can be abused or billed remain Environment secrets even though their final values are visible in compiled JavaScript.
 
 The `staging` Environment must additionally provide:
 
@@ -39,6 +39,18 @@ The `staging` Environment must additionally provide:
 
 The acceptance user must contain no real customer data, must not be an admin/agent/operator, and must be disabled or rotated after the release cycle. Never reuse its password elsewhere.
 
+The protected `production` Environment must also provide direct HTTPS links to the approved evidence records below. Each link must identify a specific report, ticket, run or signed record rather than a generic home page.
+
+| Name | Required evidence |
+|---|---|
+| `GO_LIVE_SECURITY_EVIDENCE_URL` | Threat review, key rotation/restriction and accepted security findings |
+| `GO_LIVE_DATABASE_EVIDENCE_URL` | Migration reconciliation, role/RLS matrix, restored backup and PITR proof |
+| `GO_LIVE_PAYMENTS_EVIDENCE_URL` | Stripe scenario, webhook replay, refund/failure and reconciliation results |
+| `GO_LIVE_LEGAL_EVIDENCE_URL` | German operator, marketplace, auction, payments and privacy approval |
+| `GO_LIVE_ACCESSIBILITY_EVIDENCE_URL` | BFSG/WCAG independent review and accepted remediation |
+| `GO_LIVE_OPERATIONS_EVIDENCE_URL` | Monitoring, on-call, incident and rollback rehearsal |
+| `GO_LIVE_NATIVE_EVIDENCE_URL` | Signing, real-device, privacy/data-safety and store evidence; required for `web-and-native` scope |
+
 ## 4. Required run order
 
 1. Open a pull request and obtain green CI, Security and Native validation checks on its exact head SHA.
@@ -46,8 +58,9 @@ The acceptance user must contain no real customer data, must not be an admin/age
 3. Run **Release readiness** for `staging`.
 4. Deploy that immutable artifact to staging.
 5. Run **Staging acceptance** with its full SHA, deployment origin and health URL. Retain the browser and smoke evidence.
-6. Complete database, payment, privacy/legal, accessibility, monitoring, restore and rollback sign-off.
-7. Approve **Release readiness** for `production` and promote the accepted artifact without rebuilding.
-8. Run **Post-deploy verification** and attach the successful GitHub Deployment link to the release record.
+6. Complete database, payment, privacy/legal, accessibility, monitoring, restore and rollback sign-off and set the production evidence variables above.
+7. Run **Production candidate gate** with the accepted commit SHA, successful staging-acceptance run ID and approved scope. A protected `production` reviewer must approve the job.
+8. Deploy only the `zivvo-production-candidate-<SHA>` artifact emitted by that gate.
+9. Run **Post-deploy verification** and attach the successful GitHub Deployment link to the release record.
 
-An Actions run is evidence only for the SHA it checked. A later direct upload invalidates the evidence and must restart this sequence.
+Zivvo uses Vite compile-time environment configuration, so staging and production artifacts are intentionally separate builds of the same immutable source SHA. The production gate binds the production build to the accepted staging SHA and re-runs every source/build/security contract. A later direct upload or different SHA invalidates the evidence and must restart this sequence.

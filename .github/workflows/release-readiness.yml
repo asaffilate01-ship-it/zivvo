@@ -2,32 +2,23 @@ name: Release readiness
 
 on:
   workflow_dispatch:
-    inputs:
-      target_environment:
-        description: GitHub Environment to validate
-        required: true
-        type: choice
-        default: staging
-        options:
-          - staging
-          - production
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-readiness-${{ inputs.target_environment }}
+  group: release-readiness-staging
   cancel-in-progress: false
 
 jobs:
   build-release:
-    name: Validate and build ${{ inputs.target_environment }} artifact
+    name: Validate and build staging artifact
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    environment: ${{ inputs.target_environment }}
+    environment: staging
     env:
       RELEASE_COMMIT_SHA: ${{ github.sha }}
-      RELEASE_ENVIRONMENT: ${{ inputs.target_environment }}
+      RELEASE_ENVIRONMENT: staging
       VITE_APP_URL: ${{ vars.VITE_APP_URL }}
       VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
       VITE_SUPABASE_PROJECT_ID: ${{ vars.VITE_SUPABASE_PROJECT_ID }}
@@ -80,7 +71,7 @@ jobs:
       - run: npm run release:sbom:verify
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: zivvo-${{ inputs.target_environment }}-${{ github.sha }}
+          name: zivvo-staging-${{ github.sha }}
           path: |
             dist
             release-evidence.json

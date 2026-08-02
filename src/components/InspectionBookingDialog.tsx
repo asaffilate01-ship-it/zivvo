@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { idempotencyHeaders } from "@/lib/idempotency";
+import { redirectToStripe } from "@/lib/safeNavigation";
 
 interface Props {
   listingId: string;
@@ -61,7 +62,7 @@ const InspectionBookingDialog = ({ listingId, trigger }: Props) => {
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, "_blank");
+        redirectToStripe(data.url);
         setOpen(false);
       }
     } catch (e: any) {

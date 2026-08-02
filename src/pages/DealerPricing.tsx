@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/accordion";
 import SEOHead from "@/components/SEOHead";
 import { idempotencyHeaders } from "@/lib/idempotency";
+import { redirectToStripe } from "@/lib/safeNavigation";
 
 const partners = ["mobile.de", "AutoScout24", "Kleinanzeigen", "AUTO1.com", "eBay Motors"];
 
@@ -70,7 +71,7 @@ const DealerPricing = () => {
         headers: idempotencyHeaders(),
       });
       if (error) throw error;
-      if (data?.url) window.open(data.url, "_blank");
+      if (data?.url) redirectToStripe(data.url);
     } catch (err: any) {
       toast({ title: t("pricing.toast.errorTitle"), description: err.message, variant: "destructive" });
     } finally {

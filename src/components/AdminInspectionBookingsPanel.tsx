@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { openExternalUrl } from "@/lib/safeNavigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -140,7 +141,7 @@ const AdminInspectionBookingsPanel = () => {
 
   const viewReport = async (path: string) => {
     const { data } = await supabase.storage.from("listing-documents").createSignedUrl(path, 600);
-    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+    if (data?.signedUrl) openExternalUrl(data.signedUrl);
   };
 
   return (

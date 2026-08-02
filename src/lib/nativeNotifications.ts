@@ -2,6 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { supabase } from "@/integrations/supabase/client";
+import { navigateInternal } from "@/lib/safeNavigation";
 
 /**
  * Initialize native push + local notifications on iOS/Android.
@@ -76,7 +77,7 @@ export async function initNativeNotifications(userId?: string) {
     PushNotifications.addListener("pushNotificationActionPerformed", (action) => {
       const link = action.notification.data?.link;
       if (link && typeof window !== "undefined") {
-        window.location.href = link;
+        navigateInternal(link);
       }
     });
   } catch (err) {
@@ -88,7 +89,7 @@ export async function sendLocalNotification(title: string, body: string, link?: 
   if (!Capacitor.isNativePlatform()) {
     if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
       const n = new Notification(title, { body, icon: "/icon-192.png" });
-      if (link) n.onclick = () => (window.location.href = link);
+      if (link) n.onclick = () => { navigateInternal(link); };
     }
     return;
   }

@@ -2,8 +2,29 @@ const DEFAULT_PATH = "/";
 
 const asHttpsUrl = (value: string) => {
   const url = new URL(value, window.location.origin);
-  if (url.protocol !== "https:") throw new Error("Only HTTPS links are allowed");
+  if (url.protocol !== "https:" || url.username || url.password || !url.hostname) {
+    throw new Error("Only credential-free HTTPS links are allowed");
+  }
   return url;
+};
+
+const containsEncodedRedirectSyntax = (candidate: string) => {
+  let decoded = candidate;
+  for (let pass = 0; pass < 3; pass += 1) {
+    const hasControlCharacter = [...decoded].some((character) => {
+      const code = character.charCodeAt(0);
+      return code <= 0x1f || code === 0x7f;
+    });
+    if (decoded.includes("\\") || decoded.startsWith("//") || hasControlCharacter) return true;
+    try {
+      const next = decodeURIComponent(decoded);
+      if (next === decoded) break;
+      decoded = next;
+    } catch {
+      return true;
+    }
+  }
+  return decoded.includes("\\") || decoded.startsWith("//");
 };
 
 /**
@@ -15,7 +36,7 @@ export const safeInternalPath = (value: unknown, fallback = DEFAULT_PATH): strin
   if (typeof value !== "string") return fallback;
 
   const candidate = value.trim();
-  if (!candidate.startsWith("/") || candidate.startsWith("//") || candidate.includes("\\")) return fallback;
+  if (!candidate.startsWith("/") || containsEncodedRedirectSyntax(candidate)) return fallback;
 
   try {
     const base = typeof window === "undefined" ? "https://zivvo.de" : window.location.origin;

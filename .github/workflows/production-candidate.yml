@@ -1,0 +1,132 @@
+name: Production candidate gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_commit_sha:
+        description: Full commit SHA accepted in staging
+        required: true
+        type: string
+      staging_acceptance_run_id:
+        description: Successful Staging acceptance workflow run ID
+        required: true
+        type: string
+      release_scope:
+        description: Approved production release scope
+        required: true
+        type: choice
+        default: web
+        options:
+          - web
+          - web-and-native
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: production-candidate
+  cancel-in-progress: false
+
+jobs:
+  production-candidate:
+    name: Verify production candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_COMMIT_SHA: ${{ inputs.release_commit_sha }}
+      RELEASE_ENVIRONMENT: production
+      RELEASE_SCOPE: ${{ inputs.release_scope }}
+      STAGING_ACCEPTANCE_RUN_ID: ${{ inputs.staging_acceptance_run_id }}
+      STAGING_ACCEPTANCE_EVIDENCE_PATH: staging-acceptance/post-deploy-evidence.json
+      PRODUCTION_GATE_ACTOR: ${{ github.actor }}
+      PRODUCTION_GATE_RUN_ID: ${{ github.run_id }}
+      GO_LIVE_SECURITY_EVIDENCE_URL: ${{ vars.GO_LIVE_SECURITY_EVIDENCE_URL }}
+      GO_LIVE_DATABASE_EVIDENCE_URL: ${{ vars.GO_LIVE_DATABASE_EVIDENCE_URL }}
+      GO_LIVE_PAYMENTS_EVIDENCE_URL: ${{ vars.GO_LIVE_PAYMENTS_EVIDENCE_URL }}
+      GO_LIVE_LEGAL_EVIDENCE_URL: ${{ vars.GO_LIVE_LEGAL_EVIDENCE_URL }}
+      GO_LIVE_ACCESSIBILITY_EVIDENCE_URL: ${{ vars.GO_LIVE_ACCESSIBILITY_EVIDENCE_URL }}
+      GO_LIVE_OPERATIONS_EVIDENCE_URL: ${{ vars.GO_LIVE_OPERATIONS_EVIDENCE_URL }}
+      GO_LIVE_NATIVE_EVIDENCE_URL: ${{ vars.GO_LIVE_NATIVE_EVIDENCE_URL }}
+      VITE_APP_URL: ${{ vars.VITE_APP_URL }}
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PROJECT_ID: ${{ vars.VITE_SUPABASE_PROJECT_ID }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+      VITE_GOOGLE_MAPS_BROWSER_KEY: ${{ secrets.VITE_GOOGLE_MAPS_BROWSER_KEY }}
+      VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+      VITE_PLAUSIBLE_DOMAIN: ${{ vars.VITE_PLAUSIBLE_DOMAIN }}
+      VITE_PLAUSIBLE_SRC: ${{ vars.VITE_PLAUSIBLE_SRC }}
+      VITE_ADSENSE_CLIENT: ${{ vars.VITE_ADSENSE_CLIENT }}
+      VITE_ADSENSE_SLOT: ${{ vars.VITE_ADSENSE_SLOT }}
+      VITE_LEGAL_COMPANY_NAME: ${{ vars.VITE_LEGAL_COMPANY_NAME }}
+      VITE_LEGAL_FORM: ${{ vars.VITE_LEGAL_FORM }}
+      VITE_LEGAL_MANAGING_DIRECTOR: ${{ vars.VITE_LEGAL_MANAGING_DIRECTOR }}
+      VITE_LEGAL_STREET: ${{ vars.VITE_LEGAL_STREET }}
+      VITE_LEGAL_POSTCODE: ${{ vars.VITE_LEGAL_POSTCODE }}
+      VITE_LEGAL_CITY: ${{ vars.VITE_LEGAL_CITY }}
+      VITE_LEGAL_PHONE: ${{ vars.VITE_LEGAL_PHONE }}
+      VITE_LEGAL_EMAIL: ${{ vars.VITE_LEGAL_EMAIL }}
+      VITE_LEGAL_REGISTER_COURT: ${{ vars.VITE_LEGAL_REGISTER_COURT }}
+      VITE_LEGAL_REGISTER_NUMBER: ${{ vars.VITE_LEGAL_REGISTER_NUMBER }}
+      VITE_LEGAL_VAT_ID: ${{ vars.VITE_LEGAL_VAT_ID }}
+      VITE_LEGAL_CONTENT_RESPONSIBLE: ${{ vars.VITE_LEGAL_CONTENT_RESPONSIBLE }}
+      VITE_LEGAL_SUPERVISORY_AUTHORITY: ${{ vars.VITE_LEGAL_SUPERVISORY_AUTHORITY }}
+      VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL }}
+      VITE_PRIVACY_EMAIL: ${{ vars.VITE_PRIVACY_EMAIL }}
+      VITE_COMPLAINTS_EMAIL: ${{ vars.VITE_COMPLAINTS_EMAIL }}
+      VITE_ACCESSIBILITY_EMAIL: ${{ vars.VITE_ACCESSIBILITY_EMAIL }}
+      NATIVE_LINKS_ENABLED: ${{ vars.NATIVE_LINKS_ENABLED }}
+      IOS_TEAM_ID: ${{ vars.IOS_TEAM_ID }}
+      IOS_BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+      ANDROID_PACKAGE_NAME: ${{ vars.ANDROID_PACKAGE_NAME }}
+      ANDROID_SHA256_CERT_FINGERPRINT: ${{ secrets.ANDROID_SHA256_CERT_FINGERPRINT }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.release_commit_sha }}
+      - name: Validate staging acceptance reference
+        env:
+          COMMIT_SHA: ${{ inputs.release_commit_sha }}
+          ACCEPTANCE_RUN_ID: ${{ inputs.staging_acceptance_run_id }}
+        run: |
+          set -euo pipefail
+          [[ "$COMMIT_SHA" =~ ^[0-9a-fA-F]{40}$ ]] || { echo "release_commit_sha must be a full commit SHA"; exit 1; }
+          [[ "$ACCEPTANCE_RUN_ID" =~ ^[0-9]+$ ]] || { echo "staging_acceptance_run_id must be numeric"; exit 1; }
+          conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ACCEPTANCE_RUN_ID" --jq .conclusion)"
+          workflow="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$ACCEPTANCE_RUN_ID" --jq .name)"
+          [[ "$conclusion" == "success" ]] || { echo "Staging acceptance run did not succeed"; exit 1; }
+          [[ "$workflow" == "Staging acceptance" ]] || { echo "Run is not the Staging acceptance workflow"; exit 1; }
+          gh run download "$ACCEPTANCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "zivvo-staging-acceptance-$COMMIT_SHA" \
+            --dir staging-acceptance
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run audit:production
+      - run: npm run build:production
+      - name: Generate native association files
+        if: inputs.release_scope == 'web-and-native'
+        run: npm run native:links
+      - run: npm run release:evidence
+      - run: npm run release:evidence:verify
+      - run: npm run release:sbom
+      - run: npm run release:sbom:verify
+      - name: Bind production artifact to staging and external approvals
+        run: npm run release:production-gate
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: zivvo-production-candidate-${{ inputs.release_commit_sha }}
+          path: |
+            dist
+            release-evidence.json
+            release-evidence/sbom.cyclonedx.json
+            production-gate-evidence.json
+          if-no-files-found: error
+          retention-days: 90

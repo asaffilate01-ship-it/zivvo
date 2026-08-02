@@ -24,6 +24,7 @@ import SellerOffers from "@/components/SellerOffers";
 import ArbitragePipelineStepper from "@/components/ArbitragePipelineStepper";
 import { useTranslation } from "react-i18next";
 import { idempotencyHeaders } from "@/lib/idempotency";
+import { redirectToStripe } from "@/lib/safeNavigation";
 import {
   ArrowRightLeft, TrendingUp, Shield, Clock, CheckCircle2, XCircle,
   DollarSign, Truck, FileText, Search, Plus, Eye, Building2, CreditCard,
@@ -232,7 +233,7 @@ const TradeStock = () => {
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, "_blank");
+        redirectToStripe(data.url);
       } else {
         throw new Error(t("tradeStock.errors.paymentSessionFailed"));
       }

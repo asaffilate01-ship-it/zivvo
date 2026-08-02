@@ -9,6 +9,7 @@ const files = {
   androidGradle: "android/app/build.gradle",
   iosInfo: "ios/App/App/Info.plist",
   iosProject: "ios/App/App.xcodeproj/project.pbxproj",
+  iosSceneDelegate: "ios/App/App/SceneDelegate.swift",
   iosEntitlements: "ios/App/App/App.entitlements",
   iosPrivacy: "ios/App/App/PrivacyInfo.xcprivacy",
   iosPackage: "ios/App/CapApp-SPM/Package.swift",
@@ -50,6 +51,10 @@ requireMatch("iosProject", new RegExp(`MARKETING_VERSION = ${marketingVersion?.r
 requireMatch("iosProject", /CODE_SIGN_ENTITLEMENTS = App\/App\.entitlements;/, "iOS entitlements binding");
 requireMatch("iosEntitlements", /applinks:zivvo\.de/, "iOS Universal Link domain");
 requireMatch("iosProject", /PrivacyInfo\.xcprivacy in Resources/, "iOS privacy manifest resource binding");
+requireMatch("iosSceneDelegate", /ApplicationDelegateProxy\.shared\.application/, "iOS Capacitor 8 scene delegate link forwarding");
+if (/SceneDelegateProxy/.test(source.iosSceneDelegate)) {
+  failures.push("iOS removed SceneDelegateProxy API");
+}
 requireMatch("iosPrivacy", /<key>NSPrivacyTracking<\/key>\s*<false\/>/, "iOS tracking declaration");
 requireMatch("iosPrivacy", /<key>NSPrivacyCollectedDataTypes<\/key>\s*<array>/, "iOS collected-data declaration");
 const capacitorVersion = packageJson.dependencies?.["@capacitor/ios"];

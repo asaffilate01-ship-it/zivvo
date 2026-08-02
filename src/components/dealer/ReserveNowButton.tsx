@@ -10,6 +10,7 @@ import { CreditCard, ShieldCheck } from "lucide-react";
 import { idempotencyHeaders } from "@/lib/idempotency";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { redirectToStripe } from "@/lib/safeNavigation";
 
 interface Props {
   listingId: string;
@@ -48,7 +49,7 @@ const ReserveNowButton = ({ listingId, dealerId, listingTitle, accent }: Props) 
       });
       if (error) throw error;
       if (data?.url) {
-        window.location.href = data.url;
+        redirectToStripe(data.url);
       } else {
         throw new Error(data?.error || t("dealer.reserveNow.couldNotStartPayment"));
       }

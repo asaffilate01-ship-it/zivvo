@@ -30,6 +30,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { countryConfigs, formatPrice } from "@/lib/countryConfig";
 import { useTranslation } from "react-i18next";
 import { idempotencyHeaders } from "@/lib/idempotency";
+import { redirectToStripe } from "@/lib/safeNavigation";
 
 const formatCurrency = (amount: number, country: string) => {
   const cfg = countryConfigs[country as keyof typeof countryConfigs] || countryConfigs.DE;
@@ -290,7 +291,7 @@ const AuctionDetail = () => {
         return;
       }
       if (data?.url) {
-        window.open(data.url, "_blank");
+        redirectToStripe(data.url);
       }
     },
     onError: (e: Error) => toast.error(e.message),

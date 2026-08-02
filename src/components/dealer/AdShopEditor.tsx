@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { openExternalUrl } from "@/lib/safeNavigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -117,7 +118,7 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
   const shareFacebook = () => {
     if (!selected) return;
     const url = `${window.location.origin}/car/${selected.id}`;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank", "width=600,height=600");
+    openExternalUrl(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "width=600,height=600");
   };
 
   const shareGoogle = () => {
