@@ -33,23 +33,40 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const { priceId, businessName, successUrl, cancelUrl } = await req.json();
+    if (typeof priceId !== "string" || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
+      throw new Error("Invalid priceId");
+    }
 
     const stripe = createStripeClient(resolveStripeEnv());
+
+    // Resolve the human-readable price id (lookup key) to the Stripe price.
+    const prices = await stripe.prices.list({ lookup_keys: [priceId] });
+    const stripePrice = prices.data[0];
+    if (!stripePrice) throw new Error(`Price not found: ${priceId}`);
+    const isRecurring = stripePrice.type === "recurring";
+
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    let customerId = customers.data[0]?.id;
+    if (!customerId) {
+      const created = await stripe.customers.create({
+        email: user.email,
+        metadata: { userId: user.id },
+      });
+      customerId = created.id;
     }
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: "subscription",
+      line_items: [{ price: stripePrice.id, quantity: 1 }],
+      mode: isRecurring ? "subscription" : "payment",
       success_url: successUrl || `${req.headers.get("origin")}/dashboard?checkout=success`,
       cancel_url: cancelUrl || `${req.headers.get("origin")}/dealers?checkout=canceled`,
-      metadata: { user_id: user.id, business_name: businessName || "My Dealership" },
+      metadata: { user_id: user.id, price_lookup_key: priceId, business_name: businessName || "My Dealership" },
+      ...(isRecurring && {
+        subscription_data: { metadata: { user_id: user.id, price_lookup_key: priceId } },
+      }),
     });
+
 
     logStep("Checkout session created", { sessionId: session.id });
 

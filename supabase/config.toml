@@ -1,1 +1,30 @@
 project_id = "zxnyonbgophovotkjmwl"
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.customer-portal]
+verify_jwt = false
+
+[functions.check-subscription]
+verify_jwt = false
+
+[functions.boost-checkout]
+verify_jwt = false
+
+[functions.deposit-checkout]
+verify_jwt = false
+
+[functions.inspection-checkout]
+verify_jwt = false
+
+[functions.reserve-deposit]
+verify_jwt = false
+
+[functions.winner-payment]
+verify_jwt = false
+
+[functions.arbitrage-payment]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
