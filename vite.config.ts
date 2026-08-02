@@ -17,7 +17,7 @@ export default defineConfig(() => ({
       output: {
         manualChunks(id) {
           if (!id.includes("node_modules")) return undefined;
-          if (id.includes("recharts") || id.includes("d3-")) return "charts";
+          
           if (id.includes("@radix-ui")) return "radix";
           if (id.includes("@supabase")) return "supabase";
           if (id.includes("@tanstack")) return "query";
@@ -30,7 +30,7 @@ export default defineConfig(() => ({
           if (id.includes("date-fns")) return "dates";
           if (id.includes("embla-carousel")) return "carousel";
           if (id.includes("react-dom") || id.includes("react-router") || id.includes("react-helmet") || /node_modules\/react\//.test(id)) return "react";
-          return "vendor";
+          return undefined;
         },
       },
     },
