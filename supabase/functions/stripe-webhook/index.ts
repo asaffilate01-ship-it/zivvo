@@ -1,5 +1,5 @@
 import type Stripe from "https://esm.sh/stripe@22.0.2";
-import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
+import { createStripeClient, resolveStripeEnv, verifyWebhook } from "../_shared/stripe.ts";
 import { adminClient, env } from "../_shared/security.ts";
 import { CURRENCY, subscriptionCatalog } from "../_shared/payments.ts";
 
@@ -42,7 +42,8 @@ async function handleCheckout(session: Stripe.Checkout.Session): Promise<void> {
     const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
     if (!userId || !subscriptionId) throw new Error("Subscription metadata missing");
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-    const priceId = subscription.items.data[0]?.price.id;
+    const price = subscription.items.data[0]?.price;
+    const priceId = price?.lookup_key || price?.metadata?.lovable_external_id || price?.id;
     const plan = priceId ? subscriptionCatalog()[priceId] : null;
     if (!plan) throw new Error("Unknown subscription price");
     const customerId = typeof session.customer === "string" ? session.customer : session.customer?.id;
