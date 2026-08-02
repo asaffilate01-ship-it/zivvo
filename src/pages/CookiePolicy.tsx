@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
+import { publicContactConfig } from "@/lib/legalConfig";
 
 const CookiePolicy = () => {
   const { t } = useTranslation("cookiePolicy");
@@ -81,7 +82,9 @@ const CookiePolicy = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s5Title")}</h2>
             <p className="mt-2">
               {t("s5Body")}{" "}
-              <a href="mailto:privacy@zivvo.de" className="text-primary underline">privacy@zivvo.de</a>.
+              <a href={`mailto:${publicContactConfig.privacyEmail}`} className="text-primary underline">
+                {publicContactConfig.privacyEmail}
+              </a>.
             </p>
           </section>
         </div>

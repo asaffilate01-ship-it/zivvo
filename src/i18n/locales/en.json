@@ -61,6 +61,13 @@
       "dealers": "Dealers",
       "satisfaction": "Satisfaction"
     },
+    "highlights": {
+      "nationwide": "Germany-wide",
+      "search": "Search",
+      "evidence": "Evidence",
+      "status": "Clear status",
+      "languages": "Languages"
+    },
     "search": {
       "title": "Search vehicles",
       "subtitle": "Find exactly what you're looking for",
@@ -99,8 +106,8 @@
   },
   "footer": {
     "tagline": "Compare vehicle listings, contact sellers, and see available verification, document, and payment status clearly.",
-    "companyInfo": "Zivvo GmbH · Registered in Germany · HRB 000000\nRegistered office: Musterstraße 1, 10115 Berlin\nVAT ID: DE 000 000 000",
-    "operational": "All systems operational",
+    "companyInfo": "[Company Name] · [Commercial Register HRB xxxxx]\n[Street], [Postcode City]\nVAT ID: [VAT ID DE...]",
+    "operational": "Service status after launch monitoring",
     "sections": {
       "marketplace": "Marketplace",
       "business": "For Business",
@@ -925,7 +932,7 @@
     ],
     "s4Title": "4. How to make a request",
     "s4Days": "within one month",
-    "s4Body": "To exercise your rights, please email privacy@zivvo.de describing your request and providing proof of identity. We generally respond within one month in accordance with Art. 12(3) GDPR.",
+    "s4Body": "To exercise your rights, send our privacy contact an email describing your request and providing suitable proof of identity. We generally respond within one month in accordance with Art. 12(3) GDPR:",
     "s5Title": "5. Exceptions and limitations",
     "s5Intro": "In certain cases we may restrict or decline your request, for example where:",
     "s5List": [
@@ -2372,7 +2379,7 @@
     "metaDescription": "Legal notice and provider identification for Zivvo pursuant to Section 5 of the German Digital Services Act (DDG).",
     "title": "Legal Notice (Impressum)",
     "lastUpdated": "Last updated:",
-    "disclaimer": "This page is maintained by [Company Name]. The details below are placeholders and must be replaced by the operator with actual company data before publication.",
+    "disclaimer": "These provider details are supplied from the approved production configuration of [Company Name].",
     "s1Title": "Information pursuant to Section 5 DDG",
     "companyName": "[Company Name]",
     "legalForm": "[Legal form, e.g. GmbH]",
@@ -2399,10 +2406,10 @@
     "s6Body": "[Managing Director], [Street], [Postcode City]",
     "s7Title": "Supervisory authority",
     "s7Body": "Competent supervisory authority for operating the platform (e.g. trade supervision office): [Competent authority, address].",
-    "s8Title": "EU dispute resolution",
-    "s8Body": "The European Commission provides a platform for online dispute resolution (ODR), available at:",
-    "s8LinkText": "ec.europa.eu/consumers/odr",
-    "s8Body2": "You can find our email address above in the legal notice.",
+    "s8Title": "Consumer dispute-resolution information",
+    "s8Body": "The former EU Online Dispute Resolution platform closed on 20 July 2025. The European Commission publishes information about recognised dispute-resolution bodies at:",
+    "s8LinkText": "consumer-redress.ec.europa.eu",
+    "s8Body2": "Our contact address appears above. The following VSBG notice remains controlling.",
     "s9Title": "Consumer dispute resolution (VSBG)",
     "s9Body": "We are not obliged and not willing to participate in dispute resolution proceedings before a consumer arbitration board within the meaning of the German Consumer Dispute Resolution Act (VSBG). Please see our Complaints Policy for further information.",
     "s10Title": "Liability for content",

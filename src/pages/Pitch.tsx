@@ -191,9 +191,9 @@ const slides: { title: string; node: ReactNode }[] = [
               competitor.
             </p>
             <div className="flex gap-10 mt-10">
-              <Stat value="25K+" label="Listings" accent />
-              <Stat value="3.2K+" label="Dealers" accent />
-              <Stat value="98%" label="Satisfaction" accent />
+              <Stat value="DE-wide" label="Vehicle search" accent />
+              <Stat value="DE / EN" label="Languages" accent />
+              <Stat value="Live" label="Status data" accent />
             </div>
           </div>
           <PhoneFrame src={home} alt="Zivvo home" />

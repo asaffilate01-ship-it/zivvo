@@ -28,10 +28,10 @@ const Leasing = () => {
           <LeasingCalculator />
 
           <div className="mt-8 grid gap-4 md:grid-cols-4">
-            <Feature icon={ShieldCheck} title="TÜV-geprüfte Partner" body="Nur zertifizierte deutsche Leasinggeber." />
-            <Feature icon={Zap} title="Antwort in 24h" body="Verbindliches Angebot binnen einem Werktag." />
+            <Feature icon={ShieldCheck} title="Anbieter klar benannt" body="Prüfen Sie Anbieter und Bedingungen vor Vertragsabschluss." />
+            <Feature icon={Zap} title="Direkte Anfrage" body="Antwortzeiten werden vom jeweiligen Anbieter bestätigt." />
             <Feature icon={Users} title="Privat & Gewerbe" body="Konditionen für alle Kundengruppen." />
-            <Feature icon={CheckCircle2} title="Ohne Anzahlung" body="Auf Wunsch 0 € Anzahlung möglich." />
+            <Feature icon={CheckCircle2} title="Flexible Anzahlung" body="Verfügbarkeit und Höhe ergeben sich aus dem konkreten Angebot." />
           </div>
 
           <Card className="mt-8">

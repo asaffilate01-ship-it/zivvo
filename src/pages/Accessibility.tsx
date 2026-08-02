@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
+import { publicContactConfig } from "@/lib/legalConfig";
 
 const Accessibility = () => {
   const { t } = useTranslation("accessibility");
@@ -49,11 +50,13 @@ const Accessibility = () => {
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("reportingTitle")}</h2>
             <p className="mt-2">
-              {t("reportingBody", { email: "accessibility@zivvo.de" }).split("accessibility@zivvo.de").map((part, i, arr) => (
+              {t("reportingBody", { email: publicContactConfig.accessibilityEmail }).split(publicContactConfig.accessibilityEmail).map((part, i, arr) => (
                 <span key={i}>
                   {part}
                   {i < arr.length - 1 && (
-                    <a href="mailto:accessibility@zivvo.de" className="text-primary underline">accessibility@zivvo.de</a>
+                    <a href={`mailto:${publicContactConfig.accessibilityEmail}`} className="text-primary underline">
+                      {publicContactConfig.accessibilityEmail}
+                    </a>
                   )}
                 </span>
               ))}
