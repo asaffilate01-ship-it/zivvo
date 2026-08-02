@@ -559,7 +559,7 @@ const SalesPipeline = ({ mode, dealerId }: SalesPipelineProps) => {
             <Input placeholder="Buyer name *" value={newLead.buyer_name} onChange={e => setNewLead(p => ({ ...p, buyer_name: e.target.value }))} />
             <Input placeholder="Email" type="email" value={newLead.buyer_email} onChange={e => setNewLead(p => ({ ...p, buyer_email: e.target.value }))} />
             <Input placeholder="Phone" value={newLead.buyer_phone} onChange={e => setNewLead(p => ({ ...p, buyer_phone: e.target.value }))} />
-            <Input placeholder="Expected value ($)" type="number" value={newLead.expected_value} onChange={e => setNewLead(p => ({ ...p, expected_value: e.target.value }))} />
+            <Input placeholder="Expected value (€)" type="number" min="0" step="0.01" inputMode="decimal" value={newLead.expected_value} onChange={e => setNewLead(p => ({ ...p, expected_value: e.target.value }))} />
             <Select value={newLead.source} onValueChange={v => setNewLead(p => ({ ...p, source: v }))}>
               <SelectTrigger><SelectValue placeholder="Source" /></SelectTrigger>
               <SelectContent>

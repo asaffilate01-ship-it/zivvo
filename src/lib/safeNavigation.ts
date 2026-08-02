@@ -1,7 +1,30 @@
+const DEFAULT_PATH = "/";
+
 const asHttpsUrl = (value: string) => {
   const url = new URL(value, window.location.origin);
   if (url.protocol !== "https:") throw new Error("Only HTTPS links are allowed");
   return url;
+};
+
+/**
+ * Converts stored or API-provided navigation targets into same-origin paths.
+ * React Router must never receive external, protocol-relative, backslash or
+ * executable URL values from notification and messaging records.
+ */
+export const safeInternalPath = (value: unknown, fallback = DEFAULT_PATH): string => {
+  if (typeof value !== "string") return fallback;
+
+  const candidate = value.trim();
+  if (!candidate.startsWith("/") || candidate.startsWith("//") || candidate.includes("\\")) return fallback;
+
+  try {
+    const base = typeof window === "undefined" ? "https://zivvo.de" : window.location.origin;
+    const parsed = new URL(candidate, base);
+    if (parsed.origin !== base) return fallback;
+    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+  } catch {
+    return fallback;
+  }
 };
 
 export const openExternalUrl = (value: string, features = "") => {
@@ -20,12 +43,8 @@ export const redirectToStripe = (value: string) => {
 };
 
 export const navigateInternal = (value: string) => {
-  try {
-    const url = new URL(value, window.location.origin);
-    if (url.origin !== window.location.origin) return false;
-    window.location.assign(`${url.pathname}${url.search}${url.hash}`);
-    return true;
-  } catch {
-    return false;
-  }
+  const path = safeInternalPath(value, "");
+  if (!path) return false;
+  window.location.assign(path);
+  return true;
 };

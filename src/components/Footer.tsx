@@ -58,7 +58,7 @@ const Footer = () => {
         <div className="grid gap-10 md:grid-cols-6">
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2.5" aria-label="Zivvo">
-              <img src={zivvoLogo} alt={`Zivvo — ${t("brand.tagline")}`} className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200" />
+              <img src={zivvoLogo} alt={`Zivvo — ${t("brand.tagline")}`} loading="lazy" decoding="async" className="h-10 w-auto dark:invert dark:brightness-0 dark:contrast-200" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
               {t("footer.tagline")}
