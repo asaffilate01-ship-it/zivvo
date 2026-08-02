@@ -84,6 +84,7 @@ Use Node.js 22 and an immutable lockfile install:
 ```bash
 npm ci
 npm run check
+npm run audit:all
 npm run audit:production
 npm run build:production
 npm run release:evidence
@@ -93,6 +94,8 @@ npm run release:sbom:verify
 ```
 
 `build:production` validates the environment before compilation and then scans the compiled artifact for the approved legal/contact values, unsupported public claims, retired dispute links and sample operator data. A plain `npm run build` is never a releasable production artifact.
+
+Both build paths enforce the checked-in bundle budget. A release must not bypass the budget or publish browser source maps merely to make the build pass; investigate unexpected growth and adjust a limit only with recorded performance evidence.
 
 Use the manual **Release readiness** GitHub workflow for staging. It binds the build to the protected `staging` Environment, embeds `/release.json`, records every artifact file digest, and uploads `release-evidence.json`, a lockfile-derived CycloneDX SBOM and the immutable `dist` artifact. `build:production` must pass using the Environment's real values.
 
@@ -127,3 +130,5 @@ Test desktop and current iOS/Android browsers at minimum:
 ## 9. Go-live sign-off
 
 Release only when product, engineering, security, privacy/legal, payments, support, and operations owners have signed the checklist and no severity-1 or severity-2 issue remains open.
+
+The authoritative sign-off index is `docs/GO_LIVE_EVIDENCE_REGISTER.md`. Complete it for the exact release SHA and link each row to a retained report, workflow run, ticket or signed record.

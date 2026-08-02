@@ -22,6 +22,8 @@ Create a ruleset for `main` that:
 
 Enable GitHub secret scanning with push protection, Dependabot alerts/security updates, private vulnerability reporting and CodeQL default setup or the checked-in CodeQL workflow. Keep Actions restricted to GitHub-owned or explicitly approved actions; the repository policy requires every action reference to use a full commit SHA.
 
+Require the Security workflow's `Full dependency audit` check. It covers development and production dependencies at the high-severity threshold; `npm run audit:production` remains a separate runtime dependency gate.
+
 ## 3. Protected Environments
 
 Create `staging` and `production` Environments. Require a reviewer for both and prevent self-review where the plan supports it. Restrict `production` deployments to `main`; add a wait timer if the operational change process requires one.
@@ -64,3 +66,5 @@ The protected `production` Environment must also provide direct HTTPS links to t
 9. Run **Post-deploy verification** and attach the successful GitHub Deployment link to the release record.
 
 Zivvo uses Vite compile-time environment configuration, so staging and production artifacts are intentionally separate builds of the same immutable source SHA. The production gate binds the production build to the accepted staging SHA and re-runs every source/build/security contract. A later direct upload or different SHA invalidates the evidence and must restart this sequence.
+
+Record every approval and retained artifact in `docs/GO_LIVE_EVIDENCE_REGISTER.md`. Do not place passwords, API keys, personal customer data or private legal advice in that public file; link to access-controlled records where appropriate.
