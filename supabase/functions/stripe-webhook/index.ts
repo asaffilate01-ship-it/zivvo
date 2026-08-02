@@ -271,11 +271,13 @@ async function handleRefund(refund: Stripe.Refund): Promise<void> {
 }
 
 Deno.serve(async (req) => {
-  const signature = req.headers.get("stripe-signature");
-  if (!signature) return new Response("Missing signature", { status: 400 });
   let event: Stripe.Event;
-  try { event = stripe.webhooks.constructEvent(await req.text(), signature, env("STRIPE_WEBHOOK_SECRET")); }
-  catch { return new Response("Invalid signature", { status: 400 }); }
+  try {
+    event = (await verifyWebhook(req, resolveStripeEnv(new URL(req.url).searchParams.get("env")))) as unknown as Stripe.Event;
+  } catch {
+    return new Response("Invalid signature", { status: 400 });
+  }
+
 
   const { error: lockError } = await admin.from("stripe_webhook_events").insert({ event_id: event.id, event_type: event.type, status: "processing" });
   if (lockError) {
