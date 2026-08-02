@@ -1,8 +1,9 @@
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import type Stripe from "https://esm.sh/stripe@22.0.2";
+import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 import { adminClient, env, json, preflight, requireCron, safeError } from "../_shared/security.ts";
 import { CURRENCY } from "../_shared/payments.ts";
 
-const stripe = new Stripe(env("STRIPE_SECRET_KEY"), { apiVersion: "2024-06-20" });
+createStripeClient(resolveStripeEnv());
 
 type ClaimedReservation = {
   id: string;

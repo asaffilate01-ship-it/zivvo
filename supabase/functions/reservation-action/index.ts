@@ -1,4 +1,5 @@
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import type Stripe from "https://esm.sh/stripe@22.0.2";
+import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 import {
   env,
   HttpError,
@@ -62,7 +63,7 @@ Deno.serve(async (req) => {
       throw new HttpError(409, "Reservation payment data is invalid");
     }
 
-    const stripe = new Stripe(env("STRIPE_SECRET_KEY"), { apiVersion: "2024-06-20" });
+    createStripeClient(resolveStripeEnv());
     const paymentIntent = await stripe.paymentIntents.retrieve(reservation.stripe_payment_intent_id);
     if (paymentIntent.status !== "succeeded" || paymentIntent.currency !== CURRENCY || paymentIntent.amount_received !== expectedAmount) {
       throw new HttpError(409, "The Stripe payment does not match this reservation");

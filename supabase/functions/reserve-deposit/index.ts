@@ -1,4 +1,5 @@
-import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import type Stripe from "https://esm.sh/stripe@22.0.2";
+import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 import { appUrl, env, HttpError, json, optionalString, parseJson, preflight, requireIdempotencyKey, requirePost, requireUser, requireUuid, safeError } from "../_shared/security.ts";
 import { CURRENCY } from "../_shared/payments.ts";
 
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
       status: "pending", expires_at: expiresAt, buyer_id: user.id,
     }).select("id").single();
     if (error) throw error;
-    const stripe = new Stripe(env("STRIPE_SECRET_KEY"), { apiVersion: "2024-06-20" });
+    createStripeClient(resolveStripeEnv());
     try {
       const session = await stripe.checkout.sessions.create({
         mode: "payment", customer_email: user.email,
