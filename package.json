@@ -1,14 +1,15 @@
 {
   "name": "zivvo-marketplace",
   "private": true,
-  "version": "1.2.0-rc.2",
+  "version": "1.2.0-rc.3",
   "type": "module",
   "scripts": {
+    "audit:all": "npm audit --audit-level=high",
     "audit:production": "npm audit --omit=dev --audit-level=high",
-    "build": "vite build",
+    "build": "vite build && node scripts/check-bundle-budget.mjs",
     "build:dev": "vite build --mode development",
-    "build:production": "node scripts/validate-production-env.mjs && vite build --mode production && node scripts/verify-production-artifact.mjs",
-    "check": "npm run check:repo && npm run check:workflows && npm run check:public-claims && npm run check:edge-security && npm run check:native && npm run test:production-config && npm run test:release-contract && npm run test:smoke-contract && npm run test:sbom-contract && npm run test:production-gate && npm run typecheck && npm run lint && npm run test && npm run build",
+    "build:production": "node scripts/validate-production-env.mjs && vite build --mode production && node scripts/check-bundle-budget.mjs && node scripts/verify-production-artifact.mjs",
+    "check": "npm run check:repo && npm run check:workflows && npm run check:public-claims && npm run check:edge-security && npm run check:native && npm run test:production-config && npm run test:release-contract && npm run test:smoke-contract && npm run test:sbom-contract && npm run test:production-gate && npm run test:bundle-contract && npm run typecheck && npm run lint && npm run test && npm run build",
     "check:edge-security": "node scripts/check-edge-security.mjs",
     "check:native": "node scripts/check-native-config.mjs",
     "check:public-claims": "node scripts/check-public-claims.mjs",
@@ -27,6 +28,7 @@
     "release:sbom:verify": "node scripts/verify-sbom.mjs",
     "smoke:production": "node scripts/smoke-production.mjs",
     "test": "vitest run",
+    "test:bundle-contract": "node scripts/test-bundle-budget.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:production-config": "node scripts/test-production-env.mjs",
@@ -131,7 +133,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^5.4.21",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "yaml": "2.8.3"
   },
   "overrides": {
     "anymatch": {

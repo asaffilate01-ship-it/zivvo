@@ -27,13 +27,18 @@ npm run typecheck
 npm run lint
 npm run test
 npm run build
+npm run audit:all
 npm run audit:production
 npm run test:production-gate
 ```
 
 `npm run build:production` additionally rejects missing, placeholder, non-HTTPS, and non-live production configuration. It is intentionally expected to fail until real operator, Supabase, Stripe, and Maps values are supplied.
 
+Every build also enforces production bundle budgets and rejects source maps, oversized JavaScript/CSS chunks and excessive total JavaScript. The Security workflow runs the full dependency audit, including development tooling, so high or critical supply-chain findings cannot be hidden by the production-only audit.
+
 The protected **Production candidate gate** binds a production build to successful staging acceptance for the exact commit and requires linked security, database, payments, legal, accessibility and operations evidence before it emits a deployable candidate.
+
+Use [docs/GO_LIVE_EVIDENCE_REGISTER.md](docs/GO_LIVE_EVIDENCE_REGISTER.md) to collect the external evidence needed to turn repository readiness into an approved production launch.
 
 ## Architecture
 
