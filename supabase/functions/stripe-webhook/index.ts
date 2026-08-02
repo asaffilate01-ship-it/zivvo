@@ -14,9 +14,7 @@ const supabase = createClient(
 );
 
 const PRICE_TO_TIER: Record<string, { tier: string; maxListings: number }> = {
-  "price_1TBFMMFFogsDQVs4rwjRss69": { tier: "starter", maxListings: 15 },
-  "price_1TBFMOFFogsDQVs4vv5Rx8lW": { tier: "professional", maxListings: 50 },
-  "price_1TBFMOFFogsDQVs4y0kujRs8": { tier: "enterprise", maxListings: 9999 },
+  price_de_dealer_pro: { tier: "dealer_pro", maxListings: 30 },
 };
 
 serve(async (req) => {

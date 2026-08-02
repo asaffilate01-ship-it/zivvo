@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,9 +13,7 @@ const logStep = (step: string, details?: unknown) => {
 };
 
 const PRICE_TO_TIER: Record<string, string> = {
-  "price_1TBFMMFFogsDQVs4rwjRss69": "starter",
-  "price_1TBFMOFFogsDQVs4vv5Rx8lW": "professional",
-  "price_1TBFMOFFogsDQVs4y0kujRs8": "enterprise",
+  price_de_dealer_pro: "dealer_pro",
 };
 
 const unsubscribed = () =>
@@ -23,36 +22,6 @@ const unsubscribed = () =>
     { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
   );
 
-// Stripe REST helper with timeout to prevent edge-function hangs
-async function stripeFetch(
-  path: string,
-  stripeKey: string,
-  query: Record<string, string> = {},
-  timeoutMs = 8000
-) {
-  const url = new URL(`https://api.stripe.com/v1${path}`);
-  for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const res = await fetch(url.toString(), {
-      headers: {
-        Authorization: `Bearer ${stripeKey}`,
-        "Stripe-Version": "2023-10-16",
-      },
-      signal: controller.signal,
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Stripe ${path} ${res.status}: ${text}`);
-    }
-    return await res.json();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -60,12 +29,6 @@ serve(async (req) => {
 
   try {
     logStep("Function started");
-
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) {
-      logStep("STRIPE_SECRET_KEY not configured");
-      return unsubscribed();
-    }
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return unsubscribed();
@@ -85,10 +48,8 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const customers = await stripeFetch("/customers", stripeKey, {
-      email: user.email,
-      limit: "1",
-    });
+    const stripe = createStripeClient(resolveStripeEnv());
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
     if (!customers.data || customers.data.length === 0) {
       logStep("No customer found");
@@ -98,10 +59,10 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const subs = await stripeFetch("/subscriptions", stripeKey, {
+    const subs = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
-      limit: "1",
+      limit: 1,
     });
 
     const hasActiveSub = subs.data && subs.data.length > 0;
@@ -110,9 +71,11 @@ serve(async (req) => {
 
     if (hasActiveSub) {
       const subscription = subs.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      const priceId = subscription.items.data[0].price.id;
-      tier = PRICE_TO_TIER[priceId] || "starter";
+      const item = subscription.items.data[0];
+      const periodEnd = (item as any)?.current_period_end ?? (subscription as any).current_period_end;
+      subscriptionEnd = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
+      const lookupKey = item?.price?.lookup_key || item?.price?.id;
+      tier = PRICE_TO_TIER[lookupKey as string] || "dealer_pro";
       logStep("Active subscription found", { tier, subscriptionEnd });
     }
 
