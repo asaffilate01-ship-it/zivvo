@@ -13,7 +13,7 @@ import {
   Users, Building2, Car, DollarSign, ShieldCheck, XCircle,
   CheckCircle, Search, TrendingUp, BarChart3, Download, Calendar,
   Eye, Loader2, UserPlus, Ban, MoreHorizontal, Flag, Mail, Bug,
-  Gavel, Shield, FileText, Package, Clock, ClipboardCheck,
+  Gavel, Shield, FileText, Package, Clock, ClipboardCheck, CreditCard,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -39,6 +39,7 @@ import AdminInspectorsPanel from "@/components/AdminInspectorsPanel";
 import AdminInspectorPayoutsPanel from "@/components/AdminInspectorPayoutsPanel";
 import AdminVerificationDialog from "@/components/AdminVerificationDialog";
 import AdManager from "@/components/admin/AdManager";
+import PaymentOperationsPanel from "@/components/admin/PaymentOperationsPanel";
 
 
 
@@ -56,6 +57,8 @@ const AdminDashboard = () => {
   const [auctions, setAuctions] = useState<any[]>([]);
   const [auctionEscrows, setAuctionEscrows] = useState<any[]>([]);
   const [auctionAuditLog, setAuctionAuditLog] = useState<any[]>([]);
+  const [financeRequests, setFinanceRequests] = useState<any[]>([]);
+  const [subscriptionPayments, setSubscriptionPayments] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [listingSearch, setListingSearch] = useState("");
   const [listingStatusFilter, setListingStatusFilter] = useState("all");
@@ -71,7 +74,7 @@ const AdminDashboard = () => {
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
-    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes, auctionsRes, escrowsRes, auditRes] = await Promise.all([
+    const [dealersRes, listingsRes, commissionsRes, profilesRes, rolesRes, reportsRes, contactsRes, bugsRes, auctionsRes, escrowsRes, auditRes, financeRequestsRes, subscriptionPaymentsRes] = await Promise.all([
       supabase.from("dealers").select("*").order("created_at", { ascending: false }),
       supabase.from("car_listings").select("*").order("created_at", { ascending: false }).limit(200),
       supabase.from("agent_commissions").select("*").order("created_at", { ascending: false }),
@@ -83,6 +86,8 @@ const AdminDashboard = () => {
       supabase.from("auctions").select("*, car_listings!inner(title, make, model, year, registration)").order("created_at", { ascending: false }),
       supabase.from("auction_escrow").select("*").order("created_at", { ascending: false }),
       supabase.from("auction_audit_log").select("*").order("created_at", { ascending: false }).limit(200),
+      (supabase.from as any)("auction_finance_requests").select("*").order("created_at", { ascending: false }).limit(200),
+      (supabase.from as any)("subscription_payments").select("*").order("paid_at", { ascending: false }).limit(1000),
     ]);
     if (dealersRes.data) setDealers(dealersRes.data);
     if (listingsRes.data) setListings(listingsRes.data);
@@ -95,29 +100,26 @@ const AdminDashboard = () => {
     if (auctionsRes.data) setAuctions(auctionsRes.data);
     if (escrowsRes.data) setAuctionEscrows(escrowsRes.data);
     if (auditRes.data) setAuctionAuditLog(auditRes.data);
+    if (financeRequestsRes.data) setFinanceRequests(financeRequestsRes.data);
+    if (subscriptionPaymentsRes.data) setSubscriptionPayments(subscriptionPaymentsRes.data);
     setLoading(false);
   };
 
   const approveKYC = async (dealerId: string) => {
-    const { error } = await supabase.from("dealers").update({
-      kyc_verified: true,
-      kyc_approved_at: new Date().toISOString(),
-    }).eq("id", dealerId);
+    const { error } = await (supabase.rpc as any)("review_dealer_kyc", { p_dealer_id: dealerId, p_approve: true });
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else { toast({ title: "KYC Approved" }); fetchAll(); }
   };
 
   const rejectKYC = async (dealerId: string) => {
-    const { error } = await supabase.from("dealers").update({
-      kyc_verified: false,
-      is_active: false,
-    }).eq("id", dealerId);
+    const { error } = await (supabase.rpc as any)("review_dealer_kyc", { p_dealer_id: dealerId, p_approve: false });
     if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
     else { toast({ title: "Dealer rejected" }); fetchAll(); }
   };
 
   const toggleDealerActive = async (dealerId: string, active: boolean) => {
-    await supabase.from("dealers").update({ is_active: active }).eq("id", dealerId);
+    const { error } = await (supabase.rpc as any)("set_dealer_active", { p_dealer_id: dealerId, p_active: active });
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
     toast({ title: active ? "Dealer activated" : "Dealer suspended" });
     fetchAll();
   };
@@ -173,30 +175,34 @@ const AdminDashboard = () => {
     fetchAll();
   };
 
-  const approveAuction = async (auctionId: string, rating: number) => {
-    await supabase.from("auctions").update({
-      status: "live" as any,
-      inspection_rating: rating,
-      hpi_clear: true,
-      ownership_verified: true,
-      seller_verified: true,
-      starts_at: new Date().toISOString(),
-    }).eq("id", auctionId);
-    toast({ title: "Auction approved & live!" });
-    fetchAll();
-  };
-
   const rejectAuction = async (auctionId: string) => {
-    await supabase.from("auctions").update({ status: "cancelled" as any }).eq("id", auctionId);
+    const { error } = await (supabase.rpc as any)("review_auction_submission", {
+      p_auction_id: auctionId, p_approve: false, p_inspection_rating: null,
+      p_ownership_verified: false, p_seller_verified: false, p_legal_check_clear: false, p_condition_report: {},
+    });
+    if (error) { toast({ title: "Rejection failed", description: error.message, variant: "destructive" }); return; }
     toast({ title: "Auction rejected" });
     fetchAll();
   };
 
-  const updateEscrowStatus = async (escrowId: string, status: string) => {
-    const update: any = { status };
-    if (status === "released_to_seller") update.released_at = new Date().toISOString();
-    await supabase.from("auction_escrow").update(update).eq("id", escrowId);
-    toast({ title: `Payment protection ${status.replace(/_/g, " ")}` });
+  const releaseEscrow = async (escrowId: string) => {
+    const reference = window.prompt("Auszahlungsreferenz des Zahlungsdienstleisters eingeben");
+    if (!reference) return;
+    const { error } = await (supabase.rpc as any)("record_seller_payout", { p_escrow_id: escrowId, p_reference: reference });
+    if (error) { toast({ title: "Release failed", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "Auszahlung dokumentiert" });
+    fetchAll();
+  };
+
+  const reviewFinanceRequest = async (request: any, approve: boolean) => {
+    const { error } = await (supabase.rpc as any)("review_auction_finance_request", {
+      p_request_id: request.id,
+      p_approve: approve,
+      p_approved_amount: approve ? Number(request.requested_amount) : null,
+      p_valid_days: 30,
+    });
+    if (error) { toast({ title: "Prüfung fehlgeschlagen", description: error.message, variant: "destructive" }); return; }
+    toast({ title: approve ? "Finanzierungsnachweis bestätigt" : "Finanzierungsnachweis abgelehnt" });
     fetchAll();
   };
 
@@ -218,8 +224,11 @@ const AdminDashboard = () => {
   const pendingKYC = dealers.filter((d) => !d.kyc_verified && d.kyc_submitted_at);
   const activeListings = listings.filter((l) => l.status === "active");
   const pendingReports = listingReports.filter((r) => r.status === "pending");
-  const prices: Record<string, number> = { starter: 49, professional: 99, enterprise: 199 };
-  const totalRevenue = dealers.filter((d) => d.subscription_status === "active").reduce((acc, d) => acc + (prices[d.tier] || 0), 0);
+  const revenueCutoff = new Date();
+  revenueCutoff.setDate(revenueCutoff.getDate() - 30);
+  const totalRevenue = subscriptionPayments
+    .filter((payment) => new Date(payment.paid_at) >= revenueCutoff)
+    .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
   const totalUsers = allProfiles.length;
 
   const filteredDealers = dealers.filter((d) =>
@@ -243,11 +252,18 @@ const AdminDashboard = () => {
     const months = Array.from({ length: 6 }, (_, i) => {
       const d = new Date();
       d.setMonth(d.getMonth() - (5 - i));
-      return { label: d.toLocaleDateString("en-US", { month: "short" }), value: 0 };
+      return { label: d.toLocaleDateString("de-DE", { month: "short" }), year: d.getFullYear(), month: d.getMonth(), value: 0 };
     });
-    const base = Math.max(totalRevenue * 0.5, 100);
-    return months.map((m, i) => ({ ...m, value: Math.round(base + (totalRevenue - base) * (i / 5)) }));
-  }, [totalRevenue]);
+    return months.map((month) => ({
+      ...month,
+      value: subscriptionPayments
+        .filter((payment) => {
+          const paid = new Date(payment.paid_at);
+          return paid.getFullYear() === month.year && paid.getMonth() === month.month;
+        })
+        .reduce((sum, payment) => sum + Number(payment.amount || 0), 0),
+    })).map(({ label, value }) => ({ label, value }));
+  }, [subscriptionPayments]);
 
   const dealerGrowthData = useMemo(() => {
     return Array.from({ length: 6 }, (_, i) => {
@@ -295,7 +311,7 @@ const AdminDashboard = () => {
             { label: "Total Users", value: totalUsers, icon: Users, color: "text-primary" },
             { label: "Total Dealers", value: dealers.length, icon: Building2, color: "text-info" },
             { label: "Active Listings", value: activeListings.length, icon: Car, color: "text-success" },
-            { label: "Monthly Revenue", value: `£${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
+            { label: "Monthly Revenue", value: `€${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-warning" },
             { label: "Pending Reports", value: pendingReports.length, icon: Flag, color: "text-destructive" },
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
@@ -333,6 +349,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="contacts">Messages</TabsTrigger>
             <TabsTrigger value="bugs">Bugs</TabsTrigger>
             <TabsTrigger value="finance">Finance</TabsTrigger>
+            <TabsTrigger value="payments" className="gap-1"><CreditCard className="h-3 w-3" /> Payments</TabsTrigger>
             <TabsTrigger value="dms" className="gap-1"><Package className="h-3 w-3" /> DMS Health</TabsTrigger>
             <TabsTrigger value="analytics" className="gap-1"><BarChart3 className="h-3 w-3" /> Analytics</TabsTrigger>
             <TabsTrigger value="inspections" className="gap-1"><Shield className="h-3 w-3" /> Inspections</TabsTrigger>
@@ -498,8 +515,8 @@ const AdminDashboard = () => {
                       <TableHead>Vehicle</TableHead>
                       <TableHead>Price</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Logbook</TableHead>
-                      <TableHead>HPI</TableHead>
+                      <TableHead>Eigentumsnachweis</TableHead>
+                      <TableHead>Legacy evidence</TableHead>
                       <TableHead>Views</TableHead>
                       <TableHead>Posted</TableHead>
                       <TableHead>Actions</TableHead>
@@ -508,9 +525,9 @@ const AdminDashboard = () => {
                   <TableBody>
                     {filteredListings.slice(0, 50).map((l) => {
                       const hasLogbook = !!(l as any).logbook_url;
-                      const hpiData = (l as any).hpi_check_data;
-                      const hasHpi = !!hpiData;
-                      const hpiClean = hasHpi && !hpiData?.stolen_reported && !hpiData?.finance_outstanding && !hpiData?.write_off;
+                      const legacyEvidence = (l as any).hpi_check_data;
+                      const hasLegacyEvidence = !!legacyEvidence;
+                      const legacyEvidenceFlagged = hasLegacyEvidence && (legacyEvidence?.stolen_reported || legacyEvidence?.finance_outstanding || legacyEvidence?.write_off);
                       return (
                         <TableRow key={l.id}>
                           <TableCell>
@@ -522,7 +539,7 @@ const AdminDashboard = () => {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>£{Number(l.price).toLocaleString()}</TableCell>
+                          <TableCell>€{Number(l.price).toLocaleString()}</TableCell>
                           <TableCell><Badge variant={l.status === "active" ? "default" : l.status === "under_review" ? "destructive" : "secondary"}>{l.status}</Badge></TableCell>
                           <TableCell>
                             <Badge variant="outline" className={hasLogbook ? "border-success text-success" : "border-destructive text-destructive"}>
@@ -530,9 +547,9 @@ const AdminDashboard = () => {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {hasHpi ? (
-                              <Badge variant="outline" className={hpiClean ? "border-success text-success" : "border-destructive text-destructive"}>
-                                {hpiClean ? "Clear" : "Issues"}
+                            {hasLegacyEvidence ? (
+                              <Badge variant="outline" className={legacyEvidenceFlagged ? "border-destructive text-destructive" : "border-muted-foreground text-muted-foreground"}>
+                                {legacyEvidenceFlagged ? "Flagged" : "No stored flags"}
                               </Badge>
                             ) : (
                               <Badge variant="outline" className="border-muted-foreground text-muted-foreground">None</Badge>
@@ -553,14 +570,14 @@ const AdminDashboard = () => {
                                   <DropdownMenuItem
                                     onClick={() => {
                                       if (!hasLogbook) {
-                                        toast({ title: "Cannot approve", description: "Seller has not uploaded a logbook.", variant: "destructive" });
+                                        toast({ title: "Freigabe nicht möglich", description: "Der Verkäufer hat keinen Eigentumsnachweis hochgeladen.", variant: "destructive" });
                                         return;
                                       }
                                       toggleListingStatus(l.id, "active");
                                     }}
                                   >
                                     <CheckCircle className="mr-2 h-4 w-4" /> Approve
-                                    {!hasLogbook && <span className="ml-1 text-xs text-destructive">(no logbook)</span>}
+                                    {!hasLogbook && <span className="ml-1 text-xs text-destructive">(kein Nachweis)</span>}
                                   </DropdownMenuItem>
                                 )}
                                 {l.status === "active" && (
@@ -600,14 +617,11 @@ const AdminDashboard = () => {
                         <div key={a.id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-border p-4">
                           <div>
                             <p className="font-medium text-card-foreground">{l?.year} {l?.make} {l?.model}</p>
-                            <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: £{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
+                            <p className="text-xs text-muted-foreground">Reg: {l?.registration || "N/A"} · Starting: €{Number(a.starting_price).toLocaleString()} · Format: {a.format}</p>
                           </div>
                           <div className="flex gap-2">
                             <Button size="sm" variant="default" className="gap-1" onClick={() => setInspectingAuction(a)}>
                               <ClipboardCheck className="h-3 w-3" /> Full Inspection
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => approveAuction(a.id, 3)} title="Quick approve with 3/5">
-                              ⭐ Quick 3/5
                             </Button>
                             <Button size="sm" variant="outline" className="text-destructive" onClick={() => rejectAuction(a.id)}>
                               <XCircle className="mr-1 h-3 w-3" /> Reject
@@ -662,7 +676,7 @@ const AdminDashboard = () => {
                             </TableCell>
                             <TableCell><Badge variant={a.status === "live" ? "default" : a.status === "sold" ? "secondary" : "outline"}>{a.status}</Badge></TableCell>
                             <TableCell>{a.inspection_rating ? `${a.inspection_rating}/5` : "—"}</TableCell>
-                            <TableCell>£{Number(a.current_bid || a.starting_price).toLocaleString()}</TableCell>
+                            <TableCell>€{Number(a.current_bid || a.starting_price).toLocaleString()}</TableCell>
                             <TableCell>{a.bid_count || 0}</TableCell>
                             <TableCell className="text-xs text-muted-foreground">{a.ends_at ? new Date(a.ends_at).toLocaleDateString() : "—"}</TableCell>
                             <TableCell>
@@ -670,8 +684,8 @@ const AdminDashboard = () => {
                                 <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => setSelectedAuction(a)}><Eye className="mr-2 h-4 w-4" /> Details</DropdownMenuItem>
-                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => approveAuction(a.id, 3)}><CheckCircle className="mr-2 h-4 w-4" /> Quick Approve (3/5)</DropdownMenuItem>}
-                                  {a.status !== "cancelled" && <DropdownMenuItem onClick={() => rejectAuction(a.id)} className="text-destructive"><XCircle className="mr-2 h-4 w-4" /> Cancel</DropdownMenuItem>}
+                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => setInspectingAuction(a)}><ClipboardCheck className="mr-2 h-4 w-4" /> Vollprüfung</DropdownMenuItem>}
+                                  {a.status === "pending_inspection" && <DropdownMenuItem onClick={() => rejectAuction(a.id)} className="text-destructive"><XCircle className="mr-2 h-4 w-4" /> Ablehnen</DropdownMenuItem>}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
@@ -683,12 +697,12 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Payment Protection Management */}
+              {/* Payment and handover records */}
               <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Payment Protection ({auctionEscrows.length})</CardTitle></CardHeader>
+                <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="h-4 w-4 text-primary" /> Zahlungs- und Übergabestatus ({auctionEscrows.length})</CardTitle></CardHeader>
                 <CardContent className="overflow-x-auto">
                   {auctionEscrows.length === 0 ? (
-                    <p className="py-8 text-center text-muted-foreground">No payment protection records yet</p>
+                    <p className="py-8 text-center text-muted-foreground">Noch keine Zahlungs- oder Übergabedatensätze</p>
                   ) : (
                     <Table>
                       <TableHeader>
@@ -696,7 +710,7 @@ const AdminDashboard = () => {
                           <TableHead>Auction</TableHead>
                           <TableHead>Total</TableHead>
                           <TableHead>Status</TableHead>
-                          <TableHead>V5C</TableHead>
+                          <TableHead>Dokumente</TableHead>
                           <TableHead>Keys</TableHead>
                           <TableHead>Contract</TableHead>
                           <TableHead>Actions</TableHead>
@@ -706,7 +720,7 @@ const AdminDashboard = () => {
                         {auctionEscrows.map((e: any) => (
                           <TableRow key={e.id}>
                             <TableCell className="text-xs">{e.auction_id.slice(0, 8)}...</TableCell>
-                            <TableCell>£{Number(e.total_amount).toLocaleString()}</TableCell>
+                            <TableCell>€{Number(e.total_amount).toLocaleString()}</TableCell>
                             <TableCell><Badge variant="outline" className="capitalize">{(e.status as string).replace(/_/g, " ")}</Badge></TableCell>
                             <TableCell>{e.v5c_received ? "✅" : "⏳"}</TableCell>
                             <TableCell>{e.keys_handed_over ? "✅" : "⏳"}</TableCell>
@@ -716,10 +730,8 @@ const AdminDashboard = () => {
                                 <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   {e.v5c_received && e.keys_handed_over && e.contract_signed && e.status !== "released_to_seller" && (
-                                    <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "released_to_seller")}><CheckCircle className="mr-2 h-4 w-4" /> Release to Seller</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => releaseEscrow(e.id)}><CheckCircle className="mr-2 h-4 w-4" /> Auszahlung dokumentieren</DropdownMenuItem>
                                   )}
-                                  {e.status !== "refunded" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "refunded")} className="text-destructive">Refund Buyer</DropdownMenuItem>}
-                                  {e.status !== "disputed" && <DropdownMenuItem onClick={() => updateEscrowStatus(e.id, "disputed")}>Mark Disputed</DropdownMenuItem>}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>
@@ -1004,6 +1016,25 @@ const AdminDashboard = () => {
 
           {/* Finance Tab */}
           <TabsContent value="finance" className="mt-4">
+            <Card className="mb-4">
+              <CardHeader><CardTitle className="text-base">Finanzierungsnachweise für Auktionen</CardTitle></CardHeader>
+              <CardContent className="overflow-x-auto">
+                {financeRequests.length === 0 ? <p className="py-6 text-center text-muted-foreground">Keine Anfragen</p> : (
+                  <Table>
+                    <TableHeader><TableRow><TableHead>Anbieter</TableHead><TableHead>Referenz</TableHead><TableHead>Betrag</TableHead><TableHead>Status</TableHead><TableHead>Aktion</TableHead></TableRow></TableHeader>
+                    <TableBody>{financeRequests.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell>{request.provider}</TableCell>
+                        <TableCell className="font-mono text-xs">{request.reference}</TableCell>
+                        <TableCell>{Number(request.requested_amount).toLocaleString("de-DE", { style: "currency", currency: "EUR" })}</TableCell>
+                        <TableCell><Badge variant="outline">{request.status}</Badge></TableCell>
+                        <TableCell>{request.status === "pending" && <div className="flex gap-2"><Button size="sm" onClick={() => reviewFinanceRequest(request, true)}>Bestätigen</Button><Button size="sm" variant="outline" onClick={() => reviewFinanceRequest(request, false)}>Ablehnen</Button></div>}</TableCell>
+                      </TableRow>
+                    ))}</TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
             <div className="grid gap-4 md:grid-cols-2">
               <Card>
                 <CardHeader>
@@ -1011,27 +1042,20 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {["starter", "professional", "enterprise"].map((tier) => {
-                      const count = dealers.filter((d) => d.tier === tier && d.subscription_status === "active").length;
-                      const revenue = count * prices[tier];
-                      const maxRevenue = totalRevenue || 1;
-                      return (
-                        <div key={tier}>
-                          <div className="flex justify-between text-sm">
-                            <span className="capitalize text-card-foreground">{tier}</span>
-                            <span className="text-muted-foreground">{count} dealers · ${revenue}/mo</span>
-                          </div>
-                          <div className="mt-1 h-2 rounded-full bg-muted">
-                            <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${(revenue / maxRevenue) * 100}%` }} />
-                          </div>
-                        </div>
-                      );
-                    })}
+                    <div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-card-foreground">Händler-Abozahlungen</span>
+                        <span className="text-muted-foreground">{new Set(subscriptionPayments.filter((payment) => new Date(payment.paid_at) >= revenueCutoff).map((payment) => payment.dealer_id)).size} Händler · €{totalRevenue.toLocaleString("de-DE", { minimumFractionDigits: 2 })} / 30 Tage</span>
+                      </div>
+                      <div className="mt-1 h-2 rounded-full bg-muted">
+                        <div className="h-full w-full rounded-full bg-primary" />
+                      </div>
+                    </div>
                   </div>
                   <div className="mt-6 border-t border-border pt-4">
                     <div className="flex justify-between font-display font-bold">
                       <span className="text-card-foreground">Total MRR</span>
-                      <span className="text-primary">£{totalRevenue.toLocaleString()}</span>
+                      <span className="text-primary">€{totalRevenue.toLocaleString()}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -1055,7 +1079,7 @@ const AdminDashboard = () => {
                             <p className="text-sm font-medium text-card-foreground">Commission #{c.id.slice(0, 8)}</p>
                             <p className="text-xs text-muted-foreground">{c.status} · {c.period_start ? new Date(c.period_start).toLocaleDateString() : ""}</p>
                           </div>
-                          <span className="font-display font-semibold text-primary">£{Number(c.amount).toFixed(2)}</span>
+                          <span className="font-display font-semibold text-primary">€{Number(c.amount).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
@@ -1063,6 +1087,10 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="payments" className="mt-4">
+            <PaymentOperationsPanel />
           </TabsContent>
 
           {/* DMS Health Tab */}
@@ -1159,11 +1187,11 @@ const AdminDashboard = () => {
                   <div><span className="text-muted-foreground">Status:</span> <Badge variant="outline">{selectedAuction.status}</Badge></div>
                   <div><span className="text-muted-foreground">Format:</span> <span className="text-foreground">{selectedAuction.format}</span></div>
                   <div><span className="text-muted-foreground">Rating:</span> <span className="text-foreground">{selectedAuction.inspection_rating ? `${selectedAuction.inspection_rating}/5` : "Pending"}</span></div>
-                  <div><span className="text-muted-foreground">Starting:</span> <span className="text-foreground">£{Number(selectedAuction.starting_price).toLocaleString()}</span></div>
-                  <div><span className="text-muted-foreground">Current:</span> <span className="text-foreground font-bold">£{Number(selectedAuction.current_bid || selectedAuction.starting_price).toLocaleString()}</span></div>
-                  <div><span className="text-muted-foreground">Reserve:</span> <span className="text-foreground">{selectedAuction.reserve_price ? `£${Number(selectedAuction.reserve_price).toLocaleString()}` : "None"}</span></div>
+                  <div><span className="text-muted-foreground">Starting:</span> <span className="text-foreground">€{Number(selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Current:</span> <span className="text-foreground font-bold">€{Number(selectedAuction.current_bid || selectedAuction.starting_price).toLocaleString()}</span></div>
+                  <div><span className="text-muted-foreground">Reserve:</span> <span className="text-foreground">{selectedAuction.reserve_price ? `€${Number(selectedAuction.reserve_price).toLocaleString()}` : "None"}</span></div>
                   <div><span className="text-muted-foreground">Bids:</span> <span className="text-foreground">{selectedAuction.bid_count || 0}</span></div>
-                  <div><span className="text-muted-foreground">HPI:</span> <span>{selectedAuction.hpi_clear ? "✅ Clear" : "⏳"}</span></div>
+                  <div><span className="text-muted-foreground">Register/Finanzierung:</span> <span>{selectedAuction.hpi_clear ? "✅ geprüft" : "⏳"}</span></div>
                   <div><span className="text-muted-foreground">Verified:</span> <span>{selectedAuction.seller_verified ? "✅" : "⏳"}</span></div>
                 </div>
                 <Separator />
@@ -1173,8 +1201,8 @@ const AdminDashboard = () => {
                       <ClipboardCheck className="h-3 w-3" /> Full Inspection
                     </Button>
                   )}
-                  {selectedAuction.status !== "cancelled" && (
-                    <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Cancel</Button>
+                  {selectedAuction.status === "pending_inspection" && (
+                    <Button size="sm" variant="destructive" onClick={() => { rejectAuction(selectedAuction.id); setSelectedAuction(null); }}>Ablehnen</Button>
                   )}
                 </div>
               </div>

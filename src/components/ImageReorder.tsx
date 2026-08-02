@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { X, GripVertical, ImagePlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ImageReorderProps {
   existingImages: string[];
@@ -24,6 +25,7 @@ const ImageReorder = ({
   onAddClick,
   maxImages = 20,
 }: ImageReorderProps) => {
+  const { t } = useTranslation();
   const [dragItem, setDragItem] = useState<DragItem | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const dragCounter = useRef(0);
@@ -91,7 +93,7 @@ const ImageReorder = ({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+    <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5" role="list" aria-label={t("productionV2.upload.imageList")}>
       {allItems.map((item, unifiedIndex) => {
         const isDragging =
           dragItem &&
@@ -108,6 +110,7 @@ const ImageReorder = ({
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, unifiedIndex)}
             onDragEnd={handleDragEnd}
+            role="listitem"
             className={`group relative aspect-square cursor-grab overflow-hidden rounded-lg border transition-all active:cursor-grabbing ${
               isDragging
                 ? "opacity-40 border-primary"
@@ -118,10 +121,10 @@ const ImageReorder = ({
                 : "border-border"
             }`}
           >
-            <img src={item.src} alt="" className="h-full w-full object-cover" />
+            <img src={item.src} alt={t("productionV2.upload.imageAlt", { number: unifiedIndex + 1 })} className="h-full w-full object-cover" />
             
             {/* Drag handle */}
-            <div className="absolute left-1 top-1 rounded bg-background/80 p-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute left-1 top-1 rounded bg-background/80 p-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100" aria-hidden="true">
               <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
             </div>
 
@@ -129,11 +132,11 @@ const ImageReorder = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                item.type === "existing"
-                  ? onRemoveExisting(item.originalIndex)
-                  : onRemoveNew(item.originalIndex);
+                if (item.type === "existing") onRemoveExisting(item.originalIndex);
+                else onRemoveNew(item.originalIndex);
               }}
               className="absolute right-1 top-1 rounded-full bg-background/80 p-1 opacity-0 transition-opacity group-hover:opacity-100"
+              aria-label={t("productionV2.upload.removeImage", { number: unifiedIndex + 1 })}
             >
               <X className="h-3 w-3" />
             </button>
@@ -141,12 +144,12 @@ const ImageReorder = ({
             {/* Labels */}
             {unifiedIndex === 0 && (
               <span className="absolute bottom-1 left-1 rounded bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
-                Cover
+                {t("productionV2.upload.cover")}
               </span>
             )}
             {item.type === "new" && (
               <span className="absolute bottom-1 right-1 rounded bg-accent/90 px-1.5 py-0.5 text-[10px] font-medium text-accent-foreground">
-                New
+                {t("common.new")}
               </span>
             )}
           </div>
@@ -155,11 +158,12 @@ const ImageReorder = ({
 
       {totalImages < maxImages && (
         <button
+          type="button"
           onClick={onAddClick}
           className="flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed border-border text-muted-foreground transition-colors hover:border-primary hover:text-primary"
         >
           <ImagePlus className="h-6 w-6" />
-          <span className="mt-1 text-xs">Add</span>
+          <span className="mt-1 text-xs">{t("productionV2.upload.add")}</span>
         </button>
       )}
     </div>

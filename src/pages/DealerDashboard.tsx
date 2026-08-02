@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "react-router-dom";
 import { useCountry } from "@/contexts/CountryContext";
@@ -18,12 +18,10 @@ import BoostListingDialog from "@/components/BoostListingDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import DashboardChart from "@/components/DashboardChart";
+import { redirectToStripe } from "@/lib/safeNavigation";
 import DealerPageBuilder from "@/components/DealerPageBuilder";
 import SellerAnalytics from "@/components/SellerAnalytics";
 import SalesPipeline from "@/components/SalesPipeline";
-import PortalSyndication from "@/components/PortalSyndication";
-import ListingSyndicationStatus from "@/components/ListingSyndicationStatus";
 import StockBookManager from "@/components/dealer/StockBookManager";
 import VehicleCostsManager from "@/components/dealer/VehicleCostsManager";
 import StaffManager from "@/components/dealer/StaffManager";
@@ -31,6 +29,7 @@ import ReservationsManager from "@/components/dealer/ReservationsManager";
 import BookingsManager from "@/components/dealer/BookingsManager";
 import AdShopEditor from "@/components/dealer/AdShopEditor";
 import DmsConnectionsManager from "@/components/dealer/DmsConnectionsManager";
+import DealerLeadInbox from "@/components/dealer/DealerLeadInbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -61,7 +60,7 @@ const DealerDashboard = () => {
   const { user, subscription, refreshSubscription } = useAuth();
   const { config } = useCountry();
   const { toast } = useToast();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [dealer, setDealer] = useState<DealerInfo | null>(null);
   const [summary, setSummary] = useState<ListingSummary>({
     total: 0, active: 0, draft: 0, sold: 0, totalViews: 0, totalEnquiries: 0,
@@ -77,7 +76,7 @@ const DealerDashboard = () => {
       toast({ title: t("dealerDashboard.toasts.subActivated"), description: t("dealerDashboard.toasts.subActivatedDesc") });
       refreshSubscription();
     }
-  }, [searchParams]);
+  }, [refreshSubscription, searchParams, t, toast]);
 
   useEffect(() => {
     if (!user) return;
@@ -119,7 +118,7 @@ const DealerDashboard = () => {
         });
         return;
       }
-      if (data?.url) window.open(data.url, "_blank");
+      if (data?.url) redirectToStripe(data.url);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
@@ -174,7 +173,8 @@ const DealerDashboard = () => {
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -210,26 +210,6 @@ const DealerDashboard = () => {
     URL.revokeObjectURL(url);
     toast({ title: t("dealerDashboard.toasts.csvExported") });
   };
-
-  const viewsChartData = useMemo(() => {
-    const last7 = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      return { label: d.toLocaleDateString("en-US", { weekday: "short" }), value: 0 };
-    });
-    const perDay = Math.round(summary.totalViews / 7);
-    return last7.map((d) => ({ ...d, value: Math.max(0, perDay + Math.round(Math.random() * perDay * 0.4)) }));
-  }, [summary.totalViews]);
-
-  const enquiriesChartData = useMemo(() => {
-    const last7 = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      return { label: d.toLocaleDateString("en-US", { weekday: "short" }), value: 0 };
-    });
-    const perDay = Math.round(summary.totalEnquiries / 7);
-    return last7.map((d) => ({ ...d, value: Math.max(0, perDay + Math.round(Math.random() * 3 - 1)) }));
-  }, [summary.totalEnquiries]);
 
   const tierColors: Record<string, string> = {
     starter: "bg-secondary text-secondary-foreground",
@@ -342,20 +322,21 @@ const DealerDashboard = () => {
         {/* DMS Tools */}
         <div className="mt-8">
           <h2 className="font-display text-lg font-bold text-foreground mb-4">{t("dealerDashboard.managementTools")}</h2>
-          <Tabs defaultValue="stock-book">
+          <Tabs value={searchParams.get("tab") || "stock-book"} onValueChange={(tab) => setSearchParams(tab === "stock-book" ? {} : { tab }, { replace: true })}>
             <TabsList className="flex w-full flex-wrap justify-start gap-1 h-auto">
               <TabsTrigger value="stock-book">{t("dealerDashboard.tabs.stockBook")}</TabsTrigger>
+              <TabsTrigger value="leads">{t("productionV2.leads.tab")}</TabsTrigger>
               <TabsTrigger value="costs">{t("dealerDashboard.tabs.costs")}</TabsTrigger>
               <TabsTrigger value="reservations">{t("dealerDashboard.tabs.reservations")}</TabsTrigger>
               <TabsTrigger value="bookings">{t("dealerDashboard.tabs.bookings")}</TabsTrigger>
               <TabsTrigger value="staff">{t("dealerDashboard.tabs.staff")}</TabsTrigger>
               <TabsTrigger value="ad-shop">{t("dealerDashboard.tabs.adShop")}</TabsTrigger>
               <TabsTrigger value="pipeline">{t("dealerDashboard.tabs.pipeline")}</TabsTrigger>
-              <TabsTrigger value="syndication">{t("dealerDashboard.tabs.syndication")}</TabsTrigger>
               <TabsTrigger value="integrations">{t("dealerDashboard.tabs.integrations")}</TabsTrigger>
               <TabsTrigger value="analytics">{t("dealerDashboard.tabs.analytics")}</TabsTrigger>
             </TabsList>
             <TabsContent value="stock-book" className="mt-4"><StockBookManager dealerId={dealer.id} /></TabsContent>
+            <TabsContent value="leads" className="mt-4"><DealerLeadInbox dealerId={dealer.id} /></TabsContent>
             <TabsContent value="costs" className="mt-4"><VehicleCostsManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="reservations" className="mt-4"><ReservationsManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="bookings" className="mt-4"><BookingsManager dealerId={dealer.id} /></TabsContent>
@@ -364,7 +345,6 @@ const DealerDashboard = () => {
               <AdShopEditor dealerId={dealer.id} logoUrl={(dealer as any).logo_url} businessName={dealer.business_name} />
             </TabsContent>
             <TabsContent value="pipeline" className="mt-4"><SalesPipeline mode="dealer" dealerId={dealer.id} /></TabsContent>
-            <TabsContent value="syndication" className="mt-4"><PortalSyndication dealerId={dealer.id} /></TabsContent>
             <TabsContent value="integrations" className="mt-4"><DmsConnectionsManager dealerId={dealer.id} /></TabsContent>
             <TabsContent value="analytics" className="mt-4"><SellerAnalytics /></TabsContent>
           </Tabs>
@@ -428,9 +408,6 @@ const DealerDashboard = () => {
                         <Link to={`/car/${listing.id}`} className="font-medium text-card-foreground hover:text-primary">{listing.title}</Link>
                         <p className="text-sm text-muted-foreground">{t("dealerDashboard.viewsEnquiries", { views: listing.views_count || 0, enquiries: listing.enquiries_count || 0 })}</p>
                       </div>
-                      {listing.status === "active" && dealer && (
-                        <ListingSyndicationStatus listingId={listing.id} dealerId={dealer.id} />
-                      )}
                       <Badge variant={listing.status === "active" ? "default" : "secondary"}>{listing.status}</Badge>
                       <span className="font-display font-semibold text-card-foreground">{formatPrice(Number(listing.price), config)}</span>
                       {listing.status === "active" && (

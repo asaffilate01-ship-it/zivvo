@@ -45,13 +45,14 @@
     "getStarted": "Get started",
     "chooseFile": "Choose file",
     "delete": "Delete",
-    "updated": "Updated"
+    "updated": "Updated",
+    "error": "Error"
   },
   "hero": {
-    "badge": "Live marketplace — updated in real-time",
+    "badge": "Vehicle marketplace for Germany",
     "title1": "Find your",
     "title2": "perfect drive",
-    "subtitle": "Browse thousands of verified vehicles from trusted dealers and private sellers across Germany.",
+    "subtitle": "Compare active vehicle listings from dealers and private sellers across Germany. Each listing shows the verification and evidence actually available.",
     "stats": {
       "listings": "Listings",
       "dealers": "Dealers",
@@ -94,7 +95,7 @@
     }
   },
   "footer": {
-    "tagline": "The trusted marketplace for buying and selling vehicles. Verified listings, transparent history and secure transactions.",
+    "tagline": "Compare vehicle listings, contact sellers, and see available verification, document, and payment status clearly.",
     "companyInfo": "Zivvo GmbH · Registered in Germany · HRB 000000\nRegistered office: Musterstraße 1, 10115 Berlin\nVAT ID: DE 000 000 000",
     "operational": "All systems operational",
     "sections": {
@@ -131,20 +132,20 @@
   "pricing": {
     "private": {
       "title": "For Private Sellers",
-      "headline": "2 cars per month — free",
-      "subtitle": "After that, just €9.99 per vehicle — with up to 10 photos, active until sold.",
+      "headline": "Up to 2 cars per month — free",
+      "subtitle": "Up to two new listings per calendar month, with 10 photos and review before publication.",
       "cta": "List your car free",
       "freePerMonth": "2 free listings / month",
-      "extraListing": "€9.99 per additional car",
+      "extraListing": "No paid extra listings",
       "photos": "10 photos per vehicle",
       "activeUntilSold": "Active until sold",
       "noSubscription": "No subscription required",
-      "perExtra": "per extra listing"
+      "perExtra": "for private sellers"
     },
     "dealer": {
       "title": "For Dealers",
       "headline": "€49.99 / month — up to 30 vehicles",
-      "subtitle": "2 months free trial. Cheaper than mobile.de and AutoScout24 — with all pro features.",
+      "subtitle": "Try it free for 2 months. Inventory, analytics and a dealer page in one plan.",
       "cta": "Start 2 months free",
       "vehicles": "Up to 30 active listings",
       "photos": "15 photos per vehicle",
@@ -154,14 +155,14 @@
       "landingPage": "Custom dealer landing page",
       "featured": "Featured placements",
       "support": "Priority support",
-      "syndication": "Portal syndication (mobile.de, AutoScout24)",
-      "financeIntegration": "Finance integration",
-      "verifiedBadge": "Verified dealer badge"
+      "syndication": "Secure stock import on request",
+      "financeIntegration": "Document finance enquiries",
+      "verifiedBadge": "Transparent dealer verification status"
     },
     "hero": {
       "title": "Plans built to grow your dealership",
-      "subtitle": "Powerful tools, beautiful listings and your own landing page. Cancel anytime — no contracts, no commission.",
-      "cheaperThan": "Cheaper than mobile.de, AutoScout24 & Kleinanzeigen",
+      "subtitle": "Inventory tools, polished listings and your own landing page. Cancel through the billing portal at the end of the billing period; no commission on regular classified sales.",
+      "cheaperThan": "One transparent plan for up to 30 active vehicles",
       "twoMonthsFree": "2 months free"
     },
     "faq": {
@@ -169,25 +170,25 @@
       "q1": "Can I cancel or change my plan anytime?",
       "a1": "Yes — you can upgrade, downgrade or cancel from your billing portal anytime. Changes take effect at the next billing cycle.",
       "q2": "What's the difference between private and dealer plans?",
-      "a2": "Private sellers get 2 free listings per month, then pay €9.99 per additional vehicle. Dealers pay €49.99/month for up to 30 active listings.",
+      "a2": "Private sellers can publish up to 2 new listings per calendar month. Dealers pay €49.99/month for up to 30 active listings.",
       "q3": "Is there a free trial?",
       "a3": "Yes — dealers get 2 months free to try all features.",
       "q4": "Do you take sales commission?",
-      "a4": "No. We never take commission on vehicle sales. Your subscription covers everything."
+      "a4": "No sales commission applies to regular classified sales. Auction, reservation or add-on fees are shown separately before confirmation."
     },
     "perMonth": "month",
     "contactSales": "Contact sales",
-    "portalSync": "Portal syndication to leading German marketplaces",
+    "portalSync": "Central Zivvo inventory",
     "pillarsTitle": "Everything you need to sell more cars",
     "pillars": {
       "analyticsTitle": "Live analytics",
       "analyticsDesc": "Views, leads and conversion in real time.",
-      "verifiedTitle": "Verified badge",
-      "verifiedDesc": "Build buyer trust with KYC verification.",
-      "reachTitle": "Multi-portal reach",
-      "reachDesc": "Automatically syndicated to mobile.de, AutoScout24 & more.",
-      "supportTitle": "German support",
-      "supportDesc": "Priority help from our team in Germany."
+      "verifiedTitle": "Verification status",
+      "verifiedDesc": "Show buyers only the KYC status that has actually been completed.",
+      "reachTitle": "Inventory & dealer page",
+      "reachDesc": "Manage stock centrally and present it on your Zivvo dealer page.",
+      "supportTitle": "Help channel",
+      "supportDesc": "Report platform questions and issues through the documented support channel."
     },
     "finalCta": {
       "title": "Ready to grow your dealership?",
@@ -208,24 +209,24 @@
     }
   },
   "finance": {
-    "title": "Vehicle Financing",
-    "subtitle": "Finance your new car easily through our partner banks.",
-    "intro": "We work with leading German finance partners so you can drive your dream car today — without paying the full price upfront.",
-    "partners": "Partner banks",
-    "partnerList": "Santander · CreditPlus · Bank11 · Volkswagen Bank · TARGOBANK",
+    "title": "Prepare a Finance Enquiry",
+    "subtitle": "Calculate illustrative payments and ask the relevant dealer about availability.",
+    "intro": "Zivvo provides calculation examples and sends a contact request to the platform team. Zivvo is not a lender, and this page is not a credit offer or approval.",
+    "partners": "Important notice",
+    "partnerList": "The provider, terms and intermediary role must be disclosed separately before any application.",
     "features": {
-      "quick": "Fast approval",
-      "quickDesc": "Response within minutes",
-      "flexible": "Flexible terms",
-      "flexibleDesc": "12 to 84 months",
-      "rates": "Attractive rates",
-      "ratesDesc": "From 2.99% APR",
-      "noFee": "No fees",
-      "noFeeDesc": "No processing fees, no hidden costs"
+      "quick": "No credit approval",
+      "quickDesc": "A contact request does not replace a credit assessment",
+      "flexible": "Compare terms",
+      "flexibleDesc": "Illustrations from 12 to 84 months",
+      "rates": "Check the rate",
+      "ratesDesc": "Compare APR and total amount payable",
+      "noFee": "Contact request",
+      "noFeeDesc": "Zivvo does not charge to submit this request"
     },
     "cta": "Apply for financing",
     "form": {
-      "title": "Financing enquiry",
+      "title": "Non-binding contact request",
       "name": "Full name",
       "email": "Email",
       "phone": "Phone",
@@ -234,8 +235,8 @@
       "vehicle": "Vehicle of interest (optional)",
       "downpayment": "Down payment (€, optional)",
       "submit": "Submit enquiry",
-      "success": "Thanks! A finance expert will contact you within 24 hours.",
-      "consent": "I agree that my information may be shared with partner banks to assess my financing."
+      "success": "Thank you. The request was sent to the Zivvo platform team. A response or financing is not guaranteed.",
+      "consent": "I agree that Zivvo may process these details to handle this contact request as described in the Privacy Policy. No finance provider receives them without separate information."
     }
   },
   "language": {
@@ -267,7 +268,7 @@
       "email": "Email",
       "emailPlaceholder": "you@example.com",
       "password": "Password",
-      "passwordPlaceholder": "Min 6 characters",
+      "passwordPlaceholder": "Min 12 characters",
       "agree": "I agree to the",
       "terms": "Terms of Service",
       "and": "and",
@@ -322,50 +323,50 @@
       "eyebrow": "Services",
       "title": "All you need, in one place",
       "finance": {
-        "title": "Cut the cost of car finance",
-        "b1": "Zero deposit available",
-        "b2": "Soft-search — no impact on credit",
-        "b3": "Decision in minutes",
-        "cta": "Get a quote",
-        "ribbon": "Rates from 3.9% APR"
+        "title": "Understand financing",
+        "b1": "Calculate illustrative payments",
+        "b2": "Compare APR and total cost",
+        "b3": "Ask the dealer about availability",
+        "cta": "Open calculator",
+        "ribbon": "Not a credit offer"
       },
       "sell": {
         "title": "Sell your car",
-        "b1": "List in under 2 minutes",
-        "b2": "Reach 25K+ active buyers",
-        "b3": "Free valuation in seconds",
-        "cta": "Get a free valuation",
-        "ribbon": "Average sale: 7 days"
+        "b1": "Create a guided listing",
+        "b2": "Show review status clearly",
+        "b3": "Compare active asking prices",
+        "cta": "Compare listings",
+        "ribbon": "Up to 2 listings free"
       },
       "hpi": {
-        "title": "Vehicle history check",
-        "b1": "Outstanding finance",
-        "b2": "Stolen / written-off",
-        "b3": "Mileage anomalies",
-        "cta": "Run a history check",
-        "ribbon": "9 of 10 listings checked"
+        "title": "Independent vehicle inspection",
+        "b1": "Standardised inspection points",
+        "b2": "Documented condition report",
+        "b3": "Bookable on supported listings",
+        "cta": "Browse vehicles",
+        "ribbon": "Optional booking"
       }
     },
     "featured": {
       "title": "Featured Vehicles",
       "badge": "Hot",
-      "subtitle": "Hand-picked premium listings",
+      "subtitle": "Active promoted listings",
       "seeAll": "See all",
       "empty": "No featured vehicles yet. Check back soon!"
     },
     "trust": {
       "badge": "Why Zivvo",
       "titleA": "Buy with",
-      "titleB": "complete confidence",
-      "subtitle": "We go the extra mile to ensure every transaction is safe, transparent and hassle-free.",
-      "verifiedTitle": "Verified Listings",
-      "verifiedDesc": "Every dealer is vetted. Verified badges mean the vehicle has passed legality and finance checks.",
-      "financeTitle": "Finance & Legal Check",
-      "financeDesc": "Instantly check if a vehicle has outstanding finance, is reported stolen, or written off.",
-      "historyTitle": "Full History Reports",
-      "historyDesc": "MOT/TÜV history, mileage verification and previous owner details in one click.",
-      "verifiedClean": "Verified clean",
-      "verifiedCleanSub": "No finance · No theft"
+      "titleB": "clear evidence",
+      "subtitle": "Clear labels show which seller, document, and payment checks have actually been completed.",
+      "verifiedTitle": "Visible Approval Status",
+      "verifiedDesc": "Dealer and listing status appear only after the relevant platform review has been completed.",
+      "financeTitle": "Documented Vehicle Details",
+      "financeDesc": "Seller declarations and available evidence are labelled; missing external checks are never implied.",
+      "historyTitle": "Optional Condition Reports",
+      "historyDesc": "Where an independent inspection exists, the vehicle page shows its report, date, and result.",
+      "verifiedClean": "Transparent status",
+      "verifiedCleanSub": "Only evidenced checks are shown"
     },
     "stats": {
       "users": "Active users",
@@ -400,46 +401,46 @@
     "howItWorks": {
       "badge": "How it works",
       "title": "From search to driveway in 4 steps",
-      "subtitle": "A streamlined buying journey — backed by inspections, escrow and a 7-day guarantee.",
+      "subtitle": "A clear journey with listing, inspection and payment status shown at each step.",
       "step": "Step {{n}}",
       "s1Title": "Search & Shortlist",
       "s1Desc": "Filter by make, budget, fuel type and distance. Save searches and get instant alerts.",
       "s2Title": "Reserve with Confidence",
-      "s2Desc": "Every dealer is KYC-verified. Buyer protection and pre-auth deposits keep your money safe.",
+      "s2Desc": "Dealer approval and reservation status are shown clearly. Deposits are confirmed by the payment provider.",
       "s3Title": "Inspect & Check",
-      "s3Desc": "200-point inspections, full history, MOT/TÜV and finance status — all in one place.",
+      "s3Desc": "Review the documents, seller statements and inspection report that are actually available for the vehicle.",
       "s4Title": "Drive Away",
-      "s4Desc": "Collect locally or get nationwide home delivery. 7-day money-back guarantee on eligible cars."
+      "s4Desc": "Agree collection or delivery directly with the seller and keep the handover record with your transaction."
     },
     "whyBuy": {
       "titleA": "Why buy from",
       "titleB": "?",
-      "subtitle": "We're building the most trusted car marketplace in the world.",
-      "verifiedTitle": "Verified Sellers",
-      "verifiedDesc": "Every dealer passes KYC verification. Private sellers are identity-checked.",
-      "checksTitle": "Finance & Theft Checks",
-      "checksDesc": "All vehicles are screened for outstanding finance, theft and write-off history.",
+      "subtitle": "Clear status and role-aware workflows for a German vehicle marketplace.",
+      "verifiedTitle": "Seller Approval Status",
+      "verifiedDesc": "Dealer and seller verification status is displayed where the platform has completed it.",
+      "checksTitle": "Check Status & Evidence",
+      "checksDesc": "Available documents and external check status are labelled per vehicle; no missing check is implied.",
       "paymentsTitle": "Secure Payments",
-      "paymentsDesc": "Stripe-powered transactions with buyer protection on every purchase.",
+      "paymentsDesc": "Eligible deposits and checkout flows are verified server-side through Stripe.",
       "supportTitle": "Dedicated Support",
-      "supportDesc": "Our team is available 7 days a week for questions or issues.",
-      "historyTitle": "Full History Reports",
-      "historyDesc": "MOT/TÜV history, mileage checks, and previous owner details instantly.",
+      "supportDesc": "Use the help and complaints channels for platform questions and transaction issues.",
+      "historyTitle": "Available History Evidence",
+      "historyDesc": "Review the history and mileage evidence supplied for each individual vehicle.",
       "privacyTitle": "Data Privacy",
-      "privacyDesc": "Your personal data is encrypted and never shared with third parties."
+      "privacyDesc": "Privacy controls and legal notices explain how data is processed and shared."
     },
     "trustStrip": {
       "headline": "Built for buyers, sellers & dealers in Germany",
-      "kycLabel": "KYC-Verified Dealers",
-      "kycSub": "Every seller checked",
-      "protectionLabel": "Buyer Protection",
-      "protectionSub": "Escrow & deposits",
-      "inspectionLabel": "200-Point Inspection",
-      "inspectionSub": "Detailed report",
-      "historyLabel": "History Checked",
-      "historySub": "Full history reports",
-      "guaranteeLabel": "7-Day Guarantee",
-      "guaranteeSub": "On eligible vehicles",
+      "kycLabel": "Dealer Verification",
+      "kycSub": "Approval status shown",
+      "protectionLabel": "Server-Checked Payment",
+      "protectionSub": "Amount and ownership verified",
+      "inspectionLabel": "Optional Inspection",
+      "inspectionSub": "Only when a report exists",
+      "historyLabel": "Documented Details",
+      "historySub": "Evidence status shown",
+      "guaranteeLabel": "Transparent Status",
+      "guaranteeSub": "No implied checks",
       "foundingLabel": "Founding Members",
       "foundingSub": "Be one of the first"
     },
@@ -452,7 +453,7 @@
     "carOfWeek": {
       "editorsPick": "Editor's Pick",
       "badge": "Car of the Week",
-      "defaultDesc": "A stunning {{year}} {{make}} {{model}} in excellent condition.",
+      "defaultDesc": "A promoted listing for a {{year}} {{make}} {{model}}.",
       "year": "Year",
       "mileage": "Mileage",
       "views": "Views",
@@ -510,25 +511,25 @@
       "badge": "Founding members",
       "titleA": "Be one of the first to",
       "titleB": "join Zivvo",
-      "subtitle": "We're a brand-new marketplace built by car people, for car people. No inflated review counts, no fake five-star averages — just real listings, verified sellers, and honest pricing from day one. Your review will help shape the platform.",
+      "subtitle": "We're a new vehicle marketplace. There are no inflated review counts or fabricated five-star averages — listings, approval status, and active asking prices appear as recorded in the platform. Your review will help shape the product.",
       "listFree": "List your car free",
       "becomeDealer": "Become a founding dealer",
       "reviewsBadge": "Real reviews",
       "reviewsTitle": "What our community says",
-      "reviewsSub": "Verified reviews from real Zivvo sellers and buyers"
+      "reviewsSub": "Published reviews from the Zivvo community"
     },
     "hpiPromo": {
       "badge": "Buy with confidence",
-      "title": "Every car, fully checked before you commit",
-      "subtitle": "Run an instant history check to see if a vehicle has outstanding finance, has been written off, reported stolen, or has mileage discrepancies — all in one report.",
-      "statLabel": "Listings carry a basic history check",
-      "f1": "Full MOT/TÜV & service history",
-      "f2": "Theft & write-off check",
-      "f3": "Outstanding finance check",
-      "f4": "Mileage verification",
-      "cta": "Run a history check",
-      "ctaAlt": "Free part-exchange valuation",
-      "poweredBy": "Reports powered by DVLA/KBA & HPI data — instant download.",
+      "title": "Review available vehicle evidence before buying",
+      "subtitle": "See which seller declarations, documents, or inspection reports actually exist, and commission any missing external checks independently.",
+      "statLabel": "Evidence shown per listing",
+      "f1": "HU/AU/TÜV and service records where uploaded",
+      "f2": "Seller declarations about damage and origin",
+      "f3": "Finance status as declared by the seller",
+      "f4": "Mileage shown from listing details and documents",
+      "cta": "Compare listings",
+      "ctaAlt": "Get price guidance",
+      "poweredBy": "Review available vehicle records and seller-provided documents in one place.",
       "imageAlt": "Vehicle history verification"
     },
     "budget": {
@@ -573,11 +574,11 @@
       },
       {
         "q": "How does the finance check work?",
-        "a": "Our finance check buttons on each listing link to trusted third-party providers who can verify if a vehicle has outstanding finance, has been reported stolen, or has been written off. We recommend checking before making any purchase."
+        "a": "Each listing shows seller declarations and the status of any documents or reports that actually exist. Zivvo does not currently run an automated external vehicle-history check; independently verify finance, ownership, accident, and theft status before purchase."
       },
       {
         "q": "What are dealer subscription plans?",
-        "a": "Dealers can choose from Starter (£49/mo, 15 listings), Professional (£99/mo, 50 listings), or Enterprise (£199/mo, unlimited listings). All plans include a customisable dealer landing page, analytics dashboard, and priority support."
+        "a": "There is one dealer plan at €49.99 per month after a 60-day trial. It includes up to 30 active listings, up to 15 photos and 2 videos per vehicle, analytics, a dealer landing page, and secure stock import on request."
       },
       {
         "q": "How do I contact a seller?",
@@ -589,11 +590,11 @@
       },
       {
         "q": "How do I report a suspicious listing?",
-        "a": "If you believe a listing is fraudulent or misleading, please contact us via our Contact page. Our admin team reviews reports and takes action within 24 hours."
+        "a": "If you believe a listing is fraudulent or misleading, contact us through the Contact page and include the listing reference. Reports are prioritised for review, but no fixed response time is promised."
       },
       {
         "q": "How do I delete my account?",
-        "a": "Go to Profile → Settings and click 'Request Account Deletion'. This will remove all your personal data, listings, and messages permanently. This action cannot be undone."
+        "a": "Go to Profile → Settings and click 'Request Account Deletion'. Deletable account data is removed or anonymised; transaction, security, or evidence records required by law may be retained under restricted access for the applicable period."
       },
       {
         "q": "What is the agent programme?",
@@ -607,14 +608,14 @@
     "title": "Get in Touch",
     "subtitle": "Have a question? We'd love to hear from you.",
     "email": "Email",
-    "emailDetail": "support@zivvo.co.uk",
-    "emailSub": "We respond within 24 hours",
+    "emailDetail": "See legal notice",
+    "emailSub": "Support requests and platform reports",
     "phone": "Phone",
-    "phoneDetail": "+44 20 7123 4567",
-    "phoneSub": "Mon-Fri 9am-6pm GMT",
+    "phoneDetail": "See legal notice",
+    "phoneSub": "Platform operator contact number",
     "office": "Office",
-    "officeDetail": "London, United Kingdom",
-    "officeSub": "By appointment only",
+    "officeDetail": "Registered address in the legal notice",
+    "officeSub": "Operator details must be configured before release",
     "sendMessageTitle": "Send us a message",
     "nameLabel": "Name",
     "namePlaceholder": "Your name",
@@ -627,7 +628,7 @@
     "sendMessage": "Send Message",
     "toastFailTitle": "Failed to send message",
     "toastSuccessTitle": "Message sent!",
-    "toastSuccessDesc": "We'll get back to you within 24 hours."
+    "toastSuccessDesc": "Your message has been sent to the platform team for review."
   },
   "blog": {
     "metaTitle": "Zivvo Blog — Car Buying Tips, Reviews & Guides",
@@ -661,7 +662,7 @@
       },
       "how-to-sell-car-fast": {
         "title": "How to Sell Your Car Fast: 10 Expert Tips",
-        "excerpt": "From pricing strategy to photo tips, learn what makes listings sell faster. Data-backed advice from thousands of successful sales on Zivvo.",
+        "excerpt": "Practical pricing, photography and response tips for a clearer, more useful listing.",
         "category": "Selling Tips"
       },
       "finance-check-guide": {
@@ -688,7 +689,7 @@
     "moreArticles": "More Articles",
     "contents": "Contents",
     "shareArticle": "Share this article",
-    "authorBio": "Helping buyers and sellers make smarter car decisions across the UK.",
+    "authorBio": "Helping buyers and sellers make informed vehicle decisions across Germany.",
     "foundUseful": "Found this useful? Share it",
     "youMightAlsoLike": "You Might Also Like",
     "readMore": "Read more",
@@ -699,11 +700,11 @@
         "category": "Buying Guide",
         "content": [
           "Buying a used car can be one of the smartest financial decisions you make — but only if you do it right. Every year, thousands of buyers end up with vehicles that have hidden problems, outstanding finance, or a questionable history.",
-          "Our comprehensive checklist breaks down every step of the used car buying process, from your initial online search to the final handshake. We've compiled this from data across thousands of successful and unsuccessful transactions on Zivvo.",
-          "## Before You View\n\n1. **Set your budget** — include insurance, tax, and running costs\n2. **Research the model** — check common faults on owner forums\n3. **Run an HPI check** — verify no outstanding finance, theft, or write-offs\n4. **Check the MOT history** — look for advisory patterns online",
+          "Our practical checklist covers each step of the used-car buying process, from the initial online search to the handover.",
+          "## Before You View\n\n1. **Set your budget** — include insurance, tax, and running costs\n2. **Research the model** — check common faults on owner forums\n3. **Run an vehicle-history check** — verify no outstanding finance, theft, or write-offs\n4. **Check the HU/AU history** — look for advisory patterns online",
           "## At the Viewing\n\n1. **Walk around the exterior** — check panel gaps, paint mismatches, rust\n2. **Open all doors, boot, and bonnet** — listen for creaks\n3. **Check tyre condition** — uneven wear suggests alignment issues\n4. **Start the engine cold** — listen for knocks or rattles\n5. **Test all electrics** — windows, mirrors, lights, infotainment",
           "## The Test Drive\n\nDrive for at least 15 minutes on varied roads. Check brakes, steering response, gearbox smoothness, and listen for any unusual noises. Pay attention to how the car feels at motorway speeds.",
-          "## After the Deal\n\nEnsure you receive the V5C logbook, service history, both keys, and a receipt. Transfer the V5C to your name within 14 days and arrange insurance before driving away."
+          "## After the Deal\n\nEnsure you receive the registration document logbook, service history, both keys, and a receipt. Transfer the registration document to your name within 14 days and arrange insurance before driving away."
         ]
       },
       "electric-vs-hybrid-2026": {
@@ -712,23 +713,23 @@
         "category": "EV Guide",
         "content": [
           "The electric vehicle landscape has transformed dramatically. With charging infrastructure now covering most major routes and battery costs falling year on year, the question is no longer 'if' but 'when' to go electric.",
-          "## Full Electric (BEV)\n\nPure electric vehicles offer the lowest running costs, zero tailpipe emissions, and an increasingly impressive range. Most modern EVs now offer 250-400 miles per charge, making range anxiety largely a thing of the past.",
-          "## Hybrid (HEV & PHEV)\n\nHybrids offer a stepping stone — you get electric efficiency around town with petrol backup for longer journeys. Plug-in hybrids (PHEVs) typically offer 30-60 miles of electric-only range, perfect for daily commutes.",
-          "## Cost Comparison\n\nWhile EVs have a higher upfront cost, they're significantly cheaper to run. Electricity costs roughly 7p per mile compared to 15-20p for petrol. Tax benefits, lower servicing costs, and congestion charge exemptions add up quickly.",
-          "## Our Verdict\n\nIf you have home charging and drive under 300 miles per day, go full electric. If you frequently drive long distances without reliable charging stops, a PHEV offers the best of both worlds."
+          "## Full electric (BEV)\n\nPure electric vehicles have no tailpipe emissions and can reduce energy costs, but actual range and charging cost vary substantially by model, weather, route and tariff.",
+          "## Hybrid (HEV & PHEV)\n\nHybrids combine electric assistance with a combustion engine. Plug-in electric range varies by vehicle and should be checked against official WLTP figures and real use.",
+          "## Cost comparison\n\nCompare purchase price, depreciation, insurance, charging tariff, fuel use, tax and maintenance for the specific vehicles. Generic per-kilometre claims can be misleading.",
+          "## How to decide\n\nReview your typical daily distance, home or workplace charging access, long-distance routes and the vehicle's verified range before choosing."
         ]
       },
       "how-to-sell-car-fast": {
         "title": "How to Sell Your Car Fast: 10 Expert Tips",
-        "excerpt": "Data-backed advice from thousands of successful sales on Zivvo.",
+        "excerpt": "Practical guidance for presenting and managing a vehicle listing.",
         "category": "Selling Tips",
         "content": [
-          "Selling your car doesn't have to be a drawn-out process. Based on data from thousands of successful sales on Zivvo, here are the strategies that consistently lead to faster sales at better prices.",
-          "## 1. Price It Right\n\nOverpricing is the #1 reason cars sit unsold. Research similar models on Zivvo and price competitively. Listings priced within 5% of market value sell 3x faster.",
-          "## 2. Take Great Photos\n\nListings with 10+ high-quality photos get 4x more enquiries. Shoot in daylight, clean the car first, and include interior, exterior, engine bay, and any imperfections.",
+          "A well-presented, accurately priced listing helps buyers decide whether to contact you. These practical steps improve clarity and reduce avoidable questions.",
+          "## 1. Price it carefully\n\nCompare vehicles with similar age, mileage, specification and condition. Explain material differences instead of relying on a single automated estimate.",
+          "## 2. Take useful photos\n\nShoot in daylight, clean the car first, and include the interior, exterior, engine bay, documents and any imperfections.",
           "## 3. Write a Detailed Description\n\nBe honest and thorough. Include service history highlights, recent work done, and genuine reasons for selling. Transparency builds trust.",
-          "## 4. Get an HPI Check\n\nA clear HPI check reassures buyers and can justify a higher price. Zivvo offers integrated HPI checks directly from your listing dashboard.",
-          "## 5. Respond Quickly\n\nSellers who respond to enquiries within 1 hour are 5x more likely to close the sale. Enable notifications and keep your phone handy."
+          "## 4. Obtain an independent vehicle-history check\n\nWhere available, use a reputable German provider to verify finance, theft and damage records, and share the result with prospective buyers.",
+          "## 5. Respond clearly\n\nAnswer enquiries promptly, keep communication on-platform where possible, and do not conceal faults or document gaps."
         ]
       },
       "finance-check-guide": {
@@ -738,7 +739,7 @@
         "content": [
           "Every year, thousands of cars are sold with outstanding finance — meaning the buyer could lose the car and their money. A finance check is one of the most important steps you can take.",
           "## What Is Outstanding Finance?\n\nWhen a car is bought on finance (HP, PCP, or personal loan secured against the vehicle), the finance company retains legal ownership until the debt is fully paid. If you buy a car with outstanding finance, the finance company can legally repossess it.",
-          "## How to Check\n\nZivvo's integrated HPI check includes a comprehensive finance check. Simply enter the registration number and we'll search against all major UK finance databases.",
+          "## How to check\n\nUse a reputable independent provider that covers Germany. Verify its scope and terms, because available records differ between providers and vehicles.",
           "## What If Finance Is Found?\n\nDon't panic — but don't proceed with the purchase either. The seller needs to settle the outstanding amount before the sale can go through legitimately."
         ]
       },
@@ -760,11 +761,11 @@
         "excerpt": "How verified dealers reach more buyers and close faster.",
         "category": "For Dealers",
         "content": [
-          "Independent dealers across the UK are discovering that Zivvo's platform offers a more cost-effective way to reach serious buyers compared to traditional classified sites.",
+          "Independent dealers can use Zivvo to publish inventory, receive enquiries and maintain a branded marketplace presence in Germany.",
           "## The Challenge\n\nSmall and medium dealers often struggle with high advertising costs, limited visibility, and difficulty building trust with online buyers.",
-          "## The Zivvo Solution\n\nOur dealer plans start from just £49/month and include verified dealer badges, custom landing pages, integrated analytics, and direct buyer messaging.",
-          "## Results\n\n- **47% more enquiries** within the first month\n- **3x faster response times** with our integrated messaging\n- **Verified dealer badge** increased click-through rates by 62%\n- **Custom landing pages** gave dealers a professional online presence",
-          "## Getting Started\n\nJoin hundreds of dealers already growing their business on Zivvo. Choose from Starter, Professional, or Enterprise plans to match your dealership size."
+          "## The Zivvo workspace\n\nThe dealer plan combines inventory management, a configurable landing page, analytics and direct buyer enquiries in one workspace.",
+          "## What dealers can improve\n\n- Publish consistent, complete inventory data\n- Respond to buyer enquiries from one inbox\n- Review listing and enquiry performance\n- Maintain a professional branded landing page",
+          "## Getting started\n\nReview the current dealer plan, complete verification, connect an approved stock feed if needed, and publish only accurate inventory."
         ]
       }
     }
@@ -791,14 +792,14 @@
     "reportingTitle": "Reporting Accessibility Issues",
     "reportingBody": "If you encounter any accessibility barriers, please email {{email}}. We aim to respond within 5 working days.",
     "enforcementTitle": "Enforcement",
-    "enforcementBody": "If we do not respond to your report within a reasonable time or do not resolve your concern satisfactorily, you may contact the competent enforcement/market surveillance body for accessibility: [Competent BFSG enforcement body, address].",
-    "disclaimer": "This page is maintained by [Company Name].",
+    "enforcementBody": "If we do not respond within a reasonable time, you may contact the market-surveillance authority competent under the BFSG. Current competence depends on the service provider's registered office.",
+    "disclaimer": "This statement describes the current accessibility status of Zivvo's digital service.",
     "bfsgTitle": "Legal basis",
     "bfsgBody": "This statement is issued under the Accessibility Strengthening Act (BFSG) and the Accessibility Strengthening Ordinance (BFSGV), which implement the European Accessibility Act (Directive (EU) 2019/882) into German law."
   },
   "complaints": {
     "metaTitle": "Complaints Policy — Zivvo",
-    "metaDescription": "How to submit a complaint to Zivvo, including consumer dispute resolution (VSBG) and the EU ODR platform.",
+    "metaDescription": "How to submit a complaint to Zivvo and the applicable consumer dispute-resolution notice.",
     "title": "Complaints Policy",
     "lastUpdated": "Last updated:",
     "acknowledgedWithin": "Acknowledged within",
@@ -812,9 +813,9 @@
     "s2Intro": "You can contact us in any of the following ways:",
     "s2Email": "Email:",
     "s2Phone": "Phone:",
-    "s2PhoneValue": "0800 000 0000 (Mon–Fri 9am–6pm)",
+    "s2PhoneValue": "Telephone number in the legal notice",
     "s2Post": "Post:",
-    "s2PostValue": "Zivvo Complaints, PO Box 1234, London, EC1A 1AA",
+    "s2PostValue": "Registered address in the legal notice",
     "s2Online": "Online form:",
     "s2OnlineValue": "Via our",
     "s2ContactPage": "Contact Us",
@@ -834,7 +835,7 @@
       "**Final response (within 8 weeks):** If unresolved, we issue a final response letter explaining your right to escalate."
     ],
     "s4Title": "4. Dispute resolution (VSBG)",
-    "s4Intro": "The European Commission provides a platform for online dispute resolution (ODR):",
+    "s4Intro": "The former EU online dispute-resolution platform has closed. The following consumer-arbitration notice applies.",
     "s4Ombudsman": "The Motor Ombudsman",
     "s4OmbudsmanDesc": "for vehicle sale disputes with accredited dealers.",
     "s4Citizens": "Citizens Advice",
@@ -850,20 +851,20 @@
     "s6Body": "All complaints are logged in our case management system. We review trends quarterly to improve our services and report annually on root causes and resolution times.",
     "s7Title": "7. No-Cost Process",
     "s7Body": "Our complaints process is free of charge. You do not need a solicitor — but you are welcome to be represented by anyone of your choice.",
-    "disclaimer": "This page is maintained by [Company Name].",
+    "disclaimer": "This policy covers complaints about Zivvo as a platform.",
     "emailUs2": "complaints@zivvo.de",
     "s4TeilnahmeTitle": "Participation in dispute resolution proceedings",
-    "s4TeilnahmeBody": "We are not obliged and currently not willing to participate in dispute resolution proceedings before a consumer arbitration board within the meaning of the German Consumer Dispute Resolution Act (VSBG). [If this changes, name the competent arbitration board here.]",
+    "s4TeilnahmeBody": "We are not obliged and currently not willing to participate in dispute resolution proceedings before a consumer arbitration board within the meaning of the German Consumer Dispute Resolution Act (VSBG).",
     "s4Universal": "General consumer arbitration board:",
     "s4UniversalDesc": "Universalschlichtungsstelle des Bundes, Straßburger Straße 8, 77694 Kehl, Germany,"
   },
   "cookiePolicy": {
     "metaTitle": "Cookie Policy — Zivvo",
-    "metaDescription": "How Zivvo uses cookies under Section 25 TTDSG and how to manage your consent.",
+    "metaDescription": "How Zivvo uses cookies under Section 25 TDDDG and how to manage your consent.",
     "title": "Cookie Policy",
     "lastUpdated": "Last updated:",
     "s1Title": "1. What Are Cookies?",
-    "s1Body": "Cookies are small text files stored on your device when you visit a website. Under Section 25 of the German Telecommunications-Telemedia Data Protection Act (TTDSG), we need your consent for any cookies that are not strictly technically necessary.",
+    "s1Body": "Cookies are small text files stored on your device when you visit a website. Under Section 25 of the German Telecommunications Digital Services Data Protection Act (TDDDG), we need your consent for any cookies that are not strictly technically necessary.",
     "s2Title": "2. Categories We Use",
     "tableCategory": "Category",
     "tablePurpose": "Purpose",
@@ -884,7 +885,7 @@
     "s3Body": "On your first visit we show a cookie banner where you can selectively allow or reject analytics and marketing cookies. You can withdraw your consent at any time via the cookie settings or delete cookies in your browser settings. Disabling strictly necessary cookies may impair platform functionality.",
     "s4Title": "4. Consent and withdrawal",
     "s4List": [
-      "**Strictly necessary cookies** are set without consent as they are required for platform operation (Section 25(2) No. 2 TTDSG).",
+      "**Strictly necessary cookies** are set without consent as they are required for platform operation (Section 25(2) No. 2 TDDDG).",
       "**Analytics and marketing cookies** are only set after you actively consent.",
       "You may withdraw your consent at any time with effect for the future."
     ],
@@ -897,7 +898,7 @@
     "metaDescription": "Your rights under the GDPR and how to exercise them with Zivvo.",
     "title": "GDPR & Your Data Rights",
     "lastUpdated": "Last updated:",
-    "disclaimer": "This page is maintained by [Company Name]. Bracketed details are placeholders.",
+    "disclaimer": "This overview supplements the Privacy Policy and describes the principal data-subject rights.",
     "s1Title": "1. Our commitment",
     "s1Body": "Zivvo is fully committed to compliance with the General Data Protection Regulation (GDPR) and the German Federal Data Protection Act (BDSG). We act as controller under Art. 4(7) GDPR for personal data you provide to us.",
     "s2Title": "2. Legal bases for processing",
@@ -934,18 +935,18 @@
     "s8Title": "8. Children",
     "s8Body": "Our services are not directed at persons under 18. We do not knowingly collect data from minors.",
     "s9Title": "9. Right to lodge a complaint with a supervisory authority",
-    "s9Body": "You have the right to lodge a complaint with a data protection supervisory authority, in particular the authority competent for [Federal State]:",
-    "s10Title": "10. Data Protection Officer",
-    "s10Body": "For data protection questions, contact our Data Protection Officer [Name/Role] at:"
+    "s9Body": "Under Art. 77 GDPR, you may lodge a complaint with a data protection supervisory authority, particularly in your place of residence, workplace, or the place of the alleged infringement.",
+    "s10Title": "10. Privacy contact",
+    "s10Body": "For privacy questions and to exercise your rights, use our privacy contact:"
   },
   "privacyPolicy": {
     "metaTitle": "Privacy Policy — Zivvo",
     "metaDescription": "Privacy policy under Art. 13/14 GDPR: how Zivvo collects, processes and protects personal data.",
     "title": "Privacy Policy",
     "lastUpdated": "Last updated:",
-    "disclaimer": "This page is maintained by [Company Name]. Bracketed legal details are placeholders that must be completed by the operator before publication.",
+    "disclaimer": "The following operator details apply.",
     "s1Title": "1. Controller",
-    "s1Body": "The controller within the meaning of the General Data Protection Regulation (GDPR) is: [Company Name], [Street], [Postcode City], Germany. Represented by: [Managing Director]. Contact: [Email], [Phone]. Details of our Data Protection Officer are set out in Section 10.",
+    "s1Body": "The controller within the meaning of the General Data Protection Regulation (GDPR) is: [Company Name], [Street], [Postcode City], Germany. Represented by: [Managing Director]. Contact: [Email], [Phone]. Our privacy contact is set out in Section 10.",
     "s2Title": "2. Data we collect",
     "s2List": [
       "**Account data:** name, email address, phone number and profile photo when you create an account.",
@@ -957,7 +958,7 @@
     "s3Title": "3. Purposes and legal bases of processing (Art. 6(1) GDPR)",
     "s3List": [
       "**Contract performance (Art. 6(1)(b) GDPR):** providing the marketplace, account management, handling subscriptions and payments.",
-      "**Consent (Art. 6(1)(a) GDPR):** marketing communications and non-essential cookies under Section 25 TTDSG — revocable at any time.",
+      "**Consent (Art. 6(1)(a) GDPR):** marketing communications and non-essential cookies under Section 25 TDDDG — revocable at any time.",
       "**Legitimate interests (Art. 6(1)(f) GDPR):** fraud prevention, IT security, product improvement and anonymised analytics.",
       "**Legal obligation (Art. 6(1)(c) GDPR):** compliance with tax, commercial law and, where applicable, anti-money-laundering retention and verification duties (GwG for high-value vehicle transactions)."
     ],
@@ -990,19 +991,19 @@
       "**Right to lodge a complaint with a supervisory authority** (Art. 77 GDPR)"
     ],
     "s7Footer": "To exercise your rights, please contact [Email]. Further details and the complaints procedure can be found on our GDPR page.",
-    "s8Title": "8. Cookies and tracking (Section 25 TTDSG)",
-    "s8Body": "We use technically necessary cookies as well as — only with your prior consent under Section 25 TTDSG — analytics and marketing cookies. Details on categories, purposes and retention periods are set out in our Cookie Policy. You may withdraw your consent at any time via the cookie banner.",
+    "s8Title": "8. Cookies and tracking (Section 25 TDDDG)",
+    "s8Body": "We use technically necessary cookies as well as — only with your prior consent under Section 25 TDDDG — analytics and marketing cookies. Details on categories, purposes and retention periods are set out in our Cookie Policy. You may withdraw your consent at any time via the cookie banner.",
     "s9Title": "9. Data security",
     "s9Body": "We use appropriate technical and organisational measures to protect your data against unauthorised access, loss or misuse, including encryption of data transmission (TLS) and role-based access restrictions. We do not claim certifications such as ISO 27001 or SOC 2 unless actually held.",
-    "s10Title": "10. Data Protection Officer / contact",
-    "s10Body": "For questions about data protection or to exercise your rights, please contact: [Data Protection Officer / contact person], email: [Email], [Company Name], [Street], [Postcode City]."
+    "s10Title": "10. Privacy contact",
+    "s10Body": "For questions about data protection or to exercise your rights, please contact: [Email], [Company Name], [Street], [Postcode City]."
   },
   "terms": {
     "metaTitle": "Terms and Conditions (AGB) — Zivvo",
     "metaDescription": "General terms and conditions for using the Zivvo vehicle marketplace under Sections 305 et seq. BGB.",
     "title": "Terms and Conditions (AGB)",
     "lastUpdated": "Last updated:",
-    "disclaimer": "This page is maintained by [Company Name]. Bracketed details are placeholders that must be completed by the operator before publication.",
+    "disclaimer": "These terms apply to the Zivvo services described below.",
     "s1Title": "1. Scope and contracting party",
     "s1Body": "These General Terms and Conditions (\"Terms\") apply to the use of the online vehicle marketplace operated by [Company Name], [Street], [Postcode City] (\"Zivvo\", \"we\"). By registering for or using the platform, you agree to these Terms in accordance with Section 305 BGB. Deviating terms of the user shall not apply unless we expressly agree to them in writing.",
     "s2Title": "2. Description of services — marketplace",
@@ -1030,14 +1031,14 @@
     "s5Title": "5. Prices, payment terms and price indication (PAngV)",
     "s5List": [
       "All stated subscription prices are final prices including statutory VAT, unless expressly stated otherwise (German Price Indication Ordinance — PAngV).",
-      "The Dealer subscription costs €49.99 per month (incl. VAT); the Private seller listing package costs €9.99 per vehicle listing (incl. VAT), unless stated otherwise in the respective order flow.",
+      "The Dealer subscription costs €49.99 per month (incl. VAT), unless the relevant checkout states otherwise. Private sellers may create up to two new listings per calendar month free of charge.",
       "Payment is processed via the payment provider Stripe using the offered payment methods.",
       "Subscriptions automatically renew for the applicable term unless cancelled in time; details are set out in the respective product description.",
       "Consumers have a 14-day right of withdrawal for paid subscriptions under Section 312g BGB; details are set out in our Withdrawal Notice."
     ],
     "s6Title": "6. Termination",
     "s6List": [
-      "Paid subscriptions may be terminated with [notice period, e.g. 30 days'] notice to the end of the respective term, unless otherwise stated in the product description.",
+      "Paid subscriptions may be cancelled at any time with effect from the end of the current billing period through the customer portal, unless the relevant checkout states otherwise.",
       "The right of extraordinary termination for good cause remains unaffected for both parties.",
       "Zivvo may suspend or terminate user accounts in the event of serious or repeated violations of these Terms."
     ],
@@ -1050,7 +1051,7 @@
   },
   "browse": {
     "title": "Browse Cars for Sale",
-    "seoDescription": "Browse {{count}} verified vehicles. Filter by make, model, price, year, and more.",
+    "seoDescription": "Browse {{count}} active vehicle listings. Filter by make, model, price, year, verification status, and more.",
     "heading": "Browse Cars",
     "vehiclesFound": "{{count}} vehicles found",
     "compare": "Compare",
@@ -1169,7 +1170,7 @@
     "financeFrom": "Finance from ~{{amount}}/mo",
     "verifiedDealer": "Verified Dealer",
     "privateSeller": "Private Seller",
-    "bookInspection": "Book 200-pt Inspection · £249",
+    "bookInspection": "Book 200-pt Inspection · €249",
     "bookTestDrive": "Book a test drive",
     "getDeliveryQuote": "Get delivery quote",
     "signInToMessage": "Sign in to message sellers",
@@ -1191,8 +1192,8 @@
     "vat": "+ VAT"
   },
   "sellMyCar": {
-    "seoTitle": "Sell My Car — {{price}} Per Listing",
-    "seoDescription": "Sell your car on Zivvo for just {{price}} per listing. Verified buyers, instant valuation.",
+    "seoTitle": "List My Car for Free — Zivvo",
+    "seoDescription": "Create up to two private vehicle listings per calendar month and submit them for review.",
     "steps": {
       "vehicleDetails": "Vehicle Details",
       "vehicleDetailsDesc": "Enter your registration or details",
@@ -1215,11 +1216,11 @@
     "error": "Error",
     "heroTitle1": "Sell Your Car",
     "heroTitle2": " The Easy Way",
-    "heroSubtitle": "List your car for just {{price}}. Stays live until sold. If vehicle details change, it's treated as a new listing.",
-    "listingFee": "{{price}} {{label}}",
-    "trust1": "Takes 5 mins",
-    "trust2": "Verified buyers",
-    "trust3": "Sell in days",
+    "heroSubtitle": "Create up to two private listings per calendar month. Every listing is reviewed before publication.",
+    "listingFee": "Free · {{label}}",
+    "trust1": "Guided form",
+    "trust2": "Review before publication",
+    "trust3": "Status always visible",
     "vehicleDetailsHeading": "Vehicle Details",
     "regLookupLabel": "Enter your {{registration}} to auto-fill",
     "regPlaceholder": "e.g. AB12 CDE",
@@ -1330,19 +1331,19 @@
       "tradeLabel": "Trade stock",
       "tradeDesc": "Dealer-acquired stock"
     },
-    "logbookLabel": "V5C Log Book / Ownership Document *",
-    "logbookDescConsignment": "Upload the registered owner's V5C logbook.",
-    "logbookDescOwn": "Upload your V5C logbook or equivalent ownership certificate.",
+    "logbookLabel": "registration document Log Book / Ownership Document *",
+    "logbookDescConsignment": "Upload the registered owner's registration document logbook.",
+    "logbookDescOwn": "Upload your registration document logbook or equivalent ownership certificate.",
     "uploaded": "Uploaded",
     "replace": "Replace",
     "upload": "Upload",
     "photoIdLabel": "Photo ID (Driving Licence or Passport) *",
-    "photoIdDesc": "Must match the seller (you). Used to confirm identity against the V5C / consignment agreement.",
+    "photoIdDesc": "Must match the seller (you). Used to confirm identity against the registration document / consignment agreement.",
     "consignmentDetails": "Consignment Details",
     "ownerFullName": "Registered owner's full name *",
-    "ownerFullNamePlaceholder": "As shown on V5C",
+    "ownerFullNamePlaceholder": "As shown on registration document",
     "ownerAddress": "Owner's address *",
-    "ownerAddressPlaceholder": "As shown on V5C",
+    "ownerAddressPlaceholder": "As shown on registration document",
     "consignmentAgreementLabel": "Signed Consignment Agreement *",
     "consignmentAgreementDesc": "Document signed by both you and the owner authorising you to sell on their behalf.",
     "tradeInvoiceLabel": "Trade Purchase Invoice *",
@@ -1352,17 +1353,17 @@
     "financeNo": "No outstanding finance",
     "financeYes": "Yes — finance is outstanding",
     "financeLender": "Finance company / lender *",
-    "financeLenderPlaceholder": "e.g. Black Horse, Santander Consumer",
+    "financeLenderPlaceholder": "e.g. name of the lender",
     "settlementAmount": "Settlement amount ({{symbol}})",
     "settlementLetterLabel": "Settlement Letter from Lender *",
     "settlementLetterDesc": "Letter confirming settlement figure and that finance will be cleared on sale.",
-    "hpiCheckLabel": "HPI / Vehicle History Check",
-    "hpiCheckDesc": "Run an HPI check to verify the vehicle has no outstanding finance, theft records, or write-off history.",
+    "hpiCheckLabel": "vehicle-history / Vehicle History Check",
+    "hpiCheckDesc": "Run an vehicle-history check to verify the vehicle has no outstanding finance, theft records, or write-off history.",
     "issuesFound": "Issues found",
     "allClear": "All clear",
-    "rerunHpiCheck": "Re-run HPI Check",
-    "runHpiCheck": "Run HPI Check",
-    "enterRegOrVin": "Enter a registration or VIN above to enable HPI check.",
+    "rerunHpiCheck": "Re-run vehicle-history Check",
+    "runHpiCheck": "Run vehicle-history Check",
+    "enterRegOrVin": "Enter a registration or VIN above to enable vehicle-history check.",
     "truthDeclarationTitle": "I declare that the information provided is true and accurate.",
     "truthDeclarationBody": "I confirm I am legally entitled to sell this vehicle, that the documents uploaded are genuine, and that any outstanding finance has been disclosed. I understand that providing false information may result in my listing being removed, my account suspended, and may constitute a criminal offence.",
     "reviewNote": "All listings are submitted for admin review. Your listing will go live once your documents and vehicle history have been verified by our team. Documents are stored privately and only visible to Zivvo admins.",
@@ -1375,17 +1376,17 @@
     "fileTooLarge": "File too large",
     "fileTooLargeDesc": "Max {{maxMb}}MB for {{label}}.",
     "regOrVinRequired": "Registration or VIN required",
-    "regOrVinRequiredDesc": "Enter a registration number or VIN to run an HPI check.",
-    "hpiComplete": "HPI Check Complete",
+    "regOrVinRequiredDesc": "Enter a registration number or VIN to run an vehicle-history check.",
+    "hpiComplete": "vehicle-history Check Complete",
     "hpiIssuesFound": "⚠️ Issues found — review results.",
     "hpiPassed": "✅ Vehicle passed all checks.",
-    "hpiFailed": "HPI Check Failed",
-    "hpiFailedDesc": "Could not complete HPI check. You can still submit for review.",
-    "hpiUnavailable": "HPI Check Unavailable",
-    "hpiUnavailableDesc": "The HPI service is currently unavailable. You can still submit — admin will verify manually.",
+    "hpiFailed": "vehicle-history Check Failed",
+    "hpiFailedDesc": "Could not complete vehicle-history check. You can still submit for review.",
+    "hpiUnavailable": "vehicle-history Check Unavailable",
+    "hpiUnavailableDesc": "The vehicle-history service is currently unavailable. You can still submit — admin will verify manually.",
     "requiredFields": "Please fill required fields (make, model, price)",
     "logbookRequired": "Logbook Required",
-    "logbookRequiredDesc": "Please upload a V5C logbook / ownership document before publishing.",
+    "logbookRequiredDesc": "Please upload a registration document logbook / ownership document before publishing.",
     "photoIdRequired": "Photo ID Required",
     "photoIdRequiredDesc": "Please upload a photo ID (passport or driving licence) matching the seller name.",
     "ownerDetailsRequired": "Owner details required",
@@ -1421,7 +1422,7 @@
       "limitReached": "Listing limit reached",
       "limitReachedDesc": "Upgrade your plan to add more active listings.",
       "logbookRequired": "Logbook Required",
-      "logbookRequiredDesc": "Upload your V5C logbook before activating this listing.",
+      "logbookRequiredDesc": "Upload your registration document logbook before activating this listing.",
       "listingStatus": "Listing {{status}}",
       "bulkFailed": "Bulk update failed",
       "bulkUpdated": "{{count}} listings updated to {{status}}",
@@ -1471,18 +1472,18 @@
   },
   "auctions": {
     "seo": {
-      "title": "Trusted Car Auctions | Verified & Inspected Vehicles",
-      "description": "Bid on professionally inspected, HPI-checked vehicles with full condition reports. Every seller verified, every car guaranteed."
+      "title": "Vehicle Auctions | Transparent Check Status",
+      "description": "Bid on vehicles with the inspection and document status shown clearly on each auction. Review every report before bidding."
     },
     "hero": {
-      "badge": "Trusted Auctions",
-      "title1": "Every Car Inspected.",
-      "title2": "Every Seller Verified.",
-      "subtitle": "Bid with confidence. Professional inspections, HPI checks, and payment protection on every auction. Only 3% buyer premium — the lowest in the industry.",
-      "trust1": "HPI & Ownership Checked",
-      "trust2": "1-5 Condition Rating",
-      "trust3": "Payment Protected",
-      "trust4": "Verified Buyers & Sellers",
+      "badge": "Status-based vehicle auctions",
+      "title1": "Check status visible.",
+      "title2": "Bids enforced server-side.",
+      "subtitle": "Review the available inspection and document status before you bid. The applicable buyer premium is shown before confirmation.",
+      "trust1": "Document status per auction",
+      "trust2": "Condition rating where available",
+      "trust3": "Server-checked payment status",
+      "trust4": "Bidder eligibility required",
       "sell": "Sell at Auction",
       "browse": "Browse Auctions"
     },
@@ -1508,18 +1509,18 @@
       "timeLeft": "Time left",
       "mi": "mi",
       "verifiedSeller": "Verified Seller",
-      "v5cConfirmed": "V5C Confirmed"
+      "v5cConfirmed": "Registration document reviewed"
     },
     "howItWorks": {
-      "title": "How Our Trusted Auction Works",
-      "step1Title": "Professional Inspection",
-      "step1Desc": "Every car inspected by approved specialists with a 1-5 condition rating and full report.",
-      "step2Title": "HPI & History Check",
-      "step2Desc": "Finance, stolen, write-off, mileage anomaly and ownership verification included.",
+      "title": "How the Zivvo auction works",
+      "step1Title": "Review & Approval",
+      "step1Desc": "Before approval, an authorised reviewer records the condition rating and the evidence actually checked.",
+      "step2Title": "Status by Evidence Type",
+      "step2Desc": "Ownership, seller, and finance/legal evidence status is shown separately; review any open or missing item before bidding.",
       "step3Title": "Secure Bidding",
-      "step3Desc": "Buyers pre-verified with card pre-auth or finance approval. Anti-sniping protection.",
-      "step4Title": "Payment Protection & E-Sign",
-      "step4Desc": "Funds held securely. Released only after V5C, keys handover and signed contract."
+      "step3Desc": "A bid requires a valid card authorisation or finance approval recorded in the system. Anti-sniping rules are enforced server-side.",
+      "step4Title": "Payment & Digital Acceptance",
+      "step4Desc": "Payment, contract, and handover status is recorded separately. Review the exact terms before bidding and paying."
     }
   },
   "savedCars": {
@@ -1718,16 +1719,16 @@
   },
   "createAuction": {
     "seoTitle": "Create Auction | Sell Your Car at Auction",
-    "seoDescription": "List your verified vehicle for auction with professional inspection and payment protection.",
+    "seoDescription": "Submit a vehicle for auction review. Review, approval, fee, and payment status is recorded through the workflow.",
     "title": "Create Auction",
-    "subtitle": "Your car will be inspected by our specialists before going live",
+    "subtitle": "Your vehicle goes live only after a documented review and admin approval",
     "howItWorks": {
       "title": "How it works",
       "step1": "1. Submit your car for auction with condition details",
-      "step2": "2. Our approved specialist inspects and rates your car (1-5)",
-      "step3": "3. HPI check & ownership verification completed",
-      "step4": "4. Auction goes live — verified buyers bid with pre-authorised funds",
-      "step5": "5. Sale completed via Payment Protection + e-signed contract",
+      "step2": "2. An authorised reviewer records condition and available evidence",
+      "step3": "3. Ownership, seller, and finance/legal status is documented separately",
+      "step4": "4. After approval, eligible buyers bid using card authorisation or recorded finance approval",
+      "step5": "5. Payment, contract, and handover status is recorded server-side",
       "fee": "Platform fee: 1.5% seller fee on successful sale. Buyer pays 3% premium."
     },
     "selectVehicle": {
@@ -1797,7 +1798,7 @@
       "title": "Collection & Delivery",
       "collectionAddress": "Collection Address",
       "collectionAddressPlaceholder": "Where the buyer can collect",
-      "deliveryPartners": "Delivery via Logistics Partners",
+      "deliveryPartners": "Dealer-arranged delivery (if offered)",
       "deliveryPartnersDesc": "Buyer pays delivery at additional cost",
       "estimatedCost": "Estimated Delivery Cost",
       "estimatedCostPlaceholder": "e.g. 250"
@@ -1819,7 +1820,7 @@
     "notFound": "Auction not found",
     "seo": {
       "title": "{{year}} {{make}} {{model}} — Auction",
-      "description": "Bid on this inspected {{make}} {{model}}. Condition rated {{rating}}/5. HPI checked."
+      "description": "Bid on this {{make}} {{model}}. Displayed condition rating: {{rating}}/5. Review every document and evidence status before bidding."
     },
     "toasts": {
       "paymentSuccess": "Payment successful! Your purchase is being processed.",
@@ -1861,10 +1862,10 @@
       "notAssessed": "Not assessed"
     },
     "historyTab": {
-      "hpiCheck": "HPI Check",
+      "hpiCheck": "vehicle-history Check",
       "hpiClear": "Clear — No issues found",
       "ownershipVerified": "Ownership Verified",
-      "ownershipOk": "V5C confirmed with DVLA",
+      "ownershipOk": "registration document confirmed with KBA",
       "sellerVerified": "Seller Verified",
       "sellerVerifiedOk": "Identity & address verified",
       "accidentHistory": "Accident History",
@@ -1882,7 +1883,7 @@
       "additionalAssets": "Additional Assets",
       "noneListed": "None listed",
       "deliveryAvailable": "Delivery Available",
-      "deliveryVia": "Via our logistics partners{{estimate}}",
+      "deliveryVia": "Dealer-arranged delivery{{estimate}}",
       "deliveryEstimate": " — estimated {{amount}}"
     },
     "bidsTab": {
@@ -1929,14 +1930,14 @@
       "totalForBuyer": "Total for Buyer"
     },
     "trustBadges": {
-      "paymentProtected": "Payment Protected",
-      "paymentProtectedDesc": "Funds held until handover complete",
+      "paymentProtected": "Payment Status Checked",
+      "paymentProtectedDesc": "Stripe amount, currency, and ownership are verified server-side",
       "depositPreauth": "Deposit Pre-auth",
-      "depositPreauthDesc": "£500 held, not charged until you win",
-      "eSignContract": "E-Sign Contract",
-      "eSignContractDesc": "Legally binding digital contract",
-      "auditTrail": "Full Audit Trail",
-      "auditTrailDesc": "Every action logged & timestamped"
+      "depositPreauthDesc": "€500 held, not charged until you win",
+      "eSignContract": "Digital Contract Acceptance",
+      "eSignContractDesc": "Acceptance time and contract snapshot are recorded in the system",
+      "auditTrail": "Auction Audit Log",
+      "auditTrailDesc": "Critical bid, payment, and status actions are recorded"
     },
     "winnerPayment": {
       "title": "Payment Required",
@@ -1962,7 +1963,7 @@
     "handover": {
       "title": "Handover Checklist",
       "fundsNote": "Funds released to seller once all steps confirmed",
-      "v5cReceived": "V5C / Logbook Received",
+      "v5cReceived": "registration document / Logbook Received",
       "confirmed": "✓ Confirmed",
       "confirmSent": "Confirm Sent",
       "pending": "Pending",
@@ -1987,7 +1988,7 @@
     },
     "deliveryDialog": {
       "title": "Request Delivery",
-      "description": "Our logistics partners will arrange delivery to your address.",
+      "description": "Send a delivery request. Availability, provider, and binding cost are confirmed separately afterwards.",
       "collectionFrom": "Collection from",
       "tbc": "TBC",
       "estimatedCost": "Estimated cost",
@@ -1999,13 +2000,13 @@
   "tradeStock": {
     "seo": {
       "title": "Trade Stock — Wholesale Vehicle Arbitrage",
-      "description": "Access pre-verified wholesale vehicles at competitive trade prices. Platform-sourced, inspected, and ready for your forecourt."
+      "description": "Role-restricted dealer offers with visible deal, document, and payment status. Review every vehicle before accepting it."
     },
     "hero": {
       "badge": "Trade Stock",
       "title1": "Wholesale Vehicle",
       "title2": "Arbitrage",
-      "subtitle": "We source verified vehicles from sellers, inspect them, and offer them to our dealer network at a small markup. You get trade-ready stock — we handle the seller, paperwork, and logistics."
+      "subtitle": "Authorised users can offer selected listings to dealers with the seller price, markup, and workflow status shown. Review the vehicle, documents, and logistics before accepting any deal."
     },
     "search": {
       "placeholder": "Search trade stock..."
@@ -2075,7 +2076,7 @@
       "description": "Record the payment reference for {{vehicle}}. Seller receives {{amount}}.",
       "defaultVehicle": "this vehicle",
       "paymentRefLabel": "Payment Reference / Bank Transfer Ref",
-      "paymentRefPlaceholder": "e.g. BACS-2026-03-18-001",
+      "paymentRefPlaceholder": "e.g. bank-transfer-2026-03-18-001",
       "sellerPrice": "Seller Price",
       "platformRevenue": "Platform Revenue",
       "cancel": "Cancel",
@@ -2090,7 +2091,7 @@
       "step2Title": "We Buy",
       "step2Desc": "We make the seller a fair offer and acquire the car",
       "step3Title": "We Verify",
-      "step3Desc": "Full inspection, HPI check, and condition report",
+      "step3Desc": "Full inspection, vehicle-history check, and condition report",
       "step4Title": "We Offer",
       "step4Desc": "Listed to our dealer network at a small markup",
       "step5Title": "We Deliver",
@@ -2184,7 +2185,7 @@
       "applyNow": "Apply Now",
       "financeTerms": "Finance subject to status. T&Cs apply. We are a credit broker, not a lender.",
       "serviceHeading": "Servicing & aftercare",
-      "serviceSubtitle": "Full service, MOT, repairs and warranty work — all carried out by our trusted in-house team.",
+      "serviceSubtitle": "Full service, HU/AU, repairs and warranty work — all carried out by our trusted in-house team.",
       "bookService": "Book a Service",
       "callWorkshop": "Call Workshop"
     },
@@ -2247,24 +2248,24 @@
       "step2Title": "Enquire",
       "step2Desc": "Ask questions, request a video walkaround or book a test drive.",
       "step3Title": "Reserve",
-      "step3Desc": "Secure your car with a small refundable deposit. We handle the paperwork.",
+      "step3Desc": "Reserve the car under the dealer's stated deposit and cancellation terms.",
       "step4Title": "Drive away",
-      "step4Desc": "Collect in person or have it delivered to your door, fully prepared and inspected."
+      "step4Desc": "Agree collection or delivery directly with the dealer and inspect the car before handover."
     },
     "trustBadges": {
-      "hpiChecked": "All cars HPI checked",
-      "verifiedDealer": "Verified dealer",
+      "hpiChecked": "Vehicle evidence shown where supplied",
+      "verifiedDealer": "Dealer status shown transparently",
       "partExchange": "Part-exchange welcome",
-      "financeAvailable": "Finance available"
+      "financeAvailable": "Finance subject to dealer and lender terms"
     },
     "accreditations": {
-      "title": "Trusted accreditations & partners",
-      "fca": "FCA Authorised",
-      "rac": "RAC Approved",
-      "aa": "AA Inspected",
-      "hpi": "HPI Checked",
-      "trustpilot": "Trustpilot 5★",
-      "autoTrader": "Auto Trader Partner"
+      "title": "Dealer-supplied business information",
+      "fca": "Regulatory details",
+      "rac": "Inspection information",
+      "aa": "Condition information",
+      "hpi": "Vehicle evidence",
+      "trustpilot": "Customer feedback",
+      "autoTrader": "Marketplace profile"
     },
     "inventory": {
       "title": "Our Inventory",
@@ -2314,17 +2315,17 @@
       "askQuestion": "Ask us a question",
       "defaults": {
         "q1": "Do you offer finance?",
-        "a1": "Yes — we work with a panel of trusted lenders to offer competitive PCP, HP and personal loan packages on every vehicle. Representative {{apr}} APR. We are a credit broker, not a lender.",
+        "a1": "Finance availability and terms vary by dealer and vehicle. Ask the dealer for regulated pre-contract information before applying; Zivvo does not imply an offer of credit.",
         "q2": "Will you take my car in part-exchange?",
-        "a2": "Absolutely. We accept part-exchanges on any vehicle in our showroom. Get an instant online valuation or bring your car in — our team will give you a fair, no-obligation offer in minutes.",
-        "q3": "Are your cars HPI checked?",
-        "a3": "Every vehicle we sell is fully HPI checked, has a verified mileage history and comes with a comprehensive multi-point inspection. You can review the full report on each listing.",
+        "a2": "Part-exchange availability is set by the dealer. Send an enquiry with your vehicle details to request an individual assessment.",
+        "q3": "Are your cars vehicle-history checked?",
+        "a3": "Check each listing for its document and inspection status. If a report is absent, ask the dealer and obtain an independent check before purchase.",
         "q4": "Can you deliver the car to me?",
-        "a4": "Yes — we offer nationwide UK delivery. Delivery costs are calculated based on distance and vehicle, and your car arrives fully prepared, valeted and ready to drive.",
+        "a4": "Delivery availability, area, cost and handover conditions are set by the dealer. Request a written quote before committing.",
         "q5": "What warranty do you provide?",
-        "a5": "All our vehicles come with a minimum 3-month comprehensive warranty as standard, with extended warranty options available at point of sale.",
+        "a5": "Statutory rights and any additional warranty are separate. Ask the dealer for the exact written warranty scope, exclusions, duration and provider.",
         "q6": "Can I reserve a car online?",
-        "a6": "Yes — secure any vehicle in our stock with a small refundable deposit. Your car will be held for you while we arrange viewing, finance or delivery."
+        "a6": "Eligible listings show an online reservation option. Review the reservation amount, duration, refund conditions and dealer terms before paying."
       }
     },
     "testimonials": {
@@ -2355,7 +2356,7 @@
       "established": "Established",
       "companyNo": "Company No.",
       "vatNo": "VAT No.",
-      "fcaReference": "FCA Reference"
+      "fcaReference": "Regulatory reference"
     },
     "financeDialog": {
       "title": "Finance estimator"
@@ -2363,11 +2364,11 @@
   },
   "impressum": {
     "metaTitle": "Legal Notice (Impressum) — Zivvo",
-    "metaDescription": "Legal notice and provider identification for Zivvo pursuant to Section 5 of the German Telemedia Act (TMG).",
+    "metaDescription": "Legal notice and provider identification for Zivvo pursuant to Section 5 of the German Digital Services Act (DDG).",
     "title": "Legal Notice (Impressum)",
     "lastUpdated": "Last updated:",
     "disclaimer": "This page is maintained by [Company Name]. The details below are placeholders and must be replaced by the operator with actual company data before publication.",
-    "s1Title": "Information pursuant to Section 5 TMG",
+    "s1Title": "Information pursuant to Section 5 DDG",
     "companyName": "[Company Name]",
     "legalForm": "[Legal form, e.g. GmbH]",
     "street": "[Street]",
@@ -2400,7 +2401,7 @@
     "s9Title": "Consumer dispute resolution (VSBG)",
     "s9Body": "We are not obliged and not willing to participate in dispute resolution proceedings before a consumer arbitration board within the meaning of the German Consumer Dispute Resolution Act (VSBG). Please see our Complaints Policy for further information.",
     "s10Title": "Liability for content",
-    "s10Body": "As a service provider, we are responsible for our own content on these pages in accordance with general law pursuant to Section 7(1) TMG. However, pursuant to Sections 8 to 10 TMG, we are not obliged to monitor transmitted or stored third-party information. User-generated content (e.g. vehicle listings) is the responsibility of the respective user.",
+    "s10Body": "As a digital service provider, we are responsible for our own content under general law. Third-party user content is governed by the German Digital Services Act and the EU Digital Services Act. Potentially unlawful content can be reported through the listing report flow.",
     "s11Title": "Liability for links",
     "s11Body": "Our offer contains links to external third-party websites over whose content we have no influence. We therefore cannot assume any liability for this third-party content. If we become aware of any legal violations, we will remove such links immediately.",
     "s12Title": "Copyright",
@@ -2411,9 +2412,9 @@
     "metaDescription": "Consumer right of withdrawal under Section 312g BGB for paid Zivvo subscriptions.",
     "title": "Right of Withdrawal",
     "lastUpdated": "Last updated:",
-    "disclaimer": "This page is maintained by [Company Name]. Bracketed details are placeholders that must be completed by the operator.",
+    "disclaimer": "This notice applies only within the scope described below.",
     "scopeTitle": "Scope",
-    "scopeBody": "This withdrawal notice applies to the conclusion of paid Zivvo platform subscriptions (e.g. Dealer subscription from €49.99/month, Private seller listing package from €9.99/vehicle) by consumers within the meaning of Section 13 BGB. Purchases or sales of vehicles between private users on the marketplace are a separate contract between users, to which Zivvo is not a party; this withdrawal notice does not apply to those transactions.",
+    "scopeBody": "This withdrawal notice applies to paid Zivvo platform subscriptions (for example, the Dealer subscription from €49.99/month) concluded by consumers within the meaning of Section 13 BGB. Vehicle purchases or sales between marketplace users are separate contracts to which Zivvo is not a party; this notice does not apply to those transactions.",
     "s1Title": "Right of withdrawal",
     "s1Body": "You have the right to withdraw from this contract within fourteen days without giving any reason. The withdrawal period is fourteen days from the day the contract was concluded (subscription start).",
     "s2Title": "Exercising the right of withdrawal",
@@ -2447,13 +2448,13 @@
     "next": "Next",
     "start": "Get Started",
     "step1Title": "Find Your Perfect Car",
-    "step1Desc": "Search thousands of verified listings by make, model, price, and location.",
+    "step1Desc": "Search active listings by make, model, price, and location.",
     "step2Title": "Trust & Verification",
-    "step2Desc": "Every listed vehicle comes with HPI checks, finance clearance, and inspection reports.",
+    "step2Desc": "Verification, document, and inspection status is shown only where that information actually exists.",
     "step3Title": "Save & Compare",
     "step3Desc": "Save your favourite cars and compare them side by side to make the best decision.",
     "step4Title": "Finance Tools",
-    "step4Desc": "Calculate monthly payments and get instant finance quotes right from the listing."
+    "step4Desc": "Calculate illustrative monthly payments and ask the dealer about possible terms; Zivvo does not issue instant credit approval."
   },
   "pwa": {
     "title": "Install Zivvo",
@@ -2467,7 +2468,7 @@
     "title": "Set new password",
     "subtitle": "Enter your new password below",
     "label": "New Password",
-    "placeholder": "Min 6 characters",
+    "placeholder": "Min 12 characters",
     "submit": "Update Password",
     "submitting": "Updating...",
     "success": "Password updated!",
@@ -2509,8 +2510,8 @@
     "notes": "Notes (optional)",
     "notesPlaceholder": "Anything specific you want checked?",
     "howItWorksLabel": "How it works:",
-    "howItWorksDesc": "Pay £{{price}} now. We'll contact the seller, schedule the visit, and email you the full report within 48–72 hours. Refund if seller refuses access.",
-    "payAndBook": "Pay £{{price}} & Book",
+    "howItWorksDesc": "Pay €{{price}} now. We'll contact the seller, schedule the visit, and email you the full report within 48–72 hours. Refund if seller refuses access.",
+    "payAndBook": "Pay €{{price}} & Book",
     "missingTitle": "Missing details",
     "missingDesc": "Phone and address are required.",
     "bookingFailed": "Booking failed",
@@ -2537,7 +2538,7 @@
     "name": "Zivvo AI",
     "tagline": "Your car-finding assistant",
     "placeholder": "Ask me anything about cars...",
-    "suggestion1": "Find me an SUV under £15,000",
+    "suggestion1": "Find me an SUV under €15,000",
     "suggestion2": "Best electric cars available?",
     "suggestion3": "How do I sell my car?",
     "suggestion4": "What checks do you do on cars?"
@@ -2551,14 +2552,14 @@
     "steps.reviewSubmit": "Review & Submit",
     "badge": "Sell at Auction",
     "heroTitle": "Apply to Auction Your Vehicle",
-    "heroDesc": "Complete the application below. Our specialist will inspect and rate your car before it goes live to verified buyers.",
+    "heroDesc": "Complete the application below. Before approval, authorised roles record the condition details and evidence actually available.",
     "step1.title": "Select Your Vehicle",
     "step1.desc": "Choose which of your active listings you'd like to auction",
     "step1.noListings": "You don't have any active listings yet.",
     "step1.createListing": "Create a Listing First",
     "step2.title": "Photos & Video",
     "step2.desc": "Your listing photos will be used. Add notes about additional images if needed.",
-    "step2.info": "Our inspector will take additional photos during the inspection. You can add more photos to your listing before then.",
+    "step2.info": "If an inspection is scheduled, additional photos may be taken. You can add more photos to your listing beforehand.",
     "step2.notesLabel": "Additional Notes (optional)",
     "step2.notesPlaceholder": "e.g. I have a walk-around video on YouTube, there's a small scratch on the rear bumper...",
     "step2.checksTitle": "What Our Inspector Checks",
@@ -2569,7 +2570,7 @@
     "step2.check5": "Electrics & infotainment",
     "step2.check6": "Documentation & service books",
     "step3.title": "Condition Self-Assessment",
-    "step3.desc": "Be honest — our inspector will verify everything. Accurate descriptions lead to better outcomes.",
+    "step3.desc": "Describe the condition truthfully. The review workflow compares your statements with the evidence actually available.",
     "step3.paintwork": "Paintwork / Bodywork",
     "step3.ratePlaceholder": "Rate condition...",
     "step3.paintExcellent": "Excellent — No marks",
@@ -2584,7 +2585,7 @@
     "step3.tyres": "Tyres",
     "step3.tyresNew": "New / Recently replaced",
     "step3.tyresGood": "Good tread remaining",
-    "step3.tyresFair": "Adequate — will pass MOT",
+    "step3.tyresFair": "Adequate tread (self-declared)",
     "step3.tyresReplace": "Needs replacing soon",
     "step3.keysCount": "Number of Keys",
     "step3.key1": "1 key",
@@ -2616,7 +2617,7 @@
     "step4.collectionAddress": "Collection Address",
     "step4.collectionAddressPlaceholder": "Where will the buyer collect the car?",
     "step4.offerDelivery": "Offer Delivery?",
-    "step4.offerDeliveryDesc": "Allow buyers to request delivery via logistics partners",
+    "step4.offerDeliveryDesc": "Allow buyers to request delivery; provider and binding cost are confirmed separately",
     "step4.deliveryCost": "Estimated Delivery Cost",
     "step4.feeTitle": "Fee Structure",
     "step4.sellerFee": "Seller Fee",
@@ -2632,7 +2633,7 @@
     "step5.reservePrice": "Reserve Price",
     "step5.format": "Format",
     "step5.delivery": "Delivery",
-    "step5.deliveryAvailable": "Available (£{{cost}})",
+    "step5.deliveryAvailable": "Available (€{{cost}})",
     "step5.collectionOnly": "Collection only",
     "step5.conditionSummary": "Condition Summary",
     "step5.paintwork": "Paintwork",
@@ -2643,18 +2644,18 @@
     "step5.keys": "Keys",
     "step5.knownFaults": "Known Faults:",
     "step5.whatNext": "What Happens Next",
-    "step5.next1": "Our team reviews your application (within 24 hours)",
-    "step5.next2": "An approved specialist inspects your vehicle & rates it 1-5",
-    "step5.next3": "HPI check & ownership verification completed",
-    "step5.next4": "Your auction goes live to verified, deposit-backed buyers",
-    "step5.next5": "Sale completed with Payment Protection + e-signed contract",
+    "step5.next1": "The team reviews your application; no fixed review time is promised",
+    "step5.next2": "An authorised person records condition and rating if the inspection is accepted",
+    "step5.next3": "Ownership, seller, and finance/legal evidence each receive a visible status",
+    "step5.next4": "After admin approval, eligible buyers with a deposit or recorded finance approval can bid",
+    "step5.next5": "Payment, contract, and handover status is recorded separately",
     "step5.disclaimer": "By submitting, you confirm that the condition information provided is accurate to the best of your knowledge. Misrepresentation may result in deal cancellation.",
     "back": "Back",
     "next": "Next",
     "submitting": "Submitting...",
     "submitForInspection": "Submit for Inspection",
     "seoTitle": "Sell at Auction | Apply to Auction Your Vehicle",
-    "seoDesc": "Submit your vehicle for our trusted auction platform. Professional inspection, verified buyers, and payment protection included."
+    "seoDesc": "Submit a vehicle for auction review. Condition, evidence, approval, fee, and payment status is recorded transparently."
   },
   "dealer": {
     "miniActions": {
@@ -2669,17 +2670,17 @@
     },
     "reserveNow": {
       "missingInfoTitle": "Missing info",
-      "missingInfoDescription": "Name, email and amount required",
+      "missingInfoDescription": "Enter your name. The verified account email is used for payment.",
       "couldNotStartPayment": "Could not start payment",
       "reserveNow": "Reserve Now",
       "reserveTitle": "Reserve {{title}}",
-      "description": "Pay a refundable deposit to reserve this vehicle for 7 days. Fully refundable if you change your mind.",
+      "description": "Pay €500 to reserve the vehicle for 48 hours. Refunds follow the reservation terms shown before payment and are processed through Stripe.",
       "fullName": "Full Name *",
       "email": "Email *",
       "phone": "Phone",
-      "depositAmount": "Deposit Amount (£)",
+      "depositAmount": "Deposit Amount (€)",
       "redirecting": "Redirecting…",
-      "payAndReserve": "Pay £{{amount}} & Reserve"
+      "payAndReserve": "Pay {{amount}} & Reserve"
     },
     "transportQuote": {
       "checkDetailsTitle": "Check your details",
@@ -2702,7 +2703,7 @@
       "heading": "New into stock",
       "subtitle": "Vehicles added in the last {{days}} days",
       "newIn": "New in",
-      "mileage": "{{count}} mi",
+      "mileage": "{{count}} km",
       "plusVat": "+ VAT"
     },
     "financeCalculator": {
@@ -2714,17 +2715,18 @@
       "termMonths": "Term (months)",
       "aprPercent": "APR (%)",
       "applyForFinance": "Apply for Finance",
-      "disclaimer": "Representative example. Subject to status. Total interest payable {{interest}}. Finance subject to a credit check and affordability assessment."
+      "disclaimer": "Illustrative calculation only, not a credit offer. Example total interest: {{interest}}. The dealer must separately confirm provider, availability, APR, and full terms."
     },
     "enquiryDialog": {
       "missingFieldsTitle": "Missing fields",
       "missingFieldsDescription": "Please fill in your name, email and message.",
       "mailSubject": "Enquiry from {{name}} via Zivvo",
       "mailBody": "Name: {{name}}\nEmail: {{email}}\nPhone: {{phone}}\n\n{{message}}",
-      "readyTitle": "Enquiry ready to send",
-      "readyDescription": "Your email client should now open with your message.",
+      "readyTitle": "Enquiry submitted",
+      "readyDescription": "The enquiry was saved and the dealer was notified in Zivvo.",
+      "errorTitle": "Enquiry not sent",
       "title": "Enquire with {{dealerName}}",
-      "description": "Send a quick message — we usually reply within a few hours during opening times.",
+      "description": "Send a short message to the dealer through Zivvo. Response time and availability are set by that dealer.",
       "yourName": "Your name *",
       "email": "Email *",
       "phone": "Phone",
@@ -2734,17 +2736,21 @@
     },
     "reservationsManager": {
       "title": "Online Reservation Deposits",
-      "subtitle": "Buyers can pay a refundable deposit on your public dealer page to reserve a specific car. Deposits are held in your Stripe account.",
+      "subtitle": "Buyers can make a fixed reservation payment through the server-checked Stripe checkout. Zivvo records its status, expiry, and refund processing.",
       "activeReservations": "Active reservations",
-      "heldFunds": "Held funds",
+      "heldFunds": "Paid reservations",
       "allTime": "All time",
       "empty": "No reservations yet. Enable \"Reserve Now\" on listings to start taking online deposits.",
       "apply": "Apply",
       "refund": "Refund",
+      "confirmRefund": "Refund €500 through Stripe now? This cannot be reversed once processed.",
+      "confirmApply": "Mark this reservation payment as applied to the sale?",
       "statusUpdated": "Reservation {{status}}",
       "statusPending": "pending",
       "statusPaid": "paid",
       "statusRefunded": "refunded",
+      "statusRefundPending": "refund pending",
+      "statusRefundFailed": "refund failed",
       "statusAppliedToSale": "applied to sale",
       "statusCancelled": "cancelled"
     },
@@ -2761,7 +2767,7 @@
       "yourName": "Your name",
       "email": "Email",
       "phoneOptional": "Phone (optional)",
-      "maxBudget": "Max budget (£)",
+      "maxBudget": "Max budget (€)",
       "make": "Make",
       "model": "Model",
       "yearFrom": "Year from",
@@ -2803,7 +2809,7 @@
       "noTransportRequests": "No transport quote requests yet.",
       "lookingFor": "Looking for:",
       "openToOptions": "Open to options",
-      "upTo": "up to £{{amount}}",
+      "upTo": "up to €{{amount}}",
       "statusPending": "pending",
       "statusContacted": "contacted",
       "statusCompleted": "completed",
@@ -2847,6 +2853,123 @@
     "fair": "Fair Price",
     "high": "Above Market",
     "marketAvg": "Market avg"
+  },
+  "productionV2": {
+    "accessibility": {
+      "skip": "Skip to main content"
+    },
+    "app": {
+      "offline": "You are offline. Previously loaded pages remain available.",
+      "updateAvailable": "A new secure version of Zivvo is available.",
+      "update": "Update"
+    },
+    "leads": {
+      "tab": "Leads",
+      "title": "Lead inbox",
+      "subtitle": "Prioritise, assign and follow dealer enquiries through to completion.",
+      "refresh": "Refresh",
+      "open": "Open leads",
+      "due": "Overdue",
+      "won": "Won",
+      "all": "All leads",
+      "search": "Search name, email, phone or message…",
+      "empty": "No leads match this filter.",
+      "unassigned": "Unassigned",
+      "received": "Received {{date}}",
+      "statusLabel": "Status",
+      "priorityLabel": "Priority",
+      "assignee": "Assignee",
+      "nextAction": "Next action",
+      "note": "Internal note",
+      "notePlaceholder": "Document the conversation or next step…",
+      "addNote": "Add note",
+      "history": "History",
+      "noHistory": "No changes recorded yet.",
+      "overdue": "The scheduled follow-up action is overdue.",
+      "saved": "Lead updated",
+      "status": {
+        "new": "New",
+        "contacted": "Contacted",
+        "qualified": "Qualified",
+        "appointment": "Appointment",
+        "offer": "Offer",
+        "won": "Won",
+        "lost": "Lost"
+      },
+      "priority": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High"
+      },
+      "event": {
+        "created": "Lead created",
+        "status_changed": "Status changed",
+        "priority_changed": "Priority changed",
+        "assigned": "Assignee changed",
+        "note": "Note added"
+      }
+    },
+    "payments": {
+      "title": "Payment operations",
+      "subtitle": "Monitor failures, disputes and webhook processing in one place.",
+      "refresh": "Refresh",
+      "openIncidents": "Open incidents",
+      "activeDisputes": "Active disputes",
+      "failedWebhooks": "Failed webhooks",
+      "incidents": "Incidents",
+      "disputes": "Disputes",
+      "type": "Type",
+      "summary": "Summary",
+      "amount": "Amount",
+      "status": "Status",
+      "created": "Created",
+      "action": "Action",
+      "investigate": "Investigate",
+      "resolve": "Resolve",
+      "reason": "Reason",
+      "evidenceDue": "Evidence due",
+      "event": "Event",
+      "error": "Error",
+      "noIncidents": "No payment incidents.",
+      "noDisputes": "No disputes.",
+      "noWebhooks": "No webhook events."
+    },
+    "mfa": {
+      "title": "Two-factor authentication",
+      "subtitle": "Add an authenticator app to protect your account.",
+      "required": "A second security factor is required for privileged accounts.",
+      "authenticator": "Authenticator app",
+      "active": "Active and verified",
+      "remove": "Remove authenticator",
+      "enable": "Set up authenticator",
+      "qrAlt": "QR code for authenticator app setup",
+      "manualKey": "Alternative setup key",
+      "code": "Six-digit code",
+      "verify": "Verify",
+      "enabled": "Two-factor authentication enabled",
+      "invalidCode": "The security code is invalid or expired.",
+      "confirmTitle": "Security check",
+      "confirmSubtitle": "Enter the current code from your authenticator app.",
+      "continue": "Continue"
+    },
+    "upload": {
+      "invalid": "File not accepted",
+      "too_large": "The file exceeds the permitted size.",
+      "unsupported_type": "This file type is not supported.",
+      "invalid_signature": "The actual file content does not match an allowed format.",
+      "invalid_dimensions": "The image dimensions are unsuitable or the image is damaged.",
+      "imageList": "Vehicle images",
+      "imageAlt": "Vehicle image {{number}}",
+      "removeImage": "Remove vehicle image {{number}}",
+      "cover": "Cover",
+      "add": "Add"
+    },
+    "reservations": {
+      "statusExpired": "Expired",
+      "statusProcessing": "Processing expiry",
+      "remaining": "{{hours}}h {{minutes}}m remaining",
+      "awaitingExpiry": "Expiry and refund are being processed.",
+      "refundSupport": "Refund failed — support review required."
+    }
   }
 }
-

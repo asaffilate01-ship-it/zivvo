@@ -44,7 +44,7 @@ In Supabase Auth, require verified email, a minimum 12-character password, leake
 
 1. Take a verified backup and confirm point-in-time recovery.
 2. Restore a recent production-like snapshot into staging.
-3. Review and apply `supabase/migrations/20260801170000_production_security_hardening.sql` in staging.
+3. Review and apply `supabase/migrations/20260801170000_production_security_hardening.sql`, followed by `supabase/migrations/20260802120000_production_assurance_v2.sql`, in staging.
 4. Confirm there are no duplicate active reservations or conflicting idempotency rows before unique indexes are created.
 5. Test every role against the new views, grants, RLS policies, and security-definer functions.
 6. Inspect query plans and locks for bidding, auction close, stock ingestion, and analytics.
@@ -57,19 +57,21 @@ Never run a migration against production first. The migration narrows grants and
 Deploy the tracked functions only:
 
 ```bash
-for function in ad-campaigns ai-chat arbitrage-payment boost-checkout check-subscription close-auction confirm-deposit contact-submit create-checkout customer-portal delete-account deposit-checkout generate-description generate-inspection-pdf geocode inspection-checkout invite-dealer newsletter-subscribe nhtsa-vin-decode price-check reservation-action reserve-deposit reverse-geocode sitemap stock-ingest stripe-webhook winner-payment; do
+for function in ad-campaigns ai-chat arbitrage-payment boost-checkout check-subscription close-auction confirm-deposit contact-submit create-checkout customer-portal delete-account deposit-checkout expire-reservations generate-description generate-inspection-pdf geocode health-check inspection-checkout invite-dealer newsletter-subscribe nhtsa-vin-decode price-check reservation-action reserve-deposit reverse-geocode sitemap stock-ingest stripe-webhook winner-payment; do
   supabase functions deploy "$function"
 done
 ```
 
 Configure `close-auction` to run every minute with `X-Cron-Secret: <CRON_SECRET>`. Do not place the cron secret in a URL. Confirm the public functions in `supabase/config.toml` still perform their own rate limit and signature/secret checks.
 
+Configure `expire-reservations` every five minutes with the same protected header. Point uptime monitoring at `health-check`; alert on non-2xx responses without placing credentials in the URL.
+
 If the Supabase project changes, update `VITE_SUPABASE_PROJECT_ID` and the sitemap URL in `public/robots.txt`.
 
 ## 5. Stripe
 
 - Create one live recurring dealer price in EUR and set `STRIPE_PRICE_DEALER` to its ID.
-- Register the production webhook URL for `checkout.session.completed`, `invoice.paid`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `refund.created`, `refund.updated`, `refund.failed`, and `charge.refund.updated`.
+- Register the production webhook URL for `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `payment_intent.payment_failed`, `invoice.paid`, `invoice.payment_failed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `customer.subscription.trial_will_end`, `charge.dispute.created`, `charge.dispute.updated`, `charge.dispute.closed`, `charge.dispute.funds_withdrawn`, `charge.dispute.funds_reinstated`, `refund.created`, `refund.updated`, `refund.failed`, and `charge.refund.updated`.
 - Verify Stripe signatures, replay handling, expected amount/currency checks, and duplicate delivery behavior in staging.
 - Exercise subscription checkout/portal, listing boosts, reservations, inspection checkout, auction deposits, winner payment, and arbitrage payment.
 - Reconcile the Stripe dashboard, webhook ledger, payment ledger, database state, refunds, and failure states before accepting money.

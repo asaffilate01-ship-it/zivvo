@@ -1,74 +1,49 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
+import Stripe from "https://esm.sh/stripe@14.21.0?target=deno";
+import { appUrl, env, HttpError, json, optionalString, parseJson, preflight, requireIdempotencyKey, requirePost, requireUser, requireUuid, safeError } from "../_shared/security.ts";
+import { CURRENCY } from "../_shared/payments.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const RESERVATION_CENTS = 50_000;
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
+Deno.serve(async (req) => {
   try {
-    const { listing_id, dealer_id, buyer_name, buyer_email, buyer_phone, amount } = await req.json();
-
-    if (!listing_id || !dealer_id || !buyer_name || !buyer_email || !amount) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    const amt = Number(amount);
-    if (isNaN(amt) || amt < 50 || amt > 5000) {
-      return new Response(JSON.stringify({ error: "Amount must be between £50 and £5000" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const stripe = createStripeClient(resolveStripeEnv());
-
-    // Look up listing for description
-    const { data: listing } = await supabase.from("car_listings").select("title,make,model,year").eq("id", listing_id).maybeSingle();
-    const desc = listing ? `${listing.year} ${listing.make} ${listing.model}` : "Vehicle reservation";
-
-    // Create reservation row first
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: reservation, error: insErr } = await supabase
-      .from("reservation_deposits")
-      .insert({
-        dealer_id, listing_id, buyer_name, buyer_email, buyer_phone: buyer_phone || null,
-        amount: amt, currency: "gbp", status: "pending", expires_at: expires,
-      })
-      .select()
-      .single();
-
-    if (insErr || !reservation) {
-      return new Response(JSON.stringify({ error: insErr?.message || "Could not create reservation" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    const origin = req.headers.get("origin") || "https://zivvo.co.uk";
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      customer_email: buyer_email,
-      line_items: [{
-        price_data: {
-          currency: "gbp",
-          product_data: { name: `Refundable Deposit — ${desc}`, description: "Reserves this vehicle for 7 days. Fully refundable." },
-          unit_amount: Math.round(amt * 100),
+    const options = preflight(req); if (options) return options;
+    requirePost(req);
+    const idempotencyKey = requireIdempotencyKey(req);
+    const { user, admin } = await requireUser(req);
+    if (!user.email) throw new HttpError(400, "Your account needs a verified email address");
+    const body = await parseJson(req);
+    const listingId = requireUuid(body.listing_id, "listing_id");
+    const { data: listing } = await admin.from("car_listings").select("id,dealer_id,seller_id,title,year,make,model,status").eq("id", listingId).maybeSingle();
+    if (!listing || !listing.dealer_id || listing.status !== "active") throw new HttpError(404, "Reservable listing not found");
+    if (listing.seller_id === user.id) throw new HttpError(403, "You cannot reserve your own vehicle");
+    if (body.dealer_id && body.dealer_id !== listing.dealer_id) throw new HttpError(400, "Dealer does not match this listing");
+    const { data: active } = await admin.from("reservation_deposits").select("id").eq("listing_id", listingId).in("status", ["pending", "paid", "held", "expiry_processing"]).maybeSingle();
+    if (active) throw new HttpError(409, "This vehicle is already reserved");
+    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    const buyerName = optionalString(body.buyer_name, 120) || optionalString(user.user_metadata?.full_name, 120) || user.email;
+    const { data: reservation, error } = await admin.from("reservation_deposits").insert({
+      dealer_id: listing.dealer_id, listing_id: listingId, buyer_name: buyerName, buyer_email: user.email,
+      buyer_phone: optionalString(body.buyer_phone, 40), amount: RESERVATION_CENTS / 100, currency: CURRENCY,
+      status: "pending", expires_at: expiresAt, buyer_id: user.id,
+    }).select("id").single();
+    if (error) throw error;
+    const stripe = new Stripe(env("STRIPE_SECRET_KEY"), { apiVersion: "2024-06-20" });
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment", customer_email: user.email,
+        line_items: [{ price_data: { currency: CURRENCY, unit_amount: RESERVATION_CENTS, product_data: { name: `Reservierung – ${listing.title}`, description: "Reserviert das Fahrzeug 48 Stunden. Erstattungen erfolgen nach den Reservierungsbedingungen." } }, quantity: 1 }],
+        metadata: { type: "reservation_deposit", reservation_id: reservation.id, dealer_id: listing.dealer_id, listing_id: listingId, user_id: user.id, expected_amount: String(RESERVATION_CENTS), currency: CURRENCY },
+        payment_intent_data: {
+          metadata: { type: "reservation_deposit", reservation_id: reservation.id, dealer_id: listing.dealer_id, listing_id: listingId, user_id: user.id },
         },
-        quantity: 1,
-      }],
-      metadata: { reservation_id: reservation.id, dealer_id, listing_id },
-      success_url: `${origin}/car/${listing_id}?reservation=success`,
-      cancel_url: `${origin}/car/${listing_id}?reservation=cancelled`,
-    });
-
-    await supabase.from("reservation_deposits").update({ stripe_session_id: session.id }).eq("id", reservation.id);
-
-    return new Response(JSON.stringify({ url: session.url, reservation_id: reservation.id }), {
-      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (err: any) {
-    return new Response(JSON.stringify({ error: err?.message || "Server error" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+        success_url: appUrl(`/car/${listingId}?reservation=success`), cancel_url: appUrl(`/car/${listingId}?reservation=cancelled`),
+      }, { idempotencyKey });
+      await admin.from("reservation_deposits").update({ stripe_session_id: session.id }).eq("id", reservation.id);
+      await admin.from("reservation_events").insert({ reservation_id: reservation.id, actor_id: user.id, event_type: "created" });
+      return json(req, { url: session.url, reservation_id: reservation.id });
+    } catch (error) {
+      await admin.from("reservation_deposits").delete().eq("id", reservation.id).eq("status", "pending");
+      throw error;
+    }
+  } catch (error) { return safeError(req, error); }
 });
