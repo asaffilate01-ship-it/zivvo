@@ -28,9 +28,12 @@ npm run lint
 npm run test
 npm run build
 npm run audit:production
+npm run test:production-gate
 ```
 
 `npm run build:production` additionally rejects missing, placeholder, non-HTTPS, and non-live production configuration. It is intentionally expected to fail until real operator, Supabase, Stripe, and Maps values are supplied.
+
+The protected **Production candidate gate** binds a production build to successful staging acceptance for the exact commit and requires linked security, database, payments, legal, accessibility and operations evidence before it emits a deployable candidate.
 
 ## Architecture
 

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { idempotencyHeaders } from "@/lib/idempotency";
+import { redirectToStripe } from "@/lib/safeNavigation";
 
 interface BoostListingDialogProps {
   listingId: string;
@@ -39,7 +40,7 @@ const BoostListingDialog = ({ listingId, isPromoted }: BoostListingDialogProps) 
         headers: idempotencyHeaders(),
       });
       if (error) throw error;
-      if (data?.url) window.open(data.url, "_blank");
+      if (data?.url) redirectToStripe(data.url);
     } catch {
       toast({ title: "Error", description: "Could not create checkout session. Try again.", variant: "destructive" });
     } finally {
