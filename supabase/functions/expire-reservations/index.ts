@@ -3,7 +3,7 @@ import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 import { adminClient, env, json, preflight, requireCron, safeError } from "../_shared/security.ts";
 import { CURRENCY } from "../_shared/payments.ts";
 
-createStripeClient(resolveStripeEnv());
+const stripe = createStripeClient(resolveStripeEnv());
 
 type ClaimedReservation = {
   id: string;

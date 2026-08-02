@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
       status: "pending", expires_at: expiresAt, buyer_id: user.id,
     }).select("id").single();
     if (error) throw error;
-    createStripeClient(resolveStripeEnv());
+    const stripe = createStripeClient(resolveStripeEnv());
     try {
       const session = await stripe.checkout.sessions.create({
         mode: "payment", customer_email: user.email,

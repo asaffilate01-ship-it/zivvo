@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
       throw new HttpError(409, "Reservation payment data is invalid");
     }
 
-    createStripeClient(resolveStripeEnv());
+    const stripe = createStripeClient(resolveStripeEnv());
     const paymentIntent = await stripe.paymentIntents.retrieve(reservation.stripe_payment_intent_id);
     if (paymentIntent.status !== "succeeded" || paymentIntent.currency !== CURRENCY || paymentIntent.amount_received !== expectedAmount) {
       throw new HttpError(409, "The Stripe payment does not match this reservation");

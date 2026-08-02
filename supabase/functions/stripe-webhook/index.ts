@@ -3,7 +3,7 @@ import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
 import { adminClient, env } from "../_shared/security.ts";
 import { CURRENCY, subscriptionCatalog } from "../_shared/payments.ts";
 
-createStripeClient(resolveStripeEnv());
+const stripe = createStripeClient(resolveStripeEnv());
 const admin = adminClient();
 
 type StoredSubscriptionStatus = "active" | "past_due" | "canceled" | "trialing" | "incomplete";
