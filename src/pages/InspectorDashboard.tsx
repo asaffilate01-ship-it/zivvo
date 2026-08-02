@@ -81,6 +81,8 @@ const InspectorDashboard = () => {
     setLoading(false);
   };
 
+  // Reload when the authenticated inspector changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [user]);
 
   if (loading) {
@@ -136,8 +138,8 @@ const InspectorDashboard = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           <Card><CardContent className="p-4"><div className="text-2xl font-bold text-primary">{active.length}</div><p className="text-xs text-muted-foreground">Active jobs</p></CardContent></Card>
           <Card><CardContent className="p-4"><div className="text-2xl font-bold">{profile.total_inspections}</div><p className="text-xs text-muted-foreground">Completed</p></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-warning">£{payouts.pending.toFixed(0)}</div><p className="text-xs text-muted-foreground">Owed to you</p></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-success">£{payouts.paid.toFixed(0)}</div><p className="text-xs text-muted-foreground">Paid to date</p></CardContent></Card>
+          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-warning">€{payouts.pending.toFixed(0)}</div><p className="text-xs text-muted-foreground">Owed to you</p></CardContent></Card>
+          <Card><CardContent className="p-4"><div className="text-2xl font-bold text-success">€{payouts.paid.toFixed(0)}</div><p className="text-xs text-muted-foreground">Paid to date</p></CardContent></Card>
         </div>
 
         {!profile.is_verified && (

@@ -17,7 +17,7 @@ const PRICE_STEPS = [500, 1000, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 300
 const MONTHLY_STEPS = [100, 150, 200, 250, 300, 400, 500, 600, 750, 1000, 1500];
 const DISTANCE_STEPS = [5, 10, 25, 50, 75, 100, 150, 200, 300, 500];
 
-// Carlingo-style approximation: ~£245/mo per £10k full-price → priceMax = monthlyMax / 0.0245
+// Carlingo-style approximation: ~€245/mo per €10k full-price → priceMax = monthlyMax / 0.0245
 const monthlyToPrice = (m: number) => Math.round(m / 0.0245);
 
 const HeroSearch = () => {

@@ -42,7 +42,7 @@ interface VyVehicle {
 
 const norm = (v: any) => (v === undefined || v === null ? null : String(v).trim());
 const num = (v: any) =>
-  v === undefined || v === null || v === "" ? null : Number(String(v).replace(/[^0-9.\-]/g, ""));
+  v === undefined || v === null || v === "" ? null : Number(String(v).replace(/[^0-9.-]/g, ""));
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

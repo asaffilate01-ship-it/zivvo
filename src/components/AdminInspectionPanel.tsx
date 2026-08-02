@@ -142,7 +142,7 @@ const AdminInspectionPanel = ({ auction, onComplete }: AdminInspectionPanelProps
           <div>
             <h3 className="font-semibold">{listing?.year} {listing?.make} {listing?.model}</h3>
             <p className="text-sm text-muted-foreground">Reg: {listing?.registration || "N/A"} · {listing?.mileage?.toLocaleString()} miles</p>
-            <p className="text-sm text-muted-foreground">Starting: £{Number(auction.starting_price).toLocaleString()} · Format: {auction.format}</p>
+            <p className="text-sm text-muted-foreground">Starting: €{Number(auction.starting_price).toLocaleString()} · Format: {auction.format}</p>
           </div>
         </div>
 

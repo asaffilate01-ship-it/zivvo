@@ -16,13 +16,14 @@ import {
   Facebook, Instagram, Twitter, Youtube, ExternalLink, Quote, CheckCircle2,
   Share2, Copy, Check, Eye, Calendar, CreditCard, Truck, FileCheck,
   HandCoins, ShieldCheck, TrendingUp, Search as SearchIcon, Gauge,
-  ChevronUp, HelpCircle, Send, Trophy, Zap, Users, PoundSterling,
+  ChevronUp, HelpCircle, Send, Trophy, Zap, Users, Euro,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
 import DealerEnquiryDialog from "@/components/dealer/DealerEnquiryDialog";
+import { subscribeNewsletter } from "@/lib/publicSubmissions";
 import DealerStickyBar from "@/components/dealer/DealerStickyBar";
 import DealerLandingSkeleton from "@/components/dealer/DealerLandingSkeleton";
 import LiveMap from "@/components/LiveMap";
@@ -159,7 +160,7 @@ const DealerLanding = () => {
     if (budgetMode === "price" && budgetMax !== null) result = result.filter((c) => (c.price || 0) <= budgetMax);
     // Approx monthly @ representative APR over 48 months — used purely for filtering
     if (budgetMode === "monthly" && monthlyMax !== null) {
-      const approxMonthly = (price: number) => Math.round((price * 0.0245)); // ~£245/mo per £10k
+      const approxMonthly = (price: number) => Math.round((price * 0.0245)); // ~€245/mo per €10k
       result = result.filter((c) => approxMonthly(c.price || 0) <= monthlyMax);
     }
     result.sort((a, b) => {
@@ -197,9 +198,10 @@ const DealerLanding = () => {
       toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
       return;
     }
-    const { error } = await supabase.from("newsletter_subscribers").insert({ email: newsletterEmail });
-    if (error && !error.message.toLowerCase().includes("duplicate")) {
-      toast({ title: "Couldn't subscribe", description: error.message, variant: "destructive" });
+    try {
+      await subscribeNewsletter(newsletterEmail);
+    } catch (error) {
+      toast({ title: "Couldn't subscribe", description: error instanceof Error ? error.message : "Please try again.", variant: "destructive" });
       return;
     }
     setNewsletterSent(true);
@@ -418,7 +420,7 @@ const DealerLanding = () => {
               <div role="tablist" className="grid grid-cols-4 border-b border-border">
                 {[
                   { id: "buy" as const, label: "Buy", icon: Car },
-                  { id: "sell" as const, label: "Sell", icon: PoundSterling },
+                  { id: "sell" as const, label: "Sell", icon: Euro },
                   { id: "finance" as const, label: "Finance", icon: HandCoins },
                   { id: "service" as const, label: "Service", icon: Wrench },
                 ].map((t) => {
@@ -564,7 +566,7 @@ const DealerLanding = () => {
                       className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl"
                       style={{ backgroundColor: `${accent}15` }}
                     >
-                      <PoundSterling className="h-7 w-7" style={{ color: accent }} />
+                      <Euro className="h-7 w-7" style={{ color: accent }} />
                     </div>
                     <div>
                       <h3 className={`${fontClass} text-xl font-bold text-foreground`}>Free valuation of your car or van</h3>
@@ -1394,7 +1396,7 @@ const DealerLanding = () => {
       {config.show_finance_cta !== false && (
         <section className="border-t border-border bg-muted/30 py-5">
           <div className="container mx-auto flex flex-wrap items-center justify-center gap-3 px-4 text-center text-xs text-muted-foreground md:text-sm">
-            <PoundSterling className="h-4 w-4 shrink-0" style={{ color: accent }} />
+            <Euro className="h-4 w-4 shrink-0" style={{ color: accent }} />
             <span>
               <strong className="text-foreground">Representative {config.finance_apr || "9.9%"} APR.</strong>{" "}
               {config.finance_disclaimer || "We are a credit broker, not a lender. Finance is subject to status. Terms and conditions apply."}
@@ -1675,10 +1677,10 @@ const DealerLanding = () => {
 
       {/* ─── Enquiry dialog ─── */}
       <DealerEnquiryDialog
+        dealerId={dealer.id}
         open={enquiryOpen}
         onOpenChange={setEnquiryOpen}
         dealerName={dealer.business_name}
-        dealerEmail={showEmail ? dealer.business_email : null}
         accent={accent}
       />
 

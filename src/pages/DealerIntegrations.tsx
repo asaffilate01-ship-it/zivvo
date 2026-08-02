@@ -42,7 +42,7 @@ const DealerIntegrations = () => {
       <SEOHead
         title="DMS Integrations & Stock Feeds | Zivvo for Dealers"
         description="Connect your Dealer Management System (DMS) to Zivvo. Sync stock from VirtualYard, AutoTrader feeds, Click Dealer and more — JSON, XML or CSV."
-        canonical="https://zivvo.co.uk/dealers/integrations"
+        canonical="https://zivvo.de/dealers/integrations"
       />
       <Navbar />
 
@@ -135,7 +135,7 @@ const DealerIntegrations = () => {
                 <Database className="h-3.5 w-3.5" /> POST /functions/v1/stock-ingest
               </div>
               <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-xs">
-{`curl -X POST https://api.zivvo.co.uk/functions/v1/stock-ingest \\
+{`curl -X POST https://api.zivvo.de/functions/v1/stock-ingest \\
   -H "X-Zivvo-Api-Key: zvk_..." \\
   -H "Content-Type: application/json" \\
   -d '{

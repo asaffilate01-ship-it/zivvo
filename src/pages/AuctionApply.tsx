@@ -459,12 +459,12 @@ const AuctionApply = () => {
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div className="p-3 rounded-lg bg-muted/30">
                         <p className="text-xs text-muted-foreground">{t("auctionApply.step5.startingPrice")}</p>
-                        <p className="font-semibold">£{Number(startingPrice || 0).toLocaleString()}</p>
+                        <p className="font-semibold">€{Number(startingPrice || 0).toLocaleString()}</p>
                       </div>
                       {reservePrice && (
                         <div className="p-3 rounded-lg bg-muted/30">
                           <p className="text-xs text-muted-foreground">{t("auctionApply.step5.reservePrice")}</p>
-                          <p className="font-semibold">£{Number(reservePrice).toLocaleString()}</p>
+                          <p className="font-semibold">€{Number(reservePrice).toLocaleString()}</p>
                         </div>
                       )}
                       <div className="p-3 rounded-lg bg-muted/30">

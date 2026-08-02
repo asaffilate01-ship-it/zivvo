@@ -95,7 +95,7 @@ const DraggableLeadCard = ({ lead, onClick }: { lead: PipelineLead; onClick: () 
             <p className="font-medium text-sm text-card-foreground flex-1">{lead.buyer_name || "Unknown"}</p>
           </div>
           {lead.expected_value > 0 && (
-            <p className="mt-1 text-xs font-semibold text-primary">£{Number(lead.expected_value).toLocaleString()}</p>
+            <p className="mt-1 text-xs font-semibold text-primary">€{Number(lead.expected_value).toLocaleString()}</p>
           )}
           <div className="mt-2 flex items-center gap-2">
             {lead.buyer_email && <Mail className="h-3 w-3 text-muted-foreground" />}
@@ -167,7 +167,7 @@ const KanbanBoard = ({
             <CardContent className="p-3">
               <p className="font-medium text-sm text-card-foreground">{activeLead.buyer_name || "Unknown"}</p>
               {activeLead.expected_value > 0 && (
-                <p className="mt-1 text-xs font-semibold text-primary">£{Number(activeLead.expected_value).toLocaleString()}</p>
+                <p className="mt-1 text-xs font-semibold text-primary">€{Number(activeLead.expected_value).toLocaleString()}</p>
               )}
             </CardContent>
           </Card>
@@ -342,8 +342,8 @@ const SalesPipeline = ({ mode, dealerId }: SalesPipelineProps) => {
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Pipeline Value", value: `£${totalPipelineValue.toLocaleString()}`, icon: DollarSign, color: "text-primary" },
-          { label: "Won Revenue", value: `£${totalWonValue.toLocaleString()}`, icon: TrendingUp, color: "text-success" },
+          { label: "Pipeline Value", value: `€${totalPipelineValue.toLocaleString()}`, icon: DollarSign, color: "text-primary" },
+          { label: "Won Revenue", value: `€${totalWonValue.toLocaleString()}`, icon: TrendingUp, color: "text-success" },
           { label: "Conversion Rate", value: `${conversionRate}%`, icon: Target, color: "text-warning" },
           { label: "Avg Deal Time", value: `${avgDealTime}d`, icon: Clock, color: "text-info" },
         ].map((stat, i) => (
@@ -595,7 +595,7 @@ const SalesPipeline = ({ mode, dealerId }: SalesPipelineProps) => {
                 {selectedLead.buyer_phone && (
                   <div><span className="text-muted-foreground">Phone:</span> <span className="text-foreground">{selectedLead.buyer_phone}</span></div>
                 )}
-                <div><span className="text-muted-foreground">Value:</span> <span className="text-primary font-semibold">£{Number(selectedLead.expected_value).toLocaleString()}</span></div>
+                <div><span className="text-muted-foreground">Value:</span> <span className="text-primary font-semibold">€{Number(selectedLead.expected_value).toLocaleString()}</span></div>
                 <div><span className="text-muted-foreground">Source:</span> <span className="text-foreground capitalize">{selectedLead.source}</span></div>
                 <div><span className="text-muted-foreground">Created:</span> <span className="text-foreground">{new Date(selectedLead.created_at).toLocaleDateString()}</span></div>
               </div>

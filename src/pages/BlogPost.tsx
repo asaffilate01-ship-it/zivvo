@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { absoluteUrl } from "@/lib/siteConfig";
 import ShareSheet from "@/components/ShareSheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -95,11 +96,11 @@ const BlogPost = () => {
           "publisher": {
             "@type": "Organization",
             "name": "Zivvo",
-            "logo": { "@type": "ImageObject", "url": "https://zivvo.co.uk/icon-512.png" }
+            "logo": { "@type": "ImageObject", "url": absoluteUrl("/icon-512.png") }
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://zivvo.co.uk/blog/${id}`
+            "@id": absoluteUrl(`/blog/${id}`)
           }
         }}
       />

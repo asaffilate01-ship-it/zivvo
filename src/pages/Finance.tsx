@@ -11,9 +11,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { CheckCircle, Zap, Calendar, Percent, ShieldCheck, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import LeasingCalculator from "@/components/LeasingCalculator";
+import { submitContact } from "@/lib/publicSubmissions";
 
 const Finance = () => {
   const { t } = useTranslation();
@@ -37,20 +37,21 @@ const Finance = () => {
     e.preventDefault();
     if (!form.consent) return;
     setLoading(true);
-    // Log as a contact message so it lands in the existing admin inbox.
-    const { error } = await supabase.from("contact_messages").insert({
-      name: form.name,
-      email: form.email,
-      subject: "Finanzierungsanfrage",
-      message: `Betrag: €${form.amount}\nLaufzeit: ${form.term} Monate\nAnzahlung: €${form.downpayment || "0"}\nFahrzeug: ${form.vehicle || "—"}\nTelefon: ${form.phone}`,
-    });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Fehler", description: error.message, variant: "destructive" });
-      return;
+    try {
+      await submitContact({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        subject: "Finanzierungsanfrage",
+        message: `Betrag: €${form.amount}\nLaufzeit: ${form.term} Monate\nAnzahlung: €${form.downpayment || "0"}\nFahrzeug: ${form.vehicle || "—"}`,
+      });
+      setSubmitted(true);
+      toast({ title: t("finance.form.success") });
+    } catch (error) {
+      toast({ title: "Fehler", description: error instanceof Error ? error.message : "Bitte versuchen Sie es erneut.", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
-    setSubmitted(true);
-    toast({ title: t("finance.form.success") });
   };
 
   const features = [

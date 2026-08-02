@@ -1,3 +1,15 @@
+import { existsSync } from "node:fs";
+
+for (const path of [".env.production.local", ".env.production", ".env.local", ".env"]) {
+  if (existsSync(path)) process.loadEnvFile(path);
+}
+
+const resolved = {
+  ...process.env,
+  VITE_STRIPE_PUBLISHABLE_KEY: process.env.VITE_STRIPE_PUBLISHABLE_KEY || process.env.VITE_PAYMENTS_CLIENT_TOKEN,
+  VITE_GOOGLE_MAPS_BROWSER_KEY: process.env.VITE_GOOGLE_MAPS_BROWSER_KEY || process.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
+};
+
 const required = [
   "VITE_APP_URL",
   "VITE_SUPABASE_URL",
@@ -20,12 +32,12 @@ const required = [
   "VITE_LEGAL_CONTENT_RESPONSIBLE",
 ];
 
-const missing = required.filter((name) => !process.env[name]?.trim());
-const placeholders = required.filter((name) => /replace|example|000000|muster/i.test(process.env[name] || ""));
+const missing = required.filter((name) => !resolved[name]?.trim());
+const placeholders = required.filter((name) => /replace|example|000000|muster/i.test(resolved[name] || ""));
 const failures = [...new Set([...missing, ...placeholders])];
 
 for (const name of ["VITE_APP_URL", "VITE_SUPABASE_URL"]) {
-  const value = process.env[name];
+  const value = resolved[name];
   if (!value) continue;
   try {
     if (new URL(value).protocol !== "https:") failures.push(name);
@@ -34,7 +46,7 @@ for (const name of ["VITE_APP_URL", "VITE_SUPABASE_URL"]) {
   }
 }
 
-if (process.env.VITE_STRIPE_PUBLISHABLE_KEY && !process.env.VITE_STRIPE_PUBLISHABLE_KEY.startsWith("pk_live_")) {
+if (resolved.VITE_STRIPE_PUBLISHABLE_KEY && !resolved.VITE_STRIPE_PUBLISHABLE_KEY.startsWith("pk_live_")) {
   failures.push("VITE_STRIPE_PUBLISHABLE_KEY");
 }
 

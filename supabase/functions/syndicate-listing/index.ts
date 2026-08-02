@@ -32,7 +32,7 @@ const formatForEbayMotors = (listing: any) => ({
   title: listing.title,
   category_id: "6001", // eBay Motors > Cars
   condition: "Used",
-  price: { value: listing.price, currency: "GBP" },
+  price: { value: listing.price, currency: "EUR" },
   description: listing.description || "",
   aspects: {
     Make: [listing.make],
@@ -53,7 +53,7 @@ const formatForPistonHeads = (listing: any) => ({
   model: listing.model,
   year: listing.year,
   price: listing.price,
-  currency: "GBP",
+  currency: "EUR",
   mileage: listing.mileage,
   fuel: listing.fuel_type,
   gearbox: listing.transmission,

@@ -54,6 +54,8 @@ const BookingsManager = ({ dealerId }: Props) => {
     setLoading(false);
   };
 
+  // Reload when the dashboard changes dealer context.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [dealerId]);
 
   const setStatus = async (table: "test_drive_bookings" | "vehicle_finder_requests" | "transport_quotes", id: string, status: string) => {

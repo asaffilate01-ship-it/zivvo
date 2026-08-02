@@ -6,7 +6,7 @@ import { getConsent } from "@/components/CookieConsent";
 // - Cookieless by design (no PII, no cross-site tracking)
 // - Re-evaluates on consent-change events
 //
-// Configure via env: VITE_PLAUSIBLE_DOMAIN=zivvo.co.uk (or your live domain)
+// Configure via env: VITE_PLAUSIBLE_DOMAIN=zivvo.de (or your live domain)
 // Optional:          VITE_PLAUSIBLE_SRC=https://plausible.io/js/script.js
 
 const SCRIPT_ID = "plausible-analytics";

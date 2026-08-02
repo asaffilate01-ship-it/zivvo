@@ -21,7 +21,7 @@ Details: ${[
       color && `Color: ${color}`,
       engine_size && `Engine: ${engine_size}`,
       mileage && `Mileage: ${Number(mileage).toLocaleString()} miles`,
-      price && `Price: £${Number(price).toLocaleString()}`,
+      price && `Preis: ${Number(price).toLocaleString("de-DE")} €`,
     ].filter(Boolean).join(", ")}.
 
 Write 2-3 paragraphs. Be factual, highlight key selling points, mention comfort, performance, and value. Do NOT use markdown headings. Keep it under 200 words. Sound professional but warm.`;

@@ -78,6 +78,8 @@ const VehicleCostsManager = ({ dealerId }: Props) => {
     }
   };
 
+  // Reload when the dashboard changes dealer context.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [dealerId]);
 
   const openListing = async (row: ProfitRow) => {
@@ -175,9 +177,9 @@ const VehicleCostsManager = ({ dealerId }: Props) => {
       <CardContent>
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Vehicles tracked</p><p className="font-display text-xl font-bold">{rows.length}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Capital in stock</p><p className="font-display text-xl font-bold">£{totalInStock.toLocaleString()}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Est. VAT liability</p><p className="font-display text-xl font-bold">£{totalVatLiability.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Net profit (sold)</p><p className={`font-display text-xl font-bold ${totalRealisedProfit >= 0 ? "text-success" : "text-destructive"}`}>£{totalRealisedProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Capital in stock</p><p className="font-display text-xl font-bold">€{totalInStock.toLocaleString()}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Est. VAT liability</p><p className="font-display text-xl font-bold">€{totalVatLiability.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Net profit (sold)</p><p className={`font-display text-xl font-bold ${totalRealisedProfit >= 0 ? "text-success" : "text-destructive"}`}>€{totalRealisedProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p></div>
         </div>
 
         <div className="space-y-2">
@@ -195,15 +197,15 @@ const VehicleCostsManager = ({ dealerId }: Props) => {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{r.year} {r.make} {r.model}</p>
                   <p className="text-xs text-muted-foreground">
-                    Asking £{Number(r.asking_price).toLocaleString()} · Purchase £{Number(r.purchase_cost).toLocaleString()} · Expenses £{Number(r.additional_costs).toLocaleString()} · VAT due £{vatDue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    Asking €{Number(r.asking_price).toLocaleString()} · Purchase €{Number(r.purchase_cost).toLocaleString()} · Expenses €{Number(r.additional_costs).toLocaleString()} · VAT due €{vatDue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                   </p>
                 </div>
                 <div className="text-right flex flex-col items-end gap-1">
                   <Badge variant="outline" className="text-[10px] capitalize">{scheme} scheme</Badge>
                   {r.sale_price ? (
-                    <Badge className={(netProfit ?? 0) >= 0 ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}>{(netProfit ?? 0) >= 0 ? "+" : ""}£{(netProfit ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</Badge>
+                    <Badge className={(netProfit ?? 0) >= 0 ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}>{(netProfit ?? 0) >= 0 ? "+" : ""}€{(netProfit ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</Badge>
                   ) : (
-                    <Badge variant="outline">~£{netProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })} fcst</Badge>
+                    <Badge variant="outline">~€{netProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })} fcst</Badge>
                   )}
                 </div>
               </div>
@@ -235,14 +237,14 @@ const VehicleCostsManager = ({ dealerId }: Props) => {
 
                 {/* Breakdown grid */}
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">Purchase</p><p className="font-semibold">£{Number(selectedListing.purchase_cost).toLocaleString()}</p></div>
-                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">Expenses</p><p className="font-semibold">£{Number(selectedListing.additional_costs).toLocaleString()}</p></div>
-                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">{selectedListing.sale_price ? "Sale price" : "Asking"}</p><p className="font-semibold">£{Number(selectedListing.sale_price || selectedListing.asking_price).toLocaleString()}</p></div>
-                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">VAT due</p><p className="font-semibold">£{selVatDue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p></div>
+                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">Purchase</p><p className="font-semibold">€{Number(selectedListing.purchase_cost).toLocaleString()}</p></div>
+                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">Expenses</p><p className="font-semibold">€{Number(selectedListing.additional_costs).toLocaleString()}</p></div>
+                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">{selectedListing.sale_price ? "Sale price" : "Asking"}</p><p className="font-semibold">€{Number(selectedListing.sale_price || selectedListing.asking_price).toLocaleString()}</p></div>
+                  <div className="rounded border border-border p-2"><p className="text-xs text-muted-foreground">VAT due</p><p className="font-semibold">€{selVatDue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p></div>
                 </div>
 
                 <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
-                  <div className="flex justify-between"><span className="text-muted-foreground">Net profit {selectedListing.sale_price ? "(actual)" : "(forecast at asking)"}</span><span className={`font-bold ${(selNetProfit ?? 0) >= 0 ? "text-success" : "text-destructive"}`}>£{(selNetProfit ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Net profit {selectedListing.sale_price ? "(actual)" : "(forecast at asking)"}</span><span className={`font-bold ${(selNetProfit ?? 0) >= 0 ? "text-success" : "text-destructive"}`}>€{(selNetProfit ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
                   <p className="mt-1 text-[11px] text-muted-foreground">Sale − Purchase − Expenses − VAT due</p>
                 </div>
 
@@ -254,8 +256,8 @@ const VehicleCostsManager = ({ dealerId }: Props) => {
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>{COST_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent>
                     </Select>
-                    <Input placeholder="Amount £ (gross)" type="number" step="0.01" value={costForm.amount} onChange={e => setCostForm({ ...costForm, amount: e.target.value })} />
-                    <Input placeholder="Input VAT £ (opt)" type="number" step="0.01" value={costForm.vat_amount} onChange={e => setCostForm({ ...costForm, vat_amount: e.target.value })} />
+                    <Input placeholder="Amount € (gross)" type="number" step="0.01" value={costForm.amount} onChange={e => setCostForm({ ...costForm, amount: e.target.value })} />
+                    <Input placeholder="Input VAT € (opt)" type="number" step="0.01" value={costForm.vat_amount} onChange={e => setCostForm({ ...costForm, vat_amount: e.target.value })} />
                     <Input placeholder="Description" value={costForm.description} onChange={e => setCostForm({ ...costForm, description: e.target.value })} />
                     <Input placeholder="Supplier" value={costForm.supplier} onChange={e => setCostForm({ ...costForm, supplier: e.target.value })} />
                     <Input placeholder="Invoice ref" value={costForm.invoice_ref} onChange={e => setCostForm({ ...costForm, invoice_ref: e.target.value })} />
@@ -282,8 +284,8 @@ const VehicleCostsManager = ({ dealerId }: Props) => {
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="text-right">
-                              <div className="font-semibold">£{Number(c.amount).toLocaleString()}</div>
-                              {Number(c.vat_amount) > 0 && <div className="text-[10px] text-muted-foreground">incl. £{Number(c.vat_amount).toLocaleString()} VAT</div>}
+                              <div className="font-semibold">€{Number(c.amount).toLocaleString()}</div>
+                              {Number(c.vat_amount) > 0 && <div className="text-[10px] text-muted-foreground">incl. €{Number(c.vat_amount).toLocaleString()} VAT</div>}
                             </div>
                             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => removeCost(c.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                           </div>

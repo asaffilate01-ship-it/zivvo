@@ -49,6 +49,8 @@ const StockBookManager = ({ dealerId }: Props) => {
     setEntries((data as any) || []);
   };
 
+  // Reload when the dashboard changes dealer context.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [dealerId]);
 
   const submit = async () => {
@@ -144,7 +146,7 @@ const StockBookManager = ({ dealerId }: Props) => {
                 <div className="sm:col-span-2"><Label>Address</Label><Input value={form.party_address} onChange={e => setForm({ ...form, party_address: e.target.value })} /></div>
                 <div><Label>Email</Label><Input type="email" value={form.party_email} onChange={e => setForm({ ...form, party_email: e.target.value })} /></div>
                 <div><Label>Phone</Label><Input value={form.party_phone} onChange={e => setForm({ ...form, party_phone: e.target.value })} /></div>
-                <div><Label>Amount (£) *</Label><Input type="number" step="0.01" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} /></div>
+                <div><Label>Amount (€) *</Label><Input type="number" step="0.01" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} /></div>
                 <div>
                   <Label>Payment Method</Label>
                   <Select value={form.payment_method} onValueChange={v => setForm({ ...form, payment_method: v })}>
@@ -172,8 +174,8 @@ const StockBookManager = ({ dealerId }: Props) => {
         <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Purchases</p><p className="font-display text-xl font-bold">{purchases.length}</p></div>
           <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Sales</p><p className="font-display text-xl font-bold">{sales.length}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash Out</p><p className="font-display text-lg font-bold text-destructive">£{totalIn.toLocaleString()}</p></div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash In</p><p className="font-display text-lg font-bold text-success">£{totalOut.toLocaleString()}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash Out</p><p className="font-display text-lg font-bold text-destructive">€{totalIn.toLocaleString()}</p></div>
+          <div className="rounded-lg border border-border bg-muted/30 p-3"><p className="text-xs text-muted-foreground">Cash In</p><p className="font-display text-lg font-bold text-success">€{totalOut.toLocaleString()}</p></div>
         </div>
 
         <Tabs defaultValue="all">
@@ -190,7 +192,7 @@ const StockBookManager = ({ dealerId }: Props) => {
                     </div>
                   </div>
                   <div className={`font-display font-semibold ${e.entry_type === "sale" ? "text-success" : "text-destructive"}`}>
-                    {e.entry_type === "sale" ? "+" : "−"}£{Number(e.amount).toLocaleString()}
+                    {e.entry_type === "sale" ? "+" : "−"}€{Number(e.amount).toLocaleString()}
                   </div>
                 </div>
               ))}

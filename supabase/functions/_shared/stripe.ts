@@ -1,7 +1,6 @@
 // Shared Stripe access for Zivvo.
 // All Stripe API calls are routed through the Lovable connector gateway.
 // The env vars below are gateway connection identifiers, NOT real Stripe secret keys.
-import { encode } from "https://deno.land/std@0.168.0/encoding/hex.ts";
 import Stripe from "https://esm.sh/stripe@22.0.2";
 
 const getEnv = (key: string): string => {
@@ -92,7 +91,9 @@ export async function verifyWebhook(
     key,
     new TextEncoder().encode(`${timestamp}.${body}`),
   );
-  const expected = new TextDecoder().decode(encode(new Uint8Array(signed)));
+  const expected = [...new Uint8Array(signed)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 
   if (!v1Signatures.includes(expected)) throw new Error("Invalid webhook signature");
 

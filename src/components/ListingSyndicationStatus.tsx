@@ -112,7 +112,8 @@ const ListingSyndicationStatus = ({ listingId, dealerId }: Props) => {
                     onCheckedChange={(checked) => {
                       setSelectedPortals((prev) => {
                         const next = new Set(prev);
-                        checked ? next.add(portal) : next.delete(portal);
+                        if (checked) next.add(portal);
+                        else next.delete(portal);
                         return next;
                       });
                     }}

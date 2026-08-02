@@ -59,6 +59,8 @@ const InspectorJob = () => {
     setLoading(false);
   };
 
+  // Reload when the routed job or authenticated inspector changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [id, user]);
 
   const liveScore = useMemo(() => calculateScore(data), [data]);

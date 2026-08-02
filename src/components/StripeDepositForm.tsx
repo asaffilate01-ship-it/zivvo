@@ -6,12 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CreditCard, Shield, Loader2 } from "lucide-react";
+import { idempotencyHeaders } from "@/lib/idempotency";
 
-// The publishable key is stored as a secret; we retrieve it via an edge function
-// For now we use a config approach - this will be set by the user
-const stripePromise = loadStripe(
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_placeholder"
-);
+const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : Promise.resolve(null);
 
 interface DepositFormProps {
   auctionId: string;
@@ -62,10 +60,10 @@ const CheckoutForm = ({ depositId, paymentIntentId, onSuccess }: { depositId: st
       <PaymentElement />
       <Button type="submit" disabled={!stripe || processing} className="w-full h-11 gap-2">
         {processing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Shield className="w-4 h-4" />}
-        {processing ? "Authorizing..." : "Pre-authorize £500 Deposit"}
+        {processing ? "Autorisierung …" : "500 € Kaution autorisieren"}
       </Button>
       <p className="text-[10px] text-muted-foreground text-center">
-        This holds £500 on your card. You will only be charged if you win the auction.
+        500 € werden auf Ihrer Karte reserviert und nur bei einem Auktionsgewinn verrechnet.
       </p>
     </form>
   );
@@ -82,8 +80,10 @@ const StripeDepositForm = ({ auctionId, onSuccess, onCancel }: DepositFormProps)
     setLoading(true);
     setError(null);
     try {
+      if (!stripePublishableKey) throw new Error("Stripe ist noch nicht für die Produktion konfiguriert");
       const { data, error: fnErr } = await supabase.functions.invoke("deposit-checkout", {
-        body: { auction_id: auctionId, amount: 500 },
+        body: { auction_id: auctionId },
+        headers: idempotencyHeaders(),
       });
       if (fnErr) throw fnErr;
 
@@ -117,8 +117,8 @@ const StripeDepositForm = ({ auctionId, onSuccess, onCancel }: DepositFormProps)
             <div>
               <h3 className="font-semibold">Pre-authorize Deposit</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                A £500 hold will be placed on your card. This is <strong>not a charge</strong> — 
-                it's released automatically if you don't win.
+                500 € werden auf Ihrer Karte reserviert. Das ist <strong>keine Abbuchung</strong> —
+                die Reservierung wird automatisch freigegeben, wenn Sie nicht gewinnen.
               </p>
             </div>
           </div>
@@ -142,7 +142,7 @@ const StripeDepositForm = ({ auctionId, onSuccess, onCancel }: DepositFormProps)
 
           <div className="flex gap-2">
             <Button variant="outline" onClick={onCancel} className="flex-1">Cancel</Button>
-            <Button onClick={initDeposit} disabled={loading} className="flex-1 gap-2">
+            <Button onClick={initDeposit} disabled={loading || !stripePublishableKey} className="flex-1 gap-2">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
               {loading ? "Loading..." : "Enter Card Details"}
             </Button>

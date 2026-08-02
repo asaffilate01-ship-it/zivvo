@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import SellerOffers from "@/components/SellerOffers";
 import ArbitragePipelineStepper from "@/components/ArbitragePipelineStepper";
 import { useTranslation } from "react-i18next";
+import { idempotencyHeaders } from "@/lib/idempotency";
 import {
   ArrowRightLeft, TrendingUp, Shield, Clock, CheckCircle2, XCircle,
   DollarSign, Truck, FileText, Search, Plus, Eye, Building2, CreditCard,
@@ -227,6 +228,7 @@ const TradeStock = () => {
       setPayingDealId(dealId);
       const { data, error } = await supabase.functions.invoke("arbitrage-payment", {
         body: { deal_id: dealId },
+        headers: idempotencyHeaders(),
       });
       if (error) throw error;
       if (data?.url) {

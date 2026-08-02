@@ -9,16 +9,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Send } from "lucide-react";
+import { submitDealerLead } from "@/lib/publicSubmissions";
 
 interface DealerEnquiryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  dealerId: string;
   dealerName: string;
-  dealerEmail?: string | null;
   accent?: string;
 }
 
-const DealerEnquiryDialog = ({ open, onOpenChange, dealerName, dealerEmail, accent }: DealerEnquiryDialogProps) => {
+const DealerEnquiryDialog = ({ open, onOpenChange, dealerId, dealerName, accent }: DealerEnquiryDialogProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [name, setName] = useState("");
@@ -34,20 +35,20 @@ const DealerEnquiryDialog = ({ open, onOpenChange, dealerName, dealerEmail, acce
       return;
     }
     setLoading(true);
-    // Open user's mail client as a reliable fallback (no public dealer contact endpoint exists)
-    const subject = encodeURIComponent(t("dealer.enquiryDialog.mailSubject", { name }));
-    const body = encodeURIComponent(
-      t("dealer.enquiryDialog.mailBody", { name, email, phone: phone || "—", message })
-    );
-    if (dealerEmail) {
-      window.location.href = `mailto:${dealerEmail}?subject=${subject}&body=${body}`;
-    }
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await submitDealerLead({ dealerId, name, email, phone, message });
       toast({ title: t("dealer.enquiryDialog.readyTitle"), description: t("dealer.enquiryDialog.readyDescription") });
       onOpenChange(false);
       setName(""); setEmail(""); setPhone(""); setMessage("");
-    }, 400);
+    } catch (error) {
+      toast({
+        title: t("dealer.enquiryDialog.missingFieldsTitle"),
+        description: error instanceof Error ? error.message : t("dealer.enquiryDialog.missingFieldsDescription"),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,7 +72,7 @@ const DealerEnquiryDialog = ({ open, onOpenChange, dealerName, dealerEmail, acce
             </div>
             <div>
               <Label htmlFor="enq-phone" className="text-xs">{t("dealer.enquiryDialog.phone")}</Label>
-              <Input id="enq-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="07…" />
+              <Input id="enq-phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+49 …" />
             </div>
           </div>
           <div>

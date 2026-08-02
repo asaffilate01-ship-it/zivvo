@@ -87,11 +87,11 @@ export const countryConfigs: Record<CountryCode, CountryConfig> = {
       "Stuttgart", "Düsseldorf", "Leipzig", "Dortmund", "Essen",
       "Bremen", "Dresden", "Hannover", "Nürnberg", "Duisburg",
     ],
-    // Private seller: 2 free listings/month, then €9.99 per extra listing (10 photos)
+    // Private seller: up to 2 free listings per calendar month (10 photos each).
     individualPlan: {
-      price: 9.99,
-      priceId: "price_de_private_extra_listing",
-      label: "pro zusätzliches Inserat",
+      price: 0,
+      priceId: "",
+      label: "kostenlos",
       freePerMonth: 2,
       maxPhotos: 10,
     },

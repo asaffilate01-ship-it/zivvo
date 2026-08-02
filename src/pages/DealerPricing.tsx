@@ -24,6 +24,7 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import SEOHead from "@/components/SEOHead";
+import { idempotencyHeaders } from "@/lib/idempotency";
 
 const partners = ["mobile.de", "AutoScout24", "Kleinanzeigen", "AUTO1.com", "eBay Motors"];
 
@@ -39,14 +40,13 @@ const DealerPricing = () => {
   const [businessName, setBusinessName] = useState("");
 
   const dealerPlan = config.dealerPlans[0];
-  const privatePlan = config.individualPlan;
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("checkout") === "canceled") {
       toast({ title: t("pricing.toast.canceledTitle"), description: t("pricing.toast.canceledDesc") });
     }
-  }, []);
+  }, [t, toast]);
 
   const handleSubscribe = async (priceId: string) => {
     if (!user) { navigate("/signup"); return; }
@@ -66,9 +66,8 @@ const DealerPricing = () => {
         body: {
           priceId: selectedPriceId,
           businessName,
-          successUrl: `${window.location.origin}/dashboard?checkout=success`,
-          cancelUrl: `${window.location.origin}/dealers?checkout=canceled`,
         },
+        headers: idempotencyHeaders(),
       });
       if (error) throw error;
       if (data?.url) window.open(data.url, "_blank");
@@ -137,10 +136,6 @@ const DealerPricing = () => {
                   <span className="font-display text-4xl font-bold text-card-foreground">{formatPrice(0, config)}</span>
                   <span className="text-sm text-muted-foreground">/ {t("common.free").toLowerCase()}</span>
                 </div>
-                <p className="mt-1 text-xs text-success">
-                  + {formatPrice(privatePlan.price, config)} {t("pricing.private.perExtra")}
-                </p>
-
                 <p className="mt-4 text-sm text-muted-foreground">{t("pricing.private.subtitle")}</p>
 
                 <Button className="mt-6 w-full" variant="outline" onClick={() => navigate("/sell")}>

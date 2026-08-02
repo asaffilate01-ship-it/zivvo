@@ -1,94 +1,112 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { checkoutMetadata, CURRENCY } from "../_shared/payments.ts";
+import {
+  appUrl,
+  HttpError,
+  json,
+  parseJson,
+  preflight,
+  requireIdempotencyKey,
+  requirePost,
+  requireUser,
+  requireUuid,
+  safeError,
+} from "../_shared/security.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-  );
-
-  const supabaseAdmin = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-  );
-
+Deno.serve(async (req) => {
   try {
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
-    if (!user?.email) throw new Error("Authentication required");
+    const options = preflight(req);
+    if (options) return options;
+    requirePost(req);
+    requireIdempotencyKey(req);
+    const { user, admin } = await requireUser(req);
+    if (!user.email) throw new HttpError(400, "A verified email address is required");
 
-    const { auction_id } = await req.json();
-    if (!auction_id) throw new Error("auction_id required");
-
-    // Get auction + escrow
-    const { data: escrow } = await supabaseAdmin
+    const body = await parseJson(req);
+    const auctionId = requireUuid(body.auction_id, "auction_id");
+    const { data: escrow, error: escrowError } = await admin
       .from("auction_escrow")
-      .select("*")
-      .eq("auction_id", auction_id)
+      .select("id,auction_id,buyer_id,total_amount,status")
+      .eq("auction_id", auctionId)
       .eq("buyer_id", user.id)
-      .single();
-
-    if (!escrow) throw new Error("No payment protection record found");
-    if (escrow.status !== "pending_deposit") throw new Error("Payment already processed");
-
-    // Get deposit (to capture the pre-auth)
-    const { data: deposit } = await supabaseAdmin
-      .from("auction_deposits")
-      .select("*")
-      .eq("auction_id", auction_id)
-      .eq("user_id", user.id)
-      .eq("status", "authorized")
       .maybeSingle();
+    if (escrowError) throw escrowError;
+    if (!escrow || !["pending_deposit", "deposit_held"].includes(escrow.status)) {
+      throw new HttpError(409, "Winner payment is not available");
+    }
+
+    const { data: deposit, error: depositError } = await admin
+      .from("auction_deposits")
+      .select("id,amount,currency,status,type,stripe_payment_intent_id")
+      .eq("auction_id", auctionId)
+      .eq("user_id", user.id)
+      .in("status", ["authorized", "captured"])
+      .eq("type", "card_preauth")
+      .maybeSingle();
+    if (depositError) throw depositError;
+    if (!deposit?.stripe_payment_intent_id) throw new HttpError(409, "A verified card deposit is required");
 
     const stripe = createStripeClient(resolveStripeEnv());
+    const intent = await stripe.paymentIntents.retrieve(deposit.stripe_payment_intent_id);
+    const validIntent = ["requires_capture", "succeeded"].includes(intent.status) && intent.currency === CURRENCY &&
+      intent.metadata.type === "auction_deposit" && intent.metadata.auction_id === auctionId &&
+      intent.metadata.user_id === user.id;
+    if (!validIntent) throw new HttpError(409, "Auction deposit is no longer valid");
 
-    // If there's a pre-auth deposit, capture it first
-    let depositCaptured = 0;
-    if (deposit?.stripe_payment_intent_id) {
-      try {
-        await stripe.paymentIntents.capture(deposit.stripe_payment_intent_id);
-        depositCaptured = Number(deposit.amount);
-        await supabaseAdmin.from("auction_deposits").update({
-          status: "captured",
-          captured_at: new Date().toISOString(),
-        }).eq("id", deposit.id);
-      } catch (e) {
-        console.log("Deposit capture skipped:", e);
-      }
+    const totalCents = Math.round(Number(escrow.total_amount) * 100);
+    if (!Number.isSafeInteger(totalCents) || totalCents <= 0) throw new HttpError(409, "Auction total is invalid");
+    if (intent.status === "succeeded") {
+      if (intent.amount_received !== totalCents) throw new HttpError(409, "Winner payment is still being reconciled");
+      const { error: repairDepositError } = await admin.from("auction_deposits").update({
+        status: "captured",
+        captured_at: new Date().toISOString(),
+        captured_amount: intent.amount_received / 100,
+      }).eq("id", deposit.id).in("status", ["authorized", "captured"]);
+      if (repairDepositError) throw repairDepositError;
+      const { error: repairEscrowError } = await admin.from("auction_escrow")
+        .update({ status: "full_payment_held" })
+        .eq("id", escrow.id)
+        .eq("buyer_id", user.id)
+        .in("status", ["pending_deposit", "deposit_held", "full_payment_held"]);
+      if (repairEscrowError) throw repairEscrowError;
+      return json(req, { success: true, fully_paid: true });
     }
 
-    // Calculate remaining balance
-    const remainingBalance = Number(escrow.total_amount) - depositCaptured;
+    const captureCents = Math.min(intent.amount_capturable, totalCents);
+    const remainingCents = totalCents - captureCents;
 
-    if (remainingBalance <= 0) {
-      // Fully covered by deposit
-      await supabaseAdmin.from("auction_escrow").update({
-        status: "full_payment_held",
-      }).eq("id", escrow.id);
-
-      return new Response(JSON.stringify({ success: true, fully_paid: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (remainingCents === 0) {
+      await stripe.paymentIntents.capture(intent.id, { amount_to_capture: captureCents }, {
+        idempotencyKey: `winner-deposit:${escrow.id}:${captureCents}`,
       });
+      const { error: depositUpdateError } = await admin.from("auction_deposits").update({
+        status: "captured",
+        captured_at: new Date().toISOString(),
+        captured_amount: captureCents / 100,
+      }).eq("id", deposit.id).in("status", ["authorized", "captured"]);
+      if (depositUpdateError) throw depositUpdateError;
+      const { error: escrowUpdateError } = await admin.from("auction_escrow")
+        .update({ status: "full_payment_held" })
+        .eq("id", escrow.id)
+        .eq("buyer_id", user.id)
+        .in("status", ["pending_deposit", "deposit_held", "full_payment_held"]);
+      if (escrowUpdateError) throw escrowUpdateError;
+      await admin.from("auction_audit_log").insert({
+        auction_id: auctionId,
+        actor_id: user.id,
+        actor_role: "buyer",
+        action: "winner_payment_completed",
+        details: { deposit_payment_intent: intent.id, captured_amount_cents: captureCents, currency: CURRENCY },
+      });
+      return json(req, { success: true, fully_paid: true });
     }
 
-    // Create checkout for remaining balance
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId: string;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-    } else {
-      const customer = await stripe.customers.create({ email: user.email });
+    const customers = await stripe.customers.list({ email: user.email, limit: 10 });
+    let customerId = customers.data.find((customer) => customer.metadata.userId === user.id)?.id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({ email: user.email, metadata: { userId: user.id } }, {
+        idempotencyKey: `buyer-customer:${user.id}`,
+      });
       customerId = customer.id;
     }
 
@@ -96,34 +114,31 @@ serve(async (req) => {
       customer: customerId,
       line_items: [{
         price_data: {
-          currency: "gbp",
+          currency: CURRENCY,
           product_data: {
-            name: `Auction Payment — Balance Due`,
-            description: `Remaining balance for auction ${auction_id.slice(0, 8)}`,
+            name: "Auktionskauf – Restbetrag",
+            description: `Restzahlung für Auktion ${auctionId.slice(0, 8)}`,
           },
-          unit_amount: Math.round(remainingBalance * 100),
+          unit_amount: remainingCents,
         },
         quantity: 1,
       }],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/auction/${auction_id}?payment=success`,
-      cancel_url: `${req.headers.get("origin")}/auction/${auction_id}?payment=cancelled`,
-      metadata: {
-        auction_id,
+      success_url: appUrl(`/auction/${auctionId}?payment=success`),
+      cancel_url: appUrl(`/auction/${auctionId}?payment=cancelled`),
+      metadata: checkoutMetadata("auction_winner_payment", remainingCents, {
+        auction_id: auctionId,
         escrow_id: escrow.id,
         buyer_id: user.id,
-        type: "auction_winner_payment",
-      },
-    });
+        user_id: user.id,
+        deposit_id: deposit.id,
+        deposit_payment_intent_id: intent.id,
+        deposit_capture_amount: String(captureCents),
+      }),
+    }, { idempotencyKey: `winner-payment:${escrow.id}:${totalCents}` });
 
-    return new Response(JSON.stringify({ url: session.url, remaining_balance: remainingBalance }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json(req, { url: session.url, remaining_balance: remainingCents / 100 });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return new Response(JSON.stringify({ error: msg }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return safeError(req, error);
   }
 });

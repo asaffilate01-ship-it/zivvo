@@ -46,6 +46,8 @@ const StaffManager = ({ dealerId }: Props) => {
     setStaff((data as any) || []);
   };
 
+  // Reload when the dashboard changes dealer context.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [dealerId]);
 
   const invite = async () => {

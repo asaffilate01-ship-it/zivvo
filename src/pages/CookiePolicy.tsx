@@ -81,7 +81,7 @@ const CookiePolicy = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s5Title")}</h2>
             <p className="mt-2">
               {t("s5Body")}{" "}
-              <a href="mailto:privacy@zivvo.co.uk" className="text-primary underline">privacy@zivvo.co.uk</a>.
+              <a href="mailto:privacy@zivvo.de" className="text-primary underline">privacy@zivvo.de</a>.
             </p>
           </section>
         </div>
