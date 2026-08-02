@@ -73,7 +73,7 @@ jobs:
               environment_url: process.env.DEPLOYMENT_URL,
               description: 'Running production smoke checks'
             });
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.commit_sha }}
       - uses: actions/setup-node@v4
