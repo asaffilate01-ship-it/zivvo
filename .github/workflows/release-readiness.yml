@@ -76,11 +76,14 @@ jobs:
         run: npm run native:links
       - run: npm run release:evidence
       - run: npm run release:evidence:verify
+      - run: npm run release:sbom
+      - run: npm run release:sbom:verify
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: zivvo-${{ inputs.target_environment }}-${{ github.sha }}
           path: |
             dist
             release-evidence.json
+            release-evidence/sbom.cyclonedx.json
           if-no-files-found: error
           retention-days: 30

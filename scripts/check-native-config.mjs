@@ -11,6 +11,7 @@ const files = {
   iosProject: "ios/App/App.xcodeproj/project.pbxproj",
   iosEntitlements: "ios/App/App/App.entitlements",
   iosPrivacy: "ios/App/App/PrivacyInfo.xcprivacy",
+  iosPackage: "ios/App/CapApp-SPM/Package.swift",
   androidInstrumentationTest: "android/app/src/androidTest/java/de/zivvo/app/ExampleInstrumentedTest.java",
 };
 const failures = [];
@@ -51,6 +52,16 @@ requireMatch("iosEntitlements", /applinks:zivvo\.de/, "iOS Universal Link domain
 requireMatch("iosProject", /PrivacyInfo\.xcprivacy in Resources/, "iOS privacy manifest resource binding");
 requireMatch("iosPrivacy", /<key>NSPrivacyTracking<\/key>\s*<false\/>/, "iOS tracking declaration");
 requireMatch("iosPrivacy", /<key>NSPrivacyCollectedDataTypes<\/key>\s*<array>/, "iOS collected-data declaration");
+const capacitorVersion = packageJson.dependencies?.["@capacitor/ios"];
+if (!capacitorVersion || capacitorVersion !== packageJson.dependencies?.["@capacitor/core"]) {
+  failures.push("Capacitor iOS/core version alignment");
+} else {
+  requireMatch(
+    "iosPackage",
+    new RegExp(`capacitor-swift-pm\\.git", exact: "${capacitorVersion.replaceAll(".", "\\.")}"`),
+    "iOS Swift package Capacitor version",
+  );
+}
 for (const key of ["NSCameraUsageDescription", "NSLocationWhenInUseUsageDescription", "NSPhotoLibraryUsageDescription"]) {
   if (!source.iosInfo.includes(`<key>${key}</key>`)) failures.push(`iOS ${key}`);
 }

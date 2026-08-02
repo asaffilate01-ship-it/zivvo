@@ -12,6 +12,21 @@ dist
 dist-ssr
 *.local
 
+# Runtime environment files must never be committed. Keep only documented
+# templates that contain non-secret examples.
+.env
+.env.*
+!.env.example
+!env.example
+
+# Native signing material and provisioning profiles
+*.jks
+*.keystore
+*.p8
+*.p12
+*.pfx
+*.mobileprovision
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -27,3 +42,8 @@ test-results
 playwright-report
 blob-report
 .capacitor/
+release-evidence.json
+post-deploy-evidence.json
+release-evidence/
+sbom*.json
+sbom*.xml
