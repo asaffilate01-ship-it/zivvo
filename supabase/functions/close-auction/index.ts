@@ -1,14 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { adminClient, json, preflight, requireCron, requirePost, safeError } from "../_shared/security.ts";
 
 // Cancels a held deposit PaymentIntent through the managed Stripe gateway.
-async function cancelPaymentIntent(paymentIntentId: string, _unused?: string): Promise<boolean> {
+async function cancelPaymentIntent(paymentIntentId: string): Promise<boolean> {
   try {
     const stripe = createStripeClient(resolveStripeEnv());
     await stripe.paymentIntents.cancel(paymentIntentId);
@@ -22,13 +17,12 @@ async function cancelPaymentIntent(paymentIntentId: string, _unused?: string): P
 async function releaseDeposits(
   supabase: any,
   deposits: any[],
-  stripeKey: string,
   excludeUserId?: string
 ) {
   for (const dep of deposits) {
     if (excludeUserId && dep.user_id === excludeUserId) continue;
     if (!dep.stripe_payment_intent_id) continue;
-    const ok = await cancelPaymentIntent(dep.stripe_payment_intent_id, stripeKey);
+    const ok = await cancelPaymentIntent(dep.stripe_payment_intent_id);
     if (ok) {
       await supabase.from("auction_deposits").update({
         status: "released",
@@ -42,19 +36,13 @@ async function releaseDeposits(
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
-  );
-
-  const stripeKey = "";
-
   try {
+    const options = preflight(req);
+    if (options) return options;
+    requirePost(req);
+    requireCron(req);
+    const supabase = adminClient();
+
     // Find auctions that have ended
     const { data: endedAuctions, error: fetchError } = await supabase
       .from("auctions")
@@ -64,9 +52,7 @@ serve(async (req) => {
 
     if (fetchError) throw fetchError;
     if (!endedAuctions || endedAuctions.length === 0) {
-      return new Response(JSON.stringify({ message: "No auctions to close", closed: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json(req, { message: "No auctions to close", closed: 0 });
     }
 
     let closedCount = 0;
@@ -109,7 +95,7 @@ serve(async (req) => {
 
         if (winningBid) {
           // Release deposits for non-winners
-          await releaseDeposits(supabase, allDeposits || [], stripeKey, winningBid.bidder_id);
+          await releaseDeposits(supabase, allDeposits || [], winningBid.bidder_id);
 
           const hammerPrice = winningBid.amount;
           const buyerPremium = hammerPrice * (auction.buyer_premium_pct / 100);
@@ -203,7 +189,7 @@ serve(async (req) => {
 
       // Release ALL deposits for non-sold auctions
       if (newStatus === "reserve_not_met" || newStatus === "ended") {
-        await releaseDeposits(supabase, allDeposits || [], stripeKey);
+        await releaseDeposits(supabase, allDeposits || []);
 
         if (newStatus === "reserve_not_met") {
           await supabase.from("notifications").insert({
@@ -260,15 +246,8 @@ serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ success: true, closed: closedCount }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json(req, { success: true, closed: closedCount });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    console.error(`[CLOSE-AUCTION] ERROR: ${msg}`);
-    return new Response(JSON.stringify({ success: false, error: msg }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return safeError(req, error);
   }
 });

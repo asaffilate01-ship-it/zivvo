@@ -15,7 +15,7 @@ const allowedEnvironmentTemplates = new Set([".env.example", "env.example"]);
 const forbiddenTrackedFiles = trackedFiles.filter((path) => {
   if (allowedEnvironmentTemplates.has(path)) return false;
   if (/(^|\/)\.env(?:\.|$)/i.test(path)) return true;
-  return /(?:^|\/)(?:credentials|service-account)(?:\.|$)|\.(?:pem|p12|pfx|key)$/i.test(path);
+  return /(?:^|\/)(?:credentials|service-account)(?:\.|$)|\.(?:pem|p8|p12|pfx|key|jks|keystore|mobileprovision)$/i.test(path);
 });
 
 const failures = [];

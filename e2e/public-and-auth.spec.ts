@@ -18,6 +18,23 @@ test("authentication form has labels, keyboard access and no serious axe violati
   expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact || ""))).toEqual([]);
 });
 
+test("signup form is labelled and has no serious axe violations", async ({ page }) => {
+  await page.goto("/signup");
+  await expect(page.getByLabel(/name/i)).toBeVisible();
+  await expect(page.getByLabel(/e-mail|email/i)).toBeVisible();
+  await expect(page.getByLabel(/passwort|password/i)).toBeVisible();
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact || ""))).toEqual([]);
+});
+
+test("release-critical public routes render an application shell", async ({ page }) => {
+  for (const route of ["/browse", "/dealers", "/finance", "/sell-my-car", "/privacy", "/terms", "/accessibility"]) {
+    await page.goto(route);
+    await expect(page.locator("#root")).toBeVisible();
+    await expect(page.locator("body")).not.toContainText(/application error|failed to render/i);
+  }
+});
+
 test("mobile viewport retains the primary listing journey", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.includes("mobile"), "Mobile-specific assertion");
   await page.goto("/browse");

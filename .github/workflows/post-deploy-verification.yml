@@ -1,0 +1,129 @@
+name: Post-deploy verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: Deployed GitHub Environment
+        required: true
+        type: choice
+        default: staging
+        options:
+          - staging
+          - production
+      commit_sha:
+        description: Full commit SHA used to build the deployed artifact
+        required: true
+        type: string
+      deployment_url:
+        description: HTTPS URL of the deployed frontend
+        required: true
+        type: string
+      health_url:
+        description: HTTPS URL of the deployed Supabase health-check function
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: post-deploy-${{ inputs.target_environment }}
+  cancel-in-progress: false
+
+jobs:
+  verify-deployment:
+    name: Verify ${{ inputs.target_environment }} deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: ${{ inputs.target_environment }}
+      url: ${{ inputs.deployment_url }}
+    steps:
+      - name: Validate inputs and create deployment record
+        id: deployment
+        uses: actions/github-script@v7
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          DEPLOYMENT_ENVIRONMENT: ${{ inputs.target_environment }}
+          DEPLOYMENT_URL: ${{ inputs.deployment_url }}
+        with:
+          script: |
+            if (!/^[0-9a-f]{40}$/i.test(process.env.COMMIT_SHA)) throw new Error('commit_sha must be a full commit SHA');
+            const url = new URL(process.env.DEPLOYMENT_URL);
+            if (url.protocol !== 'https:' || url.username || url.password) throw new Error('deployment_url must be HTTPS without credentials');
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: process.env.COMMIT_SHA,
+              environment: process.env.DEPLOYMENT_ENVIRONMENT,
+              auto_merge: false,
+              required_contexts: [],
+              transient_environment: process.env.DEPLOYMENT_ENVIRONMENT === 'staging',
+              production_environment: process.env.DEPLOYMENT_ENVIRONMENT === 'production',
+              description: 'Zivvo post-deploy verification'
+            });
+            core.setOutput('deployment_id', deployment.data.id);
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: 'in_progress',
+              environment_url: process.env.DEPLOYMENT_URL,
+              description: 'Running production smoke checks'
+            });
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit_sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify deployed release and backend health
+        run: npm run smoke:production
+        env:
+          SMOKE_BASE_URL: ${{ inputs.deployment_url }}
+          SMOKE_HEALTH_URL: ${{ inputs.health_url }}
+          SMOKE_EXPECTED_COMMIT_SHA: ${{ inputs.commit_sha }}
+          SMOKE_EXPECTED_ENVIRONMENT: ${{ inputs.target_environment }}
+      - name: Mark deployment successful
+        if: success()
+        uses: actions/github-script@v7
+        env:
+          DEPLOYMENT_ID: ${{ steps.deployment.outputs.deployment_id }}
+          DEPLOYMENT_URL: ${{ inputs.deployment_url }}
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: Number(process.env.DEPLOYMENT_ID),
+              state: 'success',
+              environment_url: process.env.DEPLOYMENT_URL,
+              description: 'Release metadata, frontend, headers and backend health verified'
+            });
+      - name: Mark deployment failed
+        if: failure() && steps.deployment.outputs.deployment_id != ''
+        uses: actions/github-script@v7
+        env:
+          DEPLOYMENT_ID: ${{ steps.deployment.outputs.deployment_id }}
+          DEPLOYMENT_URL: ${{ inputs.deployment_url }}
+        with:
+          script: |
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: Number(process.env.DEPLOYMENT_ID),
+              state: 'failure',
+              environment_url: process.env.DEPLOYMENT_URL,
+              description: 'Post-deploy verification failed'
+            });
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zivvo-post-deploy-${{ inputs.target_environment }}-${{ inputs.commit_sha }}
+          path: post-deploy-evidence.json
+          if-no-files-found: warn
+          retention-days: 90

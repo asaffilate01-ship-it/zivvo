@@ -116,7 +116,7 @@ const Navbar = () => {
           {/* Theme */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t("nav.theme")}>
                 {resolved === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </Button>
             </DropdownMenuTrigger>
@@ -137,7 +137,7 @@ const Navbar = () => {
           </DropdownMenu>
 
           <Link to="/saved">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t("nav.saved")}>
               <Heart className="h-4 w-4" />
             </Button>
           </Link>
@@ -146,7 +146,7 @@ const Navbar = () => {
 
           {user && (
             <Link to="/inbox">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t("nav.inbox")}>
                 <InboxBadge />
               </Button>
             </Link>
@@ -212,14 +212,20 @@ const Navbar = () => {
           {user && <NotificationBell />}
           {user && (
             <Link to="/inbox">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t("nav.inbox")}>
                 <InboxBadge />
               </Button>
             </Link>
           )}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                aria-label={t("nav.openMenu")}
+                aria-expanded={mobileOpen}
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>

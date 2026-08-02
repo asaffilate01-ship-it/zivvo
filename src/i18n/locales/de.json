@@ -23,7 +23,10 @@
     "signOut": "Abmelden",
     "postAd": "Inserat aufgeben",
     "admin": "Admin-Bereich",
-    "agent": "Agenten-Bereich"
+    "agent": "Agenten-Bereich",
+    "theme": "Farbschema auswählen",
+    "notifications": "Benachrichtigungen",
+    "openMenu": "Navigationsmenü öffnen"
   },
   "common": {
     "search": "Suchen",
@@ -258,7 +261,9 @@
       "noAccount": "Noch kein Konto?",
       "signupLink": "Registrieren",
       "failed": "Anmeldung fehlgeschlagen",
-      "welcome": "Willkommen zurück!"
+      "welcome": "Willkommen zurück!",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort ausblenden"
     },
     "signup": {
       "title": "Konto erstellen",

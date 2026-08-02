@@ -38,12 +38,25 @@ if (valid.status !== 0) {
   process.exit(1);
 }
 
+const validStaging = runValidator({
+  RELEASE_ENVIRONMENT: "staging",
+  VITE_APP_URL: "https://staging.zivvo.de",
+  VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_ci_contract_123456789",
+});
+if (validStaging.status !== 0) {
+  console.error(validStaging.stderr || validStaging.stdout);
+  process.exit(1);
+}
+
 const rejectedCases = [
   { VITE_APP_URL: "https://preview.lovableproject.com" },
   { VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_not_allowed" },
   { VITE_LEGAL_COMPANY_NAME: "[Company Name]" },
   { VITE_SUPABASE_PUBLISHABLE_KEY: "service_role_not_allowed" },
   { VITE_SUPABASE_URL: "https://different-project.supabase.co" },
+  { RELEASE_ENVIRONMENT: "production", VITE_APP_URL: "https://staging.zivvo.de" },
+  { RELEASE_ENVIRONMENT: "staging", VITE_APP_URL: "https://zivvo.de", VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_ci_contract_123456789" },
+  { RELEASE_ENVIRONMENT: "staging", VITE_APP_URL: "https://staging.zivvo.de", VITE_STRIPE_PUBLISHABLE_KEY: "pk_live_ci_contract_123456789" },
 ];
 
 for (const invalidEnvironment of rejectedCases) {
@@ -54,4 +67,4 @@ for (const invalidEnvironment of rejectedCases) {
   }
 }
 
-console.log(`Production environment contract passed (1 valid and ${rejectedCases.length} rejected cases).`);
+console.log(`Release environment contract passed (2 valid and ${rejectedCases.length} rejected cases).`);
