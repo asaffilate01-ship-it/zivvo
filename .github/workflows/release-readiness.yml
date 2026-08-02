@@ -1,22 +1,33 @@
-name: Production release readiness
+name: Release readiness
 
 on:
   workflow_dispatch:
+    inputs:
+      target_environment:
+        description: GitHub Environment to validate
+        required: true
+        type: choice
+        default: staging
+        options:
+          - staging
+          - production
 
 permissions:
   contents: read
 
 concurrency:
-  group: production-release-readiness
+  group: release-readiness-${{ inputs.target_environment }}
   cancel-in-progress: false
 
 jobs:
-  build-production:
-    name: Validate and build production artifact
+  build-release:
+    name: Validate and build ${{ inputs.target_environment }} artifact
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: production
+    timeout-minutes: 25
+    environment: ${{ inputs.target_environment }}
     env:
+      RELEASE_COMMIT_SHA: ${{ github.sha }}
+      RELEASE_ENVIRONMENT: ${{ inputs.target_environment }}
       VITE_APP_URL: ${{ vars.VITE_APP_URL }}
       VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
       VITE_SUPABASE_PROJECT_ID: ${{ vars.VITE_SUPABASE_PROJECT_ID }}
@@ -40,6 +51,11 @@ jobs:
       VITE_LEGAL_REGISTER_NUMBER: ${{ vars.VITE_LEGAL_REGISTER_NUMBER }}
       VITE_LEGAL_VAT_ID: ${{ vars.VITE_LEGAL_VAT_ID }}
       VITE_LEGAL_CONTENT_RESPONSIBLE: ${{ vars.VITE_LEGAL_CONTENT_RESPONSIBLE }}
+      NATIVE_LINKS_ENABLED: ${{ vars.NATIVE_LINKS_ENABLED }}
+      IOS_TEAM_ID: ${{ vars.IOS_TEAM_ID }}
+      IOS_BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+      ANDROID_PACKAGE_NAME: ${{ vars.ANDROID_PACKAGE_NAME }}
+      ANDROID_SHA256_CERT_FINGERPRINT: ${{ secrets.ANDROID_SHA256_CERT_FINGERPRINT }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,15 +63,19 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run check:repo
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run test
+      - run: npm run check
       - run: npm run audit:production
       - run: npm run build:production
+      - name: Generate native association files
+        if: env.NATIVE_LINKS_ENABLED == 'true'
+        run: npm run native:links
+      - run: npm run release:evidence
+      - run: npm run release:evidence:verify
       - uses: actions/upload-artifact@v4
         with:
-          name: zivvo-production-dist-${{ github.sha }}
-          path: dist
+          name: zivvo-${{ inputs.target_environment }}-${{ github.sha }}
+          path: |
+            dist
+            release-evidence.json
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30

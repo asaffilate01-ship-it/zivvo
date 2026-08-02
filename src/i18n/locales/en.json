@@ -23,7 +23,10 @@
     "signOut": "Sign Out",
     "postAd": "Post Ad",
     "admin": "Admin Panel",
-    "agent": "Agent Panel"
+    "agent": "Agent Panel",
+    "theme": "Choose colour theme",
+    "notifications": "Notifications",
+    "openMenu": "Open navigation menu"
   },
   "common": {
     "search": "Search",
@@ -258,7 +261,9 @@
       "noAccount": "Don't have an account?",
       "signupLink": "Sign up",
       "failed": "Login failed",
-      "welcome": "Welcome back!"
+      "welcome": "Welcome back!",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
     },
     "signup": {
       "title": "Create account",

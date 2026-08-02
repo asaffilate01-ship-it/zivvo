@@ -9,6 +9,11 @@ const resolved = {
   VITE_STRIPE_PUBLISHABLE_KEY: process.env.VITE_STRIPE_PUBLISHABLE_KEY || process.env.VITE_PAYMENTS_CLIENT_TOKEN,
   VITE_GOOGLE_MAPS_BROWSER_KEY: process.env.VITE_GOOGLE_MAPS_BROWSER_KEY || process.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
 };
+const releaseEnvironment = (process.env.RELEASE_ENVIRONMENT || "production").trim();
+if (!new Set(["staging", "production"]).has(releaseEnvironment)) {
+  console.error("RELEASE_ENVIRONMENT must be staging or production");
+  process.exit(1);
+}
 
 const required = [
   "VITE_APP_URL",
@@ -57,7 +62,8 @@ const parseHttpsUrl = (name) => {
 const appUrl = parseHttpsUrl("VITE_APP_URL");
 if (appUrl) {
   const host = appUrl.hostname.toLowerCase();
-  if (host !== "zivvo.de" && host !== "www.zivvo.de") fail("VITE_APP_URL");
+  if (releaseEnvironment === "production" && host !== "zivvo.de" && host !== "www.zivvo.de") fail("VITE_APP_URL");
+  if (releaseEnvironment === "staging" && (host === "zivvo.de" || host === "www.zivvo.de")) fail("VITE_APP_URL");
   if (appUrl.pathname !== "/" || appUrl.search || appUrl.hash) fail("VITE_APP_URL");
 }
 
@@ -70,7 +76,8 @@ if (supabaseUrl) {
   }
 }
 
-if (!/^pk_live_[A-Za-z0-9_]{16,}$/.test(resolved.VITE_STRIPE_PUBLISHABLE_KEY || "")) {
+const stripePattern = releaseEnvironment === "production" ? /^pk_live_[A-Za-z0-9_]{16,}$/ : /^pk_test_[A-Za-z0-9_]{16,}$/;
+if (!stripePattern.test(resolved.VITE_STRIPE_PUBLISHABLE_KEY || "")) {
   fail("VITE_STRIPE_PUBLISHABLE_KEY");
 }
 

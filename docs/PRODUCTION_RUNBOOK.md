@@ -85,11 +85,15 @@ npm ci
 npm run check
 npm run audit:production
 npm run build:production
+npm run release:evidence
+npm run release:evidence:verify
 ```
 
-`build:production` must pass using the hosting environment's real values. Publish the generated `dist/` directory with `public/_headers` and `public/_redirects`, or use `vercel.json`. Confirm that the Content Security Policy is present on the actual response, HTTPS redirects are active, and `index.html` is not cached.
+Prefer the manual **Release readiness** GitHub workflow. It binds the build to the selected protected `staging` or `production` Environment, embeds `/release.json`, records every artifact file digest, and uploads `release-evidence.json` with the immutable `dist` artifact. `build:production` must pass using that Environment's real values. Publish the generated `dist/` directory with `public/_headers` and `public/_redirects`, or use `vercel.json`.
 
-Deploy to staging, complete acceptance, then promote the exact same artifact to production. Do not rebuild between approval and promotion.
+Deploy to staging, complete acceptance, then promote the exact same artifact to production. Do not rebuild between approval and promotion. After each external deployment, run **Post-deploy verification** with the exact build SHA, frontend URL and Supabase health URL. It creates a GitHub Deployment record and will only mark it successful after verifying the embedded SHA, release environment, critical routes, security headers and database-backed health check.
+
+If native launch is enabled, set `NATIVE_LINKS_ENABLED=true` plus the real Apple Team ID, bundle ID, Android package and release-signing SHA-256 fingerprint in the selected GitHub Environment. The release workflow then generates the Apple Universal Link and Android App Link association files. Never use a debug certificate fingerprint in production.
 
 ## 7. Acceptance matrix
 

@@ -1,0 +1,84 @@
+name: Native validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - android/**
+      - ios/**
+      - src/**
+      - public/**
+      - capacitor.config.ts
+      - package.json
+      - package-lock.json
+      - .github/workflows/native.yml
+  pull_request:
+    paths:
+      - android/**
+      - ios/**
+      - src/**
+      - public/**
+      - capacitor.config.ts
+      - package.json
+      - package-lock.json
+      - .github/workflows/native.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android test and lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync android
+      - run: ./gradlew test lint
+        working-directory: android
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-lint-${{ github.sha }}
+          path: android/app/build/reports
+          if-no-files-found: ignore
+          retention-days: 14
+
+  ios:
+    name: iOS simulator build
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx cap sync ios
+      - name: Build unsigned simulator application
+        run: >-
+          xcodebuild
+          -project ios/App/App.xcodeproj
+          -scheme App
+          -configuration Debug
+          -sdk iphonesimulator
+          -destination 'generic/platform=iOS Simulator'
+          CODE_SIGNING_ALLOWED=NO
+          build

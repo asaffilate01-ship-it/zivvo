@@ -85,7 +85,13 @@ const Signup = () => {
                 <Label htmlFor="password">{t("auth.signup.password")}</Label>
                 <div className="relative">
                   <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("auth.signup.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} minLength={12} autoComplete="new-password" required />
-                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setShowPassword(!showPassword)}>
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? t("auth.login.hidePassword") : t("auth.login.showPassword")}
+                    aria-pressed={showPassword}
+                  >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
