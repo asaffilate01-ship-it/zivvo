@@ -9,7 +9,7 @@
     "build:production": "node scripts/validate-production-env.mjs && vite build --mode production && node scripts/verify-production-artifact.mjs",
     "build:dev": "vite build --mode development",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "check": "npm run check:repo && npm run check:workflows && npm run check:public-claims && npm run check:edge-security && npm run check:native && npm run test:production-config && npm run test:release-contract && npm run test:smoke-contract && npm run typecheck && npm run lint && npm run test && npm run build",
+    "check": "npm run check:repo && npm run check:workflows && npm run check:public-claims && npm run check:edge-security && npm run check:native && npm run test:production-config && npm run test:release-contract && npm run test:smoke-contract && npm run test:sbom-contract && npm run typecheck && npm run lint && npm run test && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -30,7 +30,10 @@
     "test:release-contract": "node scripts/test-release-contract.mjs",
     "test:smoke-contract": "node scripts/test-smoke-production.mjs",
     "check:workflows": "node scripts/check-workflow-security.mjs",
-    "check:public-claims": "node scripts/check-public-claims.mjs"
+    "check:public-claims": "node scripts/check-public-claims.mjs",
+    "release:sbom": "node scripts/generate-sbom.mjs",
+    "release:sbom:verify": "node scripts/verify-sbom.mjs",
+    "test:sbom-contract": "node scripts/test-sbom.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.4.2",

@@ -1,0 +1,96 @@
+name: Staging acceptance
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_url:
+        description: HTTPS origin of the deployed staging frontend
+        required: true
+        type: string
+      health_url:
+        description: HTTPS URL of the deployed staging health-check function
+        required: true
+        type: string
+      commit_sha:
+        description: Full deployed commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-acceptance
+  cancel-in-progress: false
+
+jobs:
+  public-acceptance:
+    name: Browser and service acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: staging
+    env:
+      PLAYWRIGHT_BASE_URL: ${{ inputs.deployment_url }}
+      STAGING_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      STAGING_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      STAGING_E2E_USER_EMAIL: ${{ secrets.STAGING_E2E_USER_EMAIL }}
+      STAGING_E2E_USER_PASSWORD: ${{ secrets.STAGING_E2E_USER_PASSWORD }}
+      SMOKE_BASE_URL: ${{ inputs.deployment_url }}
+      SMOKE_HEALTH_URL: ${{ inputs.health_url }}
+      SMOKE_EXPECTED_COMMIT_SHA: ${{ inputs.commit_sha }}
+      SMOKE_EXPECTED_ENVIRONMENT: staging
+    steps:
+      - name: Validate immutable staging target
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+          DEPLOYMENT_URL: ${{ inputs.deployment_url }}
+          HEALTH_URL: ${{ inputs.health_url }}
+        run: |
+          node --input-type=module <<'NODE'
+          if (!/^[0-9a-f]{40}$/i.test(process.env.COMMIT_SHA || "")) {
+            throw new Error("commit_sha must be a full commit SHA");
+          }
+          for (const name of ["DEPLOYMENT_URL", "HEALTH_URL"]) {
+            const url = new URL(process.env[name] || "");
+            if (url.protocol !== "https:" || url.username || url.password) {
+              throw new Error(`${name.toLowerCase()} must be HTTPS without credentials`);
+            }
+            if (name === "DEPLOYMENT_URL" && (url.pathname !== "/" || url.search || url.hash)) {
+              throw new Error("deployment_url must be an HTTPS origin without a path, query or fragment");
+            }
+          }
+          NODE
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.commit_sha }}
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Require protected staging acceptance credentials
+        run: |
+          node --input-type=module <<'NODE'
+          const required = [
+            "STAGING_SUPABASE_URL",
+            "STAGING_SUPABASE_PUBLISHABLE_KEY",
+            "STAGING_E2E_USER_EMAIL",
+            "STAGING_E2E_USER_PASSWORD",
+          ];
+          const missing = required.filter((name) => !process.env[name]?.trim());
+          if (missing.length) throw new Error(`Missing staging acceptance configuration: ${missing.join(", ")}`);
+          NODE
+      - name: Run public and authentication-shell browser acceptance
+        run: npm run test:e2e
+      - name: Verify release metadata, security headers and backend health
+        run: npm run smoke:production
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: zivvo-staging-acceptance-${{ inputs.commit_sha }}
+          path: |
+            playwright-report
+            post-deploy-evidence.json
+          if-no-files-found: warn
+          retention-days: 90

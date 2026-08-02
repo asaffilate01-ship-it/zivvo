@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { URL } from "node:url";
 
 const trackedResult = spawnSync("git", ["ls-files", "-z"], { encoding: "utf8" });
 
@@ -24,6 +25,23 @@ if (forbiddenTrackedFiles.length > 0) {
   failures.push(`Sensitive runtime files are tracked: ${forbiddenTrackedFiles.join(", ")}`);
 }
 
+const ignoreContracts = [
+  [".env", true],
+  [".env.production", true],
+  [".env.example", false],
+  ["android/release.jks", true],
+  ["ios/App/AuthKey_test.p8", true],
+  ["release-evidence.json", true],
+  ["release-evidence/sbom.cyclonedx.json", true],
+];
+
+for (const [path, shouldBeIgnored] of ignoreContracts) {
+  const ignored = spawnSync("git", ["check-ignore", "--no-index", "--quiet", path]).status === 0;
+  if (ignored !== shouldBeIgnored) {
+    failures.push(`${path} must ${shouldBeIgnored ? "be" : "not be"} ignored`);
+  }
+}
+
 const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
 const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 const lockRoot = packageLock.packages?.[""];
@@ -39,6 +57,27 @@ for (const [name, version] of Object.entries(packageJson.dependencies ?? {})) {
 
 for (const [name, version] of Object.entries(packageJson.devDependencies ?? {})) {
   if (lockRoot?.devDependencies?.[name] !== version) failures.push(`Lockfile root dev dependency is stale: ${name}`);
+}
+
+for (const [path, dependency] of Object.entries(packageLock.packages ?? {})) {
+  if (!dependency?.resolved) continue;
+  try {
+    const url = new URL(dependency.resolved);
+    if (url.protocol !== "https:" || url.hostname !== "registry.npmjs.org") {
+      failures.push(`Lockfile package does not use the public npm registry: ${path || "root"}`);
+    }
+  } catch {
+    failures.push(`Lockfile package has an invalid resolved URL: ${path || "root"}`);
+  }
+  if (!dependency.integrity) failures.push(`Lockfile package has no integrity hash: ${path || "root"}`);
+}
+
+const workflowFiles = trackedFiles.filter((path) => /^\.github\/workflows\/.*\.ya?ml$/i.test(path));
+for (const path of workflowFiles) {
+  const workflow = readFileSync(path, "utf8");
+  if (/\brun:\s*npm\s+(?:i|install)\b/m.test(workflow)) {
+    failures.push(`Workflow must use npm ci for reproducible installs: ${path}`);
+  }
 }
 
 const capacitorConfig = readFileSync("capacitor.config.ts", "utf8");

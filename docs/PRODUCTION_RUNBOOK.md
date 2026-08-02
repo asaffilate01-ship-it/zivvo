@@ -88,13 +88,15 @@ npm run audit:production
 npm run build:production
 npm run release:evidence
 npm run release:evidence:verify
+npm run release:sbom
+npm run release:sbom:verify
 ```
 
 `build:production` validates the environment before compilation and then scans the compiled artifact for the approved legal/contact values, unsupported public claims, retired dispute links and sample operator data. A plain `npm run build` is never a releasable production artifact.
 
-Prefer the manual **Release readiness** GitHub workflow. It binds the build to the selected protected `staging` or `production` Environment, embeds `/release.json`, records every artifact file digest, and uploads `release-evidence.json` with the immutable `dist` artifact. `build:production` must pass using that Environment's real values. Publish the generated `dist/` directory with `public/_headers` and `public/_redirects`, or use `vercel.json`.
+Prefer the manual **Release readiness** GitHub workflow. It binds the build to the selected protected `staging` or `production` Environment, embeds `/release.json`, records every artifact file digest, and uploads `release-evidence.json`, a lockfile-derived CycloneDX SBOM and the immutable `dist` artifact. `build:production` must pass using that Environment's real values. Publish the generated `dist/` directory with `public/_headers` and `public/_redirects`, or use `vercel.json`.
 
-Deploy to staging, complete acceptance, then promote the exact same artifact to production. Do not rebuild between approval and promotion. After each external deployment, run **Post-deploy verification** with the exact build SHA, frontend URL and Supabase health URL. It creates a GitHub Deployment record and will only mark it successful after verifying the embedded SHA, release environment, critical routes, security headers and database-backed health check.
+Deploy to staging, then run **Staging acceptance** with the exact build SHA, frontend URL and Supabase health URL. The protected `staging` Environment must provide the dedicated test-user credentials described in `docs/GITHUB_GO_LIVE_SETUP.md`; the workflow fails if they are absent and exercises authenticated buyer routes without committing a session or password. Promote the exact same accepted artifact to production. Do not rebuild between approval and promotion. After each external deployment, run **Post-deploy verification**. It creates a GitHub Deployment record and will only mark it successful after verifying the embedded SHA, release environment, critical routes, security headers and database-backed health check.
 
 If native launch is enabled, set `NATIVE_LINKS_ENABLED=true` plus the real Apple Team ID, bundle ID, Android package and release-signing SHA-256 fingerprint in the selected GitHub Environment. The release workflow then generates the Apple Universal Link and Android App Link association files. Never use a debug certificate fingerprint in production. Reconcile App Store Connect and Google Play data-safety answers against `ios/App/App/PrivacyInfo.xcprivacy`, the privacy policy and observed SDK traffic before submission.
 
