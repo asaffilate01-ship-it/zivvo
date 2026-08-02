@@ -1,13 +1,22 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { env } from "../_shared/security.ts";
 
-serve(async (req) => {
+const escapeXml = (value: string) => value.replace(/[&<>"']/g, (character) => ({
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&apos;",
+}[character] || character));
+
+serve(async () => {
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_ANON_KEY") ?? ""
   );
 
-  const origin = req.headers.get("origin") || "https://zivvo.de";
+  const origin = new URL(env("APP_URL")).origin;
 
   const { data: listings } = await supabase
     .from("car_listings")
@@ -39,7 +48,7 @@ serve(async (req) => {
   for (const page of staticPages) {
     xml += `
   <url>
-    <loc>${origin}${page.loc}</loc>
+    <loc>${escapeXml(`${origin}${page.loc}`)}</loc>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
   </url>`;
@@ -49,7 +58,7 @@ serve(async (req) => {
     for (const l of listings) {
       xml += `
   <url>
-    <loc>${origin}/car/${l.id}</loc>
+    <loc>${escapeXml(`${origin}/car/${l.id}`)}</loc>
     <lastmod>${new Date(l.updated_at).toISOString().split("T")[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -62,7 +71,7 @@ serve(async (req) => {
       if (d.slug) {
         xml += `
   <url>
-    <loc>${origin}/dealer/${d.slug}</loc>
+    <loc>${escapeXml(`${origin}/dealer/${d.slug}`)}</loc>
     <lastmod>${new Date(d.updated_at).toISOString().split("T")[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

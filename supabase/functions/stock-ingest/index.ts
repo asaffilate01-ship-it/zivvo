@@ -26,7 +26,7 @@ const sha256 = async (s: string) => {
 };
 
 const num = (v: any) =>
-  v === undefined || v === null || v === "" ? null : Number(String(v).replace(/[^0-9.\-]/g, ""));
+  v === undefined || v === null || v === "" ? null : Number(String(v).replace(/[^0-9.-]/g, ""));
 const norm = (v: any) => (v === undefined || v === null ? null : String(v).trim());
 
 const toRow = (v: any, dealerId: string, sellerId: string) => {

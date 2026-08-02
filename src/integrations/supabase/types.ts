@@ -492,7 +492,9 @@ export type Database = {
           auction_id: string
           authorized_at: string | null
           captured_at: string | null
+          captured_amount: number
           created_at: string
+          currency: string
           finance_amount: number | null
           finance_provider: string | null
           finance_reference: string | null
@@ -508,7 +510,9 @@ export type Database = {
           auction_id: string
           authorized_at?: string | null
           captured_at?: string | null
+          captured_amount?: number
           created_at?: string
+          currency?: string
           finance_amount?: number | null
           finance_provider?: string | null
           finance_reference?: string | null
@@ -524,7 +528,9 @@ export type Database = {
           auction_id?: string
           authorized_at?: string | null
           captured_at?: string | null
+          captured_amount?: number
           created_at?: string
+          currency?: string
           finance_amount?: number | null
           finance_provider?: string | null
           finance_reference?: string | null

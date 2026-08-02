@@ -80,7 +80,7 @@ const CompareCars = () => {
   const handleShare = async () => {
     const url = `${window.location.origin}/compare?${selectedIds.map((id) => `car=${id}`).join("&")}`;
     if (navigator.share) {
-      try { await navigator.share({ title: t("shareTitle"), url }); } catch {}
+      try { await navigator.share({ title: t("shareTitle"), url }); } catch { /* User cancelled sharing. */ }
     } else {
       await navigator.clipboard.writeText(url);
       toast({ title: t("linkCopied") });

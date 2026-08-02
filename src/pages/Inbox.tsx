@@ -52,7 +52,7 @@ const Inbox = () => {
           lastAt: "",
           unreadCount: 0,
         });
-      } catch {}
+      } catch { /* Ignore malformed deep-link data. */ }
     }
   }, []);
 
@@ -165,7 +165,7 @@ const Inbox = () => {
       supabase.removeChannel(channel);
       supabase.removeChannel(msgChannel);
     };
-  }, [user]);
+  }, [user, t, toast]);
 
   const handleReply = async (enquiryId: string) => {
     const text = replyText[enquiryId];

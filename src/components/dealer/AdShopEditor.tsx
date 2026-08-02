@@ -55,7 +55,7 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
 
     // Price tag
     if (config.showPrice) {
-      const price = `£${Number(selected.price).toLocaleString()}`;
+      const price = `€${Number(selected.price).toLocaleString()}`;
       ctx.font = `bold ${Math.round(canvas.height * 0.06)}px Inter, sans-serif`;
       const padding = 24;
       const m = ctx.measureText(price);
@@ -97,6 +97,8 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
     }
   };
 
+  // Canvas rendering is intentionally driven by these visible editor inputs.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { if (open && selected) renderPreview(); }, [open, selected, imageIdx, config]);
 
   const download = () => {
@@ -121,7 +123,7 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
   const shareGoogle = () => {
     if (!selected) return;
     const url = `${window.location.origin}/car/${selected.id}`;
-    const text = `${selected.title} — £${Number(selected.price).toLocaleString()}`;
+    const text = `${selected.title} — €${Number(selected.price).toLocaleString()}`;
     navigator.clipboard.writeText(`${text}\n${url}`);
     toast({ title: "Copied for Google Business", description: "Paste into your Google Business Profile post." });
   };
@@ -143,7 +145,7 @@ const AdShopEditor = ({ dealerId, logoUrl, businessName }: Props) => {
                   <img src={l.images[0]} alt={l.title} className="aspect-[4/3] w-full object-cover transition-transform group-hover:scale-105" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-left">
                     <p className="text-xs font-medium text-white truncate">{l.title}</p>
-                    <p className="text-xs text-white/80">£{Number(l.price).toLocaleString()}</p>
+                    <p className="text-xs text-white/80">€{Number(l.price).toLocaleString()}</p>
                   </div>
                 </button>
               ))}

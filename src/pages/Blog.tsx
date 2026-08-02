@@ -8,7 +8,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { subscribeNewsletter } from "@/lib/publicSubmissions";
+import { absoluteUrl } from "@/lib/siteConfig";
 import { useTranslation } from "react-i18next";
 
 const postMeta = [
@@ -37,16 +38,19 @@ const Blog = () => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setSubscribing(true);
-    const { error } = await supabase.from("newsletter_subscribers" as any).insert({ email: newsletterEmail.trim() });
-    setSubscribing(false);
-    if (error?.code === "23505") {
-      toast({ title: t("toastAlreadySubscribedTitle"), description: t("toastAlreadySubscribedDesc") });
-    } else if (error) {
+    try {
+      const result = await subscribeNewsletter(newsletterEmail);
+      if (result?.alreadySubscribed) {
+        toast({ title: t("toastAlreadySubscribedTitle"), description: t("toastAlreadySubscribedDesc") });
+      } else {
+        toast({ title: t("toastSuccessTitle"), description: t("toastSuccessDesc") });
+      }
+      setNewsletterEmail("");
+    } catch {
       toast({ title: t("toastFailTitle"), variant: "destructive" });
-    } else {
-      toast({ title: t("toastSuccessTitle"), description: t("toastSuccessDesc") });
+    } finally {
+      setSubscribing(false);
     }
-    setNewsletterEmail("");
   };
 
   return (
@@ -60,11 +64,11 @@ const Blog = () => {
           "@type": "Blog",
           "name": "Zivvo Blog",
           "description": "Expert advice on buying, selling, and maintaining your car.",
-          "url": "https://zivvo.co.uk/blog",
+          "url": absoluteUrl("/blog"),
           "publisher": {
             "@type": "Organization",
             "name": "Zivvo",
-            "logo": { "@type": "ImageObject", "url": "https://zivvo.co.uk/icon-512.png" }
+            "logo": { "@type": "ImageObject", "url": absoluteUrl("/icon-512.png") }
           }
         }}
       />

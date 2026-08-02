@@ -50,8 +50,10 @@ const PortalSyndication = ({ dealerId }: Props) => {
   const [saving, setSaving] = useState<string | null>(null);
   const [editingPortal, setEditingPortal] = useState<string | null>(null);
 
+  // Reload only when the selected dealer changes.
   useEffect(() => {
     fetchConfigs();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dealerId]);
 
   const fetchConfigs = async () => {

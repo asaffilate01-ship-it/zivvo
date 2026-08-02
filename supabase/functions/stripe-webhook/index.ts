@@ -1,7 +1,7 @@
 import type Stripe from "https://esm.sh/stripe@22.0.2";
 import { createStripeClient, resolveStripeEnv, verifyWebhook } from "../_shared/stripe.ts";
 import { adminClient } from "../_shared/security.ts";
-import { CURRENCY, subscriptionCatalog } from "../_shared/payments.ts";
+import { assertPaidCheckout, boostCatalog, CURRENCY, subscriptionCatalog } from "../_shared/payments.ts";
 
 const stripe = createStripeClient(resolveStripeEnv());
 const admin = adminClient();
@@ -11,14 +11,6 @@ type StoredSubscriptionStatus = "active" | "past_due" | "canceled" | "trialing" 
 function storedSubscriptionStatus(status: Stripe.Subscription.Status): StoredSubscriptionStatus {
   if (status === "active" || status === "past_due" || status === "canceled" || status === "trialing" || status === "incomplete") return status;
   return status === "incomplete_expired" ? "canceled" : "past_due";
-}
-
-function assertPaidSession(session: Stripe.Checkout.Session): void {
-  const expected = Number(session.metadata?.expected_amount || "NaN");
-  const currency = session.metadata?.currency;
-  if (session.payment_status !== "paid" || !Number.isSafeInteger(expected) || session.amount_total !== expected || session.currency !== currency || currency !== CURRENCY) {
-    throw new Error(`Checkout verification failed for ${session.id}`);
-  }
 }
 
 async function notify(userId: string | null | undefined, title: string, message: string, link: string): Promise<void> {
@@ -40,7 +32,7 @@ async function handleCheckout(session: Stripe.Checkout.Session): Promise<void> {
   if (type === "dealer_subscription") {
     const userId = session.metadata?.user_id;
     const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
-    if (!userId || !subscriptionId) throw new Error("Subscription metadata missing");
+    if (!userId || !subscriptionId || session.mode !== "subscription") throw new Error("Subscription metadata missing");
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     const price = subscription.items.data[0]?.price;
     const priceId = price?.lookup_key || price?.metadata?.lovable_external_id || price?.id;
@@ -63,12 +55,13 @@ async function handleCheckout(session: Stripe.Checkout.Session): Promise<void> {
     return;
   }
 
-  assertPaidSession(session);
+  assertPaidCheckout(session);
   if (type === "boost") {
     const listingId = session.metadata?.listing_id;
     const userId = session.metadata?.user_id;
     const days = Number(session.metadata?.days);
-    if (!listingId || !userId || !Number.isInteger(days)) throw new Error("Boost metadata missing");
+    const plan = boostCatalog()[days];
+    if (!listingId || !userId || !Number.isInteger(days) || !plan || Number(session.metadata?.expected_amount) !== plan.amountCents) throw new Error("Boost metadata missing");
     const promotedUntil = new Date(Date.now() + days * 86_400_000).toISOString();
     const { data, error } = await admin.from("car_listings").update({ is_promoted: true, promoted_until: promotedUntil }).eq("id", listingId).eq("seller_id", userId).eq("status", "active").select("id").maybeSingle();
     if (error || !data) throw error || new Error("Boost ownership verification failed");
@@ -80,7 +73,7 @@ async function handleCheckout(session: Stripe.Checkout.Session): Promise<void> {
     const bookingId = session.metadata?.booking_id;
     const userId = session.metadata?.user_id;
     if (!bookingId || !userId) throw new Error("Inspection metadata missing");
-    const { data: booking, error } = await admin.from("inspection_bookings").update({ status: "paid", stripe_payment_intent_id: session.payment_intent as string }).eq("id", bookingId).eq("buyer_id", userId).eq("status", "pending_payment").select("buyer_id,seller_id,listing_id").maybeSingle();
+    const { data: booking, error } = await admin.from("inspection_bookings").update({ status: "paid", stripe_payment_intent_id: session.payment_intent as string }).eq("id", bookingId).eq("buyer_id", userId).in("status", ["pending_payment", "paid"]).select("buyer_id,seller_id,listing_id").maybeSingle();
     if (error || !booking) throw error || new Error("Inspection ownership verification failed");
     await Promise.all([
       notify(booking.buyer_id, "Prüfung gebucht", "Die Zahlung ist eingegangen. Wir koordinieren den Termin.", "/inbox"),
@@ -93,7 +86,7 @@ async function handleCheckout(session: Stripe.Checkout.Session): Promise<void> {
     const reservationId = session.metadata?.reservation_id;
     const userId = session.metadata?.user_id;
     if (!reservationId || !userId) throw new Error("Reservation metadata missing");
-    const { data, error } = await admin.from("reservation_deposits").update({ status: "paid", stripe_payment_intent_id: session.payment_intent as string, paid_at: new Date().toISOString() }).eq("id", reservationId).eq("buyer_id", userId).eq("status", "pending").select("listing_id").maybeSingle();
+    const { data, error } = await admin.from("reservation_deposits").update({ status: "paid", stripe_payment_intent_id: session.payment_intent as string, paid_at: new Date().toISOString() }).eq("id", reservationId).eq("buyer_id", userId).in("status", ["pending", "paid"]).select("listing_id").maybeSingle();
     if (error || !data) throw error || new Error("Reservation ownership verification failed");
     await admin.from("reservation_events").insert({ reservation_id: reservationId, actor_id: userId, event_type: "paid", details: { session_id: session.id } });
     await notify(userId, "Fahrzeug reserviert", "Ihre Reservierungszahlung ist eingegangen.", `/car/${data.listing_id}`);
@@ -104,7 +97,7 @@ async function handleCheckout(session: Stripe.Checkout.Session): Promise<void> {
     const dealId = session.metadata?.deal_id;
     const dealerId = session.metadata?.dealer_id;
     if (!dealId || !dealerId) throw new Error("Trade payment metadata missing");
-    const { data, error } = await admin.from("arbitrage_deals").update({ dealer_paid_at: new Date().toISOString(), dealer_payment_ref: session.payment_intent as string || session.id }).eq("id", dealId).eq("buyer_dealer_id", dealerId).is("dealer_paid_at", null).select("id").maybeSingle();
+    const { data, error } = await admin.from("arbitrage_deals").update({ dealer_paid_at: new Date().toISOString(), dealer_payment_ref: session.payment_intent as string || session.id }).eq("id", dealId).eq("buyer_dealer_id", dealerId).select("id").maybeSingle();
     if (error || !data) throw error || new Error("Trade payment verification failed");
     await admin.from("arbitrage_audit_log").insert({ deal_id: dealId, actor_role: "system", action: "dealer_payment_completed", details: { session_id: session.id, payment_intent: session.payment_intent } });
     return;
@@ -117,14 +110,28 @@ async function handleCheckout(session: Stripe.Checkout.Session): Promise<void> {
     if (!auctionId || !escrowId || !buyerId) throw new Error("Auction payment metadata missing");
     const depositId = session.metadata?.deposit_id;
     const depositIntent = session.metadata?.deposit_payment_intent_id;
+    const captureAmount = Number(session.metadata?.deposit_capture_amount || "NaN");
     if (depositId && depositIntent) {
       const intent = await stripe.paymentIntents.retrieve(depositIntent);
-      if (intent.status !== "requires_capture" || intent.metadata.auction_id !== auctionId || intent.metadata.user_id !== buyerId) throw new Error("Auction deposit verification failed");
-      await stripe.paymentIntents.capture(depositIntent, {}, { idempotencyKey: `capture-${session.id}` });
-      const { error } = await admin.from("auction_deposits").update({ status: "captured", captured_at: new Date().toISOString() }).eq("id", depositId).eq("user_id", buyerId).eq("status", "authorized");
+      const capturable = intent.status === "requires_capture";
+      const alreadyCaptured = intent.status === "succeeded" && intent.amount_received === captureAmount;
+      if (
+        (!capturable && !alreadyCaptured) ||
+        intent.currency !== CURRENCY ||
+        intent.metadata.type !== "auction_deposit" ||
+        intent.metadata.auction_id !== auctionId ||
+        intent.metadata.user_id !== buyerId ||
+        !Number.isSafeInteger(captureAmount) ||
+        captureAmount <= 0 ||
+        (capturable && captureAmount > intent.amount_capturable)
+      ) throw new Error("Auction deposit verification failed");
+      if (capturable) {
+        await stripe.paymentIntents.capture(depositIntent, { amount_to_capture: captureAmount }, { idempotencyKey: `capture-${session.id}` });
+      }
+      const { error } = await admin.from("auction_deposits").update({ status: "captured", captured_at: new Date().toISOString(), captured_amount: captureAmount / 100 }).eq("id", depositId).eq("user_id", buyerId).in("status", ["authorized", "captured"]);
       if (error) throw error;
     }
-    const { data, error } = await admin.from("auction_escrow").update({ status: "full_payment_held" }).eq("id", escrowId).eq("auction_id", auctionId).eq("buyer_id", buyerId).in("status", ["pending_deposit", "deposit_held"]).select("id").maybeSingle();
+    const { data, error } = await admin.from("auction_escrow").update({ status: "full_payment_held" }).eq("id", escrowId).eq("auction_id", auctionId).eq("buyer_id", buyerId).in("status", ["pending_deposit", "deposit_held", "full_payment_held"]).select("id").maybeSingle();
     if (error || !data) throw error || new Error("Escrow verification failed");
     await admin.from("auction_audit_log").insert({ auction_id: auctionId, actor_id: buyerId, actor_role: "buyer", action: "winner_payment_completed", details: { session_id: session.id, payment_intent: session.payment_intent } });
     await notify(buyerId, "Zahlung eingegangen", "Die Auktionszahlung wird bis zur sicheren Übergabe verwahrt.", `/auction/${auctionId}`);

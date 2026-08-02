@@ -80,6 +80,7 @@ const CarDetail = () => {
   const [similarCars, setSimilarCars] = useState<any[]>([]);
   const [inspectionReport, setInspectionReport] = useState<any>(null);
 
+  // Fetch when the route changes; analytics identities are captured for this view.
   useEffect(() => {
     const fetchCar = async () => {
       const { data } = await supabase
@@ -123,6 +124,7 @@ const CarDetail = () => {
       setLoading(false);
     };
     fetchCar();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (loading) {

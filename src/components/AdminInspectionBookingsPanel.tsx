@@ -162,7 +162,7 @@ const AdminInspectionBookingsPanel = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge className={STATUS_COLORS[b.status]}>{b.status.replace("_", " ")}</Badge>
-                    <span className="text-sm font-medium">£{b.price} · {b.inspection_type === "premium_300" ? "Premium 300pt" : "Standard 200pt"}</span>
+                    <span className="text-sm font-medium">€{b.price} · {b.inspection_type === "premium_300" ? "Premium 300pt" : "Standard 200pt"}</span>
                     {b.score !== null && <Badge variant="outline">{b.score}/{b.total_points}</Badge>}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 truncate">

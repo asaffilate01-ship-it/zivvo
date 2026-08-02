@@ -188,7 +188,7 @@ const PlatformAnalytics = () => {
     URL.revokeObjectURL(url);
   };
 
-  const formatCurrency = (n: number) => `£${n.toLocaleString()}`;
+  const formatCurrency = (n: number) => `€${n.toLocaleString()}`;
 
   return (
     <>

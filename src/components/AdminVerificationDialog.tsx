@@ -69,7 +69,7 @@ const AdminVerificationDialog = ({ listing, open, onClose }: Props) => {
             {listing.finance_outstanding && (
               <div className="mt-2 text-xs">
                 <p>Lender: <strong>{listing.finance_lender || "—"}</strong></p>
-                <p>Settlement: <strong>£{Number(listing.finance_settlement_amount || 0).toLocaleString()}</strong></p>
+                <p>Settlement: <strong>€{Number(listing.finance_settlement_amount || 0).toLocaleString()}</strong></p>
               </div>
             )}
           </div>

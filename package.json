@@ -1,7 +1,7 @@
 {
   "name": "zivvo-marketplace",
   "private": true,
-  "version": "1.1.0-rc.1",
+  "version": "1.2.0-rc.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "audit:production": "npm audit --omit=dev --audit-level=critical",
+    "audit:production": "npm audit --omit=dev --audit-level=high",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },

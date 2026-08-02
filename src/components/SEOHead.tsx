@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { absoluteUrl, SITE_URL } from "@/lib/siteConfig";
 
 interface SEOHeadProps {
   title?: string;
@@ -16,26 +17,25 @@ interface SEOHeadProps {
   locale?: string;
 }
 
-const SITE_URL = "https://zivvo.co.uk";
-const DEFAULT_IMAGE = `${SITE_URL}/og-image.png`;
+const DEFAULT_IMAGE = absoluteUrl("/og-image.png");
 
 const SEOHead = ({
-  title = "Zivvo — Buy & Sell Cars with Confidence",
-  description = "Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing across UK, UAE, USA & Pakistan.",
+  title = "Zivvo — Autos sicher kaufen und verkaufen",
+  description = "Geprüfte Fahrzeuge von vertrauenswürdigen Händlern und privaten Verkäufern in Deutschland – mit transparenten Preisen und sicheren Zahlungen.",
   canonical,
   type = "website",
   image = DEFAULT_IMAGE,
-  imageAlt = "Zivvo — Used car marketplace",
+  imageAlt = "Zivvo — Marktplatz für geprüfte Gebrauchtwagen",
   jsonLd,
   noindex = false,
   publishedTime,
   modifiedTime,
   author = "Zivvo",
   keywords,
-  locale = "en_GB",
+  locale = "de_DE",
 }: SEOHeadProps) => {
   const fullTitle = title.includes("Zivvo") ? title : `${title} | Zivvo`;
-  const canonicalUrl = canonical || (typeof window !== "undefined" ? `${SITE_URL}${window.location.pathname}` : SITE_URL);
+  const canonicalUrl = canonical || (typeof window !== "undefined" ? absoluteUrl(window.location.pathname) : SITE_URL);
   const jsonLdArray = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
   return (
@@ -71,8 +71,8 @@ const SEOHead = ({
       <meta name="twitter:image:alt" content={imageAlt} />
 
       {/* Geo targeting */}
-      <meta name="geo.region" content="GB" />
-      <meta name="geo.placename" content="United Kingdom" />
+      <meta name="geo.region" content="DE" />
+      <meta name="geo.placename" content="Deutschland" />
 
       {/* JSON-LD */}
       {jsonLdArray.map((ld, i) => (

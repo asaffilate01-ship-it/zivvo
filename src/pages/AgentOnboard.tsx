@@ -154,9 +154,9 @@ const AgentOnboard = () => {
                 <Select value={form.tier} onValueChange={(v) => update("tier", v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="starter">Starter (£49/mo)</SelectItem>
-                    <SelectItem value="professional">Professional (£99/mo)</SelectItem>
-                    <SelectItem value="enterprise">Enterprise (£199/mo)</SelectItem>
+                    <SelectItem value="starter">Starter (€49/mo)</SelectItem>
+                    <SelectItem value="professional">Professional (€99/mo)</SelectItem>
+                    <SelectItem value="enterprise">Enterprise (€199/mo)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

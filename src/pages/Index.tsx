@@ -36,6 +36,8 @@ import { useCountry } from "@/contexts/CountryContext";
 import { formatPrice } from "@/lib/countryConfig";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { subscribeNewsletter } from "@/lib/publicSubmissions";
+import { SITE_URL } from "@/lib/siteConfig";
 import trustImage from "@/assets/trust-verify.jpg";
 import blogChecklist from "@/assets/blog-buying-checklist.jpg";
 import blogEvHybrid from "@/assets/blog-ev-hybrid.jpg";
@@ -111,16 +113,19 @@ const Index = () => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setSubscribing(true);
-    const { error } = await supabase.from("newsletter_subscribers").insert({ email: newsletterEmail.trim() });
-    if (error?.code === "23505") {
-      toast({ title: "Already subscribed", description: "This email is already on our list." });
-    } else if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Subscribed!", description: "You'll receive the latest listings and deals." });
+    try {
+      const result = await subscribeNewsletter(newsletterEmail);
+      if (result?.alreadySubscribed) {
+        toast({ title: "Already subscribed", description: "This email is already on our list." });
+      } else {
+        toast({ title: "Subscribed!", description: "You'll receive the latest listings and deals." });
+      }
       setNewsletterEmail("");
+    } catch (error) {
+      toast({ title: "Error", description: error instanceof Error ? error.message : "Please try again.", variant: "destructive" });
+    } finally {
+      setSubscribing(false);
     }
-    setSubscribing(false);
   };
 
   return (
@@ -128,7 +133,7 @@ const Index = () => {
       <SEOHead
         title="Zivvo — Buy & Sell Cars with Confidence"
         description="Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing."
-        canonical="https://zivvo.co.uk"
+        canonical={SITE_URL}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebApplication",

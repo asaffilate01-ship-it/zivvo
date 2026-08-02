@@ -1,105 +1,119 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { AUCTION_DEPOSIT_CENTS, CURRENCY } from "../_shared/payments.ts";
+import {
+  HttpError,
+  json,
+  parseJson,
+  preflight,
+  requireIdempotencyKey,
+  requirePost,
+  requireUser,
+  requireUuid,
+  safeError,
+} from "../_shared/security.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-  );
-
-  const supabaseAdmin = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-  );
-
+Deno.serve(async (req) => {
   try {
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
-    if (!user?.email) throw new Error("Authentication required");
+    const options = preflight(req);
+    if (options) return options;
+    requirePost(req);
+    const idempotencyKey = requireIdempotencyKey(req);
+    const { user, admin } = await requireUser(req);
+    if (!user.email) throw new HttpError(400, "A verified email address is required");
 
-    const { auction_id, amount } = await req.json();
-    if (!auction_id || !amount) throw new Error("auction_id and amount required");
+    const body = await parseJson(req);
+    const auctionId = requireUuid(body.auction_id, "auction_id");
+    const { data: auction, error: auctionError } = await admin
+      .from("auctions")
+      .select("id,seller_id,status,ends_at")
+      .eq("id", auctionId)
+      .maybeSingle();
+    if (auctionError) throw auctionError;
+    if (!auction || auction.status !== "live" || (auction.ends_at && new Date(auction.ends_at) <= new Date())) {
+      throw new HttpError(409, "Auction is not open for bidding");
+    }
+    if (auction.seller_id === user.id) throw new HttpError(403, "Sellers cannot bid on their own auction");
 
     const stripe = createStripeClient(resolveStripeEnv());
-
-    // Check if user already has an authorized deposit for this auction
-    const { data: existingDeposit } = await supabaseAdmin
+    const { data: existing, error: existingError } = await admin
       .from("auction_deposits")
-      .select("*")
-      .eq("auction_id", auction_id)
+      .select("id,status,stripe_payment_intent_id,amount,currency")
+      .eq("auction_id", auctionId)
       .eq("user_id", user.id)
-      .eq("status", "authorized")
+      .in("status", ["pending", "authorized"])
+      .order("created_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
+    if (existingError) throw existingError;
 
-    if (existingDeposit) {
-      return new Response(JSON.stringify({ already_authorized: true, deposit_id: existingDeposit.id }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (existing?.stripe_payment_intent_id) {
+      const intent = await stripe.paymentIntents.retrieve(existing.stripe_payment_intent_id);
+      const reusable = ["requires_payment_method", "requires_confirmation", "requires_action"].includes(intent.status);
+      const valid = intent.amount === AUCTION_DEPOSIT_CENTS && intent.currency === CURRENCY &&
+        intent.metadata.auction_id === auctionId && intent.metadata.user_id === user.id;
+      if (existing.status === "authorized" && valid && intent.status === "requires_capture") {
+        return json(req, { already_authorized: true, deposit_id: existing.id });
+      }
+      if (reusable && valid && intent.client_secret) {
+        return json(req, {
+          client_secret: intent.client_secret,
+          deposit_id: existing.id,
+          payment_intent_id: intent.id,
+        });
+      }
+      await admin.from("auction_deposits").update({ status: "failed" }).eq("id", existing.id).in("status", ["pending", "authorized"]);
     }
 
-    // Check/create Stripe customer
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId: string;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-    } else {
-      const customer = await stripe.customers.create({ email: user.email });
+    const customers = await stripe.customers.list({ email: user.email, limit: 10 });
+    let customerId = customers.data.find((customer) => customer.metadata.userId === user.id)?.id;
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: { userId: user.id },
+      }, { idempotencyKey: `auction-customer:${user.id}` });
       customerId = customer.id;
     }
 
-    // Create a PaymentIntent with capture_method: manual (pre-authorization)
-    const depositAmount = Math.round(amount * 100); // Convert to pence/cents
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: depositAmount,
-      currency: "gbp",
+      amount: AUCTION_DEPOSIT_CENTS,
+      currency: CURRENCY,
       customer: customerId,
-      capture_method: "manual", // Pre-auth only, don't capture yet
+      capture_method: "manual",
+      automatic_payment_methods: { enabled: true },
       metadata: {
-        auction_id,
+        auction_id: auctionId,
         user_id: user.id,
         type: "auction_deposit",
+        expected_amount: String(AUCTION_DEPOSIT_CENTS),
+        currency: CURRENCY,
       },
-    });
+    }, { idempotencyKey: `auction-deposit:${user.id}:${auctionId}:${idempotencyKey}` });
 
-    // Create deposit record
-    const { data: deposit, error: depositError } = await supabaseAdmin
+    const { data: deposit, error: depositError } = await admin
       .from("auction_deposits")
       .insert({
-        auction_id,
+        auction_id: auctionId,
         user_id: user.id,
-        amount,
+        amount: AUCTION_DEPOSIT_CENTS / 100,
+        currency: CURRENCY.toUpperCase(),
         type: "card_preauth",
         status: "pending",
         stripe_payment_intent_id: paymentIntent.id,
       })
-      .select()
+      .select("id")
       .single();
+    if (depositError) {
+      await stripe.paymentIntents.cancel(paymentIntent.id, {}, { idempotencyKey: `cancel-duplicate:${paymentIntent.id}` });
+      if (depositError.code === "23505") throw new HttpError(409, "A deposit is already in progress");
+      throw depositError;
+    }
 
-    if (depositError) throw depositError;
-
-    return new Response(JSON.stringify({
+    return json(req, {
       client_secret: paymentIntent.client_secret,
       deposit_id: deposit.id,
       payment_intent_id: paymentIntent.id,
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return new Response(JSON.stringify({ error: msg }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return safeError(req, error);
   }
 });

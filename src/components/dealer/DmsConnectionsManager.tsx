@@ -59,6 +59,8 @@ const DmsConnectionsManager = ({ dealerId }: Props) => {
     setLoading(false);
   };
 
+  // Reload when the dashboard changes dealer context.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [dealerId]);
 
   const saveVy = async () => {

@@ -90,6 +90,8 @@ const AdminInspectorPayoutsPanel = () => {
     setLoading(false);
   };
 
+  // Load once when this admin panel mounts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
 
   const filtered = useMemo(
@@ -130,7 +132,7 @@ const AdminInspectorPayoutsPanel = () => {
     load();
   };
 
-  const fmt = (n: number) => `£${Number(n || 0).toFixed(2)}`;
+  const fmt = (n: number) => `€${Number(n || 0).toFixed(2)}`;
 
   return (
     <div className="space-y-4">

@@ -25,9 +25,9 @@ supabase secrets set \
   SUPABASE_URL=https://PROJECT.supabase.co \
   SUPABASE_ANON_KEY=REDACTED \
   SUPABASE_SERVICE_ROLE_KEY=REDACTED \
-  STRIPE_SECRET_KEY=sk_live_REDACTED \
-  STRIPE_WEBHOOK_SECRET=whsec_REDACTED \
-  STRIPE_PRICE_DEALER=price_REDACTED \
+  STRIPE_LIVE_API_KEY=REDACTED_CONNECTOR_KEY \
+  LOVABLE_API_KEY=REDACTED \
+  PAYMENTS_LIVE_WEBHOOK_SECRET=whsec_REDACTED \
   CRON_SECRET=REDACTED \
   DMS_CREDENTIAL_ENCRYPTION_KEY=REDACTED \
   GOOGLE_MAPS_API_KEY=REDACTED \
@@ -44,20 +44,20 @@ In Supabase Auth, require verified email, a minimum 12-character password, leake
 
 1. Take a verified backup and confirm point-in-time recovery.
 2. Restore a recent production-like snapshot into staging.
-3. Review and apply `supabase/migrations/20260801170000_production_security_hardening.sql`, followed by `supabase/migrations/20260802120000_production_assurance_v2.sql`, in staging.
+3. Review and apply `supabase/migrations/20260801170000_production_security_hardening.sql`, `supabase/migrations/20260802120000_production_assurance_v2.sql`, then `supabase/migrations/20260802160000_go_live_p0_v3.sql` in staging.
 4. Confirm there are no duplicate active reservations or conflicting idempotency rows before unique indexes are created.
 5. Test every role against the new views, grants, RLS policies, and security-definer functions.
 6. Inspect query plans and locks for bidding, auction close, stock ingestion, and analytics.
 7. Apply the migration during an approved window, monitor locks/errors, and retain the backup until acceptance completes.
 
-Never run a migration against production first. The migration narrows grants and changes workflows; rolling back application code without rolling back the database may not restore compatibility.
+Never run a migration against production first. The v3 migration intentionally expires pre-existing pending/authorized auction deposits because their original currency contract cannot be proven; staging acceptance must confirm bidders are prompted to re-authorize €500. The migrations narrow grants and change workflows, so rolling back application code without rolling back the database may not restore compatibility.
 
 ## 4. Edge Functions and scheduled work
 
 Deploy the tracked functions only:
 
 ```bash
-for function in ad-campaigns ai-chat arbitrage-payment boost-checkout check-subscription close-auction confirm-deposit contact-submit create-checkout customer-portal delete-account deposit-checkout expire-reservations generate-description generate-inspection-pdf geocode health-check inspection-checkout invite-dealer newsletter-subscribe nhtsa-vin-decode price-check reservation-action reserve-deposit reverse-geocode sitemap stock-ingest stripe-webhook winner-payment; do
+for function in ad-campaigns ai-chat arbitrage-payment boost-checkout check-subscription close-auction confirm-deposit contact-submit create-checkout customer-portal delete-account deposit-checkout expire-reservations generate-description generate-inspection-pdf geocode health-check inspection-checkout invite-dealer newsletter-subscribe nhtsa-vin-decode notify-arbitrage price-check reservation-action reserve-deposit reverse-geocode send-notification-email sitemap stock-ingest stripe-webhook syndicate-listing virtualyard-sync winner-payment; do
   supabase functions deploy "$function"
 done
 ```
@@ -70,7 +70,7 @@ If the Supabase project changes, update `VITE_SUPABASE_PROJECT_ID` and the sitem
 
 ## 5. Stripe
 
-- Create one live recurring dealer price in EUR and set `STRIPE_PRICE_DEALER` to its ID.
+- Create one live recurring EUR dealer price with the Stripe lookup key `price_de_dealer_pro`. The application resolves the current live Price ID from that lookup key; do not expose a secret or hard-code a generated Price ID in the browser.
 - Register the production webhook URL for `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `payment_intent.payment_failed`, `invoice.paid`, `invoice.payment_failed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `customer.subscription.trial_will_end`, `charge.dispute.created`, `charge.dispute.updated`, `charge.dispute.closed`, `charge.dispute.funds_withdrawn`, `charge.dispute.funds_reinstated`, `refund.created`, `refund.updated`, `refund.failed`, and `charge.refund.updated`.
 - Verify Stripe signatures, replay handling, expected amount/currency checks, and duplicate delivery behavior in staging.
 - Exercise subscription checkout/portal, listing boosts, reservations, inspection checkout, auction deposits, winner payment, and arbitrage payment.

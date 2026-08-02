@@ -36,7 +36,7 @@ serve(async (req) => {
         notification = {
           type: "auction",
           title: "You've been outbid! 🔔",
-          message: `Someone placed a higher bid of £${data.new_bid} on ${data.car_title}. Your bid was £${data.your_bid}.`,
+          message: `Someone placed a higher bid of €${data.new_bid} on ${data.car_title}. Your bid was €${data.your_bid}.`,
           link: `/auction/${data.auction_id}`,
         };
         break;
@@ -45,7 +45,7 @@ serve(async (req) => {
         notification = {
           type: "auction",
           title: "Congratulations — You won! 🎉",
-          message: `You won the auction for ${data.car_title} with a bid of £${data.winning_bid}. Complete payment within 72 hours.`,
+          message: `You won the auction for ${data.car_title} with a bid of €${data.winning_bid}. Complete payment within 72 hours.`,
           link: `/auction/${data.auction_id}`,
         };
         break;
@@ -63,7 +63,7 @@ serve(async (req) => {
         notification = {
           type: "arbitrage",
           title: "New Offer for Your Vehicle 📋",
-          message: `You've received an offer of £${data.offer_amount} for your ${data.car_title}. Review and respond.`,
+          message: `You've received an offer of €${data.offer_amount} for your ${data.car_title}. Review and respond.`,
           link: "/trade-stock",
         };
         break;
@@ -72,7 +72,7 @@ serve(async (req) => {
         notification = {
           type: "arbitrage",
           title: "Deal Completed ✅",
-          message: `Your trade stock deal for ${data.car_title} has been completed. Payment of £${data.amount} has been processed.`,
+          message: `Your trade stock deal for ${data.car_title} has been completed. Payment of €${data.amount} has been processed.`,
           link: "/trade-stock",
         };
         break;

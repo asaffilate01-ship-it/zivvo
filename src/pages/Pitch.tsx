@@ -103,7 +103,7 @@ const slides: { title: string; node: ReactNode }[] = [
             </p>
           </div>
           <div className="flex justify-between items-end">
-            <div className="text-white/50 text-sm">zivvo.co.uk · zivvo.com · zivvo.pk · zivvo.ae</div>
+            <div className="text-white/50 text-sm">zivvo.de · zivvo.com · zivvo.pk · zivvo.ae</div>
             <div className="text-white/50 text-sm">2026 Investor Brief</div>
           </div>
         </div>
@@ -124,14 +124,14 @@ const slides: { title: string; node: ReactNode }[] = [
               <span className="block text-[hsl(295_85%_70%)]">broken.</span>
             </h2>
             <p className="text-xl text-white/70 mt-8 leading-relaxed">
-              Buyers don't trust private sellers. Dealers pay £000s/month to legacy portals.
+              Buyers don't trust private sellers. Dealers pay €000s/month to legacy portals.
               Cross-border trade is a paperwork nightmare. Auctions are gated to insiders.
             </p>
           </div>
           <div className="flex flex-col justify-center gap-6">
             {[
               { n: "73%", t: "of buyers worry about hidden vehicle history" },
-              { n: "£2,400", t: "avg. monthly fee dealers pay to AutoTrader" },
+              { n: "€2,400", t: "avg. monthly fee dealers pay to AutoTrader" },
               { n: "11 days", t: "average time to sell privately" },
               { n: "0", t: "platforms unifying UK + USA + South Asia + Gulf" },
             ].map((p) => (
@@ -219,7 +219,7 @@ const slides: { title: string; node: ReactNode }[] = [
                 ["Compare tool", "Side-by-side spec sheet, share via web link"],
                 ["Saved searches", "Email alerts when matching cars are listed"],
                 ["Map view", "Browse by location with live pins"],
-                ["Featured boosting", "£X one-off promotion at top of search"],
+                ["Featured boosting", "€X one-off promotion at top of search"],
               ].map(([t, d]) => (
                 <li key={t} className="flex gap-4">
                   <div className="w-2 h-2 rounded-full bg-[hsl(295_85%_70%)] mt-3 shrink-0" />
@@ -251,7 +251,7 @@ const slides: { title: string; node: ReactNode }[] = [
             <div className="grid grid-cols-2 gap-3 mt-8">
               {[
                 ["Phone reveal", Phone], ["Send message", MessageSquare],
-                ["Make offer", Handshake], ["Book inspection · £249", Shield],
+                ["Make offer", Handshake], ["Book inspection · €249", Shield],
                 ["Test drive", Car], ["Delivery quote", Truck],
                 ["Finance quote", CreditCard], ["Part exchange", TrendingUp],
               ].map(([t, I]: any) => (
@@ -351,14 +351,14 @@ const slides: { title: string; node: ReactNode }[] = [
             </span>
           </h2>
           <p className="text-xl text-white/70 mt-6 max-w-3xl">
-            Buyers book a 200-point professional inspection on any listing for £249. We dispatch a
-            trained inspector, generate a PDF report, and pay the inspector £120 — fully tracked.
+            Buyers book a 200-point professional inspection on any listing for €249. We dispatch a
+            trained inspector, generate a PDF report, and pay the inspector €120 — fully tracked.
           </p>
           <div className="grid grid-cols-4 gap-6 mt-12 flex-1">
             {[
-              { n: "£249", l: "Buyer pays" },
-              { n: "£120", l: "Inspector earns" },
-              { n: "£129", l: "Zivvo margin / job" },
+              { n: "€249", l: "Buyer pays" },
+              { n: "€120", l: "Inspector earns" },
+              { n: "€129", l: "Zivvo margin / job" },
               { n: "200", l: "Checkpoints" },
             ].map(s => (
               <div key={s.l} className="rounded-3xl p-8 bg-gradient-to-br from-[hsl(265_75%_58%/0.18)] to-transparent border border-[hsl(265_75%_58%/0.3)] flex flex-col justify-end">
@@ -396,8 +396,8 @@ const slides: { title: string; node: ReactNode }[] = [
               List a car in <span className="text-[hsl(295_85%_70%)]">5 minutes</span>.
             </h2>
             <p className="text-xl text-white/70 mt-6">
-              4-step wizard. VRM auto-fill via DVLA. AI-written descriptions. 20 photos + MP4 walkaround.
-              £20 one-off for private sellers — listing stays live until sold.
+              4-step wizard with AI-assisted descriptions, up to 10 photos and review before publication.
+              Private sellers can publish two vehicles per calendar month for free.
             </p>
             <div className="mt-8 space-y-3">
               {[
@@ -465,9 +465,9 @@ const slides: { title: string; node: ReactNode }[] = [
             </p>
             <div className="mt-8 space-y-3">
               {[
-                ["£49/mo", "Small · 5 listings"],
-                ["£99/mo", "Medium · 15 listings · custom landing page"],
-                ["£199/mo", "Large · unlimited · DMS sync · staff seats"],
+                ["€49.99/mo", "Up to 30 active listings"],
+                ["60 days", "Free launch trial"],
+                ["Included", "Landing page · analytics · DMS tools"],
               ].map(([p, d]) => (
                 <div key={p} className="flex items-center gap-6 p-4 rounded-xl bg-white/[0.05] border border-white/10">
                   <div className="text-3xl font-black text-[hsl(295_85%_70%)] w-32">{p}</div>
@@ -531,7 +531,7 @@ const slides: { title: string; node: ReactNode }[] = [
         </p>
         <div className="grid grid-cols-4 gap-6 mt-12">
           {[
-            { flag: "🇬🇧", name: "United Kingdom", cur: "GBP £", api: "DVLA · MOT History · HPI", market: "£100B used market" },
+            { flag: "🇬🇧", name: "United Kingdom", cur: "GBP", api: "DVLA · MOT History · HPI", market: "£100B used market" },
             { flag: "🇺🇸", name: "United States", cur: "USD $", api: "NHTSA VIN Decode · Carfax-ready", market: "$840B used market" },
             { flag: "🇵🇰", name: "Pakistan", cur: "PKR ₨", api: "Excise & Tax verification", market: "Fastest-growing S. Asia" },
             { flag: "🇦🇪", name: "United Arab Emirates", cur: "AED د.إ", api: "RTA integration ready", market: "Premium GCC hub" },
@@ -730,7 +730,7 @@ const slides: { title: string; node: ReactNode }[] = [
                 ["Multi-language + RTL", "—", "—", "—", "—", "✓"],
                 ["Custom dealer landing pages", "Partial", "—", "—", "—", "✓"],
                 ["Auction fee", "—", "—", "—", "9%", "3% buyer / 1.5% seller"],
-                ["Private seller cost", "£40+", "—", "—", "—", "£20 one-off"],
+                ["Private seller cost", "€40+", "—", "—", "—", "2 free / month"],
               ].map((r, i) => (
                 <tr key={i} className={i % 2 ? "bg-white/[0.02]" : ""}>
                   {r.map((c, j) => (
@@ -758,15 +758,15 @@ const slides: { title: string; node: ReactNode }[] = [
         </h2>
         <div className="grid grid-cols-3 gap-5 mt-12">
           {[
-            ["Dealer subscriptions", "£49–£199/mo", "Recurring · highest margin"],
-            ["Private listings", "£20 one-off", "Per-listing transactional"],
+            ["Dealer subscriptions", "€49.99/mo", "Recurring · launch plan"],
+            ["Private listings", "Free at launch", "Two per calendar month"],
             ["Auction fees", "3% + 1.5%", "Buyer premium + seller fee"],
             ["Trade Stock markup", "5–8% per car", "B2B arbitrage spread"],
-            ["Inspection bookings", "£129 / job", "After £120 inspector payout"],
-            ["Featured boosts", "£10–£50", "Top-of-search promotion"],
+            ["Inspection bookings", "€129 / job", "After €120 inspector payout"],
+            ["Featured boosts", "€10–€50", "Top-of-search promotion"],
             ["Finance referrals", "1–2% of loan", "Pre-approval pipeline"],
             ["Delivery commission", "5–10%", "Transport quote markup"],
-            ["Portal syndication", "£20–£100/mo", "Sync to AutoTrader, eBay etc."],
+            ["Portal syndication", "€20–€100/mo", "Sync to AutoTrader, eBay etc."],
           ].map(([t, p, d]) => (
             <div key={t} className="p-6 rounded-2xl bg-gradient-to-br from-[hsl(265_75%_58%/0.18)] to-transparent border border-[hsl(265_75%_58%/0.3)]">
               <div className="text-xl font-bold">{t}</div>
@@ -911,7 +911,7 @@ const slides: { title: string; node: ReactNode }[] = [
         </div>
         <div className="mt-12 p-8 rounded-3xl bg-white/[0.04] border border-white/10">
           <div className="text-2xl font-bold">If we capture just <span className="text-[hsl(295_85%_70%)]">0.05%</span> of annual transactions across the 4 regions:</div>
-          <div className="text-5xl font-black mt-4">41,000 transactions × £180 avg revenue = <span className="bg-gradient-to-r from-[hsl(295_85%_70%)] to-[hsl(265_85%_70%)] bg-clip-text text-transparent">£7.4M ARR</span></div>
+          <div className="text-5xl font-black mt-4">41,000 transactions × €180 avg revenue = <span className="bg-gradient-to-r from-[hsl(295_85%_70%)] to-[hsl(265_85%_70%)] bg-clip-text text-transparent">€7.4M ARR</span></div>
         </div>
       </SlideShell>
     ),
@@ -938,10 +938,10 @@ const slides: { title: string; node: ReactNode }[] = [
             </p>
             <div className="flex gap-6 mt-12">
               <div className="px-8 py-5 rounded-2xl bg-gradient-to-r from-[hsl(265_75%_58%)] to-[hsl(295_75%_60%)] text-xl font-bold flex items-center gap-3">
-                hello@zivvo.co.uk <ArrowRight className="w-6 h-6" />
+                hello@zivvo.de <ArrowRight className="w-6 h-6" />
               </div>
               <div className="px-8 py-5 rounded-2xl border border-white/20 text-xl font-bold backdrop-blur-sm">
-                zivvo.co.uk
+                zivvo.de
               </div>
             </div>
           </div>
@@ -1031,7 +1031,7 @@ export default function Pitch() {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await document.documentElement.requestFullscreen();
-    } catch {}
+    } catch { /* Fullscreen may be blocked by browser policy. */ }
   };
 
   return (

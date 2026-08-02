@@ -1,85 +1,90 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createStripeClient, resolveStripeEnv } from "../_shared/stripe.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { CURRENCY, subscriptionCatalog } from "../_shared/payments.ts";
+import {
+  appUrl,
+  HttpError,
+  json,
+  optionalString,
+  parseJson,
+  preflight,
+  requireIdempotencyKey,
+  requirePost,
+  requireUser,
+  safeError,
+} from "../_shared/security.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
-};
-
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-  );
-
+Deno.serve(async (req) => {
   try {
-    logStep("Function started");
+    const options = preflight(req);
+    if (options) return options;
+    requirePost(req);
+    const idempotencyKey = requireIdempotencyKey(req);
+    const { user, admin } = await requireUser(req);
+    if (!user.email) throw new HttpError(400, "A verified email address is required");
 
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    const body = await parseJson(req);
+    const priceLookupKey = typeof body.priceId === "string" ? body.priceId : "";
+    const plan = subscriptionCatalog()[priceLookupKey];
+    if (!plan) throw new HttpError(400, "Unknown dealer plan");
+    const businessName = optionalString(body.businessName, 120);
+    if (!businessName) throw new HttpError(400, "Business name is required");
 
-    const { priceId, businessName, successUrl, cancelUrl } = await req.json();
-    if (typeof priceId !== "string" || !/^[a-zA-Z0-9_-]+$/.test(priceId)) {
-      throw new Error("Invalid priceId");
+    const { data: existingDealer, error: dealerError } = await admin
+      .from("dealers")
+      .select("id,stripe_customer_id,subscription_status")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (dealerError) throw dealerError;
+    if (existingDealer && ["active", "trialing"].includes(existingDealer.subscription_status || "")) {
+      throw new HttpError(409, "Dealer subscription is already active");
     }
 
     const stripe = createStripeClient(resolveStripeEnv());
-
-    // Resolve the human-readable price id (lookup key) to the Stripe price.
-    const prices = await stripe.prices.list({ lookup_keys: [priceId] });
-    const stripePrice = prices.data[0];
-    if (!stripePrice) throw new Error(`Price not found: ${priceId}`);
-    const isRecurring = stripePrice.type === "recurring";
-
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId = customers.data[0]?.id;
-    if (!customerId) {
-      const created = await stripe.customers.create({
-        email: user.email,
-        metadata: { userId: user.id },
-      });
-      customerId = created.id;
+    const prices = await stripe.prices.list({ lookup_keys: [priceLookupKey], active: true, limit: 2 });
+    const stripePrice = prices.data.find((price) => price.lookup_key === priceLookupKey);
+    if (
+      !stripePrice ||
+      stripePrice.type !== "recurring" ||
+      stripePrice.currency !== CURRENCY ||
+      stripePrice.unit_amount !== plan.amountCents ||
+      stripePrice.recurring?.interval !== plan.interval ||
+      stripePrice.recurring?.interval_count !== 1
+    ) {
+      throw new HttpError(503, "Dealer plan is not configured correctly");
     }
 
+    let customerId = existingDealer?.stripe_customer_id || null;
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 10 });
+      customerId = customers.data.find((customer) => customer.metadata.userId === user.id)?.id || null;
+    }
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: user.email,
+        metadata: { userId: user.id },
+      }, { idempotencyKey: `dealer-customer:${user.id}` });
+      customerId = customer.id;
+    }
+
+    const metadata = {
+      type: "dealer_subscription",
+      user_id: user.id,
+      price_lookup_key: priceLookupKey,
+      business_name: businessName,
+      currency: CURRENCY,
+    };
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [{ price: stripePrice.id, quantity: 1 }],
-      mode: isRecurring ? "subscription" : "payment",
-      success_url: successUrl || `${req.headers.get("origin")}/dashboard?checkout=success`,
-      cancel_url: cancelUrl || `${req.headers.get("origin")}/dealers?checkout=canceled`,
-      metadata: { user_id: user.id, price_lookup_key: priceId, business_name: businessName || "My Dealership" },
-      ...(isRecurring && {
-        subscription_data: { metadata: { user_id: user.id, price_lookup_key: priceId } },
-      }),
-    });
+      mode: "subscription",
+      success_url: appUrl("/dashboard?checkout=success"),
+      cancel_url: appUrl("/dealers?checkout=cancelled"),
+      metadata,
+      subscription_data: { metadata, trial_period_days: plan.trialDays },
+    }, { idempotencyKey: `dealer-subscription:${user.id}:${priceLookupKey}:${idempotencyKey}` });
 
-
-    logStep("Checkout session created", { sessionId: session.id });
-
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
+    return json(req, { url: session.url });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return safeError(req, error);
   }
 });

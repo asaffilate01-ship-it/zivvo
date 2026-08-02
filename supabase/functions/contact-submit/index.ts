@@ -51,7 +51,8 @@ Deno.serve(async (req) => {
       });
       if (eventError) console.error("Dealer lead event failed", eventError);
     } else {
-      const { error } = await admin.from("contact_messages").insert({ name, email, subject, message, status: "new" });
+      const storedMessage = phone ? `${message}\nTelefon: ${phone}` : message;
+      const { error } = await admin.from("contact_messages").insert({ name, email, subject, message: storedMessage, status: "new" });
       if (error) throw error;
     }
     if (dealer) {

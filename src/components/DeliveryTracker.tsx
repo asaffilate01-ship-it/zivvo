@@ -139,7 +139,7 @@ const DeliveryTracker = ({ referenceType, referenceId, buyerId, sellerId, pickup
                     <Input type="date" value={form.scheduled_date} onChange={(e) => setForm({ ...form, scheduled_date: e.target.value })} />
                   </div>
                   <div>
-                    <Label>Delivery Cost (£)</Label>
+                    <Label>Delivery Cost (€)</Label>
                     <Input type="number" value={form.delivery_cost} onChange={(e) => setForm({ ...form, delivery_cost: e.target.value })} placeholder="0" />
                   </div>
                 </div>
@@ -248,7 +248,7 @@ const DeliveryTracker = ({ referenceType, referenceId, buyerId, sellerId, pickup
           {delivery.delivery_cost > 0 && (
             <div>
               <p className="text-muted-foreground text-xs">Cost</p>
-              <p className="text-card-foreground font-medium">£{delivery.delivery_cost}</p>
+              <p className="text-card-foreground font-medium">€{delivery.delivery_cost}</p>
             </div>
           )}
         </div>

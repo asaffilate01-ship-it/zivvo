@@ -45,7 +45,7 @@ const CarValuation = () => {
         depreciatedValue *= (1 - rate);
       }
 
-      // Mileage adjustment: -£0.05 per mile over avg, +£0.03 per mile under
+      // Mileage adjustment: -€0.05 per mile over avg, +€0.03 per mile under
       const avgMiles = age * 10000;
       const mileDiff = miles - avgMiles;
       const mileAdj = mileDiff > 0 ? -mileDiff * 0.05 : -mileDiff * 0.03;

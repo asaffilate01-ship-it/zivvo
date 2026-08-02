@@ -40,12 +40,12 @@ serve(async (req) => {
           user_id: deal.seller_id,
           type: "arbitrage",
           title: "New Trade Offer on Your Car 💰",
-          message: `We'd like to purchase your ${carTitle} for £${deal.seller_price.toLocaleString()}. Review and respond in Trade Stock.`,
+          message: `We'd like to purchase your ${carTitle} for €${deal.seller_price.toLocaleString()}. Review and respond in Trade Stock.`,
           link: "/trade-stock",
         });
         break;
 
-      case "seller_accepted":
+      case "seller_accepted": {
         // Notify admins
         const { data: admins } = await supabaseAdmin
           .from("user_roles")
@@ -56,13 +56,14 @@ serve(async (req) => {
             user_id: a.user_id,
             type: "arbitrage",
             title: "Seller Accepted Trade Offer ✅",
-            message: `Seller accepted the offer for ${carTitle} at £${deal.seller_price.toLocaleString()}. Ready to list to dealers.`,
+            message: `Seller accepted the offer for ${carTitle} at €${deal.seller_price.toLocaleString()}. Ready to list to dealers.`,
             link: "/trade-stock",
           });
         });
         break;
+      }
 
-      case "seller_rejected":
+      case "seller_rejected": {
         // Notify admins
         const { data: admins2 } = await supabaseAdmin
           .from("user_roles")
@@ -78,8 +79,9 @@ serve(async (req) => {
           });
         });
         break;
+      }
 
-      case "listed_to_dealers":
+      case "listed_to_dealers": {
         // Notify all active dealers
         const { data: dealers } = await supabaseAdmin
           .from("dealers")
@@ -90,11 +92,12 @@ serve(async (req) => {
             user_id: d.user_id,
             type: "arbitrage",
             title: "New Trade Stock Available 🚗",
-            message: `${carTitle} is now available at trade price £${deal.dealer_price.toLocaleString()}. First come, first served.`,
+            message: `${carTitle} is now available at trade price €${deal.dealer_price.toLocaleString()}. First come, first served.`,
             link: "/trade-stock",
           });
         });
         break;
+      }
 
       case "dealer_accepted":
         // Notify seller that a dealer was found
@@ -102,7 +105,7 @@ serve(async (req) => {
           user_id: deal.seller_id,
           type: "arbitrage",
           title: "Buyer Found for Your Car! 🎉",
-          message: `A dealer has purchased your ${carTitle}. Your payment of £${deal.seller_price.toLocaleString()} will be processed shortly.`,
+          message: `A dealer has purchased your ${carTitle}. Your payment of €${deal.seller_price.toLocaleString()} will be processed shortly.`,
           link: "/trade-stock",
         });
         break;
@@ -113,7 +116,7 @@ serve(async (req) => {
           user_id: deal.seller_id,
           type: "arbitrage",
           title: "Payment Sent! 💸",
-          message: `£${deal.seller_price.toLocaleString()} has been sent for your ${carTitle}. Ref: ${deal.seller_payment_ref || "Processing"}`,
+          message: `€${deal.seller_price.toLocaleString()} has been sent for your ${carTitle}. Ref: ${deal.seller_payment_ref || "Processing"}`,
           link: "/trade-stock",
         });
         break;

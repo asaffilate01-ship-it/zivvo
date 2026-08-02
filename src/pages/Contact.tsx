@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { submitContact } from "@/lib/publicSubmissions";
 import { useTranslation } from "react-i18next";
 
 const Contact = () => {
@@ -20,19 +20,14 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.from("contact_messages" as any).insert({
-      name: form.name,
-      email: form.email,
-      subject: form.subject,
-      message: form.message,
-    });
-    setLoading(false);
-
-    if (error) {
-      toast({ title: t("toastFailTitle"), description: error.message, variant: "destructive" });
-    } else {
+    try {
+      await submitContact(form);
       toast({ title: t("toastSuccessTitle"), description: t("toastSuccessDesc") });
       setForm({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      toast({ title: t("toastFailTitle"), description: error instanceof Error ? error.message : t("toastFailTitle"), variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 
