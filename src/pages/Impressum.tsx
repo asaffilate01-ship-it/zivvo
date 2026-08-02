@@ -67,7 +67,7 @@ const Impressum = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s8Title")}</h2>
             <p className="mt-2">
               {t("s8Body")}{" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+              <a href="https://consumer-redress.ec.europa.eu/dispute-resolution-bodies" target="_blank" rel="noopener noreferrer" className="text-primary underline">
                 {t("s8LinkText")}
               </a>
             </p>

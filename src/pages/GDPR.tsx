@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { useTranslation } from "react-i18next";
+import { publicContactConfig } from "@/lib/legalConfig";
 
 const GDPR = () => {
   const { t } = useTranslation("gdpr");
@@ -50,14 +51,10 @@ const GDPR = () => {
           <section>
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s4Title")}</h2>
             <p className="mt-2">
-              {t("s4Body").split("privacy@zivvo.de").map((part, i, arr) => (
-                <span key={i}>
-                  {part}
-                  {i < arr.length - 1 && (
-                    <a href="mailto:privacy@zivvo.de" className="text-primary underline">privacy@zivvo.de</a>
-                  )}
-                </span>
-              ))}
+              {t("s4Body")} {" "}
+              <a href={`mailto:${publicContactConfig.privacyEmail}`} className="text-primary underline">
+                {publicContactConfig.privacyEmail}
+              </a>.
             </p>
           </section>
 
@@ -93,7 +90,9 @@ const GDPR = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s10Title")}</h2>
             <p className="mt-2">
               {t("s10Body")}{" "}
-              <a href="mailto:dpo@zivvo.de" className="text-primary underline">dpo@zivvo.de</a>.
+              <a href={`mailto:${publicContactConfig.privacyEmail}`} className="text-primary underline">
+                {publicContactConfig.privacyEmail}
+              </a>.
             </p>
           </section>
         </div>

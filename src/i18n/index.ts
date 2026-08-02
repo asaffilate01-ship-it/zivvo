@@ -3,8 +3,18 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import de from "./locales/de.json";
 import en from "./locales/en.json";
+import { withLegalIdentity } from "@/lib/legalConfig";
+
+const legalIdentityPostProcessor = {
+  type: "postProcessor" as const,
+  name: "legalIdentity",
+  process(value: string) {
+    return withLegalIdentity(value);
+  },
+};
 
 i18n
+  .use(legalIdentityPostProcessor)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
@@ -20,6 +30,7 @@ i18n
       lookupLocalStorage: "zivvo_lang",
     },
     interpolation: { escapeValue: false },
+    postProcess: ["legalIdentity"],
   });
 
 // Ensure DE is default for first-time visitors

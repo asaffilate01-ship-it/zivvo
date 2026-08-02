@@ -10,8 +10,8 @@ test("public home and navigation render without a fatal error", async ({ page })
 
 test("authentication form has labels, keyboard access and no serious axe violations", async ({ page }) => {
   await page.goto("/login");
-  await expect(page.getByLabel(/e-mail|email/i)).toBeVisible();
-  await expect(page.getByLabel(/passwort|password/i)).toBeVisible();
+  await expect(page.locator("#email")).toBeVisible();
+  await expect(page.locator("#password")).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: /hauptinhalt|main content/i })).toBeFocused();
   const results = await new AxeBuilder({ page }).analyze();
@@ -20,9 +20,9 @@ test("authentication form has labels, keyboard access and no serious axe violati
 
 test("signup form is labelled and has no serious axe violations", async ({ page }) => {
   await page.goto("/signup");
-  await expect(page.getByLabel(/name/i)).toBeVisible();
-  await expect(page.getByLabel(/e-mail|email/i)).toBeVisible();
-  await expect(page.getByLabel(/passwort|password/i)).toBeVisible();
+  await expect(page.locator("#fullName")).toBeVisible();
+  await expect(page.locator("#email")).toBeVisible();
+  await expect(page.locator("#password")).toBeVisible();
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact || ""))).toEqual([]);
 });

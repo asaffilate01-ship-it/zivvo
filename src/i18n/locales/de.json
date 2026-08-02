@@ -61,6 +61,13 @@
       "dealers": "Händler",
       "satisfaction": "Zufriedenheit"
     },
+    "highlights": {
+      "nationwide": "Deutschlandweit",
+      "search": "Suche",
+      "evidence": "Nachweise",
+      "status": "Statusklar",
+      "languages": "Sprachen"
+    },
     "search": {
       "title": "Fahrzeugsuche",
       "subtitle": "Finde genau das, was du suchst",
@@ -99,8 +106,8 @@
   },
   "footer": {
     "tagline": "Fahrzeugangebote vergleichen, Verkäufer kontaktieren und verfügbare Prüf- und Zahlungsstatus transparent einsehen.",
-    "companyInfo": "Zivvo GmbH · Sitz in Deutschland · Handelsregister-Nr. HRB 000000\nGeschäftsanschrift: Musterstraße 1, 10115 Berlin\nUSt-IdNr.: DE 000 000 000",
-    "operational": "Alle Systeme betriebsbereit",
+    "companyInfo": "[Firmenname] · [Handelsregister HRB xxxxx]\n[Straße], [PLZ Ort]\nUSt-IdNr.: [USt-IdNr. DE...]",
+    "operational": "Systemstatus nach Launch-Monitoring",
     "sections": {
       "marketplace": "Marktplatz",
       "business": "Für Unternehmen",
@@ -1468,7 +1475,7 @@
     ],
     "s4Title": "4. So stellen Sie eine Anfrage",
     "s4Days": "innerhalb eines Monats",
-    "s4Body": "Zur Ausübung Ihrer Rechte senden Sie bitte eine E-Mail an privacy@zivvo.de mit einer Beschreibung Ihrer Anfrage und einem Identitätsnachweis. Wir antworten grundsätzlich innerhalb eines Monats gemäß Art. 12 Abs. 3 DSGVO.",
+    "s4Body": "Zur Ausübung Ihrer Rechte senden Sie bitte eine E-Mail mit einer Beschreibung Ihrer Anfrage und einem geeigneten Identitätsnachweis an unseren Datenschutzkontakt. Wir antworten grundsätzlich innerhalb eines Monats gemäß Art. 12 Abs. 3 DSGVO:",
     "s5Title": "5. Ausnahmen und Einschränkungen",
     "s5Intro": "In bestimmten Fällen können wir Ihre Anfrage einschränken oder ablehnen, etwa wenn:",
     "s5List": [
@@ -2372,7 +2379,7 @@
     "metaDescription": "Impressum und Anbieterkennzeichnung von Zivvo gemäß § 5 DDG.",
     "title": "Impressum",
     "lastUpdated": "Zuletzt aktualisiert:",
-    "disclaimer": "Diese Seite wird von [Firmenname] gepflegt. Die unten stehenden Angaben sind Platzhalter und müssen vom Betreiber vor Veröffentlichung durch die tatsächlichen Unternehmensdaten ersetzt werden.",
+    "disclaimer": "Diese Anbieterangaben werden aus der freigegebenen Produktionskonfiguration von [Firmenname] bereitgestellt.",
     "s1Title": "Angaben gemäß § 5 DDG",
     "companyName": "[Firmenname]",
     "legalForm": "[Rechtsform, z. B. GmbH]",
@@ -2399,10 +2406,10 @@
     "s6Body": "[Geschäftsführer], [Straße], [PLZ Ort]",
     "s7Title": "Aufsichtsbehörde",
     "s7Body": "Zuständige Aufsichtsbehörde für den Betrieb der Plattform (z. B. im Rahmen der Gewerbeaufsicht): [Zuständige Aufsichtsbehörde, Anschrift].",
-    "s8Title": "EU-Streitschlichtung",
-    "s8Body": "Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit, die Sie hier finden:",
-    "s8LinkText": "ec.europa.eu/consumers/odr",
-    "s8Body2": "Unsere E-Mail-Adresse finden Sie oben im Impressum.",
+    "s8Title": "Informationen zur Verbraucherstreitbeilegung",
+    "s8Body": "Die frühere EU-Plattform zur Online-Streitbeilegung wurde am 20. Juli 2025 eingestellt. Die Europäische Kommission veröffentlicht Informationen zu anerkannten Streitbeilegungsstellen unter:",
+    "s8LinkText": "consumer-redress.ec.europa.eu",
+    "s8Body2": "Unsere Kontaktadresse finden Sie oben im Impressum. Der nachfolgende VSBG-Hinweis bleibt maßgeblich.",
     "s9Title": "Verbraucherstreitbeilegung (VSBG)",
     "s9Body": "Wir sind nicht verpflichtet und nicht bereit, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle im Sinne des Verbraucherstreitbeilegungsgesetzes (VSBG) teilzunehmen. Weitere Informationen finden Sie in unserer Beschwerderichtlinie.",
     "s10Title": "Haftung für Inhalte",

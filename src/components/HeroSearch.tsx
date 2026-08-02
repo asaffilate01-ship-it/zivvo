@@ -153,9 +153,9 @@ const HeroSearch = () => {
 
             <div className="mt-8 flex gap-8">
               {[
-                { value: "25K+", label: t("hero.stats.listings") },
-                { value: "3.2K+", label: t("hero.stats.dealers") },
-                { value: "98%", label: t("hero.stats.satisfaction") },
+                { value: t("hero.highlights.nationwide"), label: t("hero.highlights.search") },
+                { value: t("hero.highlights.evidence"), label: t("hero.highlights.status") },
+                { value: "DE / EN", label: t("hero.highlights.languages") },
               ].map((stat, i) => (
                 <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.1 }}>
                   <p className="font-display text-2xl font-bold text-primary-foreground md:text-3xl">{stat.value}</p>

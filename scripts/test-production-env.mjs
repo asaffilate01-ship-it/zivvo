@@ -8,7 +8,7 @@ const validEnvironment = {
   VITE_STRIPE_PUBLISHABLE_KEY: "pk_live_ci_contract_123456789",
   VITE_GOOGLE_MAPS_BROWSER_KEY: "AIzaSyCIContractKey1234567890123456789",
   VITE_TURNSTILE_SITE_KEY: "0x4AAAAAAACIContractKey123456789",
-  VITE_LEGAL_COMPANY_NAME: "Zivvo GmbH",
+  VITE_LEGAL_COMPANY_NAME: "Zivvo",
   VITE_LEGAL_FORM: "GmbH",
   VITE_LEGAL_MANAGING_DIRECTOR: "Release Contract",
   VITE_LEGAL_STREET: "Releaseweg 1",
@@ -20,6 +20,11 @@ const validEnvironment = {
   VITE_LEGAL_REGISTER_NUMBER: "HRB 12345",
   VITE_LEGAL_VAT_ID: "DE123456789",
   VITE_LEGAL_CONTENT_RESPONSIBLE: "Release Contract",
+  VITE_LEGAL_SUPERVISORY_AUTHORITY: "Gewerbeamt Berlin, Releaseweg 2, 10115 Berlin",
+  VITE_SUPPORT_EMAIL: "support@zivvo.de",
+  VITE_PRIVACY_EMAIL: "privacy@zivvo.de",
+  VITE_COMPLAINTS_EMAIL: "complaints@zivvo.de",
+  VITE_ACCESSIBILITY_EMAIL: "accessibility@zivvo.de",
 };
 
 const runValidator = (overrides = {}) => spawnSync(
@@ -52,6 +57,7 @@ const rejectedCases = [
   { VITE_APP_URL: "https://preview.lovableproject.com" },
   { VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_not_allowed" },
   { VITE_LEGAL_COMPANY_NAME: "[Company Name]" },
+  { VITE_COMPLAINTS_EMAIL: "not-an-email" },
   { VITE_SUPABASE_PUBLISHABLE_KEY: "service_role_not_allowed" },
   { VITE_SUPABASE_URL: "https://different-project.supabase.co" },
   { RELEASE_ENVIRONMENT: "production", VITE_APP_URL: "https://staging.zivvo.de" },

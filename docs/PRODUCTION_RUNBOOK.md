@@ -4,7 +4,8 @@ This is the release checklist for `zivvo.de`. A checked-in build is not approval
 
 ## 1. Ownership and legal gates
 
-- Replace every `VITE_LEGAL_*` value with the actual operator identity and have German counsel approve all legal pages.
+- Replace every `VITE_LEGAL_*` value with the actual operator identity, configure monitored `VITE_SUPPORT_EMAIL`, `VITE_PRIVACY_EMAIL`, `VITE_COMPLAINTS_EMAIL` and `VITE_ACCESSIBILITY_EMAIL` channels, and have German counsel approve all legal pages.
+- Verify the named supervisory authority and consumer-redress body for the operator. Do not restore the retired EU ODR platform URL; it closed on 20 July 2025.
 - Confirm controller/processor roles, retention schedules, data-subject workflows, subprocessors, DPAs/AVVs, cookie consent, advertising consent, and international transfers.
 - Have counsel approve auction, reservation, deposits, escrow wording, buyer premiums, refunds, cancellation rights, dealer verification, and commission terms.
 - Perform a documented BFSG/WCAG accessibility review, including keyboard-only, screen-reader, zoom, contrast, form errors, dialogs, tables, charts, and payment flows.
@@ -89,11 +90,13 @@ npm run release:evidence
 npm run release:evidence:verify
 ```
 
+`build:production` validates the environment before compilation and then scans the compiled artifact for the approved legal/contact values, unsupported public claims, retired dispute links and sample operator data. A plain `npm run build` is never a releasable production artifact.
+
 Prefer the manual **Release readiness** GitHub workflow. It binds the build to the selected protected `staging` or `production` Environment, embeds `/release.json`, records every artifact file digest, and uploads `release-evidence.json` with the immutable `dist` artifact. `build:production` must pass using that Environment's real values. Publish the generated `dist/` directory with `public/_headers` and `public/_redirects`, or use `vercel.json`.
 
 Deploy to staging, complete acceptance, then promote the exact same artifact to production. Do not rebuild between approval and promotion. After each external deployment, run **Post-deploy verification** with the exact build SHA, frontend URL and Supabase health URL. It creates a GitHub Deployment record and will only mark it successful after verifying the embedded SHA, release environment, critical routes, security headers and database-backed health check.
 
-If native launch is enabled, set `NATIVE_LINKS_ENABLED=true` plus the real Apple Team ID, bundle ID, Android package and release-signing SHA-256 fingerprint in the selected GitHub Environment. The release workflow then generates the Apple Universal Link and Android App Link association files. Never use a debug certificate fingerprint in production.
+If native launch is enabled, set `NATIVE_LINKS_ENABLED=true` plus the real Apple Team ID, bundle ID, Android package and release-signing SHA-256 fingerprint in the selected GitHub Environment. The release workflow then generates the Apple Universal Link and Android App Link association files. Never use a debug certificate fingerprint in production. Reconcile App Store Connect and Google Play data-safety answers against `ios/App/App/PrivacyInfo.xcprivacy`, the privacy policy and observed SDK traffic before submission.
 
 ## 7. Acceptance matrix
 

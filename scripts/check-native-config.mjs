@@ -10,6 +10,8 @@ const files = {
   iosInfo: "ios/App/App/Info.plist",
   iosProject: "ios/App/App.xcodeproj/project.pbxproj",
   iosEntitlements: "ios/App/App/App.entitlements",
+  iosPrivacy: "ios/App/App/PrivacyInfo.xcprivacy",
+  androidInstrumentationTest: "android/app/src/androidTest/java/de/zivvo/app/ExampleInstrumentedTest.java",
 };
 const failures = [];
 
@@ -33,10 +35,22 @@ requireMatch("androidManifest", /android:allowBackup="false"/, "Android backup p
 requireMatch("androidManifest", /android:usesCleartextTraffic="false"/, "Android cleartext policy");
 requireMatch("androidManifest", /android:autoVerify="true"/, "Android App Link verification");
 requireMatch("androidManifest", /android:host="zivvo\.de"/, "Android Zivvo App Link domain");
+for (const capability of ["camera", "location.gps", "location.network"]) {
+  requireMatch(
+    "androidManifest",
+    new RegExp(`<uses-feature\\s+android:name="android\\.hardware\\.${capability.replaceAll(".", "\\.")}"\\s+android:required="false"\\s*/>`),
+    `Android optional ${capability} feature`,
+  );
+}
+requireMatch("androidInstrumentationTest", /package de\.zivvo\.app;/, "Android instrumentation package");
+requireMatch("androidInstrumentationTest", /assertEquals\("de\.zivvo\.app"/, "Android instrumentation application ID assertion");
 requireMatch("iosProject", new RegExp(`PRODUCT_BUNDLE_IDENTIFIER = ${APP_ID.replaceAll(".", "\\.")};`), "iOS bundle identifier");
 requireMatch("iosProject", new RegExp(`MARKETING_VERSION = ${marketingVersion?.replaceAll(".", "\\.")};`, "g"), "iOS marketing version");
 requireMatch("iosProject", /CODE_SIGN_ENTITLEMENTS = App\/App\.entitlements;/, "iOS entitlements binding");
 requireMatch("iosEntitlements", /applinks:zivvo\.de/, "iOS Universal Link domain");
+requireMatch("iosProject", /PrivacyInfo\.xcprivacy in Resources/, "iOS privacy manifest resource binding");
+requireMatch("iosPrivacy", /<key>NSPrivacyTracking<\/key>\s*<false\/>/, "iOS tracking declaration");
+requireMatch("iosPrivacy", /<key>NSPrivacyCollectedDataTypes<\/key>\s*<array>/, "iOS collected-data declaration");
 for (const key of ["NSCameraUsageDescription", "NSLocationWhenInUseUsageDescription", "NSPhotoLibraryUsageDescription"]) {
   if (!source.iosInfo.includes(`<key>${key}</key>`)) failures.push(`iOS ${key}`);
 }

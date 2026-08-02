@@ -132,13 +132,13 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <SEOHead
         title="Zivvo — Buy & Sell Cars with Confidence"
-        description="Browse thousands of verified vehicles from trusted dealers and private sellers. Finance checks, full history reports, and transparent pricing."
+        description="Compare active vehicle listings from dealers and private sellers in Germany, with available verification, document and payment status shown clearly."
         canonical={SITE_URL}
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebApplication",
           "name": "Zivvo",
-          "description": "Buy & sell cars with verified dealers and private sellers.",
+          "description": "Compare vehicle listings from dealers and private sellers with transparent status information.",
           "applicationCategory": "AutomotiveMarketplace",
           "operatingSystem": "Web",
         }}

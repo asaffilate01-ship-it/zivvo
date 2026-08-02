@@ -35,6 +35,11 @@ const required = [
   "VITE_LEGAL_REGISTER_NUMBER",
   "VITE_LEGAL_VAT_ID",
   "VITE_LEGAL_CONTENT_RESPONSIBLE",
+  "VITE_LEGAL_SUPERVISORY_AUTHORITY",
+  "VITE_SUPPORT_EMAIL",
+  "VITE_PRIVACY_EMAIL",
+  "VITE_COMPLAINTS_EMAIL",
+  "VITE_ACCESSIBILITY_EMAIL",
 ];
 
 const failures = new Set();
@@ -89,7 +94,9 @@ if (!/^0x4[A-Za-z0-9_-]{20,}$/.test(resolved.VITE_TURNSTILE_SITE_KEY || "")) {
   fail("VITE_TURNSTILE_SITE_KEY");
 }
 
-if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(resolved.VITE_LEGAL_EMAIL || "")) fail("VITE_LEGAL_EMAIL");
+for (const name of ["VITE_LEGAL_EMAIL", "VITE_SUPPORT_EMAIL", "VITE_PRIVACY_EMAIL", "VITE_COMPLAINTS_EMAIL", "VITE_ACCESSIBILITY_EMAIL"]) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(resolved[name] || "")) fail(name);
+}
 if ((resolved.VITE_LEGAL_PHONE || "").replace(/\D/g, "").length < 7) fail("VITE_LEGAL_PHONE");
 if (!/^DE\d{9}$/.test((resolved.VITE_LEGAL_VAT_ID || "").replace(/\s/g, ""))) fail("VITE_LEGAL_VAT_ID");
 

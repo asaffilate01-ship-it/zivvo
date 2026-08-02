@@ -51,16 +51,21 @@ jobs:
       VITE_LEGAL_REGISTER_NUMBER: ${{ vars.VITE_LEGAL_REGISTER_NUMBER }}
       VITE_LEGAL_VAT_ID: ${{ vars.VITE_LEGAL_VAT_ID }}
       VITE_LEGAL_CONTENT_RESPONSIBLE: ${{ vars.VITE_LEGAL_CONTENT_RESPONSIBLE }}
+      VITE_LEGAL_SUPERVISORY_AUTHORITY: ${{ vars.VITE_LEGAL_SUPERVISORY_AUTHORITY }}
+      VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL }}
+      VITE_PRIVACY_EMAIL: ${{ vars.VITE_PRIVACY_EMAIL }}
+      VITE_COMPLAINTS_EMAIL: ${{ vars.VITE_COMPLAINTS_EMAIL }}
+      VITE_ACCESSIBILITY_EMAIL: ${{ vars.VITE_ACCESSIBILITY_EMAIL }}
       NATIVE_LINKS_ENABLED: ${{ vars.NATIVE_LINKS_ENABLED }}
       IOS_TEAM_ID: ${{ vars.IOS_TEAM_ID }}
       IOS_BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
       ANDROID_PACKAGE_NAME: ${{ vars.ANDROID_PACKAGE_NAME }}
       ANDROID_SHA256_CERT_FINGERPRINT: ${{ secrets.ANDROID_SHA256_CERT_FINGERPRINT }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run check
@@ -71,7 +76,7 @@ jobs:
         run: npm run native:links
       - run: npm run release:evidence
       - run: npm run release:evidence:verify
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: zivvo-${{ inputs.target_environment }}-${{ github.sha }}
           path: |

@@ -4,6 +4,7 @@ import SEOHead from "@/components/SEOHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, Clock, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { publicContactConfig } from "@/lib/legalConfig";
 
 const ComplaintsPolicy = () => {
   const { t } = useTranslation("complaints");
@@ -31,7 +32,7 @@ const ComplaintsPolicy = () => {
         <div className="mt-8 grid gap-3 sm:grid-cols-3">
           <Card><CardContent className="p-4"><Clock className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("acknowledgedWithin")}</p><p className="font-display font-semibold">{t("acknowledgedValue")}</p></CardContent></Card>
           <Card><CardContent className="p-4"><FileText className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("resolutionTarget")}</p><p className="font-display font-semibold">{t("resolutionValue")}</p></CardContent></Card>
-          <Card><CardContent className="p-4"><Mail className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("emailUs")}</p><p className="font-display text-sm font-semibold">{t("emailUs2")}</p></CardContent></Card>
+          <Card><CardContent className="p-4"><Mail className="h-5 w-5 text-primary" /><p className="mt-2 text-xs text-muted-foreground">{t("emailUs")}</p><p className="font-display text-sm font-semibold">{publicContactConfig.complaintsEmail}</p></CardContent></Card>
         </div>
 
         <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
@@ -44,7 +45,7 @@ const ComplaintsPolicy = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s2Title")}</h2>
             <p className="mt-2">{t("s2Intro")}</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li><strong>{t("s2Email")}</strong> <a href={`mailto:${t("emailUs2")}`} className="text-primary underline">{t("emailUs2")}</a></li>
+              <li><strong>{t("s2Email")}</strong> <a href={`mailto:${publicContactConfig.complaintsEmail}`} className="text-primary underline">{publicContactConfig.complaintsEmail}</a></li>
               <li><strong>{t("s2Phone")}</strong> {t("s2PhoneValue")}</li>
               <li><strong>{t("s2Post")}</strong> {t("s2PostValue")}</li>
               <li><strong>{t("s2Online")}</strong> {t("s2OnlineValue")} <a href="/contact" className="text-primary underline">{t("s2ContactPage")}</a> {t("s2page")}</li>
@@ -66,8 +67,8 @@ const ComplaintsPolicy = () => {
             <h2 className="font-display text-lg font-semibold text-foreground">{t("s4Title")}</h2>
             <p className="mt-2">
               {t("s4Intro")}{" "}
-              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary underline">
-                ec.europa.eu/consumers/odr
+              <a href="https://consumer-redress.ec.europa.eu/dispute-resolution-bodies" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                consumer-redress.ec.europa.eu
               </a>
             </p>
 

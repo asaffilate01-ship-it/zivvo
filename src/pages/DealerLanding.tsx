@@ -1127,24 +1127,14 @@ const DealerLanding = () => {
         </div>
       </section>
 
-      {/* ─── Accreditations / Memberships ─── */}
-      <section className="border-b border-border py-10">
+      {/* Dealer-provided accreditations. Never manufacture trust badges. */}
+      {config.awards && config.awards.length > 0 && <section className="border-b border-border py-10">
         <div className="container mx-auto px-4">
           <p className="mb-5 text-center text-xs uppercase tracking-[0.18em] text-muted-foreground font-semibold">
             Trusted accreditations & partners
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12">
-            {(config.awards && config.awards.length > 0
-              ? config.awards
-              : [
-                  { name: "FCA Authorised" },
-                  { name: "RAC Approved" },
-                  { name: "AA Inspected" },
-                  { name: "HPI Checked" },
-                  { name: "Trustpilot 5★" },
-                  { name: "Auto Trader Partner" },
-                ]
-            ).map((a, i) => (
+            {config.awards.map((a, i) => (
               <motion.div
                 key={a.name}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -1165,7 +1155,7 @@ const DealerLanding = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section>}
 
       {/* ─── Inventory ─── */}
       <section id="inventory" className="py-12 md:py-16">
