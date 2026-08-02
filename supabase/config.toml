@@ -28,3 +28,21 @@ verify_jwt = false
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.expire-reservations]
+verify_jwt = false
+
+[functions.health-check]
+verify_jwt = false
+
+[functions.newsletter-subscribe]
+verify_jwt = false
+
+[functions.contact-submit]
+verify_jwt = false
+
+[functions.close-auction]
+verify_jwt = false
+
+[functions.sitemap]
+verify_jwt = false

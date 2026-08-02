@@ -10,6 +10,8 @@ import { Car, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { trackEvent } from "@/hooks/useAnalytics";
+import Turnstile, { captchaEnabled } from "@/components/security/Turnstile";
 
 const Signup = () => {
   const { t } = useTranslation();
@@ -19,6 +21,8 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaNonce, setCaptchaNonce] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -35,13 +39,17 @@ const Signup = () => {
       options: {
         data: { full_name: fullName },
         emailRedirectTo: window.location.origin,
+        captchaToken: captchaToken || undefined,
       },
     });
     setLoading(false);
+    setCaptchaToken(null);
+    setCaptchaNonce((value) => value + 1);
 
     if (error) {
       toast({ title: t("auth.signup.failed"), description: error.message, variant: "destructive" });
     } else {
+      void trackEvent("signup_submitted");
       toast({
         title: t("auth.signup.checkEmail"),
         description: t("auth.signup.checkEmailDesc"),
@@ -76,7 +84,7 @@ const Signup = () => {
               <div className="space-y-2">
                 <Label htmlFor="password">{t("auth.signup.password")}</Label>
                 <div className="relative">
-                  <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("auth.signup.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required />
+                  <Input id="password" type={showPassword ? "text" : "password"} placeholder={t("auth.signup.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} minLength={12} autoComplete="new-password" required />
                   <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -93,7 +101,9 @@ const Signup = () => {
                 </label>
               </div>
 
-              <Button type="submit" className="gradient-primary w-full border-0" disabled={loading || !agreed}>
+              <Turnstile key={captchaNonce} action="signup" onTokenChange={setCaptchaToken} />
+
+              <Button type="submit" className="gradient-primary w-full border-0" disabled={loading || !agreed || (captchaEnabled && !captchaToken)}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {loading ? t("auth.signup.submitting") : t("auth.signup.submit")}
                 {!loading && <ArrowRight className="ml-1 h-4 w-4" />}

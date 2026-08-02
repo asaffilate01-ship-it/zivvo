@@ -1,95 +1,72 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { adminClient, consumeAnonymousRateLimit, HttpError, json, optionalString, parseJson, preflight, requirePost, requireUuid, safeError } from "../_shared/security.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-function bad(message: string) {
-  return new Response(JSON.stringify({ error: message }), {
-    status: 400,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
+Deno.serve(async (req) => {
   try {
-    const body = await req.json().catch(() => ({}));
-    const name = String(body.name ?? "").trim();
-    const email = String(body.email ?? "").trim().toLowerCase();
-    const subject = String(body.subject ?? "").trim();
-    const message = String(body.message ?? "").trim();
-
-    if (name.length < 2 || name.length > 100) return bad("Invalid name");
-    if (!EMAIL.test(email) || email.length > 255) return bad("Invalid email");
-    if (subject.length < 2 || subject.length > 150) return bad("Invalid subject");
-    if (message.length < 10 || message.length > 5000) return bad("Invalid message");
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } },
-    );
-
-    // Basic rate limit: max 3 messages per email per hour
-    const hourAgo = new Date(Date.now() - 3600_000).toISOString();
-    const { count } = await supabase
-      .from("contact_messages")
-      .select("id", { count: "exact", head: true })
-      .eq("email", email)
-      .gte("created_at", hourAgo);
-
-    if ((count ?? 0) >= 3) {
-      return new Response(JSON.stringify({ error: "Too many messages, please try again later" }), {
-        status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const options = preflight(req); if (options) return options;
+    requirePost(req);
+    const admin = adminClient();
+    await consumeAnonymousRateLimit(req, admin, "contact-submit", 8, 3_600);
+    const body = await parseJson(req);
+    if (body.website) return json(req, { accepted: true });
+    const name = optionalString(body.name, 120);
+    const email = optionalString(body.email, 254)?.toLowerCase();
+    const subject = optionalString(body.subject, 160);
+    const message = optionalString(body.message, 4_000);
+    const phone = optionalString(body.phone, 40);
+    const dealerId = body.dealer_id ? requireUuid(body.dealer_id, "dealer_id") : null;
+    if (!name || !email || !EMAIL.test(email) || !subject || !message) throw new HttpError(400, "Kontaktdaten sind unvollständig");
+    let dealer: { id: string; user_id: string; business_name: string } | null = null;
+    if (dealerId) {
+      const result = await admin.from("dealers").select("id,user_id,business_name").eq("id", dealerId).eq("is_active", true).maybeSingle();
+      dealer = result.data;
+      if (!dealer) throw new HttpError(404, "Händler nicht gefunden");
     }
-
-    const { error } = await supabase
-      .from("contact_messages")
-      .insert({ name, email, subject, message, status: "new" });
-
-    if (error) throw error;
-
-    // Notify admins in-app (best effort)
-    try {
-      const { data: admins } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
-      if (admins?.length) {
-        await supabase.from("notifications").insert(
-          admins.map((a) => ({
-            user_id: a.user_id,
-            type: "contact",
-            title: "Neue Kontaktanfrage",
-            message: `${name}: ${subject}`,
-            link: "/admin",
-          })),
-        );
+    if (dealer) {
+      const listingId = body.listing_id ? requireUuid(body.listing_id, "listing_id") : null;
+      if (listingId) {
+        const { data: listing } = await admin.from("car_listings")
+          .select("id")
+          .eq("id", listingId)
+          .eq("dealer_id", dealer.id)
+          .eq("status", "active")
+          .maybeSingle();
+        if (!listing) throw new HttpError(404, "Fahrzeug nicht gefunden");
       }
-    } catch (_) {
-      // non-blocking
+      const { data: lead, error: leadError } = await admin.from("dealer_leads").insert({
+        dealer_id: dealer.id,
+        listing_id: listingId,
+        name,
+        email,
+        phone,
+        message,
+        source: listingId ? "listing" : "dealer_page",
+      }).select("id").single();
+      if (leadError) throw leadError;
+      const { error: eventError } = await admin.from("dealer_lead_events").insert({
+        lead_id: lead.id,
+        dealer_id: dealer.id,
+        event_type: "created",
+      });
+      if (eventError) console.error("Dealer lead event failed", eventError);
+    } else {
+      const { error } = await admin.from("contact_messages").insert({ name, email, subject, message, status: "new" });
+      if (error) throw error;
     }
-
-    return new Response(JSON.stringify({ ok: true }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (e) {
-    console.error("contact-submit error", e);
-    return new Response(JSON.stringify({ error: "Request failed" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    if (dealer) {
+      const contact = [email, phone].filter(Boolean).join(" · ");
+      const { error: notificationError } = await admin.from("notifications").insert({
+        user_id: dealer.user_id,
+        type: "enquiry",
+        title: `Neue Anfrage für ${dealer.business_name}`,
+        message: `${name}${contact ? ` (${contact})` : ""}: ${message}`.slice(0, 1_000),
+        link: "/dashboard?tab=leads",
+      });
+      if (notificationError) console.error("Dealer enquiry notification failed", notificationError);
+    }
+    return json(req, { accepted: true }, 201);
+  } catch (error) {
+    return safeError(req, error);
   }
 });

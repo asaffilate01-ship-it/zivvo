@@ -120,6 +120,16 @@ export async function requireUser(req: Request): Promise<{ user: User; admin: Su
 
 export async function requireAdmin(req: Request): Promise<{ user: User; admin: SupabaseClient }> {
   const context = await requireUser(req);
+  const token = (req.headers.get("authorization") || "").slice(7);
+  try {
+    const encoded = token.split(".")[1];
+    const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(encoded.length / 4) * 4, "=");
+    const payload = JSON.parse(atob(normalized)) as { aal?: string };
+    if (payload.aal !== "aal2") throw new HttpError(403, "Two-factor authentication required");
+  } catch (error) {
+    if (error instanceof HttpError) throw error;
+    throw new HttpError(401, "Authentication required");
+  }
   const { data } = await context.admin.from("user_roles").select("id").eq("user_id", context.user.id).eq("role", "admin").maybeSingle();
   if (!data) throw new HttpError(403, "Administrator access required");
   return context;

@@ -9,12 +9,15 @@ import { Car, ArrowLeft, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Turnstile, { captchaEnabled } from "@/components/security/Turnstile";
 
 const ForgotPassword = () => {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaNonce, setCaptchaNonce] = useState(0);
   const { toast } = useToast();
 
   const handleReset = async (e: React.FormEvent) => {
@@ -22,8 +25,11 @@ const ForgotPassword = () => {
     setLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
+      captchaToken: captchaToken || undefined,
     });
     setLoading(false);
+    setCaptchaToken(null);
+    setCaptchaNonce((value) => value + 1);
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -62,7 +68,8 @@ const ForgotPassword = () => {
                   required
                 />
               </div>
-              <Button type="submit" className="gradient-primary w-full border-0" disabled={loading}>
+              <Turnstile key={captchaNonce} action="password_reset" onTokenChange={setCaptchaToken} />
+              <Button type="submit" className="gradient-primary w-full border-0" disabled={loading || (captchaEnabled && !captchaToken)}>
                 {loading ? t("auth.forgot.submitting") : t("auth.forgot.submit")}
               </Button>
             </form>
