@@ -1,6 +1,6 @@
 import type Stripe from "https://esm.sh/stripe@22.0.2";
 import { createStripeClient, resolveStripeEnv, verifyWebhook } from "../_shared/stripe.ts";
-import { adminClient, env } from "../_shared/security.ts";
+import { adminClient } from "../_shared/security.ts";
 import { CURRENCY, subscriptionCatalog } from "../_shared/payments.ts";
 
 const stripe = createStripeClient(resolveStripeEnv());
